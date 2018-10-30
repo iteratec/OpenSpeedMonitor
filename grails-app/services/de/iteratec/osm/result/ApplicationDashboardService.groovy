@@ -5,11 +5,7 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
-import de.iteratec.osm.csi.JobGroupCsiAggregationService
-import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.PageCsiAggregationService
+import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
@@ -212,7 +208,7 @@ class ApplicationDashboardService {
             List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(jobGroup), fourWeeksAgo)
             if (jobResults) {
                 applicationCsiListDto.hasJobResults = true
-                applicationCsiListDto.hasInvalidJobResults = jobResults.every { WptStatus.isFailed(it.httpStatusCode) }
+                applicationCsiListDto.hasInvalidJobResults = jobResults.every { it.jobResultStatus.isFailed() }
             } else {
                 applicationCsiListDto.hasJobResults = false
             }

@@ -21,6 +21,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.async.Promise
 import groovy.util.slurpersupport.GPathResult
@@ -158,20 +159,15 @@ class WptInstructionService {
 
         GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, resultId)
         WptResultXml resultXml = convertGPathToWptResultXML(xmlResultResponse)
-        Integer statusCode = resultXml.statusCodeOfWholeTest
-        def state = [0: 'Failure!', 100: 'Test Pending', 101: 'Test Started', 200: 'Test Finished']
-        log.info("Result-Status of ${resultId}: ${statusCode} (${state[statusCode]})")
+        WptStatus wptStatus = resultXml.wptStatus
 
-        boolean resultXmlHasRuns = resultXml.hasRuns()
-        Integer runCount = resultXmlHasRuns ? resultXml.runCount : null
-
-        log.info("xmlResultResponse.data.runs.toString().isInteger()=${resultXmlHasRuns}|")
-        log.info("xmlResultResponse.data.runs.sizeRuns=${runCount}")
+        log.info("Result-Status of ${resultId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
+        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}|")
+        log.info("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
 
 
-        if (statusCode >= 200 && resultXmlHasRuns) {
+        if (resultXml.isFinishedWithResults()) {
             try {
-
                 lock.lockInterruptibly()
                 this.resultListeners.each { listener ->
                     log.info("calling listener ${listener.listenerName} for job id ${job.id}")

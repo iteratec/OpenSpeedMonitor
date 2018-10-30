@@ -2,7 +2,6 @@ package de.iteratec.osm.measurement.schedule
 
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
-import de.iteratec.osm.result.WptStatus
 import grails.gorm.transactions.Transactional
 import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 
@@ -21,13 +20,13 @@ class JobStatisticService {
 
         JobStatistic stat = getStatOf(job)
         stat.percentageSuccessfulTestsOfLast150 = results.size() == 150 ?
-                (results.count { it.wptStatus == WptStatus.COMPLETED } / 150) * 100 :
+                (results.count { it.jobResultStatus == JobResultStatus.SUCCESS } / 150) * 100 :
                 null
         stat.percentageSuccessfulTestsOfLast25 = results.size() >= 25 ?
-                (results.take(25).count { it.wptStatus == WptStatus.COMPLETED } / 25) * 100 :
+                (results.take(25).count { it.jobResultStatus == JobResultStatus.SUCCESS } / 25) * 100 :
                 null
         stat.percentageSuccessfulTestsOfLast5 = results.size() >= 5 ?
-                (results.take(5).count { it.wptStatus == WptStatus.COMPLETED } / 5) * 100 :
+                (results.take(5).count { it.jobResultStatus == JobResultStatus.SUCCESS } / 5) * 100 :
                 null
         try {
             stat.save(failOnError: true)

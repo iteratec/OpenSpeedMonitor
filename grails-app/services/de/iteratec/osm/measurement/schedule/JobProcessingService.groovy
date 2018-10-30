@@ -416,18 +416,18 @@ class JobProcessingService {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
                 resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId, job)
             }
-            WptStatus wptStatus = wptStatusFactory.buildWptStatus(resultXml?.statusCodeOfWholeTest)
+            WptStatus wptStatus = resultXml.wptStatus
             if (wptStatus == WptStatus.PENDING || wptStatus == WptStatus.IN_PROGRESS) {
                 JobResultStatus jobResultStatus = (wptStatus == WptStatus.PENDING) ? JobResultStatus.WAITING : JobResultStatus.RUNNING
                 performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
-                    persistUnfinishedJobResult(job.id, testId, jobResultStatus, wptStatusFactory.buildWptStatus(resultXml.statusCodeOfWholeTest), "polling jobrun")
+                    persistUnfinishedJobResult(job.id, testId, jobResultStatus, wptStatus, "polling jobrun")
                 }
             }
         } catch (Exception e) {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
             persistUnfinishedJobResult(job.id, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
         } finally {
-            if (resultXml && resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
+            if (resultXml && resultXml.isFinishedWithResults()) {
                 unscheduleTest(job, testId)
             }
         }
@@ -446,23 +446,21 @@ class JobProcessingService {
      * in the database. In addition, a request to cancelTest.php is made.
      */
     public void handleJobRunTimeout(Job job, String testId) {
-        // Is there a non-running result? Then done
         JobResult result = JobResult.findByJobAndTestId(job, testId)
-        if (!result)
+        if (!result || result.wptStatus.isFinished()) {
             return
-        if (result.wptStatus < WptStatus.COMPLETED) {
-            // poll a last time
-            WptResultXml lastResult = pollJobRun(job, testId)
-            if (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) < WptStatus.COMPLETED || (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) >= WptStatus.COMPLETED && !lastResult.hasRuns())) {
-                unscheduleTest(job, testId)
-                String description = "Test exceeded maximum polling time"
-                if (wptStatusFactory.buildWptStatus(lastResult.statusCodeOfWholeTest) >= WptStatus.COMPLETED) {
-                    description += ". Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
-                }
-                persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, result.wptStatus, description)
-                wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
-            }
         }
+        WptResultXml wptResult = pollJobRun(job, testId)
+        if (wptResult.isFinishedWithResults()) {
+            return
+        }
+        unscheduleTest(job, testId)
+        String description = "Test exceeded maximum polling time. Test had result code ${wptResult.wptStatus}."
+        if (!wptResult.hasRuns()) {
+            description += " XML result contains no runs."
+        }
+        persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, wptResult.wptStatus, description)
+        wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
     }
 
     /**
@@ -596,10 +594,8 @@ class JobProcessingService {
      */
     void closeRunningAndPengingJobResults() {
         DateTime currentDate = new DateTime()
-        List<JobResult> jobResults = JobResult.findAllByJobResultStatus(JobResultStatus.WAITING)
-        jobResults.add(JobResult.findAllByJobResultStatus(JobResultStatus.RUNNING))
+        List<JobResult> jobResults = JobResult.findAllByJobResultStatusInList([JobResultStatus.WAITING, JobResultStatus.RUNNING])
         jobResults = jobResults.findAll {
-            // Close the jobResult, if its job timeout is exceeded by twice the amount
             currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
         }
         if (jobResults) {

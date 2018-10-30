@@ -17,4 +17,16 @@ enum JobResultStatus {
     private JobResultStatus(Integer value) {
         this.jobResultStatusCode = value
     }
+
+    boolean isFailed() {
+        return jobResultStatusCode > SUCCESS.jobResultStatusCode
+    }
+
+    boolean isSuccess() {
+        return jobResultStatusCode == SUCCESS.jobResultStatusCode
+    }
+
+    boolean isTerminated() {
+        return isSuccess() || isFailed()
+    }
 }

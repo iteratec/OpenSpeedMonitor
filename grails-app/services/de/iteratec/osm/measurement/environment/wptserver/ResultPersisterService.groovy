@@ -61,7 +61,6 @@ class ResultPersisterService implements iResultListener {
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
     ConfigService configService
-    WptStatusFactory wptStatusFactory = new WptStatusFactory()
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -182,7 +181,7 @@ class ResultPersisterService implements iResultListener {
         }
         log.debug("persisting new JobResult ${testId}")
 
-        WptStatus wptStatus = wptStatusFactory.buildWptStatus(resultXml.getStatusCodeOfWholeTest())
+        WptStatus wptStatus = resultXml.getWptStatus()
         Date testCompletion = resultXml.getCompletionDate()
         job.lastRun = testCompletion
         job.merge(failOnError: true)
@@ -285,7 +284,7 @@ class ResultPersisterService implements iResultListener {
         int maxValidLoadTime = configService.getMaxValidLoadtime()
         int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
 
-        return (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex)) &&
+        return (!new WptStatusFactory().buildWptStatus(resultXml.getResultCodeForStep(testStepZeroBasedIndex)).isFailed() &&
                 (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
                 (loadTime >= minValidLoadTime) &&
                 (loadTime <= maxValidLoadTime))

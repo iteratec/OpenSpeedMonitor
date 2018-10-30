@@ -449,7 +449,7 @@ class JobController {
         jobs.each {
             jobId, jobResults ->
                 jobResults.each {
-                    if (it.status < JobResultStatus.SUCCESS)
+                    if (!it.status.isTerminated())
                         it.cancelLinkHtml = groovyPageRenderer.render(template: '/job/cancelLink', model: [jobId: jobId, testId: it.testId])
                 }
         }

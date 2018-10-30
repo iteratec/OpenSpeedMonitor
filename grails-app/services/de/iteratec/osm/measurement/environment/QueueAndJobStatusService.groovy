@@ -200,15 +200,15 @@ class QueueAndJobStatusService {
      * @return A map mapping the ID of each Job to a list of maps which contain
      * 	 testId, status, date, terminated, message and wptStatus.
      */
-    Map<Long, Object> getRunningAndRecentlyFinishedJobs(Date successfulSinceWhen, Date errorSinceWhen, Date runningSinceWhen) {
-        Map<Long, Object> jobResults = [:].withDefault { [] }
+    Map<Long, List> getRunningAndRecentlyFinishedJobs(Date successfulSinceWhen, Date errorSinceWhen, Date runningSinceWhen) {
+        Map<Long, List> jobResults = [:].withDefault { [] }
         Date oldestDate = [successfulSinceWhen, errorSinceWhen, runningSinceWhen].sort().first()
         JobResult.findAllByDateGreaterThanEquals(oldestDate, [sort: 'date']).each { JobResult result ->
             jobResults[result.job.id] << [
                     testId    : result.testId,
                     status    : result.jobResultStatus,
                     date      : result.date,
-                    terminated: result.jobResultStatus >= JobResultStatus.SUCCESS,
+                    terminated: result.jobResultStatus.isTerminated(),
                     message   : 'JobStatus: ' + result.jobResultStatus + ' wptStatus:' + result.wptStatus,
                     wptStatus : result.wptStatus,
                     testUrl   : (result.wptServerBaseurl.endsWith('/') ? result.wptServerBaseurl : "${result.wptServerBaseurl}/") + "result/${result.testId}"]
@@ -218,8 +218,12 @@ class QueueAndJobStatusService {
         // succeeded by successful/currently running results
         Map filteredJobResults = jobResults.each {
             it.value = it.value
-                    .findAll { result -> result['status'] < JobResultStatus.LAUNCH_ERROR || result == it.value.last() }
-                    .findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == JobResultStatus.WAITING || result['status'] == JobResultStatus.RUNNING)) || (result['date'] >= successfulSinceWhen && result['status'] == JobResultStatus.SUCCESS) || (result['date'] >= errorSinceWhen && result['status'] >= JobResultStatus.LAUNCH_ERROR) }
+                    .findAll { result -> !result['status'].isFailed() || result == it.value.last() }
+                    .findAll { result ->
+                (result['date'] >= runningSinceWhen && (!result['status'].isTerminated()) ||
+                        (result['date'] >= successfulSinceWhen && result['status'].isSuccess())) ||
+                        (result['date'] >= errorSinceWhen && result['status'].isFailed())
+            }
         }
         return filteredJobResults
     }
