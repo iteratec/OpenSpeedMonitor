@@ -270,6 +270,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             queryData.toComparative = comparativeTimeFrame[1].toISOString();
         }
         spinner.start();
+
+        updatePercentile("50", false);
         getDataForAggregationValue("median", queryData, isStateChange);
         getDataForAggregationValue("avg", queryData, isStateChange);
     };

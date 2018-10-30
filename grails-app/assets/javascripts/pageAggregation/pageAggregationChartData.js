@@ -100,8 +100,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getAggregationValueLabel = function () {
         if (aggregationValue === 'avg') {
             return 'Average'
-        } else {
-            return 'Percentile'
+        }
+        else if (aggregationValue === 'median' || aggregationValue === '50'){
+            return 'Percentile: 50%'
+        }
+        else {
+            return "Percentile: " + aggregationValue + "%"
         }
     };
 
@@ -235,7 +239,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         var seriesForSorting = getMeasurandDataForSorting().series.slice();
         var compareFunction = (ascOrdDesc === "asc") ? d3.ascending : d3.descending;
         seriesForSorting.sort(function (a, b) {
-            return compareFunction(a[aggregationValue], b[aggregationValue]);
+            return compareFunction(a[aggregationValue] ? a[aggregationValue] : -1, b[aggregationValue] ? b[aggregationValue] : -1);
         });
         var longestExistingSeries = Object.values(allMeasurandDataMap).reduce(function (curFilter, measurandData) {
             return (measurandData.series.length > curFilter.length) ? measurandData.series : curFilter;
@@ -348,7 +352,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
                 page: value.page,
                 jobGroup: value.jobGroup,
                 id: value.id,
-                value: value[aggregationValue] ? value[aggregationValue] : value.value,
+                value: value[aggregationValue] ? value[aggregationValue] : (value.value ? value.value : 0),
                 unit: value.unit,
                 measurand: value.measurand,
                 measurandGroup: value.measurandGroup,
