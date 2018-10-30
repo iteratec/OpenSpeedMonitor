@@ -63,6 +63,12 @@
         <asset:javascript src="application.js"/>
         <g:pageProperty name="page.include.p13nByCookies.script" />
 
+        <g:if test="${ pageProperty(name:'page.needsAngular') }">
+            <asset:javascript src="frontend/runtime.js"/>
+            <asset:javascript src="frontend/polyfills.js"/>
+            <asset:javascript src="frontend/main.js"/>
+        </g:if>
+
         <!-----------------------------------------------------body bottom block for javascripts of root pages-->
         <g:if test="${ pageProperty(name:'page.include.bottom') }">
             <g:pageProperty name="page.include.bottom" />

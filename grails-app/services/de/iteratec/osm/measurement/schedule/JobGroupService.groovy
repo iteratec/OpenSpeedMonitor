@@ -1,16 +1,18 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.ConfigService
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.ResultSelectionCommand
 import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
 import grails.gorm.transactions.Transactional
-import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
 
 @Transactional
 class JobGroupService {
     ResultSelectionService resultSelectionService
+    ConfigService configService
 
     Set<JobGroup> findAll() {
         Set<JobGroup> result = Collections.checkedSet(new HashSet<JobGroup>(), JobGroup.class);
@@ -42,22 +44,34 @@ class JobGroupService {
     List<JobGroup> getAllActiveJobGroups() {
         return Job.createCriteria().list {
             eq('active', true)
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             projections {
-                jobGroup {
-                    distinct('id')
-                    property('id', 'id')
-                    property('name', 'name')
-                }
+                distinct('jobGroup')
             }
         }
     }
 
-    def getAllActiveAndAllRecent() {
-        Set<JobGroup> allActiveAndRecent = getAllActiveJobGroups() as Set
+    def getAllActiveAndRecentWithResultInformation() {
+        return getAllActiveAndRecent().collect {
+            def name = it.name
+            JobResult lastDateOfResult = (JobResult) JobResult.createCriteria().list(max: 1) {
+                eq("jobGroupName", name)
+                order("date", "desc")
+            }[0]
+            def formattedLastDateOfResult = lastDateOfResult?.date?.format("yyyy-MM-dd")
+            return [
+                    id                : it.id,
+                    name              : it.name,
+                    dateOfLastResults : formattedLastDateOfResult,
+                    csiConfigurationId: it.csiConfigurationId,
+                    pageCount         : getPagesWithResultsOrActiveJobsForJobGroup(it.id)?.size()
+            ]
+        }
+    }
 
+    List<JobGroup> getAllActiveAndRecent() {
+        List<JobGroup> allActiveAndRecent = getAllActiveJobGroups()
         DateTime today = new DateTime()
-        DateTime fourWeeksAgo = new DateTime().minusWeeks(4)
+        DateTime fourWeeksAgo = configService.getStartDateForRecentMeasurements()
 
         ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
         List<JobGroup> recentJobGroups = (List<JobGroup>) resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
@@ -69,32 +83,56 @@ class JobGroupService {
             }
         })
         allActiveAndRecent.addAll(recentJobGroups)
+        return allActiveAndRecent.unique { a, b -> a.id <=> b.id }
+    }
 
-        List allActiveAndRecentFormattedJobGroups = new ArrayList()
-        allActiveAndRecent.each {
-            def name = it.name
-            JobResult lastDateOfResult = (JobResult) JobResult.createCriteria().list(max: 1) {
-                eq("jobGroupName", name)
-                order("date", "desc")
-            }[0]
+    def getPagesWithResultsOrActiveJobsForJobGroup(Long jobGroupId) {
+        DateTime today = new DateTime()
+        DateTime fourWeeksAgo = configService.getStartDateForRecentMeasurements()
+        def pagesWithResults = getPagesWithExistingEventResults(fourWeeksAgo, today, jobGroupId)
+        def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
 
-            def formattedLastDateOfResult
-            if (lastDateOfResult) {
-                formattedLastDateOfResult = lastDateOfResult.date?.format("yyyy-MM-dd")
+        List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
+        pages.unique()
+        return pages
+
+    }
+
+    private List<Page> getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
+
+        ResultSelectionCommand pagesForGivenJobGroup = new ResultSelectionCommand(
+                jobGroupIds: [jobGroupId],
+                from: from,
+                to: to
+        )
+
+        Page undefinedPage = Page.findByName(Page.UNDEFINED)
+
+        return resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionController.ResultSelectionType.Pages, { existing ->
+            and {
+                ne('page', undefinedPage)
+                if (existing) {
+                    not { 'in'('page', existing) }
+                }
             }
 
-            if (!allActiveAndRecentFormattedJobGroups.find { jobGroup -> jobGroup.id == it.id }) {
-                allActiveAndRecentFormattedJobGroups.add(
-                        [
-                                id                : it.id,
-                                name              : it.name,
-                                dateOfLastResults : formattedLastDateOfResult,
-                                csiConfigurationId: it.csiConfigurationId
-                        ]
-                )
+            projections {
+                distinct('page')
             }
-        }
+        }) as List<Page>
+    }
 
-        return allActiveAndRecentFormattedJobGroups
+    private List<Page> getPagesOfActiveJobs(Long jobGroupId) {
+        List<Script> scripts = Job.createCriteria().list {
+            eq('jobGroup.id', jobGroupId)
+            eq('active', true)
+            isNotNull('script')
+
+            projections {
+                property('script')
+            }
+        } as List<Script>
+
+        return scripts.collect { it.testedPages }.flatten() as List<Page>
     }
 }
