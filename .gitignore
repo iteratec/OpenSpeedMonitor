@@ -59,6 +59,7 @@ node_modules/
 
 grails-app/assets/javascripts/frontend/
 grails-app/assets/stylesheets/frontend/
+grails-app/assets/other/frontend
 grails-app/assets/javascripts/lib/
 grails-app/assets/stylesheets/lib/
 # the bootstrap.js was not created by the plugin
