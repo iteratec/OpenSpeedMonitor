@@ -52,36 +52,32 @@ class LocationPersisterService implements iLocationListener {
         List<String> locationIdentifiersForWptServer = []
         result.data.location.each { locationTagInXml ->
             List<Location> locations
-            // for wpt versions above 2.18 there is a Browsers-Attribute
             List<String> browserNames = locationTagInXml.Browsers.size() != 0 ? locationTagInXml.Browsers.toString().split(",") : [locationTagInXml.Browser.toString()]
-            List<Browser> browsersForLocation = browserService.findAllByNameOrAlias(browserNames)
-            browsersForLocation.each { currentBrowser ->
-                String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${currentBrowser.name}") ?: locationTagInXml.id.toString() + ":${currentBrowser.name}"
+            browserNames.each { browserName ->
+                Browser browserForLocation = browserService.findOrCreateByNameOrAlias(browserName)
+                String uniqueIdentfierForServer = locationTagInXml.id.toString().endsWith(":${browserName}") ?: locationTagInXml.id.toString() + ":${browserName}"
                 locationIdentifiersForWptServer << uniqueIdentfierForServer
-                List<Location> locationsForCurrentBrowserAndWptServer = Location.findAllByWptServerAndUniqueIdentifierForServerAndBrowser(wptserverForLocation, uniqueIdentfierForServer, currentBrowser)
+                List<Location> locationsForCurrentBrowserAndWptServer = Location.findAllByWptServerAndUniqueIdentifierForServerAndBrowser(wptserverForLocation, uniqueIdentfierForServer, browserForLocation)
                 if (!locationsForCurrentBrowserAndWptServer) {
                     Location newLocation = new Location(
                             active: true,
-                            uniqueIdentifierForServer: uniqueIdentfierForServer, // z.B. Agent1-wptdriver:Firefox
-                            location: locationTagInXml.location.toString(),//z.B. Agent1-wptdriver
-                            label: locationTagInXml.Label.toString(),//z.B. Agent 1: Windows 7 (S008178178)
-                            browser: currentBrowser,//z.B. Firefox
+                            uniqueIdentifierForServer: uniqueIdentfierForServer,
+                            location: locationTagInXml.location.toString(),
+                            label: locationTagInXml.Label.toString(),
+                            browser: browserForLocation,
                             wptServer: wptserverForLocation,
                             dateCreated: new Date(),
                             lastUpdated: new Date()
-                    ).save(failOnError: true);
+                    ).save(failOnError: true)
                     addedLocations << newLocation
                     log.info("new location written while fetching locations: ${newLocation}")
                 } else if (locationsForCurrentBrowserAndWptServer.size() > 1) {
-                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${currentBrowser}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
+                    log.error("Multiple Locations (${locations.size()}) found for WPT-Server: ${wptserverForLocation}, Browser: ${browserForLocation}, Location: ${locationTagInXml.id.toString()} - Skipping work!")
                 }
             }
         }
-
         deactivateNotMatchingLocations(wptserverForLocation, locationIdentifiersForWptServer)
-
         log.info("Location.count after creating non-existent= ${Location.count()}")
-
         return addedLocations
     }
 
