@@ -94,7 +94,9 @@ describe('ApplicationJobStatusComponent', () => {
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
+    errorIconEl = fixture.nativeElement.querySelector(allJobStatusIconCssCLasses);
     expect(errorMessageEl.textContent).toEqual(noFailingJobs);
+    expect(errorIconEl.className).toEqual(checkCircleIcon);
     expect(errorMessageEl.className).toEqual('job-status-good');
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -104,7 +106,9 @@ describe('ApplicationJobStatusComponent', () => {
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
+    errorIconEl = fixture.nativeElement.querySelector(allJobStatusIconCssCLasses);
     expect(errorMessageEl.textContent).toEqual(oneFailingJob);
+    expect(errorIconEl.className).toEqual(exclamationCircleIcon);
     expect(errorMessageEl.className).toEqual('job-status-warning');
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -114,7 +118,9 @@ describe('ApplicationJobStatusComponent', () => {
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
+    errorIconEl = fixture.nativeElement.querySelector(allJobStatusIconCssCLasses);
     expect(errorMessageEl.textContent).toEqual(multipleFailingJobs);
+    expect(errorIconEl.className).toEqual(exclamationCircleIcon);
     expect(errorMessageEl.className).toEqual('job-status-warning');
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -124,7 +130,9 @@ describe('ApplicationJobStatusComponent', () => {
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
+    errorIconEl = fixture.nativeElement.querySelector(allJobStatusIconCssCLasses);
     expect(errorMessageEl.textContent).toEqual(oneFailingJob);
+    expect(errorIconEl.className).toEqual(exclamationCircleIcon);
     expect(errorMessageEl.className).toEqual('job-status-error');
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -134,12 +142,14 @@ describe('ApplicationJobStatusComponent', () => {
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
+    errorIconEl = fixture.nativeElement.querySelector(allJobStatusIconCssCLasses);
     expect(errorMessageEl.textContent).toEqual(multipleFailingJobs);
+    expect(errorIconEl.className).toEqual(exclamationCircleIcon);
     expect(errorMessageEl.className).toEqual('job-status-error');
   });
 
   it('should only show one job status message', () => {
-    let errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li:not(.integrations)');
+    let errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
     expect(errorMessagesEl.length).toEqual(1);
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -148,7 +158,7 @@ describe('ApplicationJobStatusComponent', () => {
     });
     fixture.detectChanges();
 
-    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li:not(.integrations)');
+    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
     expect(errorMessagesEl.length).toEqual(1);
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -157,7 +167,7 @@ describe('ApplicationJobStatusComponent', () => {
     });
     fixture.detectChanges();
 
-    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li:not(.integrations)');
+    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
     expect(errorMessagesEl.length).toEqual(1);
   });
 
