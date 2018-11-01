@@ -125,6 +125,29 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
         bars.exit()
             .remove();
 
+        bars = chartContainer.selectAll("g.d3chart-bar-container")
+            .data(data, function (d) {
+                return d.name + d.value;
+            });
+
+        bars.selectAll(".d3chart-bar")
+            .attr("height", function (d) {
+                return height - yScale(d.value);
+            })
+            .attr("width", barWidth)
+            .attr("transform", function (d) {
+                return "translate(" + 0 + "," + (yScale(d.value)) + ")"
+            });
+
+        bars.selectAll(".d3chart-barLabel")
+            .attr("height", function (d) {
+                return height - yScale(d.value);
+            })
+            .attr("width", barWidth)
+            .attr("transform", function (d) {
+                return "translate(" + 0 + "," + yScale(d.value) + ")";
+            });
+
         // sort bars descending by default
         if (!sortOrder) {
             sortOrder = "desc";
