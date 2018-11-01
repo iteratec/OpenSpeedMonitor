@@ -1,12 +1,5 @@
 <div id="chart-container">
-    <div class="in-chart-buttons">
-        <a href="#downloadAsPngModal" id="download-as-png-button"
-           data-toggle="modal" role="button" onclick="initPngDownloadModal()"
-           title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
-            <i class="fas fa-download"></i>
-        </a>
-    </div>
-    <div id="filter-dropdown-group" class="pull-right">
+    <div id="filter-dropdown-group">
         <div class="btn-group pull-left perc-element" data-toggle="buttons" id="stackBarSwitch">
             <label class="btn btn-sm btn-default" id="besideButton"><input type="radio" name="stackBars" value="0" >Beside</label>
             <label class="btn btn-sm btn-default active" id="inFrontButton"><input type="radio" name="stackBars" value="1" checked>In Front</label>
@@ -21,7 +14,6 @@
                 ${g.message(code: 'de.iteratec.isocsi.pageAggregation.percentile.label', 'default': 'Percentile')}
             </label>
         </div>
-
         <input class="btn btn-sm btn-default perc-element"
                id="percentageField"
                type="number"
@@ -33,7 +25,6 @@
                type="range"
                min="0" max="100"
                step="5"/>
-
         <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle perc-element" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
             <g:message code="de.iteratec.osm.barchart.filter.label" default="filter"/> <span
@@ -63,7 +54,13 @@
             </li>
         </ul>
     </div>
-
+    <div class="in-chart-buttons">
+        <a href="#downloadAsPngModal" id="download-as-png-button"
+           data-toggle="modal" role="button" onclick="initPngDownloadModal()"
+           title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
+            <i class="fas fa-download"></i>
+        </a>
+    </div>
     <div id="svg-container">
         <svg id="page-aggregation-svg" class="d3chart" width="100%"></svg>
     </div>

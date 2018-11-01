@@ -1,11 +1,4 @@
 <div id="chart-container">
-    <div class="in-chart-buttons">
-        <a href="#downloadAsPngModal" id="download-as-png-button" data-toggle="modal" role="button"
-           onclick="initPngDownloadModal()"
-           title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
-            <i class="fas fa-download"></i>
-        </a>
-    </div>
     <div id="filter-dropdown-group" class="btn-group pull-right">
         <div class="btn-group pull-left" data-toggle="buttons" id="aggregationValueSwitch">
             <label class="btn btn-sm btn-default active" id="averageButton"><input type="radio" name="aggregationValue"
@@ -52,7 +45,13 @@
             </li>
         </ul>
     </div>
-
+    <div class="in-chart-buttons">
+        <a href="#downloadAsPngModal" id="download-as-png-button" data-toggle="modal" role="button"
+           onclick="initPngDownloadModal()"
+           title="${message(code: 'de.iteratec.ism.ui.button.save.name', default:'Download as PNG')}">
+            <i class="fas fa-download"></i>
+        </a>
+    </div>
     <div id="svg-container">
         <svg id="job-group-aggregation-svg" class="d3chart" width="100%"></svg>
     </div>

@@ -16,6 +16,10 @@
     visibility: visible;
 }
 
+#chart-container {
+    position: relative;
+}
+
 #aggregationValueSwitch {
     margin-right: 5px;
 }
@@ -23,6 +27,11 @@
 #filter-dropdown-group {
     display: flex;
     align-items: center;
+    position: absolute;
+    z-index: 2;
+    top: 4px;
+    right: 50px;
+    padding: 6px 12px;
 }
 #percentile-label {
     padding-top: 4px;
@@ -31,12 +40,6 @@
 #percentageField {
     max-width: 5em;
     padding-left: 0;
-}
-.in-chart-buttons {
-    position: relative;
-    top: 0;
-    right: 0;
-    float: right;
 }
 .perc-element {
     margin-right: .5em;
