@@ -428,16 +428,6 @@ class JobController {
     }
 
     def getRunningAndRecentlyFinishedJobs() {
-        // the following does not work due to unresolved bug in Grails:
-        // http://jira.grails.org/browse/GPCONVERTERS-10
-
-//		render(contentType: "application/json") {
-//			use (TimeCategory) {
-//				jobProcessingService.getRunningAndRecentlyFinishedJobs(new Date() - 5.days)
-//			}
-//		}
-
-        // thus this workaround:
         response.setContentType('application/json')
         Map jobs
         use(TimeCategory) {

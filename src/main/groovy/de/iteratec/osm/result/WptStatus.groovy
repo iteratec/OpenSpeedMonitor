@@ -46,4 +46,10 @@ enum WptStatus {
     boolean isFinished() {
         return wptStatusCode >= COMPLETED.wptStatusCode || wptStatusCode == SUCCESSFUL.wptStatusCode
     }
+
+    String getMessage() {
+        String codeRange = "${statusCode}"
+        codeRange += (statusCode == statusCodeRangeEnd) ? "" : " - ${statusCodeRangeEnd}"
+        return super.toString() + " (${codeRange})"
+    }
 }

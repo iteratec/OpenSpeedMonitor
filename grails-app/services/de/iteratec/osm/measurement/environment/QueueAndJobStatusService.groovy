@@ -209,7 +209,7 @@ class QueueAndJobStatusService {
                     status    : result.jobResultStatus,
                     date      : result.date,
                     terminated: result.jobResultStatus.isTerminated(),
-                    message   : 'JobStatus: ' + result.jobResultStatus + ' wptStatus:' + result.wptStatus,
+                    message   : result.jobResultStatus.getMessage(),
                     wptStatus : result.wptStatus,
                     testUrl   : (result.wptServerBaseurl.endsWith('/') ? result.wptServerBaseurl : "${result.wptServerBaseurl}/") + "result/${result.testId}"]
         }
