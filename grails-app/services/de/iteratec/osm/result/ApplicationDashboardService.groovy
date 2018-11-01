@@ -7,7 +7,10 @@ import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobGroupService
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
@@ -18,57 +21,10 @@ import org.joda.time.DateTime
 class ApplicationDashboardService {
     ConfigService configService
     OsmConfigCacheService osmConfigCacheService
-    ResultSelectionService resultSelectionService
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
-
-
-    def getPagesWithResultsOrActiveJobsForJobGroup(DateTime from, DateTime to, Long jobGroupId) {
-        def pagesWithResults = getPagesWithExistingEventResults(from, to, jobGroupId)
-        def pagesOfActiveJobs = getPagesOfActiveJobs(jobGroupId)
-
-        List<Page> pages = (pagesWithResults + pagesOfActiveJobs).collect()
-        pages.unique()
-        return pages
-
-    }
-
-    def getPagesWithExistingEventResults(DateTime from, DateTime to, Long jobGroupId) {
-
-        ResultSelectionCommand pagesForGivenJobGroup = new ResultSelectionCommand(
-                jobGroupIds: [jobGroupId],
-                from: from,
-                to: to
-        )
-
-        def pages = resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionController.ResultSelectionType.Pages, { existing ->
-            if (existing) {
-                not { 'in'('page', existing) }
-            }
-            projections {
-                distinct('page')
-            }
-        })
-
-        return pages
-    }
-
-    def getPagesOfActiveJobs(Long jobGroupId) {
-        def scriptsForJobGroup = Job.createCriteria().list {
-            eq('jobGroup.id', jobGroupId)
-            eq('active', true)
-            isNotNull('script')
-            projections {
-                property('script')
-            }
-        }
-
-        def pages = scriptsForJobGroup.collect {
-            it.testedPages
-        }.flatten()
-
-        return pages
-    }
+    JobDaoService jobDaoService
+    JobGroupService jobGroupService
 
     List<EventResultProjection> getRecentMetricsForJobGroup(Long jobGroupId) {
         SelectedMeasurand bytesFullyLoaded = new SelectedMeasurand(Measurand.FULLY_LOADED_INCOMING_BYTES.toString(), CachedView.UNCACHED)
@@ -87,23 +43,15 @@ class ApplicationDashboardService {
                 .getAverageData()
     }
 
-    List<Page> getRecentPagesForJobGroup(Long jobGroupId) {
-        DateTime from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours())
-        DateTime to = new DateTime()
-
-        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroupId)
-        return pages
-    }
-
     private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
 
         List<PageCsiDto> pageCsiDtos = []
         List<JobGroup> csiGroup = [jobGroup]
-        DateTime to = new DateTime().withTimeAtStartOfDay()
-        DateTime from = to.minusWeeks(4)
+        DateTime to = new DateTime()
+        DateTime from = configService.getStartDateForRecentMeasurements()
         CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-        List<Page> pages = getPagesWithResultsOrActiveJobsForJobGroup(from, to, jobGroup.id)
+        List<Page> pages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroup.id)
 
         pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval,
                 csiGroup, pages).each {
@@ -134,7 +82,7 @@ class ApplicationDashboardService {
             return it.projectedProperties
         }
 
-        getPagesOfActiveJobs(jobGroupId)
+        jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
                 .findAll { Page page -> page.name != Page.UNDEFINED }
                 .each { Page page ->
             Map entry = recentMetrics.find {
@@ -176,45 +124,72 @@ class ApplicationDashboardService {
     }
 
     ApplicationCsiDto getCsiValuesAndErrorsForJobGroup(JobGroup jobGroup) {
-        ApplicationCsiDto applicationCsiListDto = new ApplicationCsiDto()
+        Date fourWeeksAgo = configService.getStartDateForRecentMeasurements().toDate()
+        Map<Long, ApplicationCsiDto> csiValuesForJobGroups = getCsiValuesForJobGroupsSince([jobGroup], fourWeeksAgo)
+        return csiValuesForJobGroups.get(jobGroup.id)
+    }
 
-        if (!jobGroup.hasCsiConfiguration()) {
-            applicationCsiListDto.hasCsiConfiguration = false
-            applicationCsiListDto.csiDtoList = []
-            return applicationCsiListDto
-        }
+    Map<Long, ApplicationCsiDto> getTodaysCsiValueForJobGroups(List<JobGroup> jobGroups) {
+        Date today = new DateTime().withTimeAtStartOfDay().toDate()
+        return getCsiValuesForJobGroupsSince(jobGroups, today)
+    }
 
-        applicationCsiListDto.hasCsiConfiguration = true
+    private Map<Long, ApplicationCsiDto> getCsiValuesForJobGroupsSince(List<JobGroup> jobGroups, Date startDate) {
+
         DateTime todayDateTime = new DateTime().withTimeAtStartOfDay()
         Date today = todayDateTime.toDate()
-        Date fourWeeksAgo = todayDateTime.minusWeeks(4).toDate()
 
-        List<JobGroup> csiGroups = [jobGroup]
         CsiAggregationInterval dailyInterval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
-        List<CsiDto> csiDtoList = []
+        Map<Boolean, JobGroup[]> jobGroupsByExistingCsiConfiguration = jobGroups.groupBy { jobGroup ->
+            new Boolean(jobGroup.hasCsiConfiguration())
+        } as Map<Boolean, JobGroup[]>
 
-        jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(fourWeeksAgo, today, dailyInterval, csiGroups).each {
-            CsiDto applicationCsiDto = new CsiDto()
-            if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
-                applicationCsiDto.date = it.started.format("yyyy-MM-dd")
-                applicationCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                applicationCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
-                csiDtoList << applicationCsiDto
-            }
+        Map<Long, ApplicationCsiDto> dtosById = [:]
+        if (jobGroupsByExistingCsiConfiguration[false]) {
+            dtosById.putAll(jobGroupsByExistingCsiConfiguration[false].collectEntries { jobGroup ->
+                [(jobGroup.id): ApplicationCsiDto.createWithoutConfiguration()]
+            })
         }
 
-        if (!csiDtoList) {
-            List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(Job.findAllByJobGroup(jobGroup), fourWeeksAgo)
+        List<JobGroup> csiGroups = jobGroupsByExistingCsiConfiguration[true]
+        if (csiGroups) {
+            Map<Long, ApplicationCsiDto> dtosByIdWithValues = jobGroupCsiAggregationService
+                    .getOrCalculateShopCsiAggregations(startDate, today, dailyInterval, csiGroups)
+                    .groupBy { csiAggregation -> csiAggregation.jobGroup.id }
+                    .collectEntries { jobGroupId, csiAggregations ->
+                [(jobGroupId): csiAggregationsToDto(jobGroupId, csiAggregations, startDate)]
+            } as Map<Long, ApplicationCsiDto>
+            dtosById.putAll(dtosByIdWithValues)
+        }
+        return dtosById
+    }
+
+    private ApplicationCsiDto csiAggregationsToDto(Long jobGroupId, List<CsiAggregation> csiAggregations, Date startDate) {
+        ApplicationCsiDto dto = new ApplicationCsiDto()
+        dto.hasCsiConfiguration = true
+        dto.hasJobResults = true
+        ArrayList<CsiDto> csiDtos = new ArrayList<CsiDto>()
+        csiAggregations.each {
+            if (it.csByWptDocCompleteInPercent) {
+                CsiDto csiDto = new CsiDto()
+                csiDto.date = it.started.format("yyyy-MM-dd")
+                csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
+                csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
+                csiDtos << csiDto
+            }
+        }
+        dto.csiValues = csiDtos
+        if (!dto.csiValues.length) {
+            List<Job> jobs = jobDaoService.getJobs(JobGroup.findById(jobGroupId))
+            List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(jobs, startDate)
             if (jobResults) {
-                applicationCsiListDto.hasJobResults = true
-                applicationCsiListDto.hasInvalidJobResults = jobResults.every { it.jobResultStatus.isFailed() }
+                dto.hasJobResults = true
+                dto.hasInvalidJobResults = jobResults.every { it.jobResultStatus.isFailed()}
             } else {
-                applicationCsiListDto.hasJobResults = false
+                dto.hasJobResults = false
             }
         }
-
-        applicationCsiListDto.csiDtoList = csiDtoList
-        return applicationCsiListDto
+        return dto
     }
 }

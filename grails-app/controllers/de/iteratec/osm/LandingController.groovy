@@ -6,22 +6,28 @@ class LandingController {
     OsmStateService osmStateService
 
     def index() {
-        if (configService.infrastructureSetupRan != OsmConfiguration.InfrastructureSetupStatus.FINISHED) {
-            if (osmStateService.untouched()) {
-                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.NOT_STARTED) {
-                    forward(controller: 'InfrastructureSetup', action: 'index')
-                }
-                if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.ABORTED) {
-                    return [isSetupFinished:false]
-                }
-            }
-            else {
-                OsmConfiguration config = configService.getConfig()
-                config.infrastructureSetupRan = OsmConfiguration.InfrastructureSetupStatus.FINISHED
-                config.save(failOnError: true)
-                forward(action: 'index')
-            }
+        if (isSetupFinished()) {
+            render(view: "/angularFrontend")
+        } else if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.ABORTED) {
+            redirect(action: "continueSetup")
+        } else {
+            redirect(controller: 'InfrastructureSetup', action: 'index')
         }
-        return [isSetupFinished:true]
+    }
+
+    def continueSetup() {
+        // used for angular routing
+        render(view: "/angularFrontend")
+    }
+
+    private boolean isSetupFinished() {
+        if (configService.infrastructureSetupRan == OsmConfiguration.InfrastructureSetupStatus.FINISHED) {
+            return true
+        }
+        if (!osmStateService.untouched()) {
+            configService.setInfrastructureSetupRan(OsmConfiguration.InfrastructureSetupStatus.FINISHED)
+            return true
+        }
+        return false
     }
 }

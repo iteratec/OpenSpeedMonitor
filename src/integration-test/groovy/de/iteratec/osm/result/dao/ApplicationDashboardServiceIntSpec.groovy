@@ -8,13 +8,15 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.chart.AggregationType
+import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.ApplicationDashboardService
-import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
+import org.joda.time.DateTime
 
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
@@ -42,146 +44,6 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
     def cleanup() {
     }
 
-    void "get pages by event results and active jobs"() {
-        given: "one matching EventResults, one 'undefined' matching EventResult and one other Result"
-        EventResult.build(
-                page: page1,
-                jobGroup: jobGroup2,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        EventResult.build(
-                page: page3,
-                jobGroup: jobGroup1,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        EventResult.build(
-                page: pageUndefined,
-                jobGroup: jobGroup1,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup1.id)
-        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup1.id)
-        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup1.id)
-
-        then: "there is one page found by the event result and two pages by an active job"
-        recentMeasuredPages.size() == 1
-        activePages.size() == 2
-        allActiveOrMeasuredPages.size() == 3
-    }
-
-    void "get pages only by an active job without results"() {
-        given: "one 'undefined' matching and one other EventResult"
-        EventResult.build(
-                page: page3,
-                jobGroup: jobGroup2,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-        EventResult.build(
-                page: pageUndefined,
-                jobGroup: jobGroup1,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup1.id)
-        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup1.id)
-        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup1.id)
-
-        then: "there is no page found by an event result and two by the active job"
-        recentMeasuredPages.size() == 0
-        activePages.size() == 2
-        allActiveOrMeasuredPages.size() == 2
-    }
-
-    void "get pages only by event results"() {
-        given: "one matching EventResults, one 'undefined' matching EventResult and one other Result"
-        EventResult.build(
-                page: page3,
-                jobGroup: jobGroup1,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        EventResult.build(
-                page: page3,
-                jobGroup: jobGroup2,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        EventResult.build(
-                page: pageUndefined,
-                jobGroup: jobGroup2,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        when: "the application service determines the recent measured or/and active pages without undefined"
-        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup2.id)
-        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup2.id)
-        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup2.id)
-
-        then: "there is one page found by an event result and no page by an active job"
-        recentMeasuredPages.size() == 1
-        activePages.size() == 0
-        allActiveOrMeasuredPages.size() == 1
-    }
-
-    void "get no page by EventResults or active jobs"() {
-        given: "one 'undefined' matching EventResult and one other Result"
-        EventResult.build(
-                page: page3,
-                jobGroup: jobGroup1,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        EventResult.build(
-                page: pageUndefined,
-                jobGroup: jobGroup2,
-                fullyLoadedTimeInMillisecs: 100,
-                medianValue: true,
-                dateCreated: new Date(),
-                flush: true
-        )
-
-        when: "the application service determines the recent measured or/and active pages (without undefined page)"
-        def recentMeasuredPages = applicationDashboardService.getRecentMetricsForJobGroup(jobGroup2.id)
-        def activePages = applicationDashboardService.getPagesOfActiveJobs(jobGroup2.id)
-        def allActiveOrMeasuredPages = applicationDashboardService.getAllActivePagesAndMetrics(jobGroup2.id)
-
-        then: "there is no page found by an event result and no page by an active job"
-        recentMeasuredPages.size() == 0
-        activePages.size() == 0
-        allActiveOrMeasuredPages.size() == 0
-    }
 
     void "create a new inital csi for a job group if none exists"() {
         given: "one JobGroup without and one JobGroup with CSI Configuration"
@@ -197,6 +59,44 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         jobGroup1.csiConfiguration.id == csiConfigurationId1
         JobGroup jobGroupWithCreatedCsiConfiguration = JobGroup.findById(jobGroup2.id)
         jobGroupWithCreatedCsiConfiguration.csiConfiguration.id == csiConfigurationId2
+    }
+
+    void "return CSI from today for two job groups"() {
+        given: "two CSI Aggregations from today"
+        existingCsiConfiguration = CsiConfiguration.build()
+        def interval = CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
+        jobGroup1.csiConfiguration = existingCsiConfiguration
+        jobGroup2.csiConfiguration = existingCsiConfiguration
+        def today = new DateTime().withTimeAtStartOfDay().toDate()
+        def yesterday = new DateTime().withTimeAtStartOfDay().minusDays(1).toDate()
+        CsiAggregation.build(jobGroup: jobGroup1, started: yesterday, interval: interval, aggregationType: AggregationType.JOB_GROUP,
+                closedAndCalculated: true, csByWptDocCompleteInPercent: 20.0d, csByWptVisuallyCompleteInPercent: 20.0d)
+        CsiAggregation.build(jobGroup: jobGroup1, started: today, interval: interval, aggregationType: AggregationType.JOB_GROUP,
+                closedAndCalculated: true, csByWptDocCompleteInPercent: 50.0d, csByWptVisuallyCompleteInPercent: 60.0d)
+        CsiAggregation.build(jobGroup: jobGroup2, started: today, interval: interval, aggregationType: AggregationType.JOB_GROUP,
+                closedAndCalculated: true, csByWptDocCompleteInPercent: 70.0d, csByWptVisuallyCompleteInPercent: 80.0d)
+
+
+        when: "the application service tests for errors"
+        Map<Long, ApplicationCsiDto> applicationCsiDtos = applicationDashboardService.getTodaysCsiValueForJobGroups([jobGroup1, jobGroup2])
+
+        then: "an error is returned, all JobResults are invalid"
+        applicationCsiDtos[jobGroup1.id].hasCsiConfiguration == true
+        applicationCsiDtos[jobGroup1.id].hasJobResults == true
+        applicationCsiDtos[jobGroup1.id].hasInvalidJobResults == false
+        applicationCsiDtos[jobGroup1.id].csiValues.length == 1
+        applicationCsiDtos[jobGroup1.id].csiValues[0].date == today.format("yyyy-MM-dd")
+        applicationCsiDtos[jobGroup1.id].csiValues[0].csiDocComplete == 50.0d
+        applicationCsiDtos[jobGroup1.id].csiValues[0].csiVisComplete == 60.0d
+
+        applicationCsiDtos[jobGroup2.id].hasCsiConfiguration == true
+        applicationCsiDtos[jobGroup2.id].hasJobResults == true
+        applicationCsiDtos[jobGroup2.id].hasInvalidJobResults == false
+        applicationCsiDtos[jobGroup2.id].csiValues.length == 1
+        applicationCsiDtos[jobGroup2.id].csiValues[0].date == today.format("yyyy-MM-dd")
+        applicationCsiDtos[jobGroup2.id].csiValues[0].csiDocComplete == 70.0d
+        applicationCsiDtos[jobGroup2.id].csiValues[0].csiVisComplete == 80.0d
+
     }
 
     void "return error for invalid JobResults if all JobResults are invalid"() {
@@ -242,7 +142,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
 
         then: "the JobGroup without config should return false, the other true"
         applicationCsiDto1.hasCsiConfiguration == false
-        applicationCsiDto1.csiDtoList.length == 0
+        applicationCsiDto1.csiValues.length == 0
         applicationCsiDto2.hasCsiConfiguration == true
     }
 
