@@ -3,6 +3,7 @@ import {NgModule} from '@angular/core';
 import {TranslateTestLoader} from './ngx-translate-mocks';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {RouterTestingModule} from '@angular/router/testing';
+import {FormsModule} from "@angular/forms";
 
 
 @NgModule({
@@ -13,13 +14,15 @@ import {RouterTestingModule} from '@angular/router/testing';
         useClass: TranslateTestLoader
       }
     }),
+    FormsModule,
     HttpClientTestingModule,
     RouterTestingModule,
   ],
   exports: [
     TranslateModule,
     HttpClientTestingModule,
-    RouterTestingModule
+    RouterTestingModule,
+    FormsModule
   ]
 })
 export class SharedMocksModule {
