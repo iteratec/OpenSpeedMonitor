@@ -22,13 +22,11 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
-import de.iteratec.osm.result.WptStatusFactory
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
@@ -85,7 +83,6 @@ class JobProcessingService {
     InMemoryConfigService inMemoryConfigService
     PerformanceLoggingService performanceLoggingService
     JobDaoService jobDaoService
-    WptStatusFactory wptStatusFactory = new WptStatusFactory()
 
     /**
      * Time to wait during Job processing before each check if results are available
@@ -371,7 +368,7 @@ class JobProcessingService {
             }
 
             NodeChild runtestResponseXml = parseResponse(result, wptserver)
-            wptStatus = wptStatusFactory.buildWptStatus(runtestResponseXml?.statusCode?.toInteger())
+            wptStatus = WptStatus.byResultCode(runtestResponseXml?.statusCode?.toInteger())
             testId = runtestResponseXml?.data?.testId
             if (wptStatus != WptStatus.COMPLETED) {
                 throw new JobExecutionException("Got status code ${wptStatus} from wptserver ${wptserver}")

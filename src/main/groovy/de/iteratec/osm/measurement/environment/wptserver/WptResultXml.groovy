@@ -3,7 +3,6 @@ package de.iteratec.osm.measurement.environment.wptserver
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.WptStatus
-import de.iteratec.osm.result.WptStatusFactory
 import de.iteratec.osm.result.WptXmlResultVersion
 import groovy.util.slurpersupport.GPathResult
 
@@ -57,7 +56,7 @@ class WptResultXml {
     }
 
     WptStatus getWptStatus() {
-        return new WptStatusFactory().buildWptStatus(responseNode?.statusCode?.toInteger())
+        return WptStatus.byResultCode(responseNode?.statusCode?.toInteger())
     }
 
     Date getCompletionDate() {

@@ -27,8 +27,12 @@ enum WptStatus {
         this.statusCodeRangeEnd = statusCodeRangeEnd
     }
 
-    boolean matchesStatusCode(int wptStatusCode) {
-        return wptStatusCode >= this.statusCode && wptStatusCode <= this.statusCodeRangeEnd
+    static def byResultCode(Integer wptStatusCode) {
+        return values().find { it.matchesStatusCode(wptStatusCode) } ?: UNKNOWN
+    }
+
+    boolean matchesStatusCode(Integer wptStatusCode) {
+        return wptStatusCode != null && wptStatusCode >= this.statusCode && wptStatusCode <= this.statusCodeRangeEnd
     }
 
     int getWptStatusCode(){

@@ -284,7 +284,7 @@ class ResultPersisterService implements iResultListener {
         int maxValidLoadTime = configService.getMaxValidLoadtime()
         int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
 
-        return (!new WptStatusFactory().buildWptStatus(resultXml.getResultCodeForStep(testStepZeroBasedIndex)).isFailed() &&
+        return (!WptStatus.byResultCode(resultXml.getResultCodeForStep(testStepZeroBasedIndex)).isFailed() &&
                 (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
                 (loadTime >= minValidLoadTime) &&
                 (loadTime <= maxValidLoadTime))
