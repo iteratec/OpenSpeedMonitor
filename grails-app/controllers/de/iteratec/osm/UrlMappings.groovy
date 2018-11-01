@@ -26,21 +26,14 @@ class UrlMappings {
 
     static mappings = {
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        // Landing page
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        '/'(controller: 'landing')
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        // Pages without controller
-        ////////////////////////////////////////////////////////////////////////////////////////////////
+        '/'(controller: "landing")
         "/releasenotes"(view: "/siteinfo/releasenotes")
         "/about"(view: "/siteinfo/about")
         "/systeminfo"(view: "/siteinfo/systeminfo")
+        "/applicationDashboard/**?"(view: "/angularFrontend")
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
-        "/applicationDashboard/**?"(view: "/applicationDashboard/index")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
-        "/queueDashboard"(view: "/queueDashboard/index")
+        "/queueDashboard"(view: "/angularFrontend")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller

@@ -17,6 +17,8 @@
 
 package de.iteratec.osm
 
+import org.joda.time.DateTime
+
 /**
  * ConfigService
  * Delivers application-wide configurations from backend.
@@ -163,6 +165,10 @@ class ConfigService {
 	Integer getMaxAgeForMetricsInHours() {
 		return grailsApplication.config.getProperty("de.iteratec.osm.application-dashboard.metrics-max-age-in-h", Integer, 6)
 	}
+
+    DateTime getStartDateForRecentMeasurements() {
+        return new DateTime().withTimeAtStartOfDay().minusWeeks(4)
+    }
 
     private OsmConfiguration getConfig(){
         List<OsmConfiguration> osmConfigs = OsmConfiguration.list()

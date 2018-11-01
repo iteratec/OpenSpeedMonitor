@@ -20,27 +20,31 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <g:link  class="navbar-brand" uri="/">
+        <g:link class="navbar-brand" uri="/">
             <img class="icon osm-icon-small" src="${resource(dir: 'images', file: 'OpenSpeedMonitor_small.svg')}"
                  alt="${meta(name: 'app.name')}"/>
             <img class="logo" src="${resource(dir: 'images', file: 'OpenSpeedMonitor.svg')}"
                  alt="${meta(name: 'app.name')}"/>
         </g:link>
     </div>
+
     <div class="collapse navbar-collapse" id="main-navbar">
         <ul class="nav navbar-nav">
-            <li class="${controllerName.equals("landing") ? 'active' : ''}">
+            <li class="${controllerName.equals("landing") ? 'active' : ''}" data-active-matches="^/$">
                 <g:link uri="/"><i class="fas fa-home"></i>
                     <g:message code="navbar.home" default="Home"/>
                 </g:link>
             </li>
-            <li class="dropdown ${mainTab.equals('results') ? 'active open' : ''}">
+            <li class="dropdown ${mainTab.equals('results') ? 'active open' : ''}"
+                data-active-matches="^/applicationDashboard/?"
+                data-open-matches="^/applicationDashboard/?">
                 <a href="#" class="dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-tachometer-alt"></i>
                     <g:message code="de.iteratec.isr.measurementresults" default="Results"/> <span class="caret"></span>
                 </a>
                 <ul class="dropdown-menu">
-                    <li class="${request.forwardURI.equals('/applicationDashboard') ? 'active' : ''}">
+                    <li class="${request.forwardURI.equals('/applicationDashboard') ? 'active' : ''}"
+                        data-active-matches="/applicationDashboard/?.*">
                         <a href="${createLink(uri: '/applicationDashboard')}">
                             <i class="fas fa-table"></i>
                             <g:message message="frontend.de.iteratec.osm.applicationDashboard.title"/>

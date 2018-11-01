@@ -16,6 +16,7 @@
 */
 
 package de.iteratec.osm.measurement.environment
+
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -27,33 +28,24 @@ class BrowserService {
         return Collections.unmodifiableSet(result)
     }
 
-    List<Browser> findAllByNameOrAlias(List<String> browserNameOrAlias) {
-        List<Browser> result = []
-        browserNameOrAlias.each {
-            result << findByNameOrAlias(it)
-        }
-        return result
-    }
-
-    Browser findByNameOrAlias(String browserNameOrAlias) {
-        Browser ret = Browser.findByName(browserNameOrAlias)
-        if (ret == null) {
-            return findByAlias(browserNameOrAlias)
+    Browser findByNameOrAlias(String browserName) {
+        Browser browser = Browser.findByName(browserName)
+        if (!browser) {
+            return findByAlias(browserName)
         } else {
-            return ret
+            return browser
         }
     }
 
-    private Browser findByAlias(browserNameOrAlias) {
-        Browser ret = Browser.findByName('undefined') ?: new Browser(name: 'undefined').save(failOnError: true)
-        Browser.list().each { currBrowser ->
-            def query = BrowserAlias.where {
-                browser == currBrowser
-            }
-            query.findAll { it.alias.equals(browserNameOrAlias) }.each {
-                ret = currBrowser
-            }
+    private Browser findByAlias(String browserName) {
+        return BrowserAlias.findByAlias(browserName)?.browser
+    }
+
+    Browser findOrCreateByNameOrAlias(String browserName) {
+        Browser browser = findByNameOrAlias(browserName)
+        if (!browser) {
+            browser = new Browser(name: browserName).save(failOnError: true)
         }
-        return ret
+        return browser
     }
 }

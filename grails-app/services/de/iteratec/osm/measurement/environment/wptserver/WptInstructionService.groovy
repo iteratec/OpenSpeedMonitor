@@ -178,13 +178,13 @@ class WptInstructionService {
                     if (listener.callListenerAsync()) {
                         Promise p = task {
                             JobResult.withNewSession {
-                                listener.listenToResult(resultXml, wptserverOfResult, job)
+                                listener.listenToResult(resultXml, wptserverOfResult, job.id)
                             }
                         }
                         p.onError { Throwable err -> log.error("${listener.getListenerName()} failed persisting results", err) }
                         p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
                     } else {
-                        listener.listenToResult(resultXml, wptserverOfResult, job)
+                        listener.listenToResult(resultXml, wptserverOfResult, job.id)
                     }
                 }
 

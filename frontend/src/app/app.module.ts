@@ -3,22 +3,40 @@ import {ApplicationRef, Injector, NgModule, NgModuleFactory, SystemJsNgModuleLoa
 import {AppRoutingModule} from "./app-routing.module";
 import {APP_BASE_HREF} from '@angular/common';
 import {NotFoundComponent} from "./not-found.component";
+import {APP_COMPONENT_SELECTOR, AppComponent} from "./app.component";
+import {GlobalModule} from "./global.module";
 
 
 @NgModule({
-  declarations: [NotFoundComponent],
+  declarations: [NotFoundComponent, AppComponent],
   imports: [
-    BrowserModule, AppRoutingModule
+    BrowserModule,
+    AppRoutingModule,
+    GlobalModule
   ],
   providers: [SystemJsNgModuleLoader,
     {provide: APP_BASE_HREF, useValue: '/',}
   ],
+  entryComponents: [
+    AppComponent
+  ]
 })
 export class AppModule {
   constructor(private injector: Injector, private moduleLoader: SystemJsNgModuleLoader) {
   }
 
   ngDoBootstrap(appRef: ApplicationRef) {
+    this.bootstrapAppComponentIfExists(appRef);
+    this.bootstrapLazyModulesIfExist(appRef);
+  }
+
+  private bootstrapAppComponentIfExists(appRef: ApplicationRef) {
+    if (document.querySelector(APP_COMPONENT_SELECTOR)) {
+      appRef.bootstrap(AppComponent);
+    }
+  }
+
+  private bootstrapLazyModulesIfExist(appRef: ApplicationRef) {
     const widgets = document.querySelectorAll('[data-module-path]');
     for (const i in widgets) {
       if (!widgets.hasOwnProperty(i)) {

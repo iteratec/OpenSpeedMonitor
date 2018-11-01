@@ -1,0 +1,13 @@
+@import "../../../../../styles/variables";
+
+.logo {
+  display: block;
+  width: 200px;
+  margin: 0 auto $default-padding auto;
+}
+
+main {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
