@@ -191,7 +191,7 @@ class ResultPersisterService implements iResultListener {
                 date: testCompletion,
                 testId: testId,
                 wptStatus: wptStatus,
-                jobResultStatus: JobResultStatus.SUCCESS,
+                jobResultStatus: wptStatus.isFailed() ? JobResultStatus.FAILED : JobResultStatus.SUCCESS,
                 jobConfigLabel: job.label,
                 jobConfigRuns: job.runs,
                 wptServerLabel: job.location.wptServer.label,
