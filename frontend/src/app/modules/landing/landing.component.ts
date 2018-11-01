@@ -1,8 +1,9 @@
 import {Component} from '@angular/core';
-import {filter, map, tap} from "rxjs/operators";
+import {filter, map} from "rxjs/operators";
 import {ApplicationService} from "../../services/application.service";
 import {combineLatest, Observable} from "rxjs";
 import {ApplicationWithCsi} from "./models/application-with-csi.model";
+import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-landing',
@@ -16,9 +17,9 @@ export class LandingComponent {
   applications$: Observable<ApplicationWithCsi[]>;
 
   constructor(private applicationService: ApplicationService) {
-    this.hasData$ = this.applicationService.applications$.pipe(map(response => !response.isLoading && !!response.data));
+    this.hasData$ = this.applicationService.applications$.pipe(map(response => this.dataHasLoaded(response)));
     this.showApplicationEmptyState$ = this.applicationService.applications$.pipe(
-      map(response => !response.isLoading && response.data && !response.data.length),
+      map(response => this.dataHasLoaded(response) && response.data.length < 1),
     );
     this.applications$ = combineLatest(this.applicationService.applications$, this.applicationService.applicationCsiById$).pipe(
       filter(([applications]) => !applications.isLoading && !!applications.data),
@@ -26,6 +27,10 @@ export class LandingComponent {
     );
     this.applicationService.loadApplications();
     this.applicationService.loadRecentCsiForApplications();
+  }
+
+  private dataHasLoaded(response: ResponseWithLoadingState<object>): boolean {
+    return !response.isLoading && !!response.data;
   }
 
 }

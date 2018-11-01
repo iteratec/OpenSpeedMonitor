@@ -1,6 +1,6 @@
 import {Application} from "../../../models/application.model";
 import {Csi} from "../../../models/csi.model";
-import {ApplicationCsi} from "../../../models/csi-list.model";
+import {ApplicationCsi} from "../../../models/application-csi.model";
 
 export class ApplicationWithCsi extends Application {
   recentCsi: Csi;

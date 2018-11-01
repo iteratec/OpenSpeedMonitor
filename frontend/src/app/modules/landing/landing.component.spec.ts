@@ -7,7 +7,7 @@ import {SharedModule} from "../shared/shared.module";
 import {By} from "@angular/platform-browser";
 import {Application} from "../../models/application.model";
 import {CsiValueSmallComponent} from "../shared/components/csi-value/csi-value-small/csi-value-small.component";
-import {ApplicationCsi} from "../../models/csi-list.model";
+import {ApplicationCsi} from "../../models/application-csi.model";
 
 describe('LandingComponent', () => {
   let component: LandingComponent;

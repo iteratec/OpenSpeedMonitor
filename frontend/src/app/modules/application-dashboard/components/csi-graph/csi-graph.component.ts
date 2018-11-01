@@ -8,7 +8,7 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import {ApplicationCsi} from '../../../../models/csi-list.model';
+import {ApplicationCsi} from '../../../../models/application-csi.model';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {CsiDTO} from '../../../../models/csi.model';
 import {timeDay} from 'd3-time';

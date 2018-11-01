@@ -2,7 +2,12 @@ import {inject, TestBed} from '@angular/core/testing';
 
 import {ApplicationService} from './application.service';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO, ApplicationCsiDTOById} from "../models/csi-list.model"
+import {
+  ApplicationCsi,
+  ApplicationCsiById,
+  ApplicationCsiDTO,
+  ApplicationCsiDTOById
+} from "../models/application-csi.model"
 import {Application} from "../models/application.model";
 import {parseDate} from "../utils/date.util";
 
