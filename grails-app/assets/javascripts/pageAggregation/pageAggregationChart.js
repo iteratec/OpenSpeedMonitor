@@ -183,10 +183,15 @@ OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
         render();
     };
 
+    var isDataAvailable = function () {
+        return data.isDataAvailable();
+    };
+
     return {
         render: render,
         setData: setData,
-        resetData: resetData
+        resetData: resetData,
+        isDataAvailable: isDataAvailable
     };
 
 });
