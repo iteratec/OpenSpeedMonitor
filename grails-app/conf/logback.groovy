@@ -1,8 +1,8 @@
 import ch.qos.logback.classic.AsyncAppender
+import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.filter.ThresholdFilter
 import grails.util.BuildSettings
-import grails.util.Environment
 
 import static ch.qos.logback.classic.Level.*
 
@@ -10,16 +10,98 @@ def appenders = []
 // See http://logback.qos.ch/manual/groovy.html for details on configuration
 def targetDir = BuildSettings.TARGET_DIR
 
-if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
-    def catalinaBase = System.properties.getProperty('catalina.base')
-    if (!catalinaBase) catalinaBase = '.'   // just in case
-    def logFolder = "${catalinaBase}/logs"
+def catalinaBase = System.properties.getProperty('catalina.base')
+if (!catalinaBase) catalinaBase = '.'   // just in case
+def logFolder = "${catalinaBase}/logs"
+
+def logToFile = java.lang.Boolean.getBoolean('logToFile')
+def detailLog = java.lang.Boolean.getBoolean('detailLog')
+
+println("logToFile: $logToFile; detailLog: $detailLog")
+
+Level thresholdLevel = INFO
+
+if(targetDir)
+{
+    if(detailLog) {
+        thresholdLevel = DEBUG
+    }
+
+    initAppenders(appenders, thresholdLevel, logFolder)
+
+    def console = ["CONSOLE", "osmAppender", "asyncOsmAppenderDetails"]
+    def log = ["osmAppender", "asyncOsmAppenderDetails"]
+    def logDetail = ["asyncOsmAppenderDetails"]
+    def hibernateStats = ["osmHibernateStatsAppender"]
+
+    def consoleLogConfig = [
+        (console) : [
+                ["de.iteratec.osm", ALL],
+                ["de.iteratec.osm.da", ALL]]]
+
+    def fileLogConfig = [
+        (log) : [
+                ["de.iteratec.osm", ALL],
+                ["de.iteratec.osm.da", ALL]]]
+
+    def standardLogConfig = [
+        (log) : [
+                ["grails.app", ERROR],
+                ["org.grails.commons", ERROR],
+                ["org.grails.web.mapping", ERROR],
+                ["org.grails.web.mapping.filter", ERROR],
+                ["org.grails.web.pages", ERROR],
+                ["org.grails.web.servlet", ERROR],
+                ["org.grails.web.sitemesh", ERROR],
+                ["org.grails.plugins'", ERROR],
+                ["org.springframework", ERROR],
+                ["net.sf.ehcache.hibernate", ERROR],
+                ["org.grails.orm.hibernate", ERROR],
+                ["org.hibernate.SQL", ERROR],
+                ["org.hibernate.transaction", ERROR]]]
+
+    def liquibaseLogConfig = [
+        (logDetail) : [
+                ["liquibase", ALL]]]
+
+    def hibernateLogConfig = [
+        (hibernateStats) : [
+                ['grails.app.controllers.org.grails.plugins.LogHibernateStatsInterceptor', DEBUG],
+                ['org.hibernate.stat', DEBUG],
+                ['org.hibernate.engine', DEBUG]]]
+
+    applyLoggers(standardLogConfig)
+    applyLoggers(liquibaseLogConfig)
+
+    if(logToFile) {
+        applyLoggers(fileLogConfig)
+    }
+    else{ // console log is default
+        applyLoggers(consoleLogConfig)
+    }
+
+    if(detailLog) {
+        applyLoggers(hibernateLogConfig)
+    }
+
+    root(INFO, appenders)
+}
+
+def applyLoggers(Map prefs) {
+    prefs.keySet().forEach{key ->
+        prefs[key].forEach{val ->
+            logger(val[0], val[1], key, false);
+        }
+    }
+}
+
+def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
     appender('CONSOLE', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
             pattern = "%logger %m%n"
         }
         filter(ThresholdFilter) {
-            level = ERROR
+            level = thresholdLevel
         }
     }
     appenders << "CONSOLE"
@@ -30,14 +112,12 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
         rollingPolicy(TimeBasedRollingPolicy) {
             FileNamePattern = "${logFolder}/OpenSpeedMonitor-%d{yyyy-MM-dd}.zip"
         }
-
         encoder(PatternLayoutEncoder) {
             pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
-            level = ERROR
+            level = thresholdLevel
         }
-
     }
     appenders << "osmAppender"
 
@@ -52,7 +132,6 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
         triggeringPolicy(SizeBasedTriggeringPolicy){
             maxFileSize= '20MB'
         }
-
         encoder(PatternLayoutEncoder) {
             pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
@@ -63,63 +142,8 @@ if (Environment.getCurrent() == Environment.PRODUCTION && targetDir) {
     appender('asyncOsmAppenderDetails', AsyncAppender){
         discardingThreshold=0
         appenderRef('osmAppenderDetails')
-
     }
     appenders << "asyncOsmAppenderDetails"
-
-    // our packages
-    logger("de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("de.iteratec.osm.da", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-
-    // other packages
-    logger("liquibase", ALL,["asyncOsmAppenderDetails"], false)
-    logger("grails.app", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.commons", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.web.mapping", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.web.mapping.filter", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.web.pages", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    //      GSP
-    logger("org.grails.web.servlet", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    //      controllers
-    logger("org.grails.web.sitemesh", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    //      plugins
-    logger("org.grails.plugins'", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.springframework", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("net.sf.ehcache.hibernate", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.orm.hibernate", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.hibernate.SQL", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.hibernate.transaction", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-
-    root(ERROR, appenders)
-}
-
-if (Environment.isDevelopmentMode() && targetDir) {
-    appender('CONSOLE', ConsoleAppender) {
-        encoder(PatternLayoutEncoder) {
-            pattern = "%logger %m%n"
-        }
-        filter(ThresholdFilter) {
-            level = DEBUG
-        }
-    }
-    appenders << "CONSOLE"
-
-    appender("osmAppender", RollingFileAppender) {
-        file = "logs/OpenSpeedMonitor.log"
-        append = true
-        rollingPolicy(TimeBasedRollingPolicy) {
-            FileNamePattern = "logs/OpenSpeedMonitor-%d{yyyy-MM-dd}.zip"
-        }
-
-        encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
-        }
-        filter(ThresholdFilter) {
-            level = ERROR
-        }
-
-    }
-    appenders << "osmAppender"
 
     appender("osmHibernateStatsAppender", RollingFileAppender) {
         file = "logs/OpenSpeedMonitorHibernateStats.log"
@@ -131,122 +155,8 @@ if (Environment.isDevelopmentMode() && targetDir) {
             pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
-            level = DEBUG
+            level = thresholdLevel
         }
-
     }
     appenders << "osmHibernateStatsAppender"
-
-    appender("osmAppenderDetails", RollingFileAppender) {
-        file = "logs/OpenSpeedMonitorDetails.log"
-        append = true
-        rollingPolicy(FixedWindowRollingPolicy ) {
-            FileNamePattern = "logs/OpenSpeedMonitorDetails%i.log.zip"
-            minIndex = 1
-            maxIndex = 20
-        }
-        triggeringPolicy(SizeBasedTriggeringPolicy){
-            maxFileSize= '20MB'
-        }
-
-        encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
-        }
-        filter(ThresholdFilter) {
-            level = DEBUG
-        }
-    }
-    appender('asyncOsmAppenderDetails', AsyncAppender){
-        discardingThreshold=0
-        appenderRef('osmAppenderDetails')
-
-    }
-    appenders << "asyncOsmAppenderDetails"
-
-    // our packages
-    logger("de.iteratec.osm", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("de.iteratec.osm.da", ALL,["osmAppender", "asyncOsmAppenderDetails"], false)
-
-    // other packages
-    logger("liquibase", ALL,["asyncOsmAppenderDetails"], false)
-    logger("com.p6spy", ALL,["asyncOsmAppenderDetails"], false)
-    logger("grails.app", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.commons", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.web.mapping", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.web.mapping.filter", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.web.pages", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    //      GSP
-    logger("org.grails.web.servlet", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    //      controllers
-    logger("org.grails.web.sitemesh", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    //      plugins
-    logger("org.grails.plugins'", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.springframework", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("net.sf.ehcache.hibernate", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.grails.orm.hibernate", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.hibernate.SQL", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-    logger("org.hibernate.transaction", ERROR,["osmAppender", "asyncOsmAppenderDetails"], false)
-
-    logger('grails.app.controllers.org.grails.plugins.LogHibernateStatsInterceptor', DEBUG, ['osmHibernateStatsAppender'], false)
-    logger('org.hibernate.stat', DEBUG, ['osmHibernateStatsAppender'], false)
-
-    root(ERROR, appenders)
-}
-if (Environment.getCurrent() == Environment.TEST && targetDir) {
-    appender('CONSOLE', ConsoleAppender) {
-        encoder(PatternLayoutEncoder) {
-            pattern = "%logger %m%n"
-        }
-        filter(ThresholdFilter) {
-            level = ERROR
-        }
-    }
-    appenders << "CONSOLE"
-
-    appender("osmAppenderDetails", RollingFileAppender) {
-        file = "logs/OpenSpeedMonitorDetails.log"
-        append = true
-        rollingPolicy(FixedWindowRollingPolicy ) {
-            FileNamePattern = "logs/OpenSpeedMonitorDetails%i.log.zip"
-            minIndex = 1
-            maxIndex = 20
-        }
-        triggeringPolicy(SizeBasedTriggeringPolicy){
-            maxFileSize= '20MB'
-        }
-
-        encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
-        }
-        filter(ThresholdFilter) {
-            level = DEBUG
-        }
-    }
-    appender('asyncOsmAppenderDetails', AsyncAppender){
-        discardingThreshold=0
-        appenderRef('osmAppenderDetails')
-
-    }
-    appenders << "asyncOsmAppenderDetails"
-
-    // our packages
-    logger("de.iteratec.osm", ALL,['CONSOLE', 'osmAppenderDetails'], false)
-    logger("de.iteratec.osm.da", ALL,['CONSOLE', 'osmAppenderDetails'], false)
-
-    logger("grails.app", INFO)
-    logger("org.grails.commons",INFO)
-    logger("org.grails.web.mapping",INFO)
-    logger("org.grails.web.mapping.filter", INFO)
-    logger("org.grails.web.pages", INFO)
-    logger("org.grails.web.servlet", INFO)
-    logger("org.grails.web.servlet",INFO)
-    logger("org.grails.web.sitemesh", INFO)
-    logger("org.grails.plugins'", INFO)
-    logger("org.springframework", INFO)
-    logger("net.sf.ehcache.hibernate", INFO)
-    logger("org.grails.orm.hibernate", INFO)
-    logger("org.hibernate.SQL", INFO)
-
-
-    root(ERROR, appenders)
 }
