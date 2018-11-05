@@ -82,7 +82,6 @@ class ResultPersisterService implements iResultListener {
 
         try {
             checkJobAndLocation(resultXml, wptserverOfResult, jobId)
-            persistJobResult(resultXml, jobId)
             persistResultsForAllTeststeps(resultXml, jobId)
             informDependents(resultXml, jobId)
 
@@ -108,41 +107,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void persistJobResult(WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
 
-        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
-            String testId = resultXml.getTestId()
-            log.debug("test-ID for which results should get persisted now=${testId}")
-
-            if (testId == null) {
-                throw new OsmResultPersistanceException("No test id in result xml file from wpt server!")
-            }
-
-            log.debug("Deleting pending JobResults and create finished ...")
-            removePendingAndCreateFinishedJobResult(resultXml, testId, jobId)
-            log.debug("Deleting pending JobResults and create finished ... DONE")
-        }
-
-    }
-
-    private void removePendingAndCreateFinishedJobResult(resultXml, String testId, long jobId) {
-        Job job = jobDaoService.getJob(jobId)
-        deleteResultsMarkedAsPendingAndRunning(job, testId)
-
-        JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
-        if (!jobResult) {
-            persistNewJobRun(job, resultXml)
-        } else {
-            updateJobResult(jobResult, resultXml)
-        }
-    }
-
-    private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
-        jobResult.testAgent = resultXml.getTestAgent()
-        jobResult.wptVersion = resultXml.version.toString()
-        jobResult.save(failOnError: true, flush: true)
-    }
 
     /**
      * <p>
@@ -170,44 +135,6 @@ class ResultPersisterService implements iResultListener {
                 throw e;
             }
         }
-    }
-
-    protected void persistNewJobRun(Job job, WptResultXml resultXml) {
-
-        String testId = resultXml.getTestId()
-
-        if (!testId) {
-            return
-        }
-        log.debug("persisting new JobResult ${testId}")
-
-        WptStatus wptStatus = resultXml.getWptStatus()
-        Date testCompletion = resultXml.getCompletionDate()
-        job.lastRun = testCompletion
-        job.merge(failOnError: true)
-
-        JobResult result = new JobResult(
-                job: job,
-                date: testCompletion,
-                testId: testId,
-                wptStatus: wptStatus,
-                jobResultStatus: wptStatus.isFailed() ? JobResultStatus.FAILED : JobResultStatus.SUCCESS,
-                jobConfigLabel: job.label,
-                jobConfigRuns: job.runs,
-                wptServerLabel: job.location.wptServer.label,
-                wptServerBaseurl: job.location.wptServer.baseUrl,
-                locationLabel: job.location.label,
-                locationLocation: job.location.location,
-                locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
-                locationBrowser: job.location.browser.name,
-                jobGroupName: job.jobGroup.name,
-                testAgent: resultXml.getTestAgent(),
-                wptVersion: resultXml.version.toString()
-        )
-
-        //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
-        result.setDescription('')
-        result.save(failOnError: true, flush: true)
     }
 
     void persistResultsForAllTeststeps(WptResultXml resultXml, long jobId) {
@@ -622,13 +549,4 @@ class ResultPersisterService implements iResultListener {
         return zipped
     }
 
-    /**
-     * Clear pending/running {@link JobResult}s (i.e. wptStatus is 100 or 101) before persisting final {@link EventResult}s.
-     * @param jobLabel
-     * @param testId
-     */
-    void deleteResultsMarkedAsPendingAndRunning(Job job, String testId) {
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.IN_PROGRESS)?.delete(failOnError: true, flush: true)
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.PENDING)?.delete(failOnError: true, flush: true)
-    }
 }

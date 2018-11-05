@@ -21,18 +21,13 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
-import grails.async.Promise
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import groovyx.net.http.NativeHandlers
 
-import java.util.concurrent.locks.ReentrantLock
-
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-import static grails.async.Promises.task
 
 class JobExecutionException extends Exception {
     WptStatus wptStatus
@@ -46,17 +41,6 @@ class JobExecutionException extends Exception {
 
 }
 
-interface iResultListener {
-    public String getListenerName()
-
-    public void listenToResult(
-            WptResultXml resultXml,
-            WebPageTestServer wptserver,
-            long jobId
-    )
-
-    public boolean callListenerAsync()
-}
 
 interface iLocationListener {
     public String getListenerName()
@@ -76,21 +60,11 @@ interface iLocationListener {
  */
 class WptInstructionService {
 
-    protected List<iResultListener> resultListeners = new ArrayList<iResultListener>()
     protected List<iLocationListener> locationListeners = new ArrayList<iLocationListener>()
-    private final ReentrantLock lock = new ReentrantLock()
 
     HttpRequestService httpRequestService
     PerformanceLoggingService performanceLoggingService
     ConfigService configService
-
-    /**
-     * Listeners can register as oberservers.
-     * @param listener
-     */
-    void addResultListener(iResultListener listener) {
-        this.resultListeners.add(listener)
-    }
 
     void addLocationListener(iLocationListener listener) {
         this.locationListeners.add(listener)
@@ -188,48 +162,12 @@ class WptInstructionService {
      * 			Instance of PHP-application webpagetest (see http://webpagetest.org) from which xml-result should be get.
      * @param resultId
      * 			Id of webpagetest result
-     * @param job
-     * 	        Job that initiated webpagetest
      * @return
      */
-    WptResultXml fetchResult(WebPageTestServer wptserverOfResult, String resultId, Job job) {
-        log.info("Start Saving result ${wptserverOfResult.baseUrl}result/${resultId}")
-
+    WptResultXml fetchResult(WebPageTestServer wptserverOfResult, String resultId) {
+        log.info("Fetching result ${wptserverOfResult.baseUrl}result/${resultId}")
         GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, resultId)
-        WptResultXml resultXml = convertGPathToWptResultXML(xmlResultResponse)
-        WptStatus wptStatus = resultXml.wptStatus
-
-        log.info("Result-Status of ${resultId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
-        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}|")
-        log.info("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
-
-
-        if (resultXml.isFinishedWithResults()) {
-            try {
-                lock.lockInterruptibly()
-                this.resultListeners.each { listener ->
-                    log.info("calling listener ${listener.listenerName} for job id ${job.id}")
-                    if (listener.callListenerAsync()) {
-                        Promise p = task {
-                            JobResult.withNewSession {
-                                listener.listenToResult(resultXml, wptserverOfResult, job.id)
-                            }
-                        }
-                        p.onError { Throwable err -> log.error("${listener.getListenerName()} failed persisting results", err) }
-                        p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
-                    } else {
-                        listener.listenToResult(resultXml, wptserverOfResult, job.id)
-                    }
-                }
-
-            } finally {
-                lock.unlock()
-            }
-
-        }
-
-        return resultXml
-
+        return convertGPathToWptResultXML(xmlResultResponse)
     }
 
     private WptResultXml convertGPathToWptResultXML(GPathResult xmlResultResponse) {

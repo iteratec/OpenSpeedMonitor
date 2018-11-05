@@ -9,8 +9,9 @@ enum JobResultStatus {
     PERSISTANCE_ERROR(503, "Failed to save result"),
     TIMEOUT(504, "Timed out"),
     FAILED(505, "Failed"),
-    ORPHANED(506, "Failed"),
-    INCOMPLETE(507, "Incomplete")
+    CANCELED(506, "Canceled"),
+    ORPHANED(507, "Orphaned"),
+    INCOMPLETE(600, "Incomplete")
 
     private int jobResultStatusCode
     private String message

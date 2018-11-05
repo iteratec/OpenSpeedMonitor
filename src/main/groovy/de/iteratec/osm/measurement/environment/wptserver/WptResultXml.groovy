@@ -220,8 +220,4 @@ class WptResultXml {
         return responseNode.data.runs.toString().isInteger()
     }
 
-    boolean isFinishedWithResults() {
-        return this.wptStatus.isFinished() && hasRuns()
-    }
-
 }

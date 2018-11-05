@@ -52,6 +52,7 @@ class BootStrap {
     EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
     JobSchedulingService jobSchedulingService
+    JobResultPersisterService jobResultPersisterService
     I18nService i18nService
     ResultPersisterService resultPersisterService
     LocationPersisterService locationPersisterService
@@ -376,7 +377,7 @@ class BootStrap {
     def registerProxyListener = {
         log.info "registerProxyListener OSM ends"
         wptInstructionService.addLocationListener(locationPersisterService)
-        wptInstructionService.addResultListener(resultPersisterService)
+        jobResultPersisterService.addResultListener(resultPersisterService)
 
         // enable persistence of detailAnalysisData for JobResults if configured
         boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
@@ -388,7 +389,7 @@ class BootStrap {
             }
             microserviceUrl = microserviceUrl.endsWith("/") ? microserviceUrl : microserviceUrl + "/"
             detailAnalysisPersisterService.enablePersistenceOfDetailAnalysisDataForJobResults(microserviceUrl)
-            wptInstructionService.addResultListener(detailAnalysisPersisterService)
+            jobResultPersisterService.addResultListener(detailAnalysisPersisterService)
         }
 
         log.info "persistence of detailAnalysisData is enabled: " + persistenceEnabled

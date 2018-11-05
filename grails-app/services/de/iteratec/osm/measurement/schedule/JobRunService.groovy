@@ -3,6 +3,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.wptserver.JobExecutionException
+import de.iteratec.osm.measurement.environment.wptserver.JobResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
 import de.iteratec.osm.result.JobResult
@@ -11,7 +12,6 @@ import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.exception.ExceptionUtils
-import org.hibernate.StaleObjectStateException
 import org.joda.time.DateTime
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
@@ -23,6 +23,7 @@ class JobRunService {
     PerformanceLoggingService performanceLoggingService
     InMemoryConfigService inMemoryConfigService
     ConfigService configService
+    JobResultPersisterService jobResultPersisterService
 
     /**
      * Cancel a running Job. If the job is pending and has not been executed yet, the WPT server will
@@ -37,36 +38,15 @@ class JobRunService {
             result = JobResult.findByJobAndTestIdAndJobResultStatus(job, testId, JobResultStatus.RUNNING)
         }
         if (result) {
-            log.info("Deleting the following JobResult as requested: ${result}.")
-            result.delete(failOnError: true, flush: true)
-            log.info("Deleting the following JobResult as requested: ${result}... DONE")
+            log.info("Set status of job Result to canceled: ${result}.")
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.CANCELED, null, "Canceled by user.")
             log.info("Canceling respective test on wptserver.")
             wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
-            log.info("Canceling respective test on wptserver... DONE")
-        }
-    }
-
-    /**
-     * Saves a JobResult with the given parameters and no date to indicate that the
-     * specified Job/test is running and that this is not the result of a finished
-     * test execution.
-     */
-    JobResult persistUnfinishedJobResult(long jobId, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
-        // If no testId was provided some error occurred and needs to be logged
-        Job job = Job.get(jobId)
-        JobResult result = null
-        if (testId) {
-            result = JobResult.findByJobAndTestId(job, testId)
-        }
-
-        if (!result) {
-            return persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
         } else {
-            updateStatusAndPersist(result, job, testId, jobResultStatus, wptStatus, description)
-            return result
+            log.info("Can't cancel test ${testId} of job ${job.id} since it's status is ${result.jobResultStatus}")
         }
-
     }
+
 
     /**
      * Setting the job result status of running and pending jobResults older than maxDate
@@ -97,16 +77,12 @@ class JobRunService {
         if (!result || result.wptStatus.isFinished()) {
             return
         }
-        WptResultXml wptResult = pollJobRun(job, testId)
-        if (wptResult.isFinishedWithResults()) {
+        JobResultStatus jobResultStatus = pollJobRun(job, testId)
+        if (jobResultStatus.isTerminated()) {
             return
         }
         jobSchedulingService.unscheduleTest(job, testId)
-        String description = "Test exceeded maximum polling time. Test had result code ${wptResult.wptStatus}."
-        if (!wptResult.hasRuns()) {
-            description += " XML result contains no runs."
-        }
-        persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, wptResult.wptStatus, description)
+        jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, "Test exceeded maximum polling time.")
         wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
     }
 
@@ -115,28 +91,25 @@ class JobRunService {
      * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun()
      * every pollDelaySeconds seconds is removed
      */
-    WptResultXml pollJobRun(Job job, String testId) {
-        WptResultXml resultXml
+    JobResultStatus pollJobRun(Job job, String testId) {
+        JobResultStatus jobResultStatus = JobResultStatus.PERSISTANCE_ERROR
         try {
+            WptResultXml resultXml
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
-                resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId, job)
+                resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId)
             }
-            WptStatus wptStatus = resultXml.wptStatus
-            if (wptStatus == WptStatus.PENDING || wptStatus == WptStatus.IN_PROGRESS) {
-                JobResultStatus jobResultStatus = (wptStatus == WptStatus.PENDING) ? JobResultStatus.WAITING : JobResultStatus.RUNNING
-                performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
-                    persistUnfinishedJobResult(job.id, testId, jobResultStatus, wptStatus, "polling jobrun")
-                }
+            performanceLoggingService.logExecutionTime(DEBUG, "Handling WPT result of jobrun ${testId} of job ${job.id}", 1) {
+                jobResultStatus = jobResultPersisterService.handleWptResult(resultXml, testId, job)
             }
         } catch (Exception e) {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-            persistUnfinishedJobResult(job.id, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
         } finally {
-            if (resultXml && resultXml.isFinishedWithResults()) {
+            if (jobResultStatus.isTerminated()) {
                 jobSchedulingService.unscheduleTest(job, testId)
             }
         }
-        return resultXml
+        return jobResultStatus
     }
 
     /**
@@ -155,31 +128,16 @@ class JobRunService {
             String testId = wptInstructionService.runtest(job, priority)
             jobSchedulingService.scheduleJobRunPolling(job, testId)
             // TODO(sbr): determine WptStatus and JobResultStatus
-            persistUnfinishedJobResult(job.id, testId, JobResultStatus.WAITING, WptStatus.UNKNOWN)
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.WAITING, WptStatus.UNKNOWN)
             return testId
         } catch (Exception e) {
             WptStatus wptStatus = e instanceof JobExecutionException ? e.wptStatus : WptStatus.TEST_DID_NOT_START
             String testId = e instanceof JobExecutionException ? e.testId : null
-            persistUnfinishedJobResult(job.id, testId, JobResultStatus.LAUNCH_ERROR, wptStatus, e.getMessage())
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.LAUNCH_ERROR, wptStatus, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
 
-    private void updateStatusAndPersist(JobResult result, Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
-        log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
-        if (result.jobResultStatus != jobResultStatus || (wptStatus != null && result.wptStatus != wptStatus)) {
-            updateStatus(result, jobResultStatus, wptStatus, description)
-            try {
-                result.save(failOnError: true, flush: true)
-            } catch (StaleObjectStateException staleObjectStateException) {
-                String logMessage = "Updating status of existing JobResult: Job ${job.label}, test-id=${testId}" +
-                        "\n\t-> jobResultStatus of result couldn't get updated from ${result.jobResultStatus}->${jobResultStatus}"
-                if (wptStatus != null) logMessage += "\n\twptStatus of result couldn't get updated from ${result.wptStatus}->${wptStatus}"
-                log.error(logMessage, staleObjectStateException)
-            }
-
-        }
-    }
 
 
     Map<String, Integer> handleOldJobResults() {
@@ -222,36 +180,5 @@ class JobRunService {
         return jobResultsToReschedule.size()
     }
 
-    private void updateStatus(JobResult result, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
-        log.debug("Updating status of existing JobResult: jobResultStatus: ${result.jobResultStatus}->${jobResultStatus}")
-        result.jobResultStatus = jobResultStatus
-        result.description = description
-        if (wptStatus != null) {
-            log.debug("Updating status of existing JobResult: wptStatus: ${result.wptStatus}->${wptStatus}")
-            result.wptStatus = wptStatus
-        }
-    }
-
-    private JobResult persistNewUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
-        JobResult result = new JobResult(
-                job: job,
-                date: new Date(),
-                testId: testId ?: UUID.randomUUID() as String,
-                har: null,
-                description: description,
-                jobConfigLabel: job.label,
-                jobConfigRuns: job.runs,
-                wptServerLabel: job.location.wptServer.label,
-                wptServerBaseurl: job.location.wptServer.baseUrl,
-                locationLabel: job.location.label,
-                locationLocation: job.location.location,
-                locationBrowser: job.location.browser.name,
-                locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
-                jobGroupName: job.jobGroup.name,
-                jobResultStatus: jobResultStatus)
-        if (wptStatus != null) result.wptStatus = wptStatus
-        log.debug("Persisting of unfinished result: Job ${job.label}, test-id=${testId} -> persisting new JobResult=${result}")
-        return result.save(failOnError: true, flush: true)
-    }
 
 }
