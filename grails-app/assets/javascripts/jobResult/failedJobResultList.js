@@ -45,7 +45,7 @@ OpenSpeedMonitor.jobResult = (function (url) {
         jobResults.forEach(function (jobResult) {
             $jobResultTable.find("tbody").append('<tr><td><a href="' + jobResult['testUrl'] + '">' + jobResult['testId'] + '</a></td> + ' + // testID
                 '<td>' + jobResult['date'] + '</td>' + // date
-                '<td>' + jobResult['httpStatusCode'] + '</td>' + // http status
+                '<td>' + jobResult['jobResultStatus'] + '</td>' + // job result status
                 '<td>' + jobResult['wptStatus'] + '</td>' + // wpt status
                 '<td>' + jobResult['description'] + '</td></tr>'); // description
         });

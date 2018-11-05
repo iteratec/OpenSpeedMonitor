@@ -1177,7 +1177,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         return JobResult.build(
                 date: dateOfJobRun,
                 testId: testId,
-                httpStatusCode: 200,
+                wptStatus: WptStatus.COMPLETED,
                 jobConfigLabel: parentJob.label,
                 jobConfigRuns: 1,
                 description: '',

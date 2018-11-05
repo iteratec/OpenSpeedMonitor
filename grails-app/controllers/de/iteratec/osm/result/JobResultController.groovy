@@ -24,18 +24,16 @@ class JobResultController {
     }
 
     def getJobResults(Long jobId) {
-        List<JobResult> jobResultsWithStatusGreater200
+        List<JobResult> failedJobResults
         Job job = Job.get(jobId)
         if (job) {
             List<JobResult> jobResultsForJob = jobStatisticService.getLast150CompletedJobResultsFor(job)
 
-            jobResultsWithStatusGreater200 = jobResultsForJob.findAll {
-                it.httpStatusCode > 200
-            }
+            failedJobResults = jobResultsForJob.findAll { it.jobResultStatus.isFailed() }
         }
 
         List<FailedJobResultDTO> dtos = []
-        jobResultsWithStatusGreater200.each {
+        failedJobResults.each {
             FailedJobResultDTO jobResultDTO = new FailedJobResultDTO(it)
             jobResultDTO.date = new SimpleDateFormat(i18nService.msg("default.date.format.medium", "yyyy-MM-dd")).format(it.date)
             dtos << jobResultDTO

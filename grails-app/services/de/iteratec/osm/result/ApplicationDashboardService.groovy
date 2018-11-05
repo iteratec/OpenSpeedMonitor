@@ -185,7 +185,7 @@ class ApplicationDashboardService {
             List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(jobs, startDate)
             if (jobResults) {
                 dto.hasJobResults = true
-                dto.hasInvalidJobResults = jobResults.every { WptStatus.isFailed(it.httpStatusCode) }
+                dto.hasInvalidJobResults = jobResults.every { it.jobResultStatus.isFailed() }
             } else {
                 dto.hasJobResults = false
             }

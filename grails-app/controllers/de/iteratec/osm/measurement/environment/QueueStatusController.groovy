@@ -19,8 +19,8 @@ package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.system.LocationHealthCheck
 import de.iteratec.osm.system.LocationHealthCheckDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -86,8 +86,12 @@ class QueueStatusController {
                 jobsNextHour        : healthCheck.getNumberOfJobResultsNextHour(),
                 eventsNextHour      : healthCheck.numberOfEventResultsNextHour,
                 executingJobs       : executingJobs,
-                pendingJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size(),
-                runningJobs         : executingJobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
+                pendingJobs         : executingJobResults.findAll {
+                    it.jobResultStatus == JobResultStatus.WAITING
+                }.size(),
+                runningJobs         : executingJobResults.findAll {
+                    it.jobResultStatus == JobResultStatus.RUNNING
+                }.size()
         ]
         return queueDataOfThisLocation
     }

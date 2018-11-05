@@ -26,6 +26,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -34,6 +35,8 @@ import org.joda.time.DateTimeUtils
 import org.quartz.Trigger
 import org.quartz.TriggerKey
 import org.quartz.impl.triggers.CronTriggerImpl
+
+import static de.iteratec.osm.result.JobResultStatus.*
 
 /**
  * Integration test for JobProcessingService
@@ -172,7 +175,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
         Job activeJob2 = createJob(true, CRON_STRING_2)
 
         when: "launching all active jobs"
-        jobProcessingService.scheduleAllActiveJobs();
+        jobProcessingService.scheduleAllActiveJobs()
 
         then: "check if the triggers in the scheduler are correctly set"
         jobProcessingService.quartzScheduler.getTrigger(getTriggerKeyOf(inactiveJob)) == null
@@ -196,30 +199,30 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
     void "closeRunningAndPengingJobs test"() {
         given: "a set of persisted jobResults"
         // fix current date for test purposes
-        DateTimeUtils.setCurrentMillisFixed(1482395596904);
+        DateTimeUtils.setCurrentMillisFixed(1482395596904)
         DateTime currentDate = new DateTime()
         Job jobWithMaxDownloadTime = createJob(false)
         jobWithMaxDownloadTime.maxDownloadTimeInMinutes = 60
 
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, WptStatus.RUNNING.getWptStatusCode())
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, WptStatus.PENDING.getWptStatusCode())
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, WptStatus.RUNNING.getWptStatusCode())
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, WptStatus.PENDING.getWptStatusCode())
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, WptStatus.PENDING.getWptStatusCode())
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, WptStatus.COMPLETED.getWptStatusCode())
-        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, WptStatus.TIME_OUT.getWptStatusCode())
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "running test", location, RUNNING)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.toDate(), "pending test", location, WAITING)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes).toDate(), "barely running test", location, RUNNING)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusMinutes(2 * jobWithMaxDownloadTime.maxDownloadTimeInMinutes + 1).toDate(), "outdated running test", location, WAITING)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "outdated pending test", location, WAITING)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "finished test", location, SUCCESS)
+        createAndPersistJobResult(jobWithMaxDownloadTime, currentDate.minusDays(5).toDate(), "failed test", location, TIMEOUT)
 
         when: "closing running and pending job results"
         jobProcessingService.closeRunningAndPengingJobResults()
 
-        then: "find jobResults and check their httpStatusCode"
-        JobResult.findByTestId("running test").httpStatusCode == WptStatus.RUNNING.getWptStatusCode()
-        JobResult.findByTestId("pending test").httpStatusCode == WptStatus.PENDING.getWptStatusCode()
-        JobResult.findByTestId("barely running test").httpStatusCode == WptStatus.RUNNING.getWptStatusCode()
-        JobResult.findByTestId("outdated running test").httpStatusCode == WptStatus.OUTDATED_JOB.getWptStatusCode()
-        JobResult.findByTestId("outdated pending test").httpStatusCode == WptStatus.OUTDATED_JOB.getWptStatusCode()
-        JobResult.findByTestId("finished test").httpStatusCode == WptStatus.COMPLETED.getWptStatusCode()
-        JobResult.findByTestId("failed test").httpStatusCode == WptStatus.TIME_OUT.getWptStatusCode()
+        then: "find jobResults and check their jobResultStatus"
+        JobResult.findByTestId("running test").jobResultStatus == RUNNING
+        JobResult.findByTestId("pending test").jobResultStatus == WAITING
+        JobResult.findByTestId("barely running test").jobResultStatus == RUNNING
+        JobResult.findByTestId("outdated running test").jobResultStatus == ORPHANED
+        JobResult.findByTestId("outdated pending test").jobResultStatus == ORPHANED
+        JobResult.findByTestId("finished test").jobResultStatus == SUCCESS
+        JobResult.findByTestId("failed test").jobResultStatus == TIMEOUT
     }
 
     void "statusOfRepeatedJobExecution test"() {
@@ -230,8 +233,8 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
         Date oldestDate = now - 5
 
         when: "creating and persisting jobResults with statusCodes and a job"
-        inputStatusCodes.reverse().eachWithIndex { int httpStatusCode, int i ->
-            JobResult result = jobProcessingService.persistUnfinishedJobResult(job.id, null, httpStatusCode)
+        inputStatusCodes.reverse().eachWithIndex { JobResultStatus jobResultStatus, int i ->
+            JobResult result = jobProcessingService.persistUnfinishedJobResult(job.id, null, jobResultStatus, WptStatus.UNKNOWN)
             result.date = now - i
             result.save(flush: true, failOnError: true)
         }
@@ -241,31 +244,31 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
         then: "check if the number of jobResults matches the number of statusCodes"
         inputStatusCodes.size() == JobResult.count()
         expectedStatusCodes.size() == recentRuns.size()
-        expectedStatusCodes.eachWithIndex { int statusCode, int i ->
+        expectedStatusCodes.eachWithIndex { JobResultStatus statusCode, int i ->
             statusCode == recentRuns[i]['status']
         }
 
         where: "the input status codes are the expected status codes"
-        inputStatusCodes || expectedStatusCodes
-        [100]            || [100]
-        [200]            || [200]
-        [400]            || [400]
-        [400, 100]       || [100]
-        [100, 400]       || [100, 400]
-        [200, 400]       || [200, 400]
-        [400, 200]       || [200]
-        [100, 200]       || [100, 200]
-        [200, 100]       || [200, 100]
-        [100, 200, 400]  || [100, 200, 400]
-        [100, 400, 200]  || [100, 200]
-        [200, 100, 400]  || [200, 100, 400]
-        [200, 400, 100]  || [200, 100]
-        [400, 100, 200]  || [100, 200]
-        [400, 200, 100]  || [200, 100]
+        inputStatusCodes               || expectedStatusCodes
+        [WAITING]                      || [WAITING]
+        [SUCCESS]                      || [SUCCESS]
+        [FAILED]                       || [FAILED]
+        [FAILED, WAITING]              || [WAITING]
+        [WAITING, FAILED]              || [WAITING, FAILED]
+        [SUCCESS, FAILED]              || [SUCCESS, FAILED]
+        [INCOMPLETE, SUCCESS]          || [SUCCESS]
+        [WAITING, SUCCESS]             || [WAITING, SUCCESS]
+        [SUCCESS, WAITING]             || [SUCCESS, WAITING]
+        [WAITING, SUCCESS, FAILED]     || [WAITING, SUCCESS, FAILED]
+        [WAITING, FAILED, SUCCESS]     || [WAITING, SUCCESS]
+        [SUCCESS, WAITING, INCOMPLETE] || [SUCCESS, WAITING, INCOMPLETE]
+        [SUCCESS, INCOMPLETE, WAITING] || [SUCCESS, WAITING]
+        [INCOMPLETE, WAITING, SUCCESS] || [WAITING, SUCCESS]
+        [FAILED, SUCCESS, WAITING]     || [SUCCESS, WAITING]
     }
 
     private
-    static void createAndPersistJobResult(Job job, Date date, String nameOrId, Location location, Integer httpStatusCode) {
+    static void createAndPersistJobResult(Job job, Date date, String nameOrId, Location location, JobResultStatus jobResultStatus) {
         JobResult.build(
                 job: job,
                 date: date,
@@ -274,7 +277,7 @@ class JobProcessingServiceIntegrationSpec extends NonTransactionalIntegrationSpe
                 jobGroupName: job.jobGroup.name,
                 locationLocation: location.location,
                 locationBrowser: location.browser.name,
-                httpStatusCode: httpStatusCode,
+                jobResultStatus: jobResultStatus,
         ).save(failOnError: true)
     }
 
