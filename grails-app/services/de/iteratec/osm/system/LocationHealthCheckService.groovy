@@ -13,12 +13,11 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.GraphiteSocket
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.WptStatus
+import de.iteratec.osm.result.JobResultStatus
 import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
-
 /**
  * Functionality for getting and managing webpagetest locations health check data.
  */
@@ -117,8 +116,12 @@ class LocationHealthCheckService {
         def numberOfJobResultsLastHour = queueAndJobStatusService.getFinishedJobResultCountSince(location, oneHourAgo)
         def numberOfEventResultsLastHour = queueAndJobStatusService.getEventResultCountBetween(location, oneHourAgo, now.toDate())
         def numberOfErrorsLastHour = queueAndJobStatusService.getErroneousJobResultCountSince(location, oneHourAgo)
-        def numberOfCurrentlyPendingJobs = executingJobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size()
-        def numberOfCurrentlyRunningJobs = executingJobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
+        def numberOfCurrentlyPendingJobs = executingJobResults.findAll {
+            it.jobResultStatus == JobResultStatus.WAITING
+        }.size()
+        def numberOfCurrentlyRunningJobs = executingJobResults.findAll {
+            it.jobResultStatus == JobResultStatus.RUNNING
+        }.size()
 
         new LocationHealthCheck(
                 date: now.toDate(),

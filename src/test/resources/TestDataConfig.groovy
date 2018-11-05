@@ -1,11 +1,12 @@
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.result.WptStatus
 
 testDataConfig {
     sampleData {
@@ -19,6 +20,10 @@ testDataConfig {
             // build-test-data plugin doesn't understand custom constraints for connectivityProfile in Job class.
             connectivityProfile = { -> ConnectivityProfile.build() }
             script = { -> Script.build() }
+        }
+        'de.iteratec.osm.result.JobResult' {
+            wptStatus = WptStatus.UNKNOWN
+            jobResultStatus = JobResultStatus.SUCCESS
         }
         'de.iteratec.osm.result.EventResult' {
             connectivityProfile = { -> ConnectivityProfile.build() }

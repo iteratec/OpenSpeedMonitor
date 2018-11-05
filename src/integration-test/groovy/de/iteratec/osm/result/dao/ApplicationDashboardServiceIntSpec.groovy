@@ -13,7 +13,7 @@ import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.ApplicationDashboardService
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.WptStatus
+import de.iteratec.osm.result.JobResultStatus
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -104,8 +104,8 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         existingCsiConfiguration = CsiConfiguration.build()
         CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
         jobGroup1.csiConfiguration = existingCsiConfiguration
-        jobResult1 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
-        jobResult2 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+        jobResult1 = JobResult.build(jobResultStatus: JobResultStatus.TIMEOUT, job: job1)
+        jobResult2 = JobResult.build(jobResultStatus: JobResultStatus.TIMEOUT, job: job1)
 
         when: "the application service tests for errors"
         ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
@@ -119,8 +119,8 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         existingCsiConfiguration = CsiConfiguration.build()
         CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
         jobGroup1.csiConfiguration = existingCsiConfiguration
-        jobResult1 = JobResult.build(httpStatusCode: WptStatus.SUCCESSFUL.getWptStatusCode(), job: job1)
-        jobResult2 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+        jobResult1 = JobResult.build(jobResultStatus: JobResultStatus.SUCCESS, job: job1)
+        jobResult2 = JobResult.build(jobResultStatus: JobResultStatus.TIMEOUT, job: job1)
 
         when: "the application service tests for errors"
         ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
