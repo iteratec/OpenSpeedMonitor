@@ -14,17 +14,21 @@ def catalinaBase = System.properties.getProperty('catalina.base')
 if (!catalinaBase) catalinaBase = '.'   // just in case
 def logFolder = "${catalinaBase}/logs"
 
-def logToFile = java.lang.Boolean.getBoolean('logToFile')
-def detailLog = java.lang.Boolean.getBoolean('detailLog')
-
-println("logToFile: $logToFile; detailLog: $detailLog")
+def logToFile = Boolean.getBoolean('logToFile')
+def detailLog = Boolean.getBoolean('detailLog')
+def defaultLevel = System.properties.getProperty('logLevel')
 
 Level thresholdLevel = INFO
 
 if(targetDir)
 {
-    if(detailLog) {
-        thresholdLevel = DEBUG
+    if(defaultLevel) {
+        try {
+            thresholdLevel = Level.valueOf(defaultLevel)
+        }
+        catch (Exception e) {
+            e.printStackTrace()
+        }
     }
 
     initAppenders(appenders, thresholdLevel, logFolder)
@@ -37,12 +41,14 @@ if(targetDir)
     def consoleLogConfig = [
         (console) : [
                 ["de.iteratec.osm", ALL],
-                ["de.iteratec.osm.da", ALL]]]
+                ["de.iteratec.osm.da", ALL]]
+    ]
 
     def fileLogConfig = [
         (log) : [
                 ["de.iteratec.osm", ALL],
-                ["de.iteratec.osm.da", ALL]]]
+                ["de.iteratec.osm.da", ALL]]
+    ]
 
     def standardLogConfig = [
         (log) : [
@@ -58,25 +64,24 @@ if(targetDir)
                 ["net.sf.ehcache.hibernate", ERROR],
                 ["org.grails.orm.hibernate", ERROR],
                 ["org.hibernate.SQL", ERROR],
-                ["org.hibernate.transaction", ERROR]]]
-
-    def liquibaseLogConfig = [
+                ["org.hibernate.transaction", ERROR],
+                ["org.hibernate", WARN]],
         (logDetail) : [
-                ["liquibase", ALL]]]
+                ["liquibase", ALL]]
+    ]
 
     def hibernateLogConfig = [
         (hibernateStats) : [
                 ['grails.app.controllers.org.grails.plugins.LogHibernateStatsInterceptor', DEBUG],
-                ['org.hibernate.stat', DEBUG],
-                ['org.hibernate.engine', DEBUG]]]
+                ['org.hibernate.stat', DEBUG]]
+    ]
 
     applyLoggers(standardLogConfig)
-    applyLoggers(liquibaseLogConfig)
 
     if(logToFile) {
         applyLoggers(fileLogConfig)
     }
-    else{ // console log is default
+    else{
         applyLoggers(consoleLogConfig)
     }
 
