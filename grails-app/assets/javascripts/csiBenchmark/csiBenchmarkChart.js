@@ -91,45 +91,25 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("class", "d3chart-bar-container");
         barContainer.append("rect")
             .attr("class", "d3chart-bar")
-            .attr("height", function (d) {
-                return height - yScale(d.value);
-            })
-            .attr("width", barWidth)
-            .attr("transform", function (d) {
-                return "translate(" + 0 +  "," + (yScale(d.value)) + ")"
-            })
             .on("click", highlightClickedBar);
         barContainer.append("text")
             .text(function (d) {
                 return (d.value + "%");
             })
             .attr("class", "d3chart-barLabel")
-            .style("text-anchor", "middle")
-            .attr("x", barWidth / 2)
-            .attr("y", "1.2em")
-            .attr("transform", function (d) {
-                return "translate(" + 0 + "," + yScale(d.value) + ")";
-            });
+            .style("text-anchor", "middle");
         barContainer.append("text")
             .attr("class", "d3chart-xAxisText")
             .text(function (d) {
                 return labelMapping[d.name];
             })
-            .style("text-anchor", "end")
-            .attr("dy", "2em")
-            .attr("transform", function (d) {
-                return "translate(" + barWidth / 2 + "," + (height) + ") rotate(-45)"
-            });
+            .style("text-anchor", "end");
 
-        // exit
-        bars.exit()
-            .remove();
-
+        // update
         bars = chartContainer.selectAll("g.d3chart-bar-container")
             .data(data, function (d) {
                 return d.name + d.value;
             });
-
         bars.selectAll(".d3chart-bar")
             .attr("height", function (d) {
                 return height - yScale(d.value);
@@ -138,15 +118,25 @@ OpenSpeedMonitor.ChartModules.CsiBenchmarkChart = (function (chartIdentifier) {
             .attr("transform", function (d) {
                 return "translate(" + 0 + "," + (yScale(d.value)) + ")"
             });
-
         bars.selectAll(".d3chart-barLabel")
             .attr("height", function (d) {
                 return height - yScale(d.value);
             })
             .attr("width", barWidth)
+            .attr("x", barWidth / 2)
+            .attr("y", "1.2em")
             .attr("transform", function (d) {
                 return "translate(" + 0 + "," + yScale(d.value) + ")";
             });
+        bars.selectAll(".d3chart-xAxisText")
+            .attr("dy", "2em")
+            .attr("transform", function (d) {
+                return "translate(" + barWidth / 2 + "," + (height) + ") rotate(-45)"
+            });
+
+        // exit
+        bars.exit()
+            .remove();
 
         // sort bars descending by default
         if (!sortOrder) {
