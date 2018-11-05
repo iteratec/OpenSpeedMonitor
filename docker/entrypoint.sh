@@ -7,4 +7,4 @@ echo "complete osm config file gets prepared"
 dockerize -template $OSM_CONFIG_TARGET_LOCATION.j2:$OSM_CONFIG_TARGET_LOCATION
 
 # start tomcat
-java -Dgrails.env=prod -Dosm_config_location=${OSM_CONFIG_TARGET_LOCATION} -jar $OSM_HOME/OpenSpeedMonitor*.war
+java -Dgrails.env=prod -Dosm_config_location=${OSM_CONFIG_TARGET_LOCATION} -DlogToConsole=true -DlogToFile=true -jar $OSM_HOME/OpenSpeedMonitor*.war

@@ -15,86 +15,81 @@ if (!catalinaBase) catalinaBase = '.'   // just in case
 def logFolder = "${catalinaBase}/logs"
 
 def logToFile = Boolean.getBoolean('logToFile')
-def detailLog = Boolean.getBoolean('detailLog')
+def logToConsole = Boolean.getBoolean('logToConsole')
+def logHibernateDetails = Boolean.getBoolean('logHibernateDetails')
 def defaultLevel = System.properties.getProperty('logLevel')
 
 Level thresholdLevel = INFO
 
-if(targetDir)
-{
-    if(defaultLevel) {
-        try {
-            thresholdLevel = Level.valueOf(defaultLevel)
-        }
-        catch (Exception e) {
-            e.printStackTrace()
-        }
+if(defaultLevel) {
+    try {
+        thresholdLevel = Level.valueOf(defaultLevel)
     }
+    catch (Exception e) {
+        e.printStackTrace()
+    }
+}
 
-    initAppenders(appenders, thresholdLevel, logFolder)
+initAppenders(appenders, thresholdLevel, logFolder)
 
-    def console = ["CONSOLE", "osmAppender", "asyncOsmAppenderDetails"]
-    def log = ["osmAppender", "asyncOsmAppenderDetails"]
-    def logDetail = ["asyncOsmAppenderDetails"]
-    def hibernateStats = ["osmHibernateStatsAppender"]
+def consoleLog = ["CONSOLE"]
+def fileLog = ["osmAppender", "asyncOsmAppenderDetails"]
+def detailLog = ["asyncOsmAppenderDetails"]
+def hibernateStats = ["osmHibernateStatsAppender"]
 
+def defaultLogConfig = [
+        ["de.iteratec.osm", ALL],
+        ["de.iteratec.osm.da", ALL],
+        ["grails.app", ERROR],
+        ["org.grails.commons", ERROR],
+        ["org.grails.web.mapping", ERROR],
+        ["org.grails.web.mapping.filter", ERROR],
+        ["org.grails.web.pages", ERROR],
+        ["org.grails.web.servlet", ERROR],
+        ["org.grails.web.sitemesh", ERROR],
+        ["org.grails.plugins", ERROR],
+        ["org.springframework", ERROR],
+        ["net.sf.ehcache.hibernate", ERROR],
+        ["org.grails.orm.hibernate", ERROR],
+        ["org.hibernate.SQL", ERROR],
+        ["org.hibernate.transaction", ERROR],
+        ["org.hibernate", WARN],
+        ["org.grails.datastore.gorm", ERROR]
+]
+
+if (logToConsole) {
     def consoleLogConfig = [
-        (console) : [
-                ["de.iteratec.osm", ALL],
-                ["de.iteratec.osm.da", ALL]]
+        (consoleLog) : [
+                *defaultLogConfig,
+                ["liquibase", INFO]]
     ]
+    applyLoggers(consoleLogConfig)
+}
 
+if (logToFile && targetDir) {
     def fileLogConfig = [
-        (log) : [
-                ["de.iteratec.osm", ALL],
-                ["de.iteratec.osm.da", ALL]]
+        (fileLog) : [*defaultLogConfig],
+        (detailLog) : [
+                ["liquibase", ALL],
+                ["com.p6spy", ALL]]
     ]
-
-    def standardLogConfig = [
-        (log) : [
-                ["grails.app", ERROR],
-                ["org.grails.commons", ERROR],
-                ["org.grails.web.mapping", ERROR],
-                ["org.grails.web.mapping.filter", ERROR],
-                ["org.grails.web.pages", ERROR],
-                ["org.grails.web.servlet", ERROR],
-                ["org.grails.web.sitemesh", ERROR],
-                ["org.grails.plugins'", ERROR],
-                ["org.springframework", ERROR],
-                ["net.sf.ehcache.hibernate", ERROR],
-                ["org.grails.orm.hibernate", ERROR],
-                ["org.hibernate.SQL", ERROR],
-                ["org.hibernate.transaction", ERROR],
-                ["org.hibernate", WARN]],
-        (logDetail) : [
-                ["liquibase", ALL]]
-    ]
+    applyLoggers(fileLogConfig)
 
     def hibernateLogConfig = [
         (hibernateStats) : [
                 ['grails.app.controllers.org.grails.plugins.LogHibernateStatsInterceptor', DEBUG],
                 ['org.hibernate.stat', DEBUG]]
     ]
-
-    applyLoggers(standardLogConfig)
-
-    if(logToFile) {
-        applyLoggers(fileLogConfig)
-    }
-    else{
-        applyLoggers(consoleLogConfig)
-    }
-
-    if(detailLog) {
+    if(logHibernateDetails) {
         applyLoggers(hibernateLogConfig)
     }
-
-    root(INFO, appenders)
 }
 
-def applyLoggers(Map prefs) {
-    prefs.keySet().forEach{key ->
-        prefs[key].forEach{val ->
+root(INFO, appenders)
+
+def applyLoggers(Map config) {
+    config.keySet().forEach{key ->
+        config[key].forEach{val ->
             logger(val[0], val[1], key, false);
         }
     }
@@ -151,7 +146,7 @@ def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
     appenders << "asyncOsmAppenderDetails"
 
     appender("osmHibernateStatsAppender", RollingFileAppender) {
-        file = "logs/OpenSpeedMonitorHibernateStats.log"
+        file = "${logFolder}/OpenSpeedMonitorHibernateStats.log"
         append = true
         rollingPolicy(TimeBasedRollingPolicy) {
             FileNamePattern = "logs/OpenSpeedMonitorHibernateStats-%d{yyyy-MM-dd}.zip"
@@ -160,7 +155,7 @@ def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
             pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
         }
         filter(ThresholdFilter) {
-            level = thresholdLevel
+            level = DEBUG
         }
     }
     appenders << "osmHibernateStatsAppender"
