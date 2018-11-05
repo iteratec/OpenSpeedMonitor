@@ -22,11 +22,11 @@ import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
-import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobExecutionException
 import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandlerJob
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
+
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
@@ -224,7 +224,7 @@ class JobProcessingService {
      * test execution.
      */
     @Transactional
-    private JobResult persistUnfinishedJobResult(long jobId, String testId, int statusCode, String wptStatus = null, String description = '') {
+    private JobResult persistUnfinishedJobResult(long jobId, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
         // If no testId was provided some error occurred and needs to be logged
         Job job = Job.get(jobId)
         JobResult result
@@ -233,27 +233,27 @@ class JobProcessingService {
         }
 
         if (!result) {
-            return persistNewUnfinishedJobResult(job, testId, statusCode, wptStatus, description)
+            return persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
         } else {
-            updateStatusAndPersist(result, job, testId, statusCode, wptStatus, description)
+            updateStatusAndPersist(result, job, testId, jobResultStatus, wptStatus, description)
             return result
         }
 
     }
 
     @Transactional
-    private void updateStatusAndPersist(JobResult result, Job job, String testId, int statusCode, String wptStatus, String description) {
+    private void updateStatusAndPersist(JobResult result, Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
         log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
-        if (result.httpStatusCode != statusCode || (wptStatus != null && result.wptStatus != wptStatus)) {
+        if (result.jobResultStatus != jobResultStatus || (wptStatus != null && result.wptStatus != wptStatus)) {
 
-            updateStatus(result, statusCode, wptStatus, description)
+            updateStatus(result, jobResultStatus, wptStatus, description)
 
             try {
                 result.save(failOnError: true, flush: true)
 
             } catch (StaleObjectStateException staleObjectStateException) {
                 String logMessage = "Updating status of existing JobResult: Job ${job.label}, test-id=${testId}" +
-                        "\n\t-> httpStatusCode of result couldn't get updated from ${result.httpStatusCode}->${statusCode}"
+                        "\n\t-> jobResultStatus of result couldn't get updated from ${result.jobResultStatus}->${jobResultStatus}"
                 if (wptStatus != null) logMessage += "\n\twptStatus of result couldn't get updated from ${result.wptStatus}->${wptStatus}"
                 log.error(logMessage, staleObjectStateException)
             }
@@ -261,9 +261,9 @@ class JobProcessingService {
         }
     }
 
-    private void updateStatus(JobResult result, int statusCode, String wptStatus, String description) {
-        log.debug("Updating status of existing JobResult: httpStatusCode: ${result.httpStatusCode}->${statusCode}")
-        result.httpStatusCode = statusCode
+    private void updateStatus(JobResult result, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
+        log.debug("Updating status of existing JobResult: jobResultStatus: ${result.jobResultStatus}->${jobResultStatus}")
+        result.jobResultStatus = jobResultStatus
         result.description = description
         if (wptStatus != null) {
             log.debug("Updating status of existing JobResult: wptStatus: ${result.wptStatus}->${wptStatus}")
@@ -271,7 +271,7 @@ class JobProcessingService {
         }
     }
 
-    private JobResult persistNewUnfinishedJobResult(Job job, String testId, int statusCode, String wptStatus, String description) {
+    private JobResult persistNewUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
         JobResult result = new JobResult(
                 job: job,
                 date: new Date(),
@@ -287,7 +287,7 @@ class JobProcessingService {
                 locationBrowser: job.location.browser.name,
                 locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
                 jobGroupName: job.jobGroup.name,
-                httpStatusCode: statusCode)
+                jobResultStatus: jobResultStatus)
         if (wptStatus != null) result.wptStatus = wptStatus
         log.debug("Persisting of unfinished result: Job ${job.label}, test-id=${testId} -> persisting new JobResult=${result}")
         return result.save(failOnError: true, flush: true)
@@ -350,7 +350,7 @@ class JobProcessingService {
             throw new IllegalStateException("Job run of Job ${job} is skipped cause overloaded locations.")
         }
 
-        int statusCode
+        WptStatus wptStatus
         String testId
         try {
             def parameters = fillRequestParameters(job)
@@ -368,10 +368,10 @@ class JobProcessingService {
             }
 
             NodeChild runtestResponseXml = parseResponse(result, wptserver)
-            statusCode = runtestResponseXml?.statusCode?.toInteger()
+            wptStatus = WptStatus.byResultCode(runtestResponseXml?.statusCode?.toInteger())
             testId = runtestResponseXml?.data?.testId
-            if(statusCode != 200){
-                throw new JobExecutionException("Got status code ${statusCode} from wptserver ${wptserver}")
+            if (wptStatus != WptStatus.COMPLETED) {
+                throw new JobExecutionException("Got status code ${wptStatus} from wptserver ${wptserver}")
             }
             if(!testId){
                 throw new JobExecutionException("Jobrun failed for: wptserver=${wptserver}, sent params=${parameters} => got no testId in response");
@@ -396,8 +396,8 @@ class JobProcessingService {
 
             return testId
         } catch (Exception e) {
-            statusCode = statusCode? statusCode : 500
-            persistUnfinishedJobResult(job.id, testId, statusCode, e.getMessage())
+            wptStatus = wptStatus ? wptStatus : WptStatus.TEST_DID_NOT_START
+            persistUnfinishedJobResult(job.id, testId, wptStatus, JobResultStatus.LAUNCH_ERROR, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }
@@ -407,22 +407,24 @@ class JobProcessingService {
      * If the Job terminated (successfully or unsuccessfully) the Quartz trigger calling pollJobRun()
      * every pollDelaySeconds seconds is removed
      */
-    WptResultXml pollJobRun(Job job, String testId, String wptStatus = null) {
+    WptResultXml pollJobRun(Job job, String testId) {
         WptResultXml resultXml
         try {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
                 resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId, job)
             }
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
-                if (resultXml.statusCodeOfWholeTest < 200) {
-                    persistUnfinishedJobResult(job.id, testId, resultXml.statusCodeOfWholeTest, wptStatus)
+            WptStatus wptStatus = resultXml.wptStatus
+            if (wptStatus == WptStatus.PENDING || wptStatus == WptStatus.IN_PROGRESS) {
+                JobResultStatus jobResultStatus = (wptStatus == WptStatus.PENDING) ? JobResultStatus.WAITING : JobResultStatus.RUNNING
+                performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
+                    persistUnfinishedJobResult(job.id, testId, jobResultStatus, wptStatus, "polling jobrun")
                 }
             }
         } catch (Exception e) {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-            persistUnfinishedJobResult(job.id, testId, 400, e.getMessage())
+            persistUnfinishedJobResult(job.id, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
         } finally {
-            if (resultXml && resultXml.statusCodeOfWholeTest >= 200 && resultXml.hasRuns()) {
+            if (resultXml && resultXml.isFinishedWithResults()) {
                 unscheduleTest(job, testId)
             }
         }
@@ -437,24 +439,25 @@ class JobProcessingService {
 
     /**
      * Checks if this job instance is still unfinished. If so, the corresponding WPT Server is polled one last time
-     * and if job is still reported as running, it's temporary JobResult is set to httpStatusCode 504 (timeout)
+     * and if job is still reported as running, it's temporary JobResult is set to jobResultStatus 504 (timeout)
      * in the database. In addition, a request to cancelTest.php is made.
      */
     public void handleJobRunTimeout(Job job, String testId) {
-        // Is there a non-running result? Then done
         JobResult result = JobResult.findByJobAndTestId(job, testId)
-        if (!result)
+        if (!result || result.wptStatus.isFinished()) {
             return
-        if (result.httpStatusCode < WptStatus.COMPLETED.getWptStatusCode()) {
-            // poll a last time
-            WptResultXml lastResult = pollJobRun(job, testId)
-            if (lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() || (lastResult.statusCodeOfWholeTest >= WptStatus.COMPLETED.getWptStatusCode() && !lastResult.hasRuns())) {
-                unscheduleTest(job, testId)
-                String description = lastResult.statusCodeOfWholeTest < WptStatus.COMPLETED.getWptStatusCode() ? "Timeout of test" : "Test had result code ${lastResult.statusCodeOfWholeTest}. XML result contains no runs."
-                persistUnfinishedJobResult(job.id, testId, WptStatus.TIME_OUT.getWptStatusCode(), '', description)
-                wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
-            }
         }
+        WptResultXml wptResult = pollJobRun(job, testId)
+        if (wptResult.isFinishedWithResults()) {
+            return
+        }
+        unscheduleTest(job, testId)
+        String description = "Test exceeded maximum polling time. Test had result code ${wptResult.wptStatus}."
+        if (!wptResult.hasRuns()) {
+            description += " XML result contains no runs."
+        }
+        persistUnfinishedJobResult(job.id, testId, JobResultStatus.TIMEOUT, wptResult.wptStatus, description)
+        wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
     }
 
     /**
@@ -468,7 +471,10 @@ class JobProcessingService {
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_POLL.value())
         JobProcessingQuartzHandlerJob.unschedule(getSubtriggerId(job, testId), TriggerGroup.JOB_TRIGGER_TIMEOUT.value())
         log.info("unschedule quartz triggers for job run: job=${job.label},test id=${testId} ... DONE")
-        JobResult result = JobResult.findByJobAndTestIdAndHttpStatusCodeLessThan(job, testId, WptStatus.COMPLETED.getWptStatusCode())
+        JobResult result = JobResult.findByJobAndTestIdAndJobResultStatus(job, testId, JobResultStatus.WAITING)
+        if (!result) {
+            result = JobResult.findByJobAndTestIdAndJobResultStatus(job, testId, JobResultStatus.RUNNING)
+        }
         if (result) {
             log.info("Deleting the following JobResult as requested: ${result}.")
             result.delete(failOnError: true, flush: true)
@@ -534,10 +540,11 @@ class JobProcessingService {
     public Map<String, Integer> handleOldJobResults() {
         log.info("handleOldJobResults() OSM starts")
 
-        def jobResultsToDelete = JobResult.findAllByHttpStatusCodeLessThanAndDateLessThan(200, new DateTime().minusHours(2))
+        def jobResultsToDelete = JobResult.findAllByJobResultStatusAndDateLessThan(JobResultStatus.WAITING, new DateTime().minusHours(2))
+        jobResultsToDelete.add(JobResult.findAllByJobResultStatusAndDateLessThan(JobResultStatus.RUNNING, new DateTime().minusHours(2)))
         def jobResultsToDeleteCount = jobResultsToDelete.size()
         if (!jobResultsToDelete.isEmpty()) {
-            log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with HttpStatusCode < 200 that are to old. Start deleting...")
+            log.debug("Found ${jobResultsToDelete.size()} pending/running JobResults with JobResultStatus < 200 that are to old. Start deleting...")
             jobResultsToDelete.each { JobResult jobResult ->
                 try {
                     jobResult.delete()
@@ -548,10 +555,11 @@ class JobProcessingService {
             log.debug("Deleting done.")
         }
 
-        def jobResultsToReschedule = JobResult.findAllByHttpStatusCodeLessThanAndDateGreaterThan(200, new DateTime().minusHours(2))
+        def jobResultsToReschedule = JobResult.findAllByJobResultStatusAndDateGreaterThan(JobResultStatus.WAITING, new DateTime().minusHours(2))
+        jobResultsToReschedule.add(JobResult.findAllByJobResultStatusAndDateGreaterThan(JobResultStatus.RUNNING, new DateTime().minusHours(2)))
         def jobResultsToRescheduleCount = jobResultsToReschedule.size()
         if (!jobResultsToReschedule.isEmpty()) {
-            log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with HttpStatusCode < 200 fresh enough for rescheduling. Start rescheduling ...")
+            log.debug("Found ${jobResultsToReschedule.size()} pending/running JobResults with JobResultStatus < 200 fresh enough for rescheduling. Start rescheduling ...")
             jobResultsToReschedule.each { JobResult jobResult ->
                 Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
                 Date endDate = new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).toDate()
@@ -579,18 +587,17 @@ class JobProcessingService {
     }
 
     /**
-     * Setting the http status code of running and pending jobResults older than maxDate
+     * Setting the job result status of running and pending jobResults older than maxDate
      */
     void closeRunningAndPengingJobResults() {
         DateTime currentDate = new DateTime()
-        List<JobResult> jobResults = JobResult.findAllByHttpStatusCodeLessThan(WptStatus.COMPLETED.getWptStatusCode())
+        List<JobResult> jobResults = JobResult.findAllByJobResultStatusInList([JobResultStatus.WAITING, JobResultStatus.RUNNING])
         jobResults = jobResults.findAll {
-            // Close the jobResult, if its job timeout is exceeded by twice the amount
             currentDate > new DateTime(it.date).plusMinutes(it.job.maxDownloadTimeInMinutes * 2)
         }
         if (jobResults) {
             jobResults.each {
-                it.httpStatusCode = WptStatus.OUTDATED_JOB.getWptStatusCode()
+                it.jobResultStatus = JobResultStatus.ORPHANED
                 it.description = "closed due to nightly cleanup of job results"
                 it.save(failOnError: true)
             }

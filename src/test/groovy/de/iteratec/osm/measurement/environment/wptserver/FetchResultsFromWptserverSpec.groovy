@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.testing.gorm.DataTest
 import grails.testing.services.ServiceUnitTest
@@ -155,7 +156,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
 
         then:
         // Verify results
-        assertThat(resultXml.statusCodeOfWholeTest, is(200))
+        assertThat(resultXml.wptStatus, is(WptStatus.COMPLETED))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -185,7 +186,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
 
         then:
         // Verify results
-        assertThat(resultXml.statusCodeOfWholeTest, is(200))
+        assertThat(resultXml.wptStatus, is(WptStatus.COMPLETED))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -216,7 +217,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
 
         then:
         // Verify results
-        assertThat(resultXml.statusCodeOfWholeTest, is(200))
+        assertThat(resultXml.wptStatus, is(WptStatus.COMPLETED))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -242,7 +243,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
 
         then:
         // Verify results
-        assertThat(resultXml.statusCodeOfWholeTest, is(200))
+        assertThat(resultXml.wptStatus, is(WptStatus.COMPLETED))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data
@@ -268,7 +269,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
 
         then:
         // Verify results
-        assertThat(resultXml.statusCodeOfWholeTest, is(200))
+        assertThat(resultXml.wptStatus, is(WptStatus.COMPLETED))
         assertThat(listener.resultListeningCounter, is(1))
         assertThat(listener.wptserverOfLastListening, is(wptserver))
         listener.resultOfLastListening.responseNode.data == expectedResult.responseNode.data

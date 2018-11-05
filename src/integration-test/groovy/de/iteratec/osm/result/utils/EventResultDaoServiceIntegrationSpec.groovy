@@ -169,7 +169,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode: 200,
+                wptStatus: WptStatus.COMPLETED,
         ).save(failOnError: true)
 
         resultRunDatePlus_Zero = EventResult.build(
@@ -216,7 +216,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode: 200,
+                wptStatus: WptStatus.COMPLETED,
         ).save(failOnError: true)
 
         resultRunDatePlus_Ten = EventResult.build(
@@ -263,7 +263,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode: 200,
+                wptStatus: WptStatus.COMPLETED,
         ).save(failOnError: true)
 
         resultRunDatePlus_Twenty = EventResult.build(
@@ -310,7 +310,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode: 200,
+                wptStatus: WptStatus.COMPLETED,
         ).save(failOnError: true)
 
         resultRunDatePlus_Thirty = EventResult.build(
@@ -357,7 +357,7 @@ class EventResultDaoServiceIntegrationSpec extends NonTransactionalIntegrationSp
                 frequencyInMin: 5,
                 locationLocation: job.location.location,
                 locationBrowser: job.location.browser.name,
-                httpStatusCode: 200,
+                wptStatus: WptStatus.COMPLETED,
         ).save(failOnError: true)
 
         resultRunDatePlus_Day = EventResult.build(
