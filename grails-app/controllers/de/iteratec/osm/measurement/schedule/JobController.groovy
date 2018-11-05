@@ -43,7 +43,7 @@ class JobController {
     static final int LAST_N_HOURS_TO_SHOW_PENDING_OR_RUNNNG_RESULTS_IN_JOBLIST = 2
 
     PageRenderer groovyPageRenderer
-    JobProcessingService jobProcessingService
+    JobRunService jobRunService
     JobService jobService
     JobDaoService jobDaoService
     QueueAndJobStatusService queueAndJobStatusService
@@ -279,7 +279,7 @@ class JobController {
     def execute() {
         handleSelectedJobs("execute") { Job job, Map<Long, Object> massExecutionResults ->
             try {
-                jobProcessingService.launchJobRun(job)
+                jobRunService.launchJobRun(job)
                 massExecutionResults[job.id] = [status: 'success']
             } catch(Exception exception) {
                 massExecutionResults[job.id] = [status: 'failure']
@@ -451,7 +451,7 @@ class JobController {
 
     def cancelJobRun(long jobId, String testId) {
         Job job = Job.get(jobId)
-        jobProcessingService.cancelJobRun(job, testId)
+        jobRunService.cancelJobRun(job, testId)
 
         ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, '')
     }

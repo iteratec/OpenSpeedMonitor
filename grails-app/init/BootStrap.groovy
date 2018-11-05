@@ -30,7 +30,7 @@ import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobSchedulingService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -51,7 +51,7 @@ class BootStrap {
 
     EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
-    JobProcessingService jobProcessingService
+    JobSchedulingService jobSchedulingService
     I18nService i18nService
     ResultPersisterService resultPersisterService
     LocationPersisterService locationPersisterService
@@ -152,7 +152,7 @@ class BootStrap {
         createConnectivityProfileIfMissing(384, 384, 140, 'UMTS', 0)
         createConnectivityProfileIfMissing(3600, 1500, 40, 'UMTS - HSDPA', 0)
 
-        jobProcessingService.scheduleAllActiveJobs()
+        jobSchedulingService.scheduleAllActiveJobs()
 
         log.info "initJobScheduling() OSM ends"
     }
