@@ -12,8 +12,8 @@ describe('ApplicationJobStatusComponent', () => {
   let applicationService: ApplicationService;
 
   const noInformationAvailable = 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.noInformationAvailable';
-  const oneFailingJob = ' frontend.de.iteratec.osm.applicationDashboard.jobStatus.oneFailingJob ';
-  const multipleFailingJobs = ' frontend.de.iteratec.osm.applicationDashboard.jobStatus.multipleFailingJobs ';
+  const oneFailingJob = 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.oneFailingJob';
+  const multipleFailingJobs = 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.multipleFailingJobs';
   const noFailingJobs = 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.allJobsRunning';
 
   const questionCircleIcon = 'far fa-question-circle';
@@ -51,6 +51,7 @@ describe('ApplicationJobStatusComponent', () => {
 
   it('should only show no information available message when FailingJobStatistic is null', () => {
     component.failingJobStatistic = null;
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     const errorMessageEl: HTMLElement = fixture.nativeElement.querySelector('.clickable-list li a');
@@ -68,6 +69,7 @@ describe('ApplicationJobStatusComponent', () => {
       id: 67,
       name: 'Example'
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     const showJobsButton: HTMLElement = fixture.nativeElement.querySelector('a.btn.btn-default');
@@ -79,6 +81,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: null,
       numberOfFailingJobs: 0
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     let errorMessageEl: HTMLElement = fixture.nativeElement.querySelector(allJobStatusCssClasses);
@@ -91,6 +94,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 0,
       numberOfFailingJobs: 0
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
@@ -103,6 +107,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 80,
       numberOfFailingJobs: 1
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
@@ -115,6 +120,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 80,
       numberOfFailingJobs: 2
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
@@ -127,6 +133,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 60,
       numberOfFailingJobs: 1
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
@@ -139,6 +146,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 60,
       numberOfFailingJobs: 2
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessageEl = fixture.nativeElement.querySelector(allJobStatusCssClasses);
@@ -156,6 +164,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 80,
       numberOfFailingJobs: 1
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
@@ -165,6 +174,7 @@ describe('ApplicationJobStatusComponent', () => {
       minimumFailedJobSuccessRate: 50,
       numberOfFailingJobs: 0
     });
+    component.ngOnChanges({});
     fixture.detectChanges();
 
     errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
