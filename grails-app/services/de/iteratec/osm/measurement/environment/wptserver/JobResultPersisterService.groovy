@@ -43,14 +43,13 @@ class JobResultPersisterService {
      * specified Job/test is running and that this is not the result of a finished
      * test execution.
      */
-    JobResult persistUnfinishedJobResult(long jobId, String testId, JobResultStatus jobResultStatus, String description = '') {
-        JobResult result = JobResult.findByJobAndTestId(Job.get(jobId), testId)
+    JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, String description = '') {
+        JobResult result = JobResult.findByJobAndTestId(job, testId)
         WptStatus wptStatus = result ? result.wptStatus : WptStatus.UNKNOWN
-        return persistUnfinishedJobResult(jobId, testId, jobResultStatus, wptStatus, description)
+        return persistUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
     }
 
-    JobResult persistUnfinishedJobResult(long jobId, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
-        Job job = Job.get(jobId)
+    JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
         JobResult result = testId ? JobResult.findByJobAndTestId(job, testId) : null
         if (!result) {
             result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
@@ -68,7 +67,7 @@ class JobResultPersisterService {
             }
         } else {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
-                persistUnfinishedJobResult(job.id, testId, jobResultStatus, resultXml.wptStatus, "polling jobrun")
+                persistUnfinishedJobResult(job, testId, jobResultStatus, resultXml.wptStatus, "Polling job run.")
             }
         }
         return jobResultStatus
@@ -161,10 +160,11 @@ class JobResultPersisterService {
                 job: job,
                 date: new Date(),
                 testId: testId ?: UUID.randomUUID() as String,
-                har: null,
                 description: description,
                 jobConfigLabel: job.label,
                 jobConfigRuns: job.runs,
+                expectedSteps: job.script.measuredEventsCount,
+                firstViewOnly: job.firstViewOnly,
                 wptServerLabel: job.location.wptServer.label,
                 wptServerBaseurl: job.location.wptServer.baseUrl,
                 locationLabel: job.location.label,
@@ -202,6 +202,8 @@ class JobResultPersisterService {
                 jobResultStatus: jobResultStatus,
                 jobConfigLabel: job.label,
                 jobConfigRuns: job.runs,
+                expectedSteps: job.script.measuredEventsCount,
+                firstViewOnly: job.firstViewOnly,
                 wptServerLabel: job.location.wptServer.label,
                 wptServerBaseurl: job.location.wptServer.baseUrl,
                 locationLabel: job.location.label,

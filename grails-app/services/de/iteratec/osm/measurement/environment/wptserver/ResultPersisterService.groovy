@@ -161,8 +161,7 @@ class ResultPersisterService implements iResultListener {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected boolean persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
-        List<EventResult> resultsOfTeststep = []
-        String testId = resultXml.getTestId()      
+        String testId = resultXml.getTestId()
         Job job = jobDaoService.getJob(jobId)
         JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
 
@@ -190,15 +189,11 @@ class ResultPersisterService implements iResultListener {
         log.debug("runCount=${runCount}")
 
         resultXml.getRunCount().times { Integer runNumber ->
-            if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
-                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
-                if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
-            }
-            if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
-                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
-                if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+            [CachedView.CACHED, CachedView.UNCACHED].each { cached ->
+                if (resultXml.resultExistForRunAndView(runNumber, cached) &&
+                        (job.persistNonMedianResults || resultXml.isMedian(runNumber, cached, testStepZeroBasedIndex))) {
+                    persistSingleResult(resultXml, runNumber, cached, testStepZeroBasedIndex, jobResult, event)
+                }
             }
         }
 

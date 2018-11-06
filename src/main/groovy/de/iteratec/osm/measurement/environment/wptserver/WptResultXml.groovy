@@ -188,7 +188,7 @@ class WptResultXml {
      * @param currentRun
      * @return
      */
-    private boolean isMedian(Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex) {
+    boolean isMedian(Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex) {
 
         if (version == null) throw new IllegalStateException("Version of result xml isn't specified!")
 
