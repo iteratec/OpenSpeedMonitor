@@ -53,8 +53,8 @@ class JobResultPersisterService {
         JobResult result = testId ? JobResult.findByJobAndTestId(job, testId) : null
         if (!result) {
             result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
-        } else {
-            updateJobResultStatus(result, job, testId, jobResultStatus, wptStatus, description)
+        } else if (wptStatus != result.wptStatus || jobResultStatus != result.jobResultStatus) {
+            updateAndPersistJobResult(result, testId, jobResultStatus, wptStatus, description)
         }
         return result
     }
@@ -82,7 +82,12 @@ class JobResultPersisterService {
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {
-            return JobResultStatus.SUCCESS
+            boolean hasExpectedResult = false
+            JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
+            if (jobResult) {
+                hasExpectedResult = resultXml.hasExpectedResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
+            }
+            return hasExpectedResult ? JobResultStatus.SUCCESS : JobResultStatus.INCOMPLETE
         }
         // TODO(sbr): Check for timeout
         if (wptStatus == WptStatus.IN_PROGRESS) {
@@ -137,18 +142,22 @@ class JobResultPersisterService {
         }
     }
 
-    private void updateJobResultStatus(JobResult result, Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
-        log.debug("Updating status of existing JobResult: Job ${job.label}, test-id=${testId}")
-        if (result.jobResultStatus == jobResultStatus && result.wptStatus == wptStatus) {
-            return
-        }
+
+    private void updateJobResult(JobResult jobResult, JobResultStatus jobResultStatus, WptResultXml resultXml) {
+        jobResult.testAgent = resultXml.getTestAgent()
+        jobResult.wptVersion = resultXml.version.toString()
+        updateAndPersistJobResult(jobResult, resultXml.testId, jobResultStatus, resultXml.wptStatus)
+    }
+
+    private void updateAndPersistJobResult(JobResult result, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
+        log.debug("Updating status of existing JobResult: Job ${result.job.id}, test-id=${testId}")
         result.jobResultStatus = jobResultStatus
         result.description = description
         result.wptStatus = wptStatus
         try {
             result.save(failOnError: true, flush: true)
         } catch (StaleObjectStateException staleObjectStateException) {
-            String logMessage = "Updating status of existing JobResult: Job ${job.label}, test-id=${testId}" +
+            String logMessage = "Updating status of existing JobResult: Job ${result.job.id}, test-id=${testId}" +
                     "\n\t-> jobResultStatus of result couldn't get updated from ${result.jobResultStatus}->${jobResultStatus}" +
                     "\n\t-> wptStatus of result couldn't get updated from ${result.wptStatus}->${wptStatus}"
             log.error(logMessage, staleObjectStateException)
@@ -181,14 +190,6 @@ class JobResultPersisterService {
     private void deleteUnfinishedJobResults(Job job, String testId) {
         JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.IN_PROGRESS)?.delete(failOnError: true, flush: true)
         JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.PENDING)?.delete(failOnError: true, flush: true)
-    }
-
-    private void updateJobResult(JobResult jobResult, JobResultStatus jobResultStatus, WptResultXml resultXml) {
-        jobResult.testAgent = resultXml.getTestAgent()
-        jobResult.wptVersion = resultXml.version.toString()
-        jobResult.wptStatus = resultXml.wptStatus
-        jobResult.jobResultStatus = jobResultStatus
-        jobResult.save(failOnError: true, flush: true)
     }
 
     private void persistNewFinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptResultXml resultXml) {

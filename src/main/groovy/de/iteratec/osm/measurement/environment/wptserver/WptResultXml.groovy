@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.WptStatus
@@ -22,7 +23,16 @@ class WptResultXml {
      */
     WptXmlResultVersion version
 
-    public WptResultXml(GPathResult baseNode) {
+    int minValidLoadTime = OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+    int maxValidLoadTime = OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+
+    WptResultXml(GPathResult baseNode, int minValidLoadTime, int maxValidLoadTime) {
+        this(baseNode)
+        this.minValidLoadTime = minValidLoadTime
+        this.maxValidLoadTime = maxValidLoadTime
+    }
+
+    WptResultXml(GPathResult baseNode) {
         this.responseNode = baseNode
         version = WptXmlResultVersion.BEFORE_MULTISTEP
         if (!this.responseNode.data.median.firstView.testStep.isEmpty()) {
@@ -220,4 +230,28 @@ class WptResultXml {
         return responseNode.data.runs.toString().isInteger()
     }
 
+    boolean hasExpectedResults(int expectedRuns, int expectedSteps, boolean firstViewOnly) {
+        def expectedCached = firstViewOnly ? [CachedView.UNCACHED] : [CachedView.UNCACHED, CachedView.CACHED]
+        expectedRuns.times { run ->
+            expectedCached.each { cached ->
+                expectedSteps.times { step ->
+                    if (!isValidTestStep(getResultsContainingNode(runNumber, cachedView, stepNumber))) {
+                        return false
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    boolean isValidTestStep(GPathResult testStepNode) {
+        if (!testStepNode || testStepNode.isEmpty()) {
+            return false
+        }
+        int loadTime = testStepNode.loadTime?.toInteger()
+        return (WptStatus.byResultCode(testStepNode.result?.toInteger()).isSuccess() &&
+                (testStepNode.TTFB?.toInteger() > 0) &&
+                (loadTime >= minValidLoadTime) &&
+                (loadTime <= maxValidLoadTime))
+    }
 }

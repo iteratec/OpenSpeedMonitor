@@ -165,12 +165,6 @@ class ResultPersisterService implements iResultListener {
         Job job = jobDaoService.getJob(jobId)
         JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
 
-        if (!isEventResultValid(resultXml, testStepZeroBasedIndex)) {
-            log.debug("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
-                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
-            return false
-        }
-
         if (jobResult == null) {
             throw new OsmResultPersistanceException(
                     "JobResult couldn't be read from db while persisting associated EventResults for test id '${testId}'!"
@@ -185,31 +179,21 @@ class ResultPersisterService implements iResultListener {
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
 
         log.debug("persisting result for step=${event}")
-        Integer runCount = resultXml.getRunCount()
+        int runCount = resultXml.getRunCount()
         log.debug("runCount=${runCount}")
 
-        resultXml.getRunCount().times { Integer runNumber ->
-            [CachedView.CACHED, CachedView.UNCACHED].each { cached ->
+        for (int runNumber = 0; runNumber < resultXml.getRunCount(); runNumber++) {
+            for (CachedView cached : [CachedView.CACHED, CachedView.UNCACHED]) {
                 if (resultXml.resultExistForRunAndView(runNumber, cached) &&
                         (job.persistNonMedianResults || resultXml.isMedian(runNumber, cached, testStepZeroBasedIndex))) {
-                    persistSingleResult(resultXml, runNumber, cached, testStepZeroBasedIndex, jobResult, event)
+                    if (!persistSingleResult(resultXml, runNumber, cached, testStepZeroBasedIndex, jobResult, event)) {
+                        return false
+                    }
                 }
             }
         }
 
         return true
-    }
-
-
-    boolean isEventResultValid(WptResultXml resultXml, int testStepZeroBasedIndex) {
-        int minValidLoadTime = configService.getMinValidLoadtime()
-        int maxValidLoadTime = configService.getMaxValidLoadtime()
-        int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
-
-        return (!WptStatus.byResultCode(resultXml.getResultCodeForStep(testStepZeroBasedIndex)).isFailed() &&
-                (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
-                (loadTime >= minValidLoadTime) &&
-                (loadTime <= maxValidLoadTime))
     }
 
     /**
@@ -220,15 +204,20 @@ class ResultPersisterService implements iResultListener {
      * @param testStepZeroBasedIndex
      * @param jobRungrails -app/services/de/iteratec/ispc/ResultPersisterService.groovy
      * @param event
-     * @return Persisted result. Null if the view node is empty, i.e. the test was a "first view only" and this is the repeated view node
+     * @return True if the step is valid, false otherwise
      */
-    private EventResult persistSingleResult(
+    private boolean persistSingleResult(
             WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event) {
 
-        EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
+        if (!resultXml.isValidTestStep(viewResultsNodeOfThisRun)) {
+            // TODO(sbr): fix or move
+            log.debug("Invalid EventResult in the test:'${resultXml.getTestId()}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
+                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
+            return false
+        }
         GString waterfallAnchor = getWaterfallAnchor(resultXml, event.name, testStepZeroBasedIndex + 1)
-        result = persistResult(
+        persistResult(
                 jobRun,
                 event,
                 cachedView,
@@ -238,8 +227,7 @@ class ResultPersisterService implements iResultListener {
                 testStepZeroBasedIndex + 1,
                 waterfallAnchor
         )
-
-        return result
+        return true
     }
 
     /**
