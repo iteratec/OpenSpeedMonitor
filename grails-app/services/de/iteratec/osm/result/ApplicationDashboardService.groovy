@@ -192,4 +192,24 @@ class ApplicationDashboardService {
         }
         return dto
     }
+
+    def getFailingJobStatistics(Long jobGroupId) {
+        def jobsWithErrors = Job.createCriteria().get {
+            projections {
+                countDistinct 'id'
+                jobStatistic {
+                    min 'percentageSuccessfulTestsOfLast5'
+                }
+            }
+            and {
+                eq 'jobGroup.id', jobGroupId
+                eq 'deleted', false
+                eq 'active', true
+                jobStatistic {
+                    lt 'percentageSuccessfulTestsOfLast5', 90d
+                }
+            }
+        }
+        return jobsWithErrors
+    }
 }
