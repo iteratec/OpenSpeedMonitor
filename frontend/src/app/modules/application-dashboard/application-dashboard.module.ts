@@ -8,6 +8,7 @@ import {PageMetricComponent} from './components/page-metric/page-metric.componen
 import {CsiInfoComponent} from "./components/csi-info/csi-info.component";
 import {SharedModule} from "../shared/shared.module";
 import {HttpClientModule} from "@angular/common/http";
+import { ApplicationJobStatusComponent } from './components/application-job-status/application-job-status.component';
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -27,6 +28,7 @@ const DashboardRoutes: Routes = [
     CsiGraphComponent,
     CsiInfoComponent,
     PageMetricComponent,
+    ApplicationJobStatusComponent,
   ],
   exports: [
     RouterModule

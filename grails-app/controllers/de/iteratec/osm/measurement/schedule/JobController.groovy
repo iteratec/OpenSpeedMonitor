@@ -23,11 +23,7 @@ import de.iteratec.osm.integrations.CiPipeService
 import de.iteratec.osm.measurement.environment.QueueAndJobStatusService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.Measurand
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.Threshold
-import de.iteratec.osm.result.ThresholdService
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -432,16 +428,6 @@ class JobController {
     }
 
     def getRunningAndRecentlyFinishedJobs() {
-        // the following does not work due to unresolved bug in Grails:
-        // http://jira.grails.org/browse/GPCONVERTERS-10
-
-//		render(contentType: "application/json") {
-//			use (TimeCategory) {
-//				jobProcessingService.getRunningAndRecentlyFinishedJobs(new Date() - 5.days)
-//			}
-//		}
-
-        // thus this workaround:
         response.setContentType('application/json')
         Map jobs
         use(TimeCategory) {
@@ -453,7 +439,7 @@ class JobController {
         jobs.each {
             jobId, jobResults ->
                 jobResults.each {
-                    if (it.status < 200)
+                    if (!it.status.isTerminated())
                         it.cancelLinkHtml = groovyPageRenderer.render(template: '/job/cancelLink', model: [jobId: jobId, testId: it.testId])
                 }
         }

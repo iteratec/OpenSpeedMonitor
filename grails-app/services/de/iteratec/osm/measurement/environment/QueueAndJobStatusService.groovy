@@ -27,13 +27,14 @@ import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.measurement.script.ScriptParser
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.PageService
-import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.I18nService
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.quartz.CronExpression
+
 /**
  * QueueAndJobStatusService returns various figures regarding Jobs, Queues and EventResults.
  *
@@ -103,25 +104,25 @@ class QueueAndJobStatusService {
     }
 
     /**
-     * Get number of successfully finished Jobs (i.e. JobResults with httpStatusCode 200)
+     * Get number of successfully finished Jobs (i.e. JobResults with jobResultStatus 200)
      * from sinceWhen until now for the specified location
      * @return
      */
     int getFinishedJobResultCountSince(Location location, Date sinceWhen) {
         def query = JobResult.where {
-            date >= sinceWhen && httpStatusCode == WptStatus.COMPLETED.getWptStatusCode() && job.location == location
+            date >= sinceWhen && jobResultStatus == JobResultStatus.SUCCESS && job.location == location
         }
         return query.list().size()
     }
 
     /**
-     * Get number of successfully finished Jobs (i.e. JobResults with httpStatusCode 200)
+     * Get number of unsuccessfully finished Jobs (i.e. JobResults with jobResultStatus 500 or above)
      * from sinceWhen until now for the specified location
      * @return
      */
     int getErroneousJobResultCountSince(Location location, Date sinceWhen) {
         def query = JobResult.where {
-            date >= sinceWhen && httpStatusCode >= WptStatus.INVALID_TEST_ID.getWptStatusCode() && job.location == location
+            date >= sinceWhen && jobResultStatus >= JobResultStatus.LAUNCH_ERROR && job.location == location
         }
         return query.list().size()
     }
@@ -132,7 +133,7 @@ class QueueAndJobStatusService {
      */
     List<JobResult> getExecutingJobResults(Location location) {
         def query = JobResult.where {
-            (httpStatusCode == WptStatus.PENDING.getWptStatusCode() || httpStatusCode == WptStatus.RUNNING.getWptStatusCode()) && job.location == location
+            (jobResultStatus == JobResultStatus.WAITING || jobResultStatus == JobResultStatus.RUNNING) && job.location == location
         }
         return query.list(sort: 'date', order: 'desc')
     }
@@ -199,26 +200,30 @@ class QueueAndJobStatusService {
      * @return A map mapping the ID of each Job to a list of maps which contain
      * 	 testId, status, date, terminated, message and wptStatus.
      */
-    Map<Long, Object> getRunningAndRecentlyFinishedJobs(Date successfulSinceWhen, Date errorSinceWhen, Date runningSinceWhen) {
-        Map<Long, Object> jobResults = [:].withDefault { [] }
+    Map<Long, List> getRunningAndRecentlyFinishedJobs(Date successfulSinceWhen, Date errorSinceWhen, Date runningSinceWhen) {
+        Map<Long, List> jobResults = [:].withDefault { [] }
         Date oldestDate = [successfulSinceWhen, errorSinceWhen, runningSinceWhen].sort().first()
         JobResult.findAllByDateGreaterThanEquals(oldestDate, [sort: 'date']).each { JobResult result ->
             jobResults[result.job.id] << [
                     testId    : result.testId,
-                    status    : result.httpStatusCode,
+                    status    : result.jobResultStatus,
                     date      : result.date,
-                    terminated: result.httpStatusCode >= 200,
-                    message   : result.getStatusCodeMessage() + (result.httpStatusCode >= 400 && result.wptStatus ? ': ' + result.wptStatus : ''),
+                    terminated: result.jobResultStatus.isTerminated(),
+                    message   : result.jobResultStatus.getMessage(),
                     wptStatus : result.wptStatus,
                     testUrl   : (result.wptServerBaseurl.endsWith('/') ? result.wptServerBaseurl : "${result.wptServerBaseurl}/") + "result/${result.testId}"]
         }
 
-        // keep only the newest erroneous (httpStatusCode >= 400) result and delete all erroneous results
+        // keep only the newest erroneous (JobResultStatus >= 400) result and delete all erroneous results
         // succeeded by successful/currently running results
         Map filteredJobResults = jobResults.each {
             it.value = it.value
-                    .findAll { result -> result['status'] < WptStatus.INVALID_TEST_ID.getWptStatusCode() || result == it.value.last() }
-                    .findAll { result -> (result['date'] >= runningSinceWhen && (result['status'] == WptStatus.PENDING.getWptStatusCode() || result['status'] == WptStatus.RUNNING.getWptStatusCode())) || (result['date'] >= successfulSinceWhen && result['status'] == WptStatus.COMPLETED.getWptStatusCode()) || (result['date'] >= errorSinceWhen && result['status'] >= WptStatus.INVALID_TEST_ID.getWptStatusCode()) }
+                    .findAll { result -> !result['status'].isFailed() || result == it.value.last() }
+                    .findAll { result ->
+                (result['date'] >= runningSinceWhen && (!result['status'].isTerminated()) ||
+                        (result['date'] >= successfulSinceWhen && result['status'].isSuccess())) ||
+                        (result['date'] >= errorSinceWhen && result['status'].isFailed())
+            }
         }
         return filteredJobResults
     }

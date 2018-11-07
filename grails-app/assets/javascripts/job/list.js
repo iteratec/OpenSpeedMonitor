@@ -78,7 +78,7 @@ JobStatusUpdater = function () {
                     for (var i = 0; i < data.length; i++) {
                         var cssClass = data[i].terminated ? 'done' : 'running';
                         var cancelLink = data[i].cancelLinkHtml ? data[i].cancelLinkHtml : '';
-                        var status = data[i].status < 400 ? '<a href="' + data[i].testUrl + '">' + data[i].message + '</a>' : data[i].message;
+                        var status = '<a href="' + data[i].testUrl + '">' + data[i].message + '</a>';
                         // detect whether job just terminated
                         if (data[i].terminated && JobStatusUpdater.finishedJobs.indexOf(data[i].testId) === -1) {
                             JobStatusUpdater.finishedJobs.push(data[i].testId);

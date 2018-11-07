@@ -24,8 +24,9 @@ import groovy.util.slurpersupport.GPathResult
 
 class HttpRequestServiceMock extends HttpRequestService {
 	public static final String testId = '140210_6W_1'
-	public static final int[] statusCodes = [WptStatus.PENDING.getWptStatusCode(), WptStatus.RUNNING.getWptStatusCode(), WptStatus.RUNNING.getWptStatusCode(),
-											 WptStatus.RUNNING.getWptStatusCode(), WptStatus.COMPLETED.getWptStatusCode()]
+	public static
+	final int[] statusCodes = [WptStatus.PENDING.getWptStatusCode(), WptStatus.IN_PROGRESS.getWptStatusCode(), WptStatus.IN_PROGRESS.getWptStatusCode(),
+							   WptStatus.IN_PROGRESS.getWptStatusCode(), WptStatus.COMPLETED.getWptStatusCode()]
 	public static final String redirectUserUrl = "http://dev.server01.wpt.iteratec.de/result/${testId}/"
 
 	private int fetchResultCallCount = 0;
@@ -37,7 +38,7 @@ class HttpRequestServiceMock extends HttpRequestService {
 		String statusText
 		switch(statusCode) {
 			case WptStatus.PENDING.getWptStatusCode(): statusText = 'Test Pending'; break;
-			case WptStatus.RUNNING.getWptStatusCode(): statusText = 'Test Running'; break;
+			case WptStatus.IN_PROGRESS.getWptStatusCode(): statusText = 'Test Running'; break;
 			case WptStatus.COMPLETED.getWptStatusCode(): statusText = 'Ok'; break;
 		}
 		String xmlHeader = """\

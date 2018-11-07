@@ -1,0 +1,47 @@
+@import "colors";
+
+.clickable-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 30px;
+
+  li {
+    border-radius: 4px;
+    padding: 0 4px;
+    &:hover, &:focus {
+      background: $color-contour-light;
+    }
+
+    &:last-child a {
+      border-bottom: 0;
+
+    }
+  }
+
+  li a {
+    min-width: 30em;
+    border-bottom: 1px $color-contour-light solid;
+    padding: 0.5em 0;
+    color: $color-text-medium;
+    display: flex;
+    align-items: center;
+
+    &:hover, &:focus {
+      text-decoration: none;
+    }
+
+    .title, .detail {
+      display: block;
+    }
+
+    .detail {
+      color: $color-text-light;
+    }
+
+    aside {
+      display: block;
+      margin: 0 5px 0 0;
+    }
+  }
+
+}

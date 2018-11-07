@@ -181,7 +181,7 @@ class ResultPersisterService implements iResultListener {
         }
         log.debug("persisting new JobResult ${testId}")
 
-        Integer jobRunStatus = resultXml.getStatusCodeOfWholeTest()
+        WptStatus wptStatus = resultXml.getWptStatus()
         Date testCompletion = resultXml.getCompletionDate()
         job.lastRun = testCompletion
         job.merge(failOnError: true)
@@ -190,7 +190,8 @@ class ResultPersisterService implements iResultListener {
                 job: job,
                 date: testCompletion,
                 testId: testId,
-                httpStatusCode: jobRunStatus,
+                wptStatus: wptStatus,
+                jobResultStatus: wptStatus.isFailed() ? JobResultStatus.FAILED : JobResultStatus.SUCCESS,
                 jobConfigLabel: job.label,
                 jobConfigRuns: job.runs,
                 wptServerLabel: job.location.wptServer.label,
@@ -283,7 +284,7 @@ class ResultPersisterService implements iResultListener {
         int maxValidLoadTime = configService.getMaxValidLoadtime()
         int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
 
-        return (!WptStatus.isFailed(resultXml.getResultCodeForStep(testStepZeroBasedIndex)) &&
+        return (!WptStatus.byResultCode(resultXml.getResultCodeForStep(testStepZeroBasedIndex)).isFailed() &&
                 (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
                 (loadTime >= minValidLoadTime) &&
                 (loadTime <= maxValidLoadTime))
@@ -627,6 +628,7 @@ class ResultPersisterService implements iResultListener {
      * @param testId
      */
     void deleteResultsMarkedAsPendingAndRunning(Job job, String testId) {
-        JobResult.findByJobAndTestIdAndHttpStatusCodeLessThan(job, testId, 200)?.delete(failOnError: true, flush: true)
+        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.IN_PROGRESS)?.delete(failOnError: true, flush: true)
+        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.PENDING)?.delete(failOnError: true, flush: true)
     }
 }
