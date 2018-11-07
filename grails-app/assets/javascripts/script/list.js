@@ -15,7 +15,7 @@
 * limitations under the License.
 */
 
-//= require node_modules/StickyTableHeaders/js/jquery.stickytableheaders.js
+//= require node_modules/sticky-table-headers/js/jquery.stickytableheaders.min.js
 //= require_self
 
 function filterScriptList() {

@@ -35,7 +35,7 @@
             <th class="sortable"><g:message code="de.iteratec.osm.failedJobResults.thead.testId"
                                             default="Test ID"/></th>
             <th><g:message code="de.iteratec.osm.failedJobResults.thead.date" default="Date"/></th>
-            <th><g:message code="de.iteratec.osm.failedJobResults.thead.httpStatus" default="HTTP Status"/></th>
+            <th><g:message code="de.iteratec.osm.failedJobResults.thead.jobResultStatus" default="Status"/></th>
             <th><g:message code="de.iteratec.osm.failedJobResults.thead.wptStatus" default="WPT Status"/></th>
             <th><g:message code="de.iteratec.osm.failedJobResults.thead.description" default="Description"/></th>
         </tr>

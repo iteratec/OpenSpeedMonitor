@@ -1,0 +1,70 @@
+@import "../../../../../styles/colors";
+@import "../../../../../styles/clickable-list";
+
+p {
+  font-weight: bold;
+}
+
+.clickable-list {
+  li {
+    border: 1px solid $color-contour-light;
+    a {
+      margin-left: 10px;
+      min-width: initial;
+      i {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .job-status-error, .job-status-warning, .integrations {
+    flex-wrap: wrap;
+    .right-hand-icon {
+      margin-left: auto;
+    }
+    small {
+      flex-basis: 100%;
+      margin-left: 22.5px;
+    }
+  }
+
+  .job-status-error {
+    border: 1px solid transparent;
+    background: rgba($color-error, 0.1);
+    &:hover, &:focus {
+      background: rgba($color-error, 0.2);
+    }
+    i {
+      color: rgba($color-error, 0.6);
+    }
+    a {
+      color: $color-error;
+    }
+  }
+
+  .job-status-warning {
+    border: 1px solid rgba($color-warning, 0.5);
+    &:hover, &:focus {
+      background: rgba($color-warning, 0.1);
+    }
+    i {
+      color: $color-warning;
+    }
+  }
+
+  .job-status-good {
+    border: 1px solid rgba($color-good, 0.5);
+    &:hover, &:focus {
+      background: rgba($color-good, 0.1);
+    }
+    i {
+      color: $color-good;
+    }
+  }
+
+  .integrations {
+    i {
+      color: darken($color-contour-light, 10%);
+    }
+  }
+}

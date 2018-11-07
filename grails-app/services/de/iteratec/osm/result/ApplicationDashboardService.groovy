@@ -185,11 +185,31 @@ class ApplicationDashboardService {
             List<JobResult> jobResults = JobResult.findAllByJobInListAndDateGreaterThan(jobs, startDate)
             if (jobResults) {
                 dto.hasJobResults = true
-                dto.hasInvalidJobResults = jobResults.every { WptStatus.isFailed(it.httpStatusCode) }
+                dto.hasInvalidJobResults = jobResults.every { it.jobResultStatus.isFailed() }
             } else {
                 dto.hasJobResults = false
             }
         }
         return dto
+    }
+
+    def getFailingJobStatistics(Long jobGroupId) {
+        def jobsWithErrors = Job.createCriteria().get {
+            projections {
+                countDistinct 'id'
+                jobStatistic {
+                    min 'percentageSuccessfulTestsOfLast5'
+                }
+            }
+            and {
+                eq 'jobGroup.id', jobGroupId
+                eq 'deleted', false
+                eq 'active', true
+                jobStatistic {
+                    lt 'percentageSuccessfulTestsOfLast5', 90d
+                }
+            }
+        }
+        return jobsWithErrors
     }
 }

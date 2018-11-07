@@ -7,13 +7,14 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.measurement.schedule.JobStatistic
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.ApplicationDashboardService
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.WptStatus
+import de.iteratec.osm.result.JobResultStatus
 import grails.testing.mixin.integration.Integration
 import grails.transaction.Rollback
 import org.joda.time.DateTime
@@ -26,6 +27,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
     JobGroup jobGroup1, jobGroup2
     Page page1, page2, page3, pageUndefined
     Job job1
+    JobStatistic jobStatistic
     JobResult jobResult1, jobResult2
     Script script1
     CsiConfiguration existingCsiConfiguration
@@ -104,8 +106,8 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         existingCsiConfiguration = CsiConfiguration.build()
         CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
         jobGroup1.csiConfiguration = existingCsiConfiguration
-        jobResult1 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
-        jobResult2 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+        jobResult1 = JobResult.build(jobResultStatus: JobResultStatus.TIMEOUT, job: job1)
+        jobResult2 = JobResult.build(jobResultStatus: JobResultStatus.TIMEOUT, job: job1)
 
         when: "the application service tests for errors"
         ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
@@ -119,8 +121,8 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         existingCsiConfiguration = CsiConfiguration.build()
         CsiAggregationInterval.build(intervalInMinutes: CsiAggregationInterval.DAILY)
         jobGroup1.csiConfiguration = existingCsiConfiguration
-        jobResult1 = JobResult.build(httpStatusCode: WptStatus.SUCCESSFUL.getWptStatusCode(), job: job1)
-        jobResult2 = JobResult.build(httpStatusCode: WptStatus.TIME_OUT.getWptStatusCode(), job: job1)
+        jobResult1 = JobResult.build(jobResultStatus: JobResultStatus.SUCCESS, job: job1)
+        jobResult2 = JobResult.build(jobResultStatus: JobResultStatus.TIMEOUT, job: job1)
 
         when: "the application service tests for errors"
         ApplicationCsiDto applicationCsiDto = applicationDashboardService.getCsiValuesAndErrorsForJobGroup(jobGroup1)
@@ -144,6 +146,24 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         applicationCsiDto1.hasCsiConfiguration == false
         applicationCsiDto1.csiValues.length == 0
         applicationCsiDto2.hasCsiConfiguration == true
+    }
+
+    void "check if failing job statistic is returned correctly"() {
+        given: "three Jobs, one with matching JobStatistic"
+        jobStatistic = JobStatistic.build(percentageSuccessfulTestsOfLast5: 80)
+        job1.jobStatistic = jobStatistic
+        Job job2 = Job.build(active: true, executionSchedule: '0 */15 * * * ? 2015', jobGroup: jobGroup1, jobStatistic: JobStatistic.build())
+        Job job3 = Job.build(active: true, executionSchedule: '0 */15 * * * ? 2015', jobGroup: jobGroup1)
+        job1.save(failOnError: true, flush: true)
+        job2.save(failOnError: true, flush: true)
+        job3.save(failOnError: true, flush: true)
+
+        when: "the failingJobStatistics are retrieved"
+        def failingJobStatistics = applicationDashboardService.getFailingJobStatistics(jobGroup1.id)
+
+        then: "the returned statistic is correct"
+        failingJobStatistics[0] == 1
+        failingJobStatistics[1] == 80d
     }
 
     private void createTestDataCommonForAllTests() {
