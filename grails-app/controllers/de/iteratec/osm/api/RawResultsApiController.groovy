@@ -21,7 +21,7 @@ import org.springframework.http.HttpStatus
 
 import javax.persistence.NoResultException
 
-import static de.iteratec.osm.util.Constants.*
+import static de.iteratec.osm.util.Constants.DEFAULT_ACCESS_DENIED_MESSAGE
 
 @Api(value = "/rest", tags = ["Measurement Results"], description = "Measurement Results Api", position = 0)
 class RawResultsApiController {
@@ -353,7 +353,7 @@ class RawResultsApiController {
             List results = thresholdService.checkResults(jobResult.eventResults)
 
             Map objectToSend = [
-                    'status' : jobResult.httpStatusCode,
+                    'status' : jobResult.jobResultStatus,
                     'job'    : jobResult.job.label,
                     'results': results.flatten()
             ]

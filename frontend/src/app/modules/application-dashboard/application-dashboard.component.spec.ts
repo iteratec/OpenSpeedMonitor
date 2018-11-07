@@ -11,6 +11,7 @@ import {ApplicationService} from "../../services/application.service";
 import {CsiValueBigComponent} from "../shared/components/csi-value/csi-value-big/csi-value-big.component";
 import {CsiValueBaseComponent} from "../shared/components/csi-value/csi-value-base.component";
 import {CsiValueMediumComponent} from "../shared/components/csi-value/csi-value-medium/csi-value-medium.component";
+import {ApplicationJobStatusComponent} from "./components/application-job-status/application-job-status.component";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -27,6 +28,7 @@ describe('ApplicationDashboardComponent', () => {
         CsiGraphComponent,
         CsiInfoComponent,
         ApplicationSelectComponent,
+        ApplicationJobStatusComponent,
         PageMetricComponent,
         CsiValueBigComponent,
         CsiValueBaseComponent,

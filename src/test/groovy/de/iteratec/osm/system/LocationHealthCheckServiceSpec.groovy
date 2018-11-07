@@ -10,7 +10,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.WptStatus
+import de.iteratec.osm.result.JobResultStatus
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
@@ -79,8 +79,12 @@ class LocationHealthCheckServiceSpec extends Specification implements BuildDataT
         locationHealthChecks[0].numberOfErrorsLastHour == expectedNumberOfErrorsLastHour
         locationHealthChecks[0].numberOfJobResultsNextHour == expectedNumberOfJobResultsNextHour
         locationHealthChecks[0].numberOfEventResultsNextHour == expectedNumberOfEventResultsNextHour
-        locationHealthChecks[0].numberOfCurrentlyPendingJobs == jobResults.findAll { it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size()
-        locationHealthChecks[0].numberOfCurrentlyRunningJobs == jobResults.findAll { it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size()
+        locationHealthChecks[0].numberOfCurrentlyPendingJobs == jobResults.findAll {
+            it.jobResultStatus == JobResultStatus.WAITING
+        }.size()
+        locationHealthChecks[0].numberOfCurrentlyRunningJobs == jobResults.findAll {
+            it.jobResultStatus == JobResultStatus.RUNNING
+        }.size()
     }
     void "cleanupHealthChecks deletes just old LocationHealthChecks"(){
         given: "some old and some new LocationHealthChecks exist"
@@ -106,11 +110,11 @@ class LocationHealthCheckServiceSpec extends Specification implements BuildDataT
         location = Location.build()
         jobResults = []
         2.times {
-            jobResults << JobResult.build(httpStatusCode: WptStatus.PENDING.getWptStatusCode())
+            jobResults << JobResult.build(jobResultStatus: JobResultStatus.WAITING)
         }
-        jobResults << JobResult.build(httpStatusCode: WptStatus.RUNNING.getWptStatusCode())
+        jobResults << JobResult.build(jobResultStatus: JobResultStatus.RUNNING)
         2.times {
-            jobResults << JobResult.build(httpStatusCode: WptStatus.COMPLETED.getWptStatusCode())
+            jobResults << JobResult.build(jobResultStatus: JobResultStatus.SUCCESS)
         }
         OsmConfiguration.build()
     }

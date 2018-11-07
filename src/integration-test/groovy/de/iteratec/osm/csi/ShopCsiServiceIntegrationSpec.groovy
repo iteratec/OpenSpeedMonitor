@@ -222,7 +222,7 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
                 active: false,
                 maxDownloadTimeInMinutes: 20)
 
-        JobResult expectedResult = new JobResult(jobGroupName: "Group", jobConfigLabel: "label", jobConfigRuns: 1, httpStatusCode: 200, job: job, description: "description", date: new Date(), testId: "TestJob").save(validate: false);
+        JobResult expectedResult = JobResult.build(jobGroupName: "Group", jobConfigLabel: "label", jobConfigRuns: 1, jobResultStatus: JobResultStatus.SUCCESS, job: job, description: "description", date: new Date(), testId: "TestJob")
 
         new EventResult(
                 jobGroup: group,
