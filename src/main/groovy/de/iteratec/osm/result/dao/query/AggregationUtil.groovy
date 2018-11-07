@@ -2,8 +2,6 @@ package de.iteratec.osm.result.dao.query
 
 import de.iteratec.osm.result.SelectedMeasurand
 
-import java.awt.font.NumericShaper
-
 class AggregationUtil {
 
     static def getMedianFrom(List data) {
@@ -84,7 +82,7 @@ class AggregationUtil {
                 }
             }
         }
-        throw IllegalArgumentException("Requested index is out of bounds")
+        throw new IllegalStateException("Something went wrong during calculation of the percentile")
     }
 
     private static def partitionArray(Object[] data, int left, int right, int pivot) {

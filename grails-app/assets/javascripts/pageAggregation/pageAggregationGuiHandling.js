@@ -65,11 +65,13 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var inFrontButton = $("#inFrontButton");
     var besideButton = $("#besideButton");
     var avgLoaded = false;
-    var medianLoaded = false;
+    var percentileLoaded = false;
     var inputPercentileSlider = $("input[id='percentageSlider']");
     var inputPercentileField = $("input[id='percentageField']");
     var percentile = "50";
-    var lastPercentile = "median";
+    var lastPercentile = percentile;
+    var noDataAvailable = false;
+    var currentQuery = null;
 
     var init = function () {
         drawGraphButton.on('click', function () {
@@ -77,8 +79,10 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             loadData(true);
         });
         $(window).on('historyStateLoaded', function () {
-            loadData(false);
+            $("#chart-card").removeClass("hidden");
+            updatePercentile(inputPercentileField.val());
             togglePercentileOptionsVisibility();
+            loadData(false);
         });
         $(window).on('resize', function () {
             if(pageAggregationChart.isDataAvailable()) {
@@ -217,14 +221,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         if ($.isEmptyObject(data)) {
             $('#warning-no-data').show();
             spinner.stop();
+            noDataAvailable = true;
             return;
         }
+        noDataAvailable = false;
 
         $('#warning-no-data').hide();
         data.width = -1;
         data.selectedFilter = updateFilters(data.filterRules);
         data.stackBars = updateStackBars(data);
-        //data.aggregationValue = getAggregationValue();
+        data.aggregationValue = getAggregationValue();
 
         renderChart(data, isStateChange, isAggregationValueChange);
         $('html, body').animate({scrollTop: 0}, '500');
@@ -232,17 +238,17 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var renderChart = function (data, isStateChange, isAggregationValueChange) {
-        if (avgLoaded && medianLoaded) {
+        if (avgLoaded && percentileLoaded) {
             spinner.stop()
         }
-        if (data) {
+        if (data && !noDataAvailable) {
             pageAggregationChart.setData(data);
             if (isStateChange) {
                 $(window).trigger("historyStateChanged");
             }
         }
         if (!data.series) pageAggregationChart.render(isAggregationValueChange);
-        if (data.series && medianLoaded && avgLoaded) {
+        if (data.series && percentileLoaded && avgLoaded) {
             pageAggregationChart.render(isAggregationValueChange);
         }
     };
@@ -250,7 +256,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     var loadData = function (isStateChange) {
         pageAggregationChart.resetData();
         avgLoaded = false;
-        medianLoaded = false;
+        percentileLoaded = false;
 
         var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
         var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
@@ -274,33 +280,17 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         }
         spinner.start();
 
-        updatePercentile("50", false);
-        getDataForAggregationValue("median", queryData, isStateChange);
+        currentQuery = queryData;
+
+        getDataForAggregationValue(percentile, queryData, isStateChange);
         getDataForAggregationValue("avg", queryData, isStateChange);
     };
 
     var loadPercentile = function (isStateChange) {
-        var selectedTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getTimeFrame();
-        var comparativeTimeFrame = OpenSpeedMonitor.selectIntervalTimeframeCard.getComparativeTimeFrame();
-        var selectedSeries = OpenSpeedMonitor.BarchartMeasurings.getValues();
-        var queryData = {
-            from: selectedTimeFrame[0].toISOString(),
-            to: selectedTimeFrame[1].toISOString(),
-            selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
-                return $(e).text()
-            })),
-            selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
-                return $(e).text()
-            })),
-            selectedSeries: JSON.stringify(selectedSeries)
-        };
-
-        if (comparativeTimeFrame) {
-            queryData.fromComparative = comparativeTimeFrame[0].toISOString();
-            queryData.toComparative = comparativeTimeFrame[1].toISOString();
+        if(currentQuery) {
+            spinner.start();
+            getDataForAggregationValue(percentile, currentQuery, true);
         }
-        spinner.start();
-        getDataForAggregationValue(percentile, queryData, true);
     };
 
     function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
@@ -313,18 +303,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             success: function (data) {
                 if (aggregationValue === "avg") {
                     avgLoaded = true;
-                    data.aggregationValue = "avg";
-                    handleNewData(data, isStateChange, false);
+                    handleNewData(data, "avg", isStateChange, false);
                 }
-                else if(aggregationValue === "median"){
-                    medianLoaded = true;
-                    data.aggregationValue = "median";
-                    handleNewData(data, isStateChange, false);
+                else if(!percentileLoaded){
+                    percentileLoaded = true;
+                    lastPercentile = aggregationValue;
+                    handleNewData(data, percentile, isStateChange, false);
                 }
                 else {
                     lastPercentile = aggregationValue;
-                    data.aggregationValue = aggregationValue;
-                    handleNewData(data, true, true);
+                    handleNewData(data, aggregationValue, true, true);
                 }
             },
             error: function (e) {

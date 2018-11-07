@@ -4,8 +4,8 @@
             <label class="btn btn-sm btn-default active" id="averageButton"><input type="radio" name="aggregationValue"
                                                                                    value="avg"
                                                                                    checked>Average</label>
-            <label class="btn btn-sm btn-default" id="medianButton"><input type="radio" name="aggregationValue"
-                                                                           value="median">
+            <label class="btn btn-sm btn-default" id="percentileButton"><input type="radio" name="aggregationValue"
+                                                                               value="percentile">
                 ${g.message(code: 'de.iteratec.isocsi.pageAggregation.percentile.label', 'default': 'Percentile')}
             </label>
         </div>

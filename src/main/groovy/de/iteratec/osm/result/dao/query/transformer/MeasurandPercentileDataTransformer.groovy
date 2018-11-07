@@ -36,23 +36,23 @@ class MeasurandPercentileDataTransformer implements EventResultTransformer {
     }
 
     private Set<EventResultProjection> summarizeGroupedRawData(Map<String, List<Map>> groupedRawData, Set<ProjectionProperty> baseProjections, List<String> measurandNames) {
-        Map<EventResultProjection, List<Map>> justAHelperMap = [:]
+        Map<EventResultProjection, List<Map>> summarized = [:]
         groupedRawData.each { String key, List<Map> value ->
             EventResultProjection newKey = new EventResultProjection(id: key)
             Map metaDataSample = value[0]
             Map metaData = AggregationUtil.getMetaData(metaDataSample, baseProjections)
             newKey.projectedProperties.putAll(metaData)
-            justAHelperMap.put(newKey, value)
+            summarized.put(newKey, value)
         }
 
-        justAHelperMap.each { EventResultProjection target, List<Map> groupedButNotSummarized ->
+        summarized.each { EventResultProjection target, List<Map> groupedButNotSummarized ->
             measurandNames.each { String measurand ->
                 target.projectedProperties."$measurand" = groupedButNotSummarized.collect {
                     it."$measurand"
                 }
             }
         }
-        return justAHelperMap.keySet()
+        return summarized.keySet()
     }
 
     private Set<EventResultProjection> getPercentileFromSummarizedData(Set<EventResultProjection> eventResultProjections, List<String> measurandNames) {

@@ -74,11 +74,11 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var transformAndMergeData = function (data) {
-        if (data.series && (!rawSeries.length > 0|| rawSeries[0].hasOwnProperty(data.series[0].aggregationValue))) {
-            if(data.series[0].aggregationValue === 'avg') {
-                rawSeries = data.series;
-                dataLength = rawSeries.length;
-            }
+        if($.isEmptyObject(rawSeries)) {
+            rawSeries = data.series;
+            dataLength = rawSeries.length;
+        }
+        if (data.series && (!rawSeries.length > 0 || rawSeries[0].hasOwnProperty(data.series[0].aggregationValue))) {
             rawSeries.forEach(function (it){
                 data.series.forEach(function (newdata) {
                     if(it.jobGroup === newdata.jobGroup && it.page === newdata.page && it.measurand === newdata.measurand) {
@@ -106,9 +106,6 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getAggregationValueLabel = function () {
         if (aggregationValue === 'avg') {
             return 'Average'
-        }
-        else if (aggregationValue === 'median' || aggregationValue === '50'){
-            return 'Percentile: 50%'
         }
         else {
             return "Percentile: " + aggregationValue + "%"
@@ -354,11 +351,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getSortedValuesForBars = function (series) {
         var seriesMap = {};
         series.forEach(function (value) {
+            var seriesValue = value[aggregationValue] ? value[aggregationValue] : value.value;
             seriesMap[value.id] = {
                 page: value.page,
                 jobGroup: value.jobGroup,
                 id: value.id,
-                value: value[aggregationValue] ? value[aggregationValue] : (value.value ? value.value : 0),
+                value: seriesValue ? seriesValue : 0,
                 unit: value.unit,
                 measurand: value.measurand,
                 measurandGroup: value.measurandGroup,

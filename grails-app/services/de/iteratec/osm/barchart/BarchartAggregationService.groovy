@@ -72,9 +72,6 @@ class BarchartAggregationService {
             case 'avg':
                 eventResultProjections = queryBuilder.getAverageData()
                 break
-            case 'median':
-                eventResultProjections = queryBuilder.getPercentile(50)
-                break
             default:
                 try {
                     int percentage = Integer.parseInt(selectedAggregationValue)
