@@ -17,33 +17,14 @@ export class QueueDashboardComponent {
   wptServer$: Observable<Array<WptServerDTO>>;
   serverInfo$: Observable<ServerInfo>;
 
-  title_label = 'frontend.de.iteratec.osm.queueDashboard.title'
-  button_label = 'frontend.de.iteratec.osm.queueDashboard.load-information.label';
-
   constructor( queueService: QueueDashboardService) {
     this.queueService = queueService;
-    this.wptServer$ = this.queueService.activeServer$;
+    this.wptServer$ = this.queueService.activeServers$;
     this.serverInfo$ = this.queueService.serverInfo$;
     this.queueService.getActiveWptServer();
   }
 
-  loadQueueContent( id: number, button: HTMLButtonElement, arrow: HTMLSpanElement, table: HTMLElement){
-    button.remove();
-    arrow.style.display = "block";
-    table.style.display = "block";
+  loadQueueContent( id: number){
     this.queueService.getInfoTableForWptServer(id);
-  }
-
-  toggleTableVisibility( id: number, arrow: HTMLElement, table: HTMLElement) {
-    if(table.style.display == "block") {
-      arrow.classList.toggle("fa-chevron-down", true);
-      arrow.classList.toggle("fa-chevron-up", false);
-      table.style.display = "none";
-    }
-    else {
-      arrow.classList.toggle("fa-chevron-down", false);
-      arrow.classList.toggle("fa-chevron-up", true);
-      table.style.display = "block";
-    }
   }
 }

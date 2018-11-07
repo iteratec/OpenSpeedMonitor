@@ -3,14 +3,16 @@ import {QueueDashboardComponent} from "./queue-dashboard.component";
 import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {QueueDashboardService, ServerInfo} from "./services/queue-dashboard.service";
 import {LocationInfoListComponent} from "./components/location-info-list/location-info-list.component";
+import {OsmLangService} from "../../services/osm-lang.service";
+import {GrailsBridgeService} from "../../services/grails-bridge.service";
 
 
 describe("QueueDashboardComponent", () => {
   let component: QueueDashboardComponent;
   let fixture: ComponentFixture<QueueDashboardComponent>;
   let queueDashboardService: QueueDashboardService;
-  let mockserver = []
-  let mockinformation = []
+  let mockserver = [];
+  let mockinformation = [];
 
   beforeEach( async( () => {
     TestBed.configureTestingModule({
@@ -23,6 +25,8 @@ describe("QueueDashboardComponent", () => {
       ],
       providers: [
         QueueDashboardService,
+        OsmLangService,
+        GrailsBridgeService
       ]
     }).compileComponents()
   }));
@@ -73,7 +77,7 @@ describe("QueueDashboardComponent", () => {
   it('should show cards according to wpt servers', () => {
     queueDashboardService = TestBed.get(QueueDashboardService);
 
-    queueDashboardService.activeServer$.next(mockserver);
+    queueDashboardService.activeServers$.next(mockserver);
     fixture.detectChanges();
 
     const listHeaderEl: HTMLElement = fixture.nativeElement.querySelectorAll('h2');
@@ -83,7 +87,7 @@ describe("QueueDashboardComponent", () => {
 
   it('should not display queue information when collapsed', function () {
     queueDashboardService = TestBed.get(QueueDashboardService);
-    queueDashboardService.activeServer$.next(mockserver);
+    queueDashboardService.activeServers$.next(mockserver);
     fixture.detectChanges();
 
     const datatableEl: HTMLElement = fixture.nativeElement.querySelectorAll("#data-table-id");
@@ -99,12 +103,12 @@ describe("QueueDashboardComponent", () => {
 
     expect(datatableEl2[0].style.display).toEqual("block");
     expect(datatableEl2[1].style.display).toEqual("block");
-  })
+  });
 
   it('should show tablebody according serverinformation', () => {
     queueDashboardService = TestBed.get(QueueDashboardService);
 
-    queueDashboardService.activeServer$.next(mockserver);
+    queueDashboardService.activeServers$.next(mockserver);
     fixture.detectChanges();
 
     const datarows : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
@@ -120,5 +124,4 @@ describe("QueueDashboardComponent", () => {
     expect(datarows2).toBeTruthy();
     expect(datarows2[0].firstElementChild.textContent ).toEqual(mockinformation[0].id);
   });
-
 });

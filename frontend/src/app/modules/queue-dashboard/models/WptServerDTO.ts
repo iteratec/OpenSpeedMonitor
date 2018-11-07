@@ -1,16 +1,16 @@
 export interface WptServerDTO {
   label: string
-  //proxyIdentifier: string
+  proxyIdentifier: string
 
-  //dateCreated: any
-  //lastUpdate: any
+  dateCreated: any
+  lastUpdate: any
   id: number
 
   baseUrl: string
-  //active: boolean
-  //description: string
-  //contactPersonName: string
-  //contactPersonEmail: string
+  active: boolean
+  description: string
+  contactPersonName: string
+  contactPersonEmail: string
 
-  //apiKey: String
+  apiKey: String
 }

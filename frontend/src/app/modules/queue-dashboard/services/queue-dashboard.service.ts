@@ -13,7 +13,7 @@ export class QueueDashboardService {
 
   private http: HttpClient;
 
-  activeServer$ = new ReplaySubject<WptServerDTO[]>(1)
+  activeServers$ = new ReplaySubject<WptServerDTO[]>(1);
   serverInfo$ = new BehaviorSubject<ServerInfo>({});
 
   constructor (httpClient: HttpClient){
@@ -22,13 +22,13 @@ export class QueueDashboardService {
 
   getActiveWptServer(){
     this.http.get<WptServerDTO[]>("/queueDashboard/rest/getActiveWptServer").subscribe(
-      value => this.activeServer$.next(value),
+      value => this.activeServers$.next(value),
       error1 => this.handleError( error1 )
     )
   }
 
   getInfoTableForWptServer(serverId: number){
-    let params = new HttpParams().set("id", serverId.toString())
+    let params = new HttpParams().set("id", serverId.toString());
     this.http.post<LocationInfoDTO[]>("/queueDashboard/rest/getWptServerInformation", params).subscribe(
       value => {
         this.serverInfo$.next( {

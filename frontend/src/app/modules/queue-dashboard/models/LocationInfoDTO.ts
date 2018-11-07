@@ -5,7 +5,7 @@ export interface LocationInfoDTO {
   agents: number
   jobs: number
 
-  eventResultLastHour: number
+  eventResultsLastHour: number
   jobResultsLastHour: number
   errorsLastHour: number
 

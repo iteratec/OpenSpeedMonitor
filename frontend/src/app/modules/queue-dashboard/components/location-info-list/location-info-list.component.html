@@ -1,35 +1,33 @@
 <table class="table table-striped">
   <thead>
     <tr>
-      <th rowspan="2">{{label_id | translate}}</th>
-      <th rowspan="2">{{label_agents | translate}}</th>
-      <th rowspan="2">{{label_job_queue | translate}}</th>
+      <th rowspan="2">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.ID.label" | translate}}</th>
+      <th rowspan="2">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.agents.label" | translate}}</th>
+      <th rowspan="2">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.jobQueue.label" | translate}}</th>
       <th rowspan="2"></th>
-      <th colspan="2">{{label_osm_jobs | translate}}</th>
+      <th colspan="2">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.osmJobs.label" | translate}}</th>
 
-      <th colspan="3" class="new-col-sec">{{label_last_hour | translate}}</th>
-      <th colspan="2" class="new-col-sec">{{label_next_hour | translate}}</th>
+      <th colspan="3" class="new-col-sec">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.lastHour.label" | translate}}</th>
+      <th colspan="2" class="new-col-sec">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.nextHour.label" | translate}}</th>
     </tr>
     <tr>
-      <th>{{label_pending | translate}}</th>
-      <th>{{label_running | translate}}</th>
+      <th>{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.pending.label" | translate}}</th>
+      <th>{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.running.label" | translate}}</th>
 
-      <th class="new-col-sec">{{label_errors | translate}}</th>
-      <th>{{label_jobs | translate}}</th>
-      <th>{{label_events | translate}}</th>
+      <th class="new-col-sec">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.errors.label" | translate}}</th>
+      <th>{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.jobs.label" | translate}}</th>
+      <th>{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.events.label" | translate}}</th>
 
-      <th class="new-col-sec">{{label_jobs | translate}}</th>
-      <th>{{label_events | translate}}</th>
+      <th class="new-col-sec">{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.jobs.label" | translate}}</th>
+      <th>{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.events.label" | translate}}</th>
     </tr>
   </thead>
-
   <tbody class="datarows">
 
-    <ng-container *ngFor="let location of locationInfo$ | async">
-
-      <tr class="queueRow" #queue_row>
+    <ng-container *ngFor="let location of locationInfo" #full_row detailsVisible="false">
+      <tr class="queueRow">
         <td>
-          <strong title="{{location.label}} | {{label_last_date | translate}}: {{parseDate(location.lastHealthCheckDate) | date:'short'}}">{{location.id}}</strong>
+          <strong title="{{location.label}} | {{'frontend.de.iteratec.osm.queueDashboard.location-info-list.lastDate.label' | translate}}: {{parseDate(location.lastHealthCheckDate)}}">{{location.id}}</strong>
         </td>
         <td>
           {{location.agents}}
@@ -37,12 +35,13 @@
         <td>
           {{location.jobs}}
         </td>
-
         <td>
           <a *ngIf="location.pendingJobs > 0 || location.runningJobs > 0"  class="jobDetail">
             <span class="arrow fas fa-chevron-down chevron-large"
                   #arrow_icon
-                  (click)="togglePendingRunningJobs(arrow_icon, queue_row)">
+                  (click)="full_row.detailsVisible = !full_row.detailsVisible"
+                  [class.fa-chevron-down]="!full_row.detailsVisible"
+                  [class.fa-chevron-up]="full_row.detailsVisible">
             </span>
           </a>
         </td>
@@ -52,7 +51,6 @@
         <td>
           {{location.runningJobs}}
         </td>
-
 
         <td class="new-col-sec">
           {{location.errorsLastHour}}
@@ -71,19 +69,21 @@
         </td>
       </tr>
 
-      <tr class="jobRow" *ngIf="location.pendingJobs > 0 || location.runningJobs > 0" style="display:none">
+      <tr class="job-row" #job_row
+          *ngIf="location.pendingJobs > 0 || location.runningJobs > 0"
+          [style.display]="full_row.detailsVisible ? 'table-row' : 'none'">
         <td colspan="11" >
+
           <table>
             <ng-container *ngFor="let jobResults of location.executingJobs">
-
               <tr >
                 <td class="one-indent">
                   <strong>Job: </strong>
                   {{jobResults[0].jobConfigLabel}}
                 </td>
                 <td class="one-indent">
-                  <strong>{{label_status  | translate}}: </strong>
-                  {{label_started | translate}}
+                  <strong>{{"frontend.de.iteratec.osm.queueDashboard.location-info-list.status.label"  | translate}}: </strong>
+                  {{"frontend.de.iteratec.osm.queueDashboard.location-info-list.started.label" | translate}}
                 </td>
               </tr>
 
@@ -92,15 +92,17 @@
                   <a href="{{jobResult.wptServerBaseurl}}result/{{jobResult.testId}}">
                     {{jobResult.statusCodeMessage}}
                   </a>
-                  <i title="{{jobResult.date}}">Seit {{parseDate(jobResult.date) | date:"short"}}</i>
+                  <i title="{{jobResult.date}}">
+                    {{"frontend.de.iteratec.osm.queueDashboard.location-info-list.since" | translate}}
+                    {{ parseDate(jobResult.date) }}</i>
                 </td>
               </tr>
 
             </ng-container>
           </table>
+
         </td>
       </tr>
-
     </ng-container>
   </tbody>
 

@@ -30,13 +30,13 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
         healthCheck.numberOfJobResultsNextHour = 3
     }
 
-    void "emptyResponse is empty"() {
+    void "emptyResponse is 404"() {
 
         when:
         controller.emptyResponse()
 
         then:
-        response.getJson() == []
+        response.status == 404
     }
 
     void "Get an empty response if no id is given"() {
@@ -45,7 +45,7 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
         controller.getWptServerInformation()
 
         then:
-        response.getJson() == []
+        response.status == 404
     }
 
     void "Get an empty response if invalid id is given"() {
@@ -56,7 +56,7 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
         controller.getWptServerInformation()
 
         then:
-        response.getJson() == []
+        response.status == 404
     }
 
     void "Return Map with defaults if parameter are null"() {
@@ -72,19 +72,19 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
 
         then:
         map == [
-                agents: -1,
-                errorsLastHour: -1,
-                eventResultsLastHour: -1,
-                eventsNextHour: -1,
-                executingJobs: [],
-                id: "",
-                jobResultsLastHour: -1,
-                jobs: -1,
-                jobsNextHour: -1,
-                label: "",
-                lastHealthCheckDate: "",
-                pendingJobs: 0,
-                runningJobs: 0
+                agents: null,
+                errorsLastHour: null,
+                eventResultsLastHour: null,
+                eventsNextHour: null,
+                executingJobs: null,
+                id: null,
+                jobResultsLastHour: null,
+                jobs: null,
+                jobsNextHour: null,
+                label: null,
+                lastHealthCheckDate: null,
+                pendingJobs: null,
+                runningJobs: null
         ]
     }
 
@@ -105,15 +105,15 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
                 errorsLastHour: healthCheck.numberOfErrorsLastHour,
                 eventResultsLastHour: healthCheck.numberOfEventResultsLastHour,
                 eventsNextHour: healthCheck.numberOfEventResultsNextHour,
-                executingJobs: [],
+                executingJobs: null,
                 id: location.uniqueIdentifierForServer,
                 jobResultsLastHour: healthCheck.numberOfJobResultsLastHour,
                 jobs: healthCheck.numberOfPendingJobsInWpt,
                 jobsNextHour: healthCheck.numberOfJobResultsNextHour,
                 label: location.location,
                 lastHealthCheckDate: healthCheck.date.toString(),
-                pendingJobs: 0,
-                runningJobs: 0
+                pendingJobs: null,
+                runningJobs: null
         ]
     }
 }

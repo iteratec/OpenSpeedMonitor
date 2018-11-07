@@ -5,6 +5,9 @@ import {formatDate} from "@angular/common";
 
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
+import {OsmLangService} from "../../../../services/osm-lang.service";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
+import {parseDate} from "../../../../utils/date.util";
 registerLocaleData(localeDe, 'de');
 
 describe("LocationInfoListComponent", () => {
@@ -20,9 +23,14 @@ describe("LocationInfoListComponent", () => {
       ],
       imports: [
         SharedMocksModule
+      ],
+      providers: [
+        OsmLangService,
+        GrailsBridgeService
       ]
     }).compileComponents()
   }));
+
 
   beforeEach( () => {
     fixture = TestBed.createComponent(LocationInfoListComponent);
@@ -35,11 +43,18 @@ describe("LocationInfoListComponent", () => {
       id:11
       };
 
-    mockinformation = [{agents: 1,
+    mockinformation = [{
+      agents: 1,
       errorsLastHour: 0,
       eventResultLastHour: 0,
       eventsNextHour: 2,
-      executingJobs: [],
+      executingJobs: [
+        [{jobConfigLabel: "label",
+          date: "2018-10-14 14:00:16.0",
+          wptServerBaseUrl: "url",
+          testId: 55,
+          statusCodeMessage: "message"}]
+      ],
       id: "Dulles_GalaxyS5:undefined",
       jobResultsLastHour: 0,
       jobs: 2,
@@ -48,7 +63,6 @@ describe("LocationInfoListComponent", () => {
       lastHealthCheckDate: "2018-10-15 15:00:16.0",
       pendingJobs: 2,
       runningJobs: 0}];
-
     component.wptServerID = mockserver.id
   });
 
@@ -61,6 +75,7 @@ describe("LocationInfoListComponent", () => {
     expect(datarows.length).toEqual(0);
 
     component.serverInfo = {[mockserver.id] : mockinformation};
+    let test = parseDate(component.locationInfo[0].lastHealthCheckDate);
     fixture.detectChanges();
 
     const datarows2 : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
@@ -71,14 +86,13 @@ describe("LocationInfoListComponent", () => {
     component.serverInfo = {[mockserver.id] : mockinformation};
     fixture.detectChanges();
 
-    const jobRows : HTMLCollection = fixture.nativeElement.querySelectorAll(".jobRow");
+    const jobRows : HTMLCollection = fixture.nativeElement.querySelectorAll(".job-row");
     expect(jobRows.length).toBeGreaterThan(0);
   });
 
   it("should parse date correctly", () => {
     const date = component.parseDate("2018-10-16 11:00:14.0");
-    const formatted = formatDate(date, "short", "de");
-    expect(formatted).toEqual('16.10.18, 11:00');
+    expect(date).toEqual("10/16/18, 11:00 AM");
   });
 
 });

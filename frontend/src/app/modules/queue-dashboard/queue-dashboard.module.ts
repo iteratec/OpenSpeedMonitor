@@ -5,6 +5,7 @@ import {RouterModule, Routes} from "@angular/router";
 import {QueueDashboardService} from "./services/queue-dashboard.service";
 import {HttpClientModule} from "@angular/common/http";
 import {LocationInfoListComponent} from "./components/location-info-list/location-info-list.component";
+import {OsmLangService} from "../../services/osm-lang.service";
 
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
@@ -33,10 +34,8 @@ const QueueRoutes: Routes = [
       useValue: [QueueDashboardComponent],
       multi: true
     },
-    {
-      provide: LOCALE_ID, useValue: "de"
-    },
-    QueueDashboardService
+    QueueDashboardService,
+    OsmLangService
   ],
   entryComponents: [QueueDashboardComponent]
 })

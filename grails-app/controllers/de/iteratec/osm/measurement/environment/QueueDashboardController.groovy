@@ -1,5 +1,5 @@
 package de.iteratec.osm.measurement.environment
-
+import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.WptStatus
@@ -21,79 +21,65 @@ class QueueDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, list )
     }
 
-    def getWptServerInformation()
+    @RestAction
+    def getWptServerInformation(Long id)
     {
-        if(!params.containsKey("id")){
+        if(id == null) {
             return emptyResponse()
         }
-
-        long wptid
-        try{
-            wptid = Long.parseLong( params["id"] )
-        }
-        catch (Exception e) {
-            return emptyResponse()
-        }
-
-        WebPageTestServer wptserver = WebPageTestServer.findById(wptid)
+        WebPageTestServer wptserver = WebPageTestServer.findById(id)
 
         if(wptserver != null){
-            try {
-                List<Location> listLocation = Location.findAllByActiveAndWptServer(true, wptserver)
-                List<LocationHealthCheck> healthChecks = locationHealthCheckDaoService.getLatestHealthChecksFor(listLocation)
-                List<Map> listLocationInfo = new ArrayList<Map>()
+            List<Location> listLocation = Location.findAllByActiveAndWptServer(true, wptserver)
+            List<LocationHealthCheck> healthChecks = locationHealthCheckDaoService.getLatestHealthChecksFor(listLocation)
+            List<Map> listLocationInfo = new ArrayList<Map>()
 
-                listLocation.forEach( {Location location ->
+            listLocation.forEach( {Location location ->
 
-                    List<JobResult> executingJobResults
-                    executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
+                List<JobResult> executingJobResults
+                executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
 
-                    Map<Job, List<JobResult>> executingJobs
-                    executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
+                Map<Job, List<JobResult>> executingJobs
+                executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
 
-                    LocationHealthCheck healthCheck = healthChecks.findAll{ it.location == location }[0]
+                LocationHealthCheck healthCheck = healthChecks.findAll{ it.location == location }[0]
 
-                    DefaultQueueDashboardCommand command = new DefaultQueueDashboardCommand()
-                    command.location = location
-                    command.healthCheck = healthCheck
-                    command.executingJobResults = executingJobResults
-                    command.executingJobs = executingJobs
-                    Map map = buildMap(command)
-                    listLocationInfo.add(map)
-                } )
-                return ControllerUtils.sendObjectAsJSON(response, listLocationInfo)
-            }
-            catch (Exception e){
-                e.printStackTrace()
-                return emptyResponse()
-            }
+                DefaultQueueDashboardCommand command = new DefaultQueueDashboardCommand()
+                command.location = location
+                command.healthCheck = healthCheck
+                command.executingJobResults = executingJobResults
+                command.executingJobs = executingJobs
+                Map map = buildMap(command)
+                listLocationInfo.add(map)
+            } )
+            return ControllerUtils.sendObjectAsJSON(response, listLocationInfo)
         }
         return emptyResponse()
     }
 
     Map buildMap(DefaultQueueDashboardCommand command){
         return [
-                id                  : command.location ? command.location.uniqueIdentifierForServer : "",
-                lastHealthCheckDate : command.healthCheck ? command.healthCheck.date.toString() : "",
-                label               : command.location ? command.location.location : "",
-                agents              : command.healthCheck ? command.healthCheck.numberOfAgents : -1,
-                jobs                : command.healthCheck ? command.healthCheck.numberOfPendingJobsInWpt : -1,
-                eventResultsLastHour: command.healthCheck ? command.healthCheck.numberOfEventResultsLastHour : -1,
-                jobResultsLastHour  : command.healthCheck ? command.healthCheck.numberOfJobResultsLastHour : -1,
-            errorsLastHour      : command.healthCheck ? command.healthCheck.numberOfErrorsLastHour : -1,
-            jobsNextHour        : command.healthCheck ? command.healthCheck.numberOfJobResultsNextHour : -1,
-            eventsNextHour      : command.healthCheck ? command.healthCheck.numberOfEventResultsNextHour : -1,
-            executingJobs       : command.executingJobs ? command.executingJobs.values() : [],
-            pendingJobs         : command.executingJobResults ? command.executingJobResults.findAll {
-                it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }.size() : 0,
-            runningJobs         : command.executingJobResults ? command.executingJobResults.findAll {
-                it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }.size() : 0
+                id                  : command?.location?.uniqueIdentifierForServer,
+                lastHealthCheckDate : command?.healthCheck?.date?.toString(),
+                label               : command?.location?.location,
+                agents              : command?.healthCheck?.numberOfAgents,
+                jobs                : command?.healthCheck?.numberOfPendingJobsInWpt,
+                eventResultsLastHour: command?.healthCheck?.numberOfEventResultsLastHour,
+                jobResultsLastHour  : command?.healthCheck?.numberOfJobResultsLastHour,
+                errorsLastHour      : command?.healthCheck?.numberOfErrorsLastHour,
+                jobsNextHour        : command?.healthCheck?.numberOfJobResultsNextHour,
+                eventsNextHour      : command?.healthCheck?.numberOfEventResultsNextHour,
+                executingJobs       : command?.executingJobs?.values(),
+                pendingJobs         : command?.executingJobResults?.findAll {
+                it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }?.size(),
+                runningJobs         : command?.executingJobResults?.findAll {
+                it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }?.size()
         ]
     }
 
     def emptyResponse()
     {
-        return ControllerUtils.sendObjectAsJSON(response, [])
+        response.status = 404
     }
 }
 
