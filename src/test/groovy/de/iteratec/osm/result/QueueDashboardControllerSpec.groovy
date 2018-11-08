@@ -1,13 +1,11 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.measurement.environment.DefaultQueueDashboardCommand
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.QueueDashboardController
 import de.iteratec.osm.system.LocationHealthCheck
 import grails.buildtestdata.mixin.Build
 import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
-//import grails.test.mixin.TestFor
 
 
 @Build([QueueDashboardController])
@@ -60,15 +58,8 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
     }
 
     void "Return Map with defaults if parameter are null"() {
-        given:
-        DefaultQueueDashboardCommand command = new DefaultQueueDashboardCommand()
-        command.location = null
-        command.healthCheck = null
-        command.executingJobResults = null
-        command.executingJobs = null
-
         when:
-        def map = controller.buildMap(command)
+        def map = controller.buildMap(null, null, null, null)
 
         then:
         map == [
@@ -89,15 +80,8 @@ class QueueDashboardControllerSpec extends Specification implements ControllerUn
     }
 
     void "Return Map with only location and healthCheck"() {
-        given:
-        DefaultQueueDashboardCommand command = new DefaultQueueDashboardCommand()
-        command.location = location
-        command.healthCheck = healthCheck
-        command.executingJobResults = null
-        command.executingJobs = null
-
         when:
-        def map = controller.buildMap(command)
+        def map = controller.buildMap(location, healthCheck, null, null)
 
         then:
         map == [
