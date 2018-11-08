@@ -74,11 +74,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var transformAndMergeData = function (data) {
-        if($.isEmptyObject(rawSeries)) {
-            rawSeries = data.series;
-            dataLength = rawSeries.length;
-        }
-        if (data.series && (!rawSeries.length > 0 || rawSeries[0].hasOwnProperty(data.series[0].aggregationValue))) {
+        console.log(rawSeries);
+        if (data.series && (rawSeries.length === 0 || (rawSeries && rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)))) {
+            if(data.series[0].aggregationValue === 'avg') {
+                rawSeries = data.series;
+                dataLength = rawSeries.length;
+            }
             rawSeries.forEach(function (it){
                 data.series.forEach(function (newdata) {
                     if(it.jobGroup === newdata.jobGroup && it.page === newdata.page && it.measurand === newdata.measurand) {
