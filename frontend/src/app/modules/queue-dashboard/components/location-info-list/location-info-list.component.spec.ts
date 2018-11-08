@@ -53,7 +53,7 @@ describe("LocationInfoListComponent", () => {
           date: "2018-10-14 14:00:16.0",
           wptServerBaseUrl: "url",
           testId: 55,
-          statusCodeMessage: "message"}]
+          jobResultStatus: {name: "WAITING"}}]
       ],
       id: "Dulles_GalaxyS5:undefined",
       jobResultsLastHour: 0,

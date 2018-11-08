@@ -90,7 +90,7 @@
               <tr *ngFor="let jobResult of jobResults">
                 <td class="two-indent">
                   <a href="{{jobResult.wptServerBaseurl}}result/{{jobResult.testId}}">
-                    {{jobResult.statusCodeMessage}}
+                    {{jobResult.jobResultStatus.name}}
                   </a>
                   <i title="{{jobResult.date}}">
                     {{"frontend.de.iteratec.osm.queueDashboard.location-info-list.since" | translate}}

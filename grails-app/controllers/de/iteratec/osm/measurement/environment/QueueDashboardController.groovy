@@ -2,6 +2,7 @@ package de.iteratec.osm.measurement.environment
 import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.system.LocationHealthCheck
 import de.iteratec.osm.system.LocationHealthCheckDaoService
@@ -66,9 +67,9 @@ class QueueDashboardController {
                 eventsNextHour      : healthCheck?.numberOfEventResultsNextHour,
                 executingJobs       : executingJobs?.values(),
                 pendingJobs         : executingJobResults?.findAll {
-                it.httpStatusCode == WptStatus.PENDING.getWptStatusCode() }?.size(),
+                it.jobResultStatus == JobResultStatus.WAITING }?.size(),
                 runningJobs         : executingJobResults?.findAll {
-                it.httpStatusCode == WptStatus.RUNNING.getWptStatusCode() }?.size()
+                it.jobResultStatus == JobResultStatus.RUNNING }?.size()
         ]
     }
 
