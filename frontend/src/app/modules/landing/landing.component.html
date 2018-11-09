@@ -10,8 +10,10 @@
       <li *ngFor="let application of applications$ | async">
         <a [routerLink]="['/applicationDashboard', application.id]">
           <aside>
-            <osm-csi-value-small [csiValue]="application.recentCsi?.csiDocComplete" [csiDate]="application.recentCsi?.date"
-                                 [lastResultDate]="application.dateOfLastResults" [showLoading]="application.csiIsLoading">
+            <osm-csi-value-small [csiValue]="application.recentCsi?.csiDocComplete"
+                                 [csiDate]="application.recentCsi?.date"
+                                 [lastResultDate]="application.dateOfLastResults"
+                                 [showLoading]="application.csiIsLoading">
             </osm-csi-value-small>
           </aside>
           <span class="title">{{application.name}}
@@ -25,6 +27,34 @@
     <a href="/measurementSetup/create" class="btn btn-primary" id="create-measurement">
       <i class="fas fa-plus"></i>
       {{ 'frontend.de.iteratec.osm.landing.setupNewMeasurement' | translate}}
+    </a>
+  </section>
+
+  <section class="card">
+    <h2>{{ 'frontend.de.iteratec.osm.landing.healthIssues' | translate }}</h2>
+
+    <ng-container *ngFor="let application of applications$ | async">
+      <p class="applicationName">{{ application.name }}</p>
+      <ul class="clickable-list">
+        <li class="red">
+          <a [routerLink]="['/applicationDashboard', application.id]">
+            <aside class="percentage-aside">
+              <p class="percentage percentage-big">70%</p>
+              <p class="percentage">failure</p>
+            </aside>
+            <span class="title">
+              {{ application.name }}
+              <span class="detail">
+                {{ 'frontend.de.iteratec.osm.landing.page-count' | translate:{pageCount: application.pageCount} }}
+              </span>
+            </span>
+          </a>
+        </li>
+      </ul>
+    </ng-container>
+
+    <a href="/job/index" class="btn btn-default" id="show-jobs">
+      {{ 'frontend.de.iteratec.osm.landing.showJobs' | translate }}
     </a>
   </section>
 </main>
