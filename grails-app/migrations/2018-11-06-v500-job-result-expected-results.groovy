@@ -8,7 +8,6 @@ databaseChangeLog = {
         dropColumn(columnName: "script_url", tableName: "job_result")
         dropColumn(columnName: "script_navigationscript", tableName: "job_result")
         dropColumn(columnName: "provide_authenticate_information", tableName: "job_result")
-        dropColumn(columnName: "provide_authenticate_information", tableName: "job_result")
         dropColumn(columnName: "auth_username", tableName: "job_result")
         dropColumn(columnName: "auth_password", tableName: "job_result")
         dropColumn(columnName: "multistep", tableName: "job_result")

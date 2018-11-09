@@ -23,7 +23,6 @@ import de.iteratec.osm.measurement.schedule.quartzjobs.JobProcessingQuartzHandle
 import de.iteratec.osm.result.JobResult
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
-import groovy.time.TimeCategory
 import org.joda.time.DateTime
 import org.quartz.*
 
@@ -76,22 +75,14 @@ class JobSchedulingService {
         return String.format('%d:%s', job.id, testId)
     }
 
-
-    void scheduleJobRunPolling(Job job, String testId) {
-        use(TimeCategory) {
-            Map jobDataMap = [jobId: job.id, testId: testId]
-            Date endDate = new Date() + job.maxDownloadTimeInMinutes.minutes
-            // build and schedule subtrigger for polling every pollDelaySeconds seconds.
-            // Polling is stopped by pollJobRun() when the running test is finished or on endDate at the latest
-            log.debug("Building subtrigger for polling for job ${job.label} and test-id ${testId} (enddate ${endDate})")
-            JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(job, testId, endDate), jobDataMap)
-            // schedule a timeout trigger which will fire once after endDate + a delay of
-            // declareTimeoutAfterMaxDownloadTimePlusSeconds seconds and perform cleaning operations.
-            // This will also set this job run's status to 504 Timeout.
-            Date timeoutDate = endDate + declareTimeoutAfterMaxDownloadTimePlusSeconds.seconds
-            log.debug("Building timeout trigger for job ${job.label} and test-id ${testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
-            JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, testId, timeoutDate), jobDataMap)
-        }
+    void scheduleJobRunPolling(Job job, String testId, Date startDate) {
+        Map jobDataMap = [jobId: job.id, testId: testId]
+        Date endDate = new DateTime(startDate).plusMinutes(job.maxDownloadTimeInMinutes).toDate()
+        log.debug("Building subtrigger for polling for job ${job.label} and test-id ${testId} (enddate ${endDate})")
+        JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(job, testId, endDate), jobDataMap)
+        Date timeoutDate = new DateTime(endDate).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate()
+        log.debug("Building timeout trigger for job ${job.label} and test-id ${testId} (timeout date=${timeoutDate}, jobDataMap=${jobDataMap})")
+        JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(job, testId, timeoutDate), jobDataMap)
     }
 
 
@@ -187,12 +178,9 @@ class JobSchedulingService {
 
     void rescheduleJobRunPolling(JobResult jobResult) {
         Map jobDataMap = [jobId: jobResult.jobId, testId: jobResult.testId]
-        Date endDate = new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).toDate()
-        Date timeoutDate = new DateTime(endDate).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate()
         if (new DateTime(jobResult.date).plusMinutes(jobResult.job.maxDownloadTimeInMinutes).plusSeconds(declareTimeoutAfterMaxDownloadTimePlusSeconds).toDate() > new Date()) {
             try {
-                JobProcessingQuartzHandlerJob.schedule(buildSubTrigger(jobResult.job, jobResult.testId, endDate), jobDataMap)
-                JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, timeoutDate), jobDataMap)
+                scheduleJobRunPolling(jobResult.job, jobResult.testId, jobResult.date)
             } catch (Exception e) {
                 log.error("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}" + e)
             }
@@ -200,7 +188,7 @@ class JobSchedulingService {
             try {
                 JobProcessingQuartzHandlerJob.schedule(buildTimeoutTrigger(jobResult.job, jobResult.testId, new DateTime().plusMinutes(1).toDate()), jobDataMap)
             } catch (Exception e) {
-                log.error("Wasn't able to reschedule old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}" + e)
+                log.error("Wasn't able to schedule timeout for old JobResult JobId = ${jobResult.jobId} TestId = ${jobResult.testId}" + e)
             }
         }
     }

@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.result.WptXmlResultVersion
+import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.GPathResult
 
 /**
@@ -12,6 +13,7 @@ import groovy.util.slurpersupport.GPathResult
  * @author nkuhn
  * @see https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis#TOC-XML-response
  */
+@Slf4j
 class WptResultXml {
     /**
      * Base node of results xml.
@@ -67,6 +69,10 @@ class WptResultXml {
 
     WptStatus getWptStatus() {
         return WptStatus.byResultCode(responseNode?.statusCode?.toInteger())
+    }
+
+    String getStatusText() {
+        return responseNode?.statusText?.toString()
     }
 
     Date getCompletionDate() {
@@ -125,6 +131,7 @@ class WptResultXml {
         return responseNode.data.run
     }
 
+    //TODO(sbr): Remove
     def getStepNode(int stepZeroBasedIndex) {
         switch (version) {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
@@ -136,18 +143,6 @@ class WptResultXml {
             default:
                 throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
         }
-    }
-
-    int getResultCodeForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).result?.toInteger()
-    }
-
-    int getFirstByteForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).TTFB?.toInteger()
-    }
-
-    int getLoadTimeForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).loadTime?.toInteger()
     }
 
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {
@@ -230,28 +225,35 @@ class WptResultXml {
         return responseNode.data.runs.toString().isInteger()
     }
 
-    boolean hasExpectedResults(int expectedRuns, int expectedSteps, boolean firstViewOnly) {
-        def expectedCached = firstViewOnly ? [CachedView.UNCACHED] : [CachedView.UNCACHED, CachedView.CACHED]
+    int countValidResults(int expectedRuns, int expectedSteps, boolean firstViewOnly) {
+        int validResults = 0
+        List<CachedView> expectedCached = firstViewOnly ? [CachedView.UNCACHED] : [CachedView.UNCACHED, CachedView.CACHED]
         expectedRuns.times { run ->
             expectedCached.each { cached ->
                 expectedSteps.times { step ->
-                    if (!isValidTestStep(getResultsContainingNode(runNumber, cachedView, stepNumber))) {
-                        return false
+                    if (isValidTestStep(getResultsContainingNode(run, cached, step))) {
+                        validResults++
                     }
                 }
             }
         }
-        return true
+        return validResults
     }
 
     boolean isValidTestStep(GPathResult testStepNode) {
         if (!testStepNode || testStepNode.isEmpty()) {
             return false
         }
-        int loadTime = testStepNode.loadTime?.toInteger()
-        return (WptStatus.byResultCode(testStepNode.result?.toInteger()).isSuccess() &&
+        Integer loadTime = testStepNode.loadTime?.toInteger()
+        WptStatus wptStatus = WptStatus.byResultCode(testStepNode.result?.toInteger())
+        Integer ttfb = testStepNode.TTFB?.toInteger()
+        boolean valid = (wptStatus.isSuccess() &&
                 (testStepNode.TTFB?.toInteger() > 0) &&
                 (loadTime >= minValidLoadTime) &&
                 (loadTime <= maxValidLoadTime))
+        if (!valid) {
+            log.debug("Invalid EventResult in the test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, LoadTime: ${loadTime})")
+        }
+        return valid
     }
 }

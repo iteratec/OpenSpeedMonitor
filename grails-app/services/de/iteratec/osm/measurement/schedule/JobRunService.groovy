@@ -39,7 +39,7 @@ class JobRunService {
         }
         if (result) {
             log.info("Set status of job Result to canceled: ${result}.")
-            jobResultPersisterService.persistUnfinishedJobResult(job, testId, JobResultStatus.CANCELED, null, "Canceled by user.")
+            jobResultPersisterService.persistUnfinishedJobResult(job, testId, JobResultStatus.CANCELED, "Canceled by user.")
             log.info("Canceling respective test on wptserver.")
             wptInstructionService.cancelTest(job.location.wptServer, [test: testId])
         } else {
@@ -126,9 +126,8 @@ class JobRunService {
         }
         try {
             String testId = wptInstructionService.runtest(job, priority)
-            jobSchedulingService.scheduleJobRunPolling(job, testId)
-
             jobResultPersisterService.persistUnfinishedJobResult(job, testId, JobResultStatus.WAITING, WptStatus.PENDING, "Launched.")
+            jobSchedulingService.scheduleJobRunPolling(job, testId, new Date())
             return testId
         } catch (Exception e) {
             WptStatus wptStatus = e instanceof JobExecutionException ? e.wptStatus : WptStatus.TEST_DID_NOT_START

@@ -211,9 +211,6 @@ class ResultPersisterService implements iResultListener {
 
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
         if (!resultXml.isValidTestStep(viewResultsNodeOfThisRun)) {
-            // TODO(sbr): fix or move
-            log.debug("Invalid EventResult in the test:'${resultXml.getTestId()}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
-                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
             return false
         }
         GString waterfallAnchor = getWaterfallAnchor(resultXml, event.name, testStepZeroBasedIndex + 1)

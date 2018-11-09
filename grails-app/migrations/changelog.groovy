@@ -66,4 +66,5 @@ databaseChangeLog = {
     include file: '2018-09-27-SCHEME-v510-remove-csi-by-rank.groovy'
     include file: '2018-10-01-v500-job-label-optional.groovy'
     include file: '2018-10-11-v500-job-result-status.groovy'
+    include file: '2018-11-06-v500-job-result-expected-results.groovy'
 }

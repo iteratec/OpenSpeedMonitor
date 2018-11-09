@@ -49,6 +49,7 @@ class JobResultPersisterService {
         return persistUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
         JobResult result = testId ? JobResult.findByJobAndTestId(job, testId) : null
         if (!result) {
@@ -61,6 +62,7 @@ class JobResultPersisterService {
 
     JobResultStatus handleWptResult(WptResultXml resultXml, String testId, Job job) {
         JobResultStatus jobResultStatus = determineJobResultStatusFromWptResult(resultXml, testId, job)
+        log.debug("Jobrun ${testId} has status ${jobResultStatus}")
         if (jobResultStatus.isTerminated()) {
             performanceLoggingService.logExecutionTime(DEBUG, "Persisting finished jobrun ${testId} of job ${job.id}.", 1) {
                 processFinishedJobResult(resultXml, jobResultStatus, job)
@@ -77,17 +79,22 @@ class JobResultPersisterService {
     private JobResultStatus determineJobResultStatusFromWptResult(WptResultXml resultXml, String testId, Job job) {
         WptStatus wptStatus = resultXml.wptStatus
         log.info("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
-        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}|")
+        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}")
         log.info("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {
-            boolean hasExpectedResult = false
+            int numValidResults = 0
+            int numExpectedResults = 1
             JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
             if (jobResult) {
-                hasExpectedResult = resultXml.hasExpectedResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
+                numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
+                numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
             }
-            return hasExpectedResult ? JobResultStatus.SUCCESS : JobResultStatus.INCOMPLETE
+            if (numValidResults < 1) {
+                return JobResultStatus.FAILED
+            }
+            return numValidResults < numExpectedResults ? JobResultStatus.INCOMPLETE : JobResultStatus.SUCCESS
         }
         // TODO(sbr): Check for timeout
         if (wptStatus == WptStatus.IN_PROGRESS) {
@@ -98,25 +105,30 @@ class JobResultPersisterService {
 
     private processFinishedJobResult(WptResultXml resultXml, JobResultStatus jobResultStatus, Job job) {
         try {
-            persistFinishedJobResult(resultXml, jobResultStatus, job.id)
-            WebPageTestServer wptServer = job.location.wptServer
             lock.lockInterruptibly()
-            this.resultListeners.each { listener ->
-                log.info("calling listener ${listener.listenerName} for job id ${job.id}")
-                if (listener.callListenerAsync()) {
-                    Promise p = task {
-                        JobResult.withNewSession {
-                            listener.listenToResult(resultXml, wptServer, job.id)
-                        }
-                    }
-                    p.onError { Throwable err -> log.error("${listener.getListenerName()} failed persisting results", err) }
-                    p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
-                } else {
-                    listener.listenToResult(resultXml, wptServer, job.id)
-                }
+            persistFinishedJobResult(resultXml, jobResultStatus, job.id)
+            if (jobResultStatus.hasResults()) {
+                invokeResultPersisters(resultXml, job.location.wptServer, job.id)
             }
         } finally {
             lock.unlock()
+        }
+    }
+
+    private invokeResultPersisters(WptResultXml resultXml, WebPageTestServer wptServer, long jobId) {
+        this.resultListeners.each { listener ->
+            log.info("calling listener ${listener.listenerName} for job id ${jobId}")
+            if (listener.callListenerAsync()) {
+                Promise p = task {
+                    JobResult.withNewSession {
+                        listener.listenToResult(resultXml, wptServer, jobId)
+                    }
+                }
+                p.onError { Throwable err -> log.error("${listener.getListenerName()} failed persisting results", err) }
+                p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
+            } else {
+                listener.listenToResult(resultXml, wptServer, jobId)
+            }
         }
     }
 
@@ -146,7 +158,7 @@ class JobResultPersisterService {
     private void updateJobResult(JobResult jobResult, JobResultStatus jobResultStatus, WptResultXml resultXml) {
         jobResult.testAgent = resultXml.getTestAgent()
         jobResult.wptVersion = resultXml.version.toString()
-        updateAndPersistJobResult(jobResult, resultXml.testId, jobResultStatus, resultXml.wptStatus)
+        updateAndPersistJobResult(jobResult, resultXml.testId, jobResultStatus, resultXml.wptStatus, resultXml.getStatusText())
     }
 
     private void updateAndPersistJobResult(JobResult result, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
@@ -181,20 +193,21 @@ class JobResultPersisterService {
                 locationBrowser: job.location.browser.name,
                 locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
                 jobGroupName: job.jobGroup.name,
-                wptStaus: wptStatus,
+                wptStatus: wptStatus,
                 jobResultStatus: jobResultStatus)
         log.debug("Persisting of unfinished result: Job ${job.label}, test-id=${testId} -> persisting new JobResult=${result}")
         return result.save(failOnError: true, flush: true)
     }
 
     private void deleteUnfinishedJobResults(Job job, String testId) {
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.IN_PROGRESS)?.delete(failOnError: true, flush: true)
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.PENDING)?.delete(failOnError: true, flush: true)
+        JobResult.findAllByJobAndTestIdAndJobResultStatusInList(job, testId, [JobResultStatus.WAITING, JobResultStatus.RUNNING]).each {
+            it.delete(failOnError: true, flush: true)
+        }
     }
 
     private void persistNewFinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptResultXml resultXml) {
         log.debug("persisting new JobResult ${testId}")
-        Date testCompletion = resultXml.getCompletionDate()
+        Date testCompletion = resultXml.getCompletionDate() ?: new Date()
         JobResult result = new JobResult(
                 job: job,
                 date: testCompletion,
@@ -216,7 +229,7 @@ class JobResultPersisterService {
                 wptVersion: resultXml.version.toString(),
         )
         //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
-        result.setDescription('')
+        result.setDescription(resultXml.getStatusText())
         result.save(failOnError: true, flush: true)
         job.lastRun = testCompletion
         job.merge(failOnError: true)
