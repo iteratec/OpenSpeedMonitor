@@ -1,5 +1,6 @@
 package de.iteratec.osm.measurement.schedule
 
+import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
 import grails.gorm.transactions.Transactional
@@ -8,13 +9,15 @@ import org.grails.orm.hibernate.cfg.GrailsHibernateUtil
 @Transactional
 class JobStatisticService {
 
+    MetricReportingService metricReportingService
+
     /**
      * A {@link JobStatistic} is created and associated to given job if no one already exists.
      * The statistic is updated.
      * @param job
      */
     @Transactional
-    public void updateStatsFor(Job job) {
+    void updateStatsFor(Job job) {
 
         List<JobResult> results = getLast150CompletedJobResultsFor(job)
 
@@ -30,10 +33,10 @@ class JobStatisticService {
                 null
         try {
             stat.save(failOnError: true)
+            metricReportingService.reportJobHealthStatusToGraphite(job)
         } catch (e) {
             System.out.println(e.toString())
         }
-
     }
 
     private JobStatistic getStatOf(Job job){

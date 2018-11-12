@@ -29,6 +29,7 @@ import de.iteratec.osm.csi.PageCsiAggregationService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.AggregationType
@@ -39,7 +40,10 @@ import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.result.*
 import grails.gorm.transactions.NotTransactional
 import grails.gorm.transactions.Transactional
+import org.apache.commons.lang.CharSet
 import org.joda.time.DateTime
+
+import java.util.concurrent.ThreadLocalRandom
 
 /**
  * Reports osm-metrics to external tools.
@@ -59,6 +63,36 @@ class MetricReportingService {
     InMemoryConfigService inMemoryConfigService
     BatchActivityService batchActivityService
     CsiAggregationUtilService csiAggregationUtilService
+
+    @NotTransactional
+    void reportJobHealthStatusToGraphite(Job job) {
+        if (job) {
+            Collection<GraphiteServer> graphiteServers = job.jobGroup.graphiteServers
+            graphiteServers.each { graphiteServer ->
+                GraphiteSocket socket = graphiteSocketProvider.getSocket(graphiteServer)
+                Date date = new Date()
+
+                List<String> pathElements = []
+                pathElements.add('test-prefix')
+                pathElements.add('job-health')
+                pathElements.add(replaceInvalidGraphitePathCharacters(job.jobGroup.name))
+                pathElements.add(replaceInvalidGraphitePathCharacters(job.script.label))
+                pathElements.add(replaceInvalidGraphitePathCharacters(job.location.location))
+                pathElements.add(replaceInvalidGraphitePathCharacters(job.id.toString()))
+                String basePath = pathElements.join(".")
+
+                if (job.jobStatistic.percentageSuccessfulTestsOfLast5 != null) {
+                    socket.sendDate(GraphitePathName.valueOf(basePath + ".percentageSuccessfulTestsOfLast5"), job.jobStatistic.percentageSuccessfulTestsOfLast5, date)
+                }
+                if (job.jobStatistic.percentageSuccessfulTestsOfLast25 != null) {
+                    socket.sendDate(GraphitePathName.valueOf(basePath + ".percentageSuccessfulTestsOfLast25"), job.jobStatistic.percentageSuccessfulTestsOfLast25, date)
+                }
+                if (job.jobStatistic.percentageSuccessfulTestsOfLast150 != null) {
+                    socket.sendDate(GraphitePathName.valueOf(basePath + ".percentageSuccessfulTestsOfLast150"), job.jobStatistic.percentageSuccessfulTestsOfLast150, date)
+                }
+            }
+        }
+    }
 
     /**
      * Reports each measurand of incoming result for that a {@link GraphitePathRawData} is configured.
