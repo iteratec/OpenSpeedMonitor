@@ -50,8 +50,8 @@ class ApplicationDashboardController {
 
     def getCsiValuesForApplications() {
         List<JobGroup> jobGroups = jobGroupService.getAllActiveAndRecent()
-        def csiVales = applicationDashboardService.getTodaysCsiValueForJobGroups(jobGroups)
-        return ControllerUtils.sendObjectAsJSON(response, csiVales)
+        def csiValues = applicationDashboardService.getTodaysCsiValueForJobGroups(jobGroups)
+        return ControllerUtils.sendObjectAsJSON(response, csiValues)
     }
 
     def createCsiConfiguration(DefaultApplicationCommand command) {
