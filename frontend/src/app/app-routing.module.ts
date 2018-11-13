@@ -9,6 +9,10 @@ const appRoutes: Routes = [
     loadChildren: './modules/application-dashboard/application-dashboard.module#ApplicationDashboardModule'
   },
   {
+    path: 'queueDashboard',
+    loadChildren: './modules/queue-dashboard/queue-dashboard.module#QueueDashboardModule'
+  },
+  {
     path: 'landing',
     loadChildren: './modules/landing/landing.module#LandingModule'
   },

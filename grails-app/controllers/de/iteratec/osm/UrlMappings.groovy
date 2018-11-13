@@ -31,8 +31,9 @@ class UrlMappings {
         "/about"(view: "/siteinfo/about")
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/applicationDashboard/**?"(view: "/angularFrontend")
-
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
+        "/queueDashboard/rest/$action"(controller: "queueDashboard")
+        "/queueDashboard"(view: "/angularFrontend")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller
