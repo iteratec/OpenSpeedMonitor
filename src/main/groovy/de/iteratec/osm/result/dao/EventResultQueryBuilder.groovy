@@ -210,6 +210,17 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
+    List<EventResultProjection> getPercentile(int percentile) {
+        measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
+        measurandQueryExecutor.setTransformer(new MeasurandPercentileDataTransformer(percentile, baseProjections, measurandQueryExecutor.selectedMeasurands))
+        measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
+
+        userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
+        userTimingQueryExecutor.setTransformer(new UserTimingPercentileDataTransformer(percentile, baseProjections))
+        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+        return getResults()
+    }
+
     List<EventResultProjection> getAverageData(){
         measurandQueryExecutor.setProjector(new MeasurandAverageDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandAverageDataTransformer(baseProjections: baseProjections))

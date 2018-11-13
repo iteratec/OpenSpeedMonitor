@@ -38,6 +38,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         state["selectedAggrGroupValuesUnCached"] = [];
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
         state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
+        state["selectedPercentile"] = $('input[id=percentageField]').val();
         var measurandSelects = $(".measurand-select");
         // leave out last select as it's the "hidden clone"
         for (var i = 0; i < measurandSelects.length - 1; i++) {
@@ -72,6 +73,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         setMeasurands(state);
         setSelectedFilter(state);
         setAggregationValue(state);
+        setPercentile(state);
         loadedState = encodedState;
         if (state.selectedFolder) {
             $(window).trigger("historyStateLoaded");
@@ -138,8 +140,19 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         var isAvg = state["selectedAggregationValue"] === "avg";
         $("#averageButton input").prop("checked", isAvg);
         $("#averageButton").toggleClass("active", isAvg);
-        $("#medianButton input").prop("checked", !isAvg);
-        $("#medianButton").toggleClass("active", !isAvg);
+        $("#percentileButton input").prop("checked", !isAvg);
+        $("#percentileButton").toggleClass("active", !isAvg);
+    };
+
+    var setPercentile = function (state) {
+        if(!state["selectedPercentile"]) {
+            return
+        }
+        var percentile = state["selectedPercentile"];
+        if(percentile.match("\\d{1,3}")) {
+            $("input[id='percentageSlider']").val(percentile);
+            $("input[id='percentageField']").val(percentile);
+        }
     };
 
     var setMultiSelect = function (id, values) {
