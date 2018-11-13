@@ -93,6 +93,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setPredefinedConnectivity(MULTISTEP_JOB)
         int numberRuns = 1
         int numberSteps = 3
+        JobResult.build(job: MULTISTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
@@ -114,6 +115,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setCustomConnectivity(MULTISTEP_JOB)
         int numberRuns = 1
         int numberSteps = 3
+        JobResult.build(job: MULTISTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
@@ -135,6 +137,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setNativeConnectivity(MULTISTEP_JOB)
         int numberRuns = 1
         int numberSteps = 3
+        JobResult.build(job: MULTISTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
@@ -156,6 +159,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setPredefinedConnectivity(SINGLESTEP_JOB)
         int numberRuns = 1
         int numberSteps = 2
+        JobResult.build(job: SINGLESTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
@@ -177,6 +181,7 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setCustomConnectivity(SINGLESTEP_JOB)
         int numberRuns = 1
         int numberSteps = 2
+        JobResult.build(job: SINGLESTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
@@ -198,7 +203,8 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setNativeConnectivity(SINGLESTEP_JOB)
         int numberRuns = 1
         int numberSteps = 2
-
+        JobResult.build(job: SINGLESTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
+        
         when: "ResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 

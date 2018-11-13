@@ -18,20 +18,13 @@
 package de.iteratec.osm.measurement.environment.wptserver
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.csi.CsiConfiguration
-import de.iteratec.osm.csi.CsiDay
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.csi.TimeToCsMapping
 import de.iteratec.osm.csi.transformation.TimeToCsMappingService
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -75,11 +68,6 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         }
     }
 
-    void setupSpec() {
-        mockDomains(WebPageTestServer, Browser, Location, Job, JobResult, EventResult, BrowserAlias, Page,
-                MeasuredEvent, JobGroup, Script, CsiConfiguration, TimeToCsMapping, CsiDay, ConnectivityProfile)
-    }
-
     void "result persistance with old (single step) WPT server"(String fileName, String jobLabel, String pageName) {
         setup:
         File file = new File("src/test/resources/WptResultXmls/" + fileName)
@@ -90,6 +78,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
         Page page = Page.build(name: pageName)
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
 
         when: "services listens to XML result of a single step test with 3 runs"
         service.listenToResult(xmlResult, wptServer, job.id)
@@ -130,6 +119,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
         Page.build(name: "Produkt")
         Page.build(name: "Suche")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
 
         when: "service listens to XML of a WPT multistep fork (2.18)"
         service.listenToResult(xmlResult, wptServer, job.id)
@@ -174,6 +164,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
         Job job = Job.build(label: "FF_Otto_multistep")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
@@ -195,6 +186,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
         Job job = Job.build(label: "ExampleJob Firefox")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
@@ -219,6 +211,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
         Job job = Job.build(label: "ExampleJob Firefox")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
@@ -267,6 +260,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
         Job job = Job.build(label: "ExampleJob Chrome TTI")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
         service.timeToCsMappingService = Stub(TimeToCsMappingService) {
             getCustomerSatisfactionInPercent(_) >> { value -> value }
         }
@@ -310,6 +304,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
         Job job = Job.build(label: "FF_Otto_multistep")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
 
         when: "the service listens to results from a WPT server > 2.19 with multistep"
         service.listenToResult(xmlResult, wptServer, job.id)
@@ -342,6 +337,7 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString())
         Job job = Job.build(label: "testjob")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "the service tries to persist results for an XML result with failed step"
         service.persistResultsForAllTeststeps(xmlResult, job.id)

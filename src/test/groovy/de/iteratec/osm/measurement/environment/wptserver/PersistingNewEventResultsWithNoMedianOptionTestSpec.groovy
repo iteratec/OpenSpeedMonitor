@@ -74,6 +74,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification 
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
         Job job = Job.build(label: jobLabel, persistNonMedianResults: doPersistNonMedianResults)
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
 
         when: "the services listens to the XML file"
         service.listenToResult(xmlResult, wptServer, job.id)

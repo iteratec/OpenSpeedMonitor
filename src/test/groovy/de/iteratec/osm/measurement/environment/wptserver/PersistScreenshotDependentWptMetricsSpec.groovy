@@ -79,6 +79,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         MeasuredEvent.build(name: NAME_EVENT_2)
         MeasuredEvent.build(name: NAME_EVENT_3)
         Job job = Job.build()
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
@@ -107,6 +108,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         MeasuredEvent.build(name: NAME_EVENT_2)
         MeasuredEvent.build(name: NAME_EVENT_3)
         Job job = Job.build()
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
@@ -128,6 +130,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         MeasuredEvent.build(name: NAME_EVENT_2)
         MeasuredEvent.build(name: NAME_EVENT_3)
         Job job = Job.build()
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
@@ -172,6 +175,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         MeasuredEvent.build(name: 'IE_otto_hp_singlestep')
         Job job = Job.build()
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
@@ -196,6 +200,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         WptResultXml xmlResult = new WptResultXml (new XmlSlurper().parse(xmlResultFile))
         MeasuredEvent.build(name: 'IE_otto_hp_singlestep')
         Job job = Job.build()
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
         when: "ResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)

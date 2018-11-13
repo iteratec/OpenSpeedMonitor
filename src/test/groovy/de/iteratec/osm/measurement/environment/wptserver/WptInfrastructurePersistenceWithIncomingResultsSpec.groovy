@@ -19,7 +19,6 @@ import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
-import org.joda.time.DateTime
 import org.junit.Test
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -65,17 +64,12 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlFile))
         createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), server1)
         Job job = Job.findByLabel(jobLabel)
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: server1.baseUrl)
 
         when: "ResultPersister listens to xml result files"
         service.listenToResult(xmlResult, server1, job.id)
 
         then: "all EventResult dependent Domains got persisted as expected"
-        //check for job-runs
-        Collection<JobResult> jobRuns = JobResult.list()
-        jobRuns.size() == 1
-        //check dates of job and job_results
-        new DateTime(job.lastRun) == new DateTime(new Date(execTime))
-        new DateTime(jobRuns[0].date) == new DateTime(new Date(execTime))
         //check for steps
         List<MeasuredEvent> writtenSteps = MeasuredEvent.list()
         writtenSteps.size() == steps
@@ -148,35 +142,6 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
         Location.count() == numberOfLocationsFromCommonTestData + 1
         job.location.uniqueIdentifierForServer == locationFromResultXml
         job.location.wptServer == server1
-
-    }
-
-    @Test
-    void "Job gets associated to new WebPageTestServer if respective result xml comes in"() {
-
-        given: "xml file and WebPageTestServer and Locations already in place"
-        File xmlFile = new File("src/test/resources/WptResultXmls/BEFORE_MULTISTEP_1Run_JustFirstView.xml")
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(xmlFile))
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), server1)
-        createLocationIfNotExistent(xmlResult.responseNode.data.location.toString(), server2)
-
-        String testId_2 = "130622_FA_1AX2"
-        String testId_1 = xmlResult.responseNode.data.testId
-
-        when: "ResultPersisterService listens to 2 results for the same Job but for different WebPageTestServers"
-        Job job = Job.findByLabel('testjob')
-        service.listenToResult(xmlResult, server1, job.id)
-        xmlResult.responseNode.data.testId = testId_2
-        service.listenToResult(xmlResult, server2, job.id)
-
-        then: "Job is associated to WebPageTestServer of last result and JobResults got persisted correctly"
-        job.location.wptServer == server2
-
-        JobResult.list().size() == 2
-        int numberOfJobResultsAssociatedToServer1 = JobResult.findAllByTestIdAndWptServerBaseurl(testId_1, server1.baseUrl).size()
-        numberOfJobResultsAssociatedToServer1 == 1
-        int numberOfJobResultsAssociatedToServer2 = JobResult.findAllByTestIdAndWptServerBaseurl(testId_2, server2.baseUrl).size()
-        numberOfJobResultsAssociatedToServer2 == 1
 
     }
 
