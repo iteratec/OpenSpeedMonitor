@@ -84,19 +84,18 @@ class JobResultPersisterService {
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {
-            int numValidResults = 0
-            int numExpectedResults = 1
             JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
-            if (jobResult) {
-                numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
-                numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
+            if (!jobResult) {
+                log.error("There is no job result for finished job id ${job.id} and test id ${testId}!")
+                return JobResultStatus.FAILED
             }
+            int numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
+            int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
             if (numValidResults < 1) {
                 return JobResultStatus.FAILED
             }
             return numValidResults < numExpectedResults ? JobResultStatus.INCOMPLETE : JobResultStatus.SUCCESS
         }
-        // TODO(sbr): Check for timeout
         if (wptStatus == WptStatus.IN_PROGRESS) {
             return JobResultStatus.RUNNING
         }

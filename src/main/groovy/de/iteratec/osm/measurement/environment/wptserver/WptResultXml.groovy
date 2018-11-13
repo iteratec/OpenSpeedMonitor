@@ -118,9 +118,9 @@ class WptResultXml {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
                 return job.getEventNameIfUnknown() ?: job.getLabel()
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).eventName.toString();
+                return responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex)?.eventName?.toString()
             case WptXmlResultVersion.MULTISTEP:
-                return responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex).eventName.toString();
+                return responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex)?.eventName?.toString()
             default:
                 throw new IllegalStateException("Version of result xml isn't specified!")
 
@@ -129,20 +129,6 @@ class WptResultXml {
 
     def getRunNodes() {
         return responseNode.data.run
-    }
-
-    //TODO(sbr): Remove
-    def getStepNode(int stepZeroBasedIndex) {
-        switch (version) {
-            case WptXmlResultVersion.BEFORE_MULTISTEP:
-                return responseNode.data.median?.firstView
-            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex)
-            case WptXmlResultVersion.MULTISTEP:
-                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex)?.results
-            default:
-                throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
-        }
     }
 
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {

@@ -139,22 +139,15 @@ class ResultPersisterService implements iResultListener {
 
     void persistResultsForAllTeststeps(WptResultXml resultXml, long jobId) {
         Integer testStepCount = resultXml.getTestStepCount()
-
         log.debug("starting persistance of ${testStepCount} event results for test steps")
-        //TODO: possible to catch non median results at this position  and check if they should persist or not
 
         for (int zeroBasedTeststepIndex = 0; zeroBasedTeststepIndex < testStepCount; zeroBasedTeststepIndex++) {
-            if (resultXml.getStepNode(zeroBasedTeststepIndex)) {
-                try {
-                    if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)) {
-                        break
-                    }
-                } catch (Exception e) {
-                    log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
+            try {
+                if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)) {
+                    break
                 }
-
-            } else {
-                log.error("there is no testStep ${zeroBasedTeststepIndex + 1} for testId ${resultXml.getTestId()}")
+            } catch (Exception e) {
+                log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
             }
         }
     }
@@ -173,10 +166,12 @@ class ResultPersisterService implements iResultListener {
 
         log.debug('getting event name from xml result ...')
         String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
-        log.debug('getting event name from xml result ... DONE')
+        if (!measuredEventName) {
+            log.error("there is no testStep ${testStepZeroBasedIndex + 1} for testId ${resultXml.getTestId()}")
+            return false
+        }
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
         MeasuredEvent event = getMeasuredEvent(measuredEventName);
-        log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
 
         log.debug("persisting result for step=${event}")
         int runCount = resultXml.getRunCount()
@@ -324,7 +319,7 @@ class ResultPersisterService implements iResultListener {
         try {
             result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
         } catch (MalformedURLException mue) {
-            log.error("Failed to build test's detail url for result: ${result}!")
+            log.error("Failed to build test's detail url for result: ${result} and jobResult: ${jobRun}!", mue)
         } catch (Exception e) {
             log.error("An unexpected error occurred while trying to build test's detail url (result=${result})!", e)
         }
