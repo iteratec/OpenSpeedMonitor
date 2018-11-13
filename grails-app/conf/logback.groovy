@@ -15,7 +15,6 @@ if (!catalinaBase) catalinaBase = '.'   // just in case
 def logFolder = "${catalinaBase}/logs"
 
 def logToFile = Boolean.getBoolean('logToFile')
-def logToConsole = Boolean.getBoolean('logToConsole')
 def logHibernateDetails = Boolean.getBoolean('logHibernateDetails')
 def defaultLevel = System.properties.getProperty('logLevel')
 
@@ -57,14 +56,12 @@ def defaultLogConfig = [
         ["org.grails.datastore.gorm", ERROR]
 ]
 
-if (logToConsole) {
-    def consoleLogConfig = [
-        (consoleLog) : [
-                *defaultLogConfig,
-                ["liquibase", INFO]]
-    ]
-    applyLoggers(consoleLogConfig)
-}
+def consoleLogConfig = [
+    (consoleLog) : [
+            *defaultLogConfig,
+            ["liquibase", INFO]]
+]
+applyLoggers(consoleLogConfig)
 
 if (logToFile && targetDir) {
     def fileLogConfig = [
