@@ -58,4 +58,45 @@ class AggregationUtil {
         }
         return trimClosures
     }
+
+    static def getPercentile(List<Number> data, int nthIndex) {
+        if(data.size() > nthIndex){
+            def rawData = data.toArray()
+            int left = 0
+            int right = data.size() - 1
+            while(true) {
+                if(left == right) {
+                    return rawData[left]
+                }
+                int pivot = right
+                pivot = partitionArray(rawData, left, right, pivot)
+
+                if(nthIndex == pivot) {
+                    return rawData[nthIndex]
+                }
+                else if(nthIndex < pivot) {
+                    right = pivot -1
+                }
+                else {
+                    left = pivot +1
+                }
+            }
+        }
+        throw new IllegalStateException("Something went wrong during calculation of the percentile")
+    }
+
+    private static def partitionArray(Object[] data, int left, int right, int pivot) {
+        def pivotVal = data[pivot]
+        data.swap(pivot, right)
+        int i = left
+        int k = right - 1
+        while(true) {
+            while(data[i] < pivotVal && i<=k)i++
+            while(data[k] >= pivotVal && k>i)k--
+            if(i >= k)break
+            data.swap(i, k)
+        }
+        data.swap(i, right)
+        return i
+    }
 }

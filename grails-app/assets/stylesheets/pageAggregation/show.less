@@ -1,0 +1,104 @@
+@import "../variables-corporate";
+/*
+*= require /_resultSelection/selectBarchartMeasurings.css
+*= require_self
+*/
+
+.card-well {
+    position: relative;
+}
+
+.chart-filter .fas {
+    visibility: hidden;
+}
+
+.chart-filter.selected .fas {
+    visibility: visible;
+}
+
+#chart-container {
+    position: relative;
+}
+
+#aggregationValueSwitch {
+    margin-right: 5px;
+}
+
+#filter-dropdown-group {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    z-index: 2;
+    top: 4px;
+    right: 50px;
+    padding: 6px 12px;
+}
+#percentile-label {
+    padding-top: 4px;
+    padding-right: 0.5em;
+}
+#percentageField {
+    max-width: 5em;
+    padding-left: 0;
+}
+.perc-element {
+    margin-right: .5em;
+}
+.perc-slider {
+    -webkit-appearance: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border: 0;
+    max-width: 10em;
+}
+.perc-slider:focus {
+    -webkit-appearance: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border: 0;
+}
+.perc-slider:disabled {
+    opacity: 0.5;
+}
+.perc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 32px;
+    width: 12px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid;
+    background: @brand-primary;
+    border-color: darken(@brand-primary, 10%);
+    margin-top: -12px;
+    cursor: pointer;
+}
+.perc-slider:disabled::-webkit-slider-thumb {
+    cursor: not-allowed;
+}
+.perc-slider::-moz-range-thumb {
+    width: 10px;
+    height: 30px;
+    background: @brand-primary;
+    border-color: darken(@brand-primary, 10%);
+    border-radius: 4px;
+    cursor: pointer;
+    -moz-border-radius: 4px;
+}
+.perc-slider::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    background: lightgray;
+    height: 8px;
+    width: 100%;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+}
+.perc-slider::-moz-range-track {
+    background: lightgray;
+    height: 8px;
+    width: 100%;
+    border-radius: 2px;
+}
