@@ -10,15 +10,10 @@ export interface ServerInfo {
 
 @Injectable()
 export class QueueDashboardService {
-
-  private http: HttpClient;
-
   activeServers$ = new ReplaySubject<WptServerDTO[]>(1);
   serverInfo$ = new BehaviorSubject<ServerInfo>({});
 
-  constructor (httpClient: HttpClient){
-    this.http = httpClient
-  }
+  constructor (private http: HttpClient){}
 
   getActiveWptServer(){
     this.http.get<WptServerDTO[]>("/queueDashboard/rest/getActiveWptServer").subscribe(

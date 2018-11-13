@@ -70,8 +70,7 @@
       </tr>
 
       <tr class="job-row" #job_row
-          *ngIf="location.pendingJobs > 0 || location.runningJobs > 0"
-          [style.display]="full_row.detailsVisible ? 'table-row' : 'none'">
+          *ngIf="(location.pendingJobs > 0 || location.runningJobs > 0) && full_row.detailsVisible">
         <td colspan="11" >
 
           <table>

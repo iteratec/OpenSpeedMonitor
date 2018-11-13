@@ -36,15 +36,9 @@ class QueueDashboardController {
             List<Map> listLocationInfo = new ArrayList<Map>()
 
             listLocation.forEach( {Location location ->
-
-                List<JobResult> executingJobResults
-                executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
-
-                Map<Job, List<JobResult>> executingJobs
-                executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
-
+                List<JobResult> executingJobResults = queueAndJobStatusService.getExecutingJobResults(location)
+                Map<Job, List<JobResult>> executingJobs = queueAndJobStatusService.aggregateJobs(executingJobResults)
                 LocationHealthCheck healthCheck = healthChecks.findAll{ it.location == location }[0]
-
                 Map map = buildMap(location, healthCheck, executingJobResults, executingJobs)
                 listLocationInfo.add(map)
             } )

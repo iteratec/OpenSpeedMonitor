@@ -7,10 +7,10 @@
     <span>
       <h2>{{wptserver.label}}</h2>
       <span class="fas chevron-large"
-          (click)="thisCard.isOpened = !thisCard.isOpened"
-          [style.display]="thisCard.isLoaded ? 'block' : 'none'"
-          [class.fa-chevron-up]="thisCard.isOpened"
-          [class.fa-chevron-down]="!thisCard.isOpened"></span>
+            *ngIf="thisCard.isLoaded"
+            (click)="thisCard.isOpened = !thisCard.isOpened"
+            [class.fa-chevron-up]="thisCard.isOpened"
+            [class.fa-chevron-down]="!thisCard.isOpened">bla</span>
     </span>
   </div>
 
@@ -24,7 +24,7 @@
     </button>
   </div>
 
-  <div id="data-table-id" [style.display]="thisCard.isOpened ? 'block' : 'none'">
+  <div id="data-table-id" *ngIf="thisCard.isOpened">
     <osm-queue-list
       [serverInfo]="serverInfo$ | async"
       [wptServerID]="wptserver.id">

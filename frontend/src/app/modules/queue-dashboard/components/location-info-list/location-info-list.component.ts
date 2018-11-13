@@ -14,12 +14,9 @@ export class LocationInfoListComponent {
 
   @Input() wptServerID;
 
-  private langservice: OsmLangService;
   locationInfo : LocationInfoDTO[] = [];
 
-  constructor(langservice: OsmLangService) {
-    this.langservice = langservice;
-  }
+  constructor(private langservice: OsmLangService) {}
 
   @Input()
   set serverInfo(value: ServerInfo ) {

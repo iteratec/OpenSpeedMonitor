@@ -86,6 +86,11 @@ describe("LocationInfoListComponent", () => {
     component.serverInfo = {[mockserver.id] : mockinformation};
     fixture.detectChanges();
 
+    fixture.nativeElement.querySelectorAll(".arrow").forEach(arrow => {
+      arrow.click();
+    });
+    fixture.detectChanges();
+
     const jobRows : HTMLCollection = fixture.nativeElement.querySelectorAll(".job-row");
     expect(jobRows.length).toBeGreaterThan(0);
   });
@@ -94,5 +99,4 @@ describe("LocationInfoListComponent", () => {
     const date = component.parseDate("2018-10-16 11:00:14.0");
     expect(date).toEqual("10/16/18, 11:00 AM");
   });
-
 });

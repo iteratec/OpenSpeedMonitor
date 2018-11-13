@@ -48,11 +48,18 @@ describe("QueueDashboardComponent", () => {
       }
     ];
 
-    mockinformation = [{agents: 1,
+    mockinformation = [{
+      agents: 1,
       errorsLastHour: 0,
       eventResultLastHour: 0,
       eventsNextHour: 2,
-      executingJobs: [],
+      executingJobs: [
+        [{jobConfigLabel: "label",
+          date: "2018-10-14 14:00:16.0",
+          wptServerBaseUrl: "url",
+          testId: 55,
+          jobResultStatus: {name: "WAITING"}}]
+      ],
       id: "Dulles_GalaxyS5:undefined",
       jobResultsLastHour: 0,
       jobs: 2,
@@ -90,19 +97,16 @@ describe("QueueDashboardComponent", () => {
     queueDashboardService.activeServers$.next(mockserver);
     fixture.detectChanges();
 
-    const datatableEl: HTMLElement = fixture.nativeElement.querySelectorAll("#data-table-id");
-    expect(datatableEl[0].style.display).toEqual("none");
-    expect(datatableEl[1].style.display).toEqual("none");
+    const datatableEl: HTMLCollection = fixture.nativeElement.querySelectorAll("#data-table-id");
+    expect(datatableEl.length).toEqual(0);
 
     const buttons : HTMLButtonElement = fixture.nativeElement.querySelectorAll("#load-data-button");
     buttons[0].click();
     buttons[1].click();
 
     fixture.detectChanges();
-    const datatableEl2: HTMLElement = fixture.nativeElement.querySelectorAll("#data-table-id");
-
-    expect(datatableEl2[0].style.display).toEqual("block");
-    expect(datatableEl2[1].style.display).toEqual("block");
+    const datatableEl2: HTMLCollection = fixture.nativeElement.querySelectorAll("#data-table-id");
+    expect(datatableEl2.length).toBeGreaterThan(0);
   });
 
   it('should show tablebody according serverinformation', () => {
@@ -114,13 +118,21 @@ describe("QueueDashboardComponent", () => {
     const datarows : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
     expect(datarows.length).toEqual(0);
 
+    fixture.nativeElement.querySelectorAll(".card").forEach(card => {
+      card.isOpened = true;
+      card.isLoaded = true;
+    });
+
+    fixture.detectChanges();
+
     queueDashboardService.serverInfo$.next({
       [mockserver[0].id]: mockinformation
     });
 
     fixture.detectChanges();
 
-    const datarows2 : HTMLElement = fixture.nativeElement.querySelectorAll(".queueRow");
+    const datarows2 : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
+    console.log(datarows2);
     expect(datarows2).toBeTruthy();
     expect(datarows2[0].firstElementChild.textContent ).toEqual(mockinformation[0].id);
   });
