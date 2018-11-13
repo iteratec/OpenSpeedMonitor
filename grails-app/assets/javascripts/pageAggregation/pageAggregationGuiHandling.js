@@ -286,7 +286,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
         getDataForAggregationValue("avg", queryData, isStateChange);
     };
 
-    var loadPercentile = function (isStateChange) {
+    var loadPercentile = function () {
         if(currentQuery) {
             spinner.start();
             getDataForAggregationValue(percentile, currentQuery, true);
@@ -303,16 +303,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             success: function (data) {
                 if (aggregationValue === "avg") {
                     avgLoaded = true;
-                    handleNewData(data, "avg", isStateChange, false);
+                    handleNewData(data, isStateChange, false);
                 }
                 else if(!percentileLoaded){
                     percentileLoaded = true;
                     lastPercentile = aggregationValue;
-                    handleNewData(data, percentile, isStateChange, false);
+                    handleNewData(data, isStateChange, false);
                 }
                 else {
                     lastPercentile = aggregationValue;
-                    handleNewData(data, aggregationValue, true, true);
+                    handleNewData(data, true, true);
                 }
             },
             error: function (e) {

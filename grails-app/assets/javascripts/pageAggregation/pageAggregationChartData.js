@@ -75,7 +75,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var transformAndMergeData = function (data) {
         if (data.series && (rawSeries.length === 0 || (rawSeries && rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)))) {
-            if(data.series[0].aggregationValue === 'avg') {
+            if(rawSeries.length === 0 || (data.series[0].aggregationValue === 'avg' && !rawSeries[0].hasOwnProperty('50'))) {
                 rawSeries = data.series;
                 dataLength = rawSeries.length;
             }
