@@ -1,4 +1,13 @@
-import {Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  ViewChild,
+  ViewEncapsulation
+} from '@angular/core';
 
 import {CsiUtils} from '../../../../utils/csi-utils';
 import {TranslateService} from '@ngx-translate/core';
@@ -84,9 +93,8 @@ export class CsiValueBaseComponent implements OnInit, OnChanges {
     if (!this.csiValueRenderer) {
       return;
     }
-    if (changes.csiValue) {
-      this.updateComponent(changes.csiValue.previousValue);
-    }
+    const previousValue = changes.csiValue ? changes.csiValue.previousValue : this.csiValue;
+    this.updateComponent(previousValue);
   }
 }
 
