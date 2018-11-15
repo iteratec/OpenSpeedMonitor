@@ -373,7 +373,7 @@ class BootStrap {
     def registerProxyListener = {
         log.info "registerProxyListener OSM ends"
         wptInstructionService.addLocationListener(locationPersisterService)
-        jobResultPersisterService.addResultListener(resultPersisterService)
+        jobResultPersisterService.addResultListener(eventResultPersisterService)
 
         // enable persistence of detailAnalysisData for JobResults if configured
         boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
