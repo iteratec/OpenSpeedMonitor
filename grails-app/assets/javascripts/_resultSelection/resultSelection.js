@@ -178,6 +178,7 @@ OpenSpeedMonitor.resultSelection = (function () {
         }
         if(OpenSpeedMonitor.selectUserTimings){
             updateCard(resultSelectionUrls["userTimings"], OpenSpeedMonitor.selectUserTimings.updateUserTimings, spinner);
+            updateCard(resultSelectionUrls["heroTimings"], OpenSpeedMonitor.selectUserTimings.updateHeroTimings, spinner);
             updateStarted = true;
         }
 
@@ -220,6 +221,7 @@ OpenSpeedMonitor.resultSelection = (function () {
             dataType: "json",
             success: function (data) {
                 var updateWasEnabled = enableUpdates(false);
+                console.log(data)
                 handler(data);
                 enableUpdates(updateWasEnabled);
                 if (spinner) {
