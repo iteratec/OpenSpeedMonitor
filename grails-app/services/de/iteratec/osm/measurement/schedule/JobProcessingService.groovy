@@ -134,7 +134,9 @@ class JobProcessingService {
                 customHeaders  : job.customHeaders,
                 trace          : job.trace,
                 traceCategories: job.traceCategories,
-                spof           : job.spof
+                spof           : job.spof,
+                heroElementTimes    : job.heroElementTimes,
+                heroElements        : job.heroElements
         ]
         if (job.takeScreenshots == Job.TakeScreenshots.NONE) {
             parameters.noimages = true

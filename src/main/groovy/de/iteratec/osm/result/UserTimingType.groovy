@@ -5,7 +5,8 @@ package de.iteratec.osm.result
  */
 enum UserTimingType {
     MARK(MeasurandGroup.LOAD_TIMES, "userTimes", SelectedMeasurandType.USERTIMING_MARK ),
-    MEASURE(MeasurandGroup.LOAD_TIMES, "userTimingMeasures", SelectedMeasurandType.USERTIMING_MEASURE)
+    MEASURE(MeasurandGroup.LOAD_TIMES, "userTimingMeasures", SelectedMeasurandType.USERTIMING_MEASURE),
+    HERO_MARK(MeasurandGroup.LOAD_TIMES, "heroTimes", SelectedMeasurandType.HEROTIMING_MARK)
 
     MeasurandGroup measurandGroup
     String tagInResultXml

@@ -170,21 +170,39 @@ class ResultSelectionController extends ExceptionHandlerController {
             sendError(command)
             return
         }
-
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserTimings for ${command as JSON}", 0, {
-            def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
-                projections {
-                    userTimings {
-                        groupProperty('name')
-                        groupProperty('type')
-                    }
-                }
-            })
+            def userTimings = getAllUserAndHeroTimings(command).findAll { it[1] != UserTimingType.HERO_MARK }
             return userTimings.collect {
                 SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
             }.unique { a, b -> a.id <=> b.id }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
+    def getHeroTimings(ResultSelectionCommand command) {
+        if (command.hasErrors()) {
+            sendError(command)
+            return
+        }
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getHeroTimings for ${command as JSON}", 0, {
+            def heroTimings = getAllUserAndHeroTimings(command).findAll { it[1] == UserTimingType.HERO_MARK }
+            return heroTimings.collect {
+                SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
+            }.unique { a, b -> a.id <=> b.id }
+        })
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    private def getAllUserAndHeroTimings(ResultSelectionCommand command) {
+        return query(command, ResultSelectionType.UserTimings, { existing ->
+            projections {
+                userTimings {
+                    groupProperty('name')
+                    groupProperty('type')
+                }
+            }
+        })
     }
 
     @RestAction

@@ -459,6 +459,7 @@ class ResultPersisterService implements iResultListener {
         List<UserTiming> allUserTimings = []
         allUserTimings.addAll(createAllMarks(viewTag, result))
         allUserTimings.addAll(createAllMeasures(viewTag, result))
+        allUserTimings.addAll(createAllHeroTimings(viewTag, result))
         result.userTimings = allUserTimings
     }
 
@@ -486,6 +487,19 @@ class ResultPersisterService implements iResultListener {
                 type: UserTimingType.MEASURE,
                 eventResult: result
             )
+        }
+    }
+
+    private List<UserTiming> createAllHeroTimings(GPathResult viewTag, EventResult result){
+        return viewTag.heroElementTimes.children().collect {
+            if(it && it.name() && it.toString().isDouble()) {
+                return new UserTiming(
+                        name: it.name(),
+                        startTime: it.toDouble(),
+                        type: UserTimingType.HERO_MARK,
+                        eventResult: result
+                )
+            }
         }
     }
 

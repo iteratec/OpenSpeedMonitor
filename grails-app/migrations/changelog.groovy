@@ -67,4 +67,5 @@ databaseChangeLog = {
     include file: '2018-10-01-v500-job-label-optional.groovy'
     include file: '2018-10-10-v500-locationHealthCheck-add-index.groovy'
     include file: '2018-10-11-v500-job-result-status.groovy'
+    include file: '2018-11-15-v500-hero-element-times.groovy'
 }
