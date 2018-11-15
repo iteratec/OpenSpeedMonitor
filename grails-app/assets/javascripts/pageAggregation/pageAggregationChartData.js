@@ -74,17 +74,23 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var transformAndMergeData = function (data) {
-        if (data.series && (!rawSeries.length > 0|| rawSeries[0].hasOwnProperty(data.series[0].aggregationValue))) {
-            rawSeries = data.series;
-            dataLength = rawSeries.length;
-            rawSeries.forEach(function (it) {
-                it[data.series[0].aggregationValue] = it.value;
-                delete it.value;
-                if (data.hasComparativeData) {
+        if (data.series && (rawSeries.length === 0 || (rawSeries && rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)))) {
+            if(rawSeries.length === 0 || (data.series[0].aggregationValue === 'avg' && !rawSeries[0].hasOwnProperty('50'))) {
+                rawSeries = data.series;
+                dataLength = rawSeries.length;
+            }
+            rawSeries.forEach(function (it){
+                data.series.forEach(function (newdata) {
+                    if(it.jobGroup === newdata.jobGroup && it.page === newdata.page && it.measurand === newdata.measurand) {
+                        it[newdata.aggregationValue] = newdata.value;
+                        delete it.value;
+                    }
+                });
+                if(data.hasComparativeData) {
                     it[data.series[0].aggregationValue + 'Comparative'] = it.valueComparative;
                     delete it.valueComparative;
                 }
-            })
+            });
         }
         if (data.series && rawSeries && !rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)) {
             data.series.forEach(function (it) {
@@ -100,8 +106,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getAggregationValueLabel = function () {
         if (aggregationValue === 'avg') {
             return 'Average'
-        } else {
-            return 'Median'
+        }
+        else {
+            return "Percentile: " + aggregationValue + "%"
         }
     };
 
@@ -235,7 +242,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         var seriesForSorting = getMeasurandDataForSorting().series.slice();
         var compareFunction = (ascOrdDesc === "asc") ? d3.ascending : d3.descending;
         seriesForSorting.sort(function (a, b) {
-            return compareFunction(a[aggregationValue], b[aggregationValue]);
+            return compareFunction(a[aggregationValue] ? a[aggregationValue] : -1, b[aggregationValue] ? b[aggregationValue] : -1);
         });
         var longestExistingSeries = Object.values(allMeasurandDataMap).reduce(function (curFilter, measurandData) {
             return (measurandData.series.length > curFilter.length) ? measurandData.series : curFilter;
@@ -344,11 +351,12 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getSortedValuesForBars = function (series) {
         var seriesMap = {};
         series.forEach(function (value) {
+            var seriesValue = value[aggregationValue] ? value[aggregationValue] : value.value;
             seriesMap[value.id] = {
                 page: value.page,
                 jobGroup: value.jobGroup,
                 id: value.id,
-                value: value[aggregationValue] ? value[aggregationValue] : value.value,
+                value: seriesValue ? seriesValue : 0,
                 unit: value.unit,
                 measurand: value.measurand,
                 measurandGroup: value.measurandGroup,

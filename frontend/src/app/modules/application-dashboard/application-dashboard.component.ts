@@ -36,8 +36,8 @@ export class ApplicationDashboardComponent implements OnDestroy {
       map(response => response.data)
     );
     this.applicationCsi$ = applicationService.selectSelectedApplicationCsi();
-    this.isLoading$ = applicationService.applicationCsiById$
-      .pipe(map((applicationCsiById: ApplicationCsiById) => applicationCsiById.isLoading));
+    this.isLoading$ = combineLatest(applicationService.applicationCsiById$, applicationService.selectedApplication$)
+      .pipe(map(([applicationCsiById, selectedApplication]: [ApplicationCsiById, Application]) => applicationCsiById.isLoading && !applicationCsiById[selectedApplication.id]));
     this.recentCsiValue$ = this.applicationCsi$
       .pipe(map((applicationCsi: ApplicationCsi) => applicationCsi.recentCsi()));
     this.hasConfiguration$ = this.applicationCsi$

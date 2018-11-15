@@ -4,7 +4,7 @@
 <head>
     <meta name="layout" content="kickstart_osm"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
-    <asset:stylesheet src="/pageAggregation/show.css"/>
+    <asset:stylesheet src="/pageAggregation/show.less"/>
 </head>
 
 <body>
