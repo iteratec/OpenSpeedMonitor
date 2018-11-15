@@ -155,7 +155,7 @@
         <g:render template="/_resultSelection/hiddenWarnings"/>
         <!-- Actual tabs -->
         <ul class="nav nav-tabs card-well-tabs" id="erd-card-tabs">
-            <li >
+            <li class="active">
                 <a data-toggle="tab" href="#tabJobSelection" id="tabJobSelectionElement">
                     <g:message code="de.iteratec.sri.wptrd.time.filter.heading"
                                default="Zeitraum ausw&auml;hlen"/>
@@ -164,7 +164,7 @@
                                default="Jobs filtern"/>
                 </a>
             </li>
-            <li class="active">
+            <li >
                 <a data-toggle="tab" href="#tabVariableSelection" id="tabVariableSelectionElement">
                     <g:message code="de.iteratec.sri.wptrd.measurement.filter.heading"
                                default="Messwerte auw&auml;hlen"/>
@@ -173,7 +173,7 @@
         </ul>
 
         <div class="tab-content card-well">
-            <div class="tab-pane" id="tabJobSelection">
+            <div class="tab-pane in active" id="tabJobSelection">
                 <g:render template="/_resultSelection/selectMeasuringsAndTimeFrame"
                           model="${['selectedTimeFrameInterval'      : selectedTimeFrameInterval,
                                     'from'                           : from,
@@ -202,7 +202,7 @@
                                     'selectedAllConnectivityProfiles': selectedAllConnectivityProfiles]}"/>
             </div>
 
-            <div class="tab-pane in active" id="tabVariableSelection">
+            <div class="tab-pane" id="tabVariableSelection">
                 <g:render template="/_resultSelection/selectMeasuredVariables"
                           model="${['selectedAggrGroupValuesUnCached'   : selectedAggrGroupValuesUnCached,
                                     'aggrGroupValuesUnCached'           : aggrGroupValuesUnCached,
