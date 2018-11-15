@@ -3,7 +3,7 @@ package de.iteratec.osm.report.external
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.CsiAggregationUpdateService
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.EventResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.result.EventResult
@@ -17,7 +17,7 @@ import spock.lang.Unroll
 @Unroll
 @Build([Page, EventResult, MeasuredEvent])
 class FilterResultsToReportSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     static final PAGE_NAME_HOMEPAGE = 'Homepage'
 
@@ -46,7 +46,7 @@ class FilterResultsToReportSpec extends Specification implements BuildDataTest,
         )
         service.metricReportingService = Mock(MetricReportingService)
 
-        when: "ResultPersisterService.informDependent() is called with the Result."
+        when: "EventResultPersisterService.informDependent() is called with the Result."
         service.informDependent(er)
 
         then: "The Result is reported to Graphite."

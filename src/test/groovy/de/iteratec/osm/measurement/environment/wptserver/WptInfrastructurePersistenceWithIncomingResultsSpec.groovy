@@ -32,7 +32,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
  */
 @Build([Location, Job, Page, WebPageTestServer, CsiConfiguration])
 class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     WebPageTestServer server1, server2
 

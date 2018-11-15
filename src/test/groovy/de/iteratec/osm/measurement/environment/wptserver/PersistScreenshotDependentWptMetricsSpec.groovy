@@ -45,7 +45,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
 @Build([Job, MeasuredEvent, Location, WebPageTestServer, Page])
 @Unroll
 class PersistScreenshotDependentWptMetricsSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     static WebPageTestServer WPT_SERVER
 
@@ -81,7 +81,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         Job job = Job.build()
         JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result."
+        when: "EventResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly."
@@ -110,7 +110,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         Job job = Job.build()
         JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result."
+        when: "EventResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands are missing on written EventResults."
@@ -132,7 +132,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         Job job = Job.build()
         JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result."
+        when: "EventResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly for each step in each run."
@@ -177,7 +177,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         Job job = Job.build()
         JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result."
+        when: "EventResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly for first and repeated view."
@@ -202,7 +202,7 @@ class PersistScreenshotDependentWptMetricsSpec extends Specification implements 
         Job job = Job.build()
         JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result."
+        when: "EventResultPersisterService listens to result."
         service.listenToResult(xmlResult, WPT_SERVER, job.id)
 
         then: "Screenshot dependent measurands get persisted correctly for first and repeated view of all runs."

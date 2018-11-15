@@ -47,7 +47,7 @@ import static de.iteratec.osm.result.CachedView.UNCACHED
  */
 @Build([Location, WebPageTestServer, Job, Page, EventResult, JobGroup])
 class PersistingNewEventResultsSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     Closure doWithSpring() {
         return {

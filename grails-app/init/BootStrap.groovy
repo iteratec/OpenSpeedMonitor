@@ -50,7 +50,7 @@ class BootStrap {
     JobSchedulingService jobSchedulingService
     JobResultPersisterService jobResultPersisterService
     I18nService i18nService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
     LocationPersisterService locationPersisterService
     DetailAnalysisPersisterService detailAnalysisPersisterService
     WptInstructionService wptInstructionService

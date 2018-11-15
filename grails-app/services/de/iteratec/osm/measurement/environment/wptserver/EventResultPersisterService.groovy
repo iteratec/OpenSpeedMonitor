@@ -43,7 +43,7 @@ import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 /**
  * Persists locations and results. Observer of JobResultPersisterService.
  */
-class ResultPersisterService implements iResultListener {
+class EventResultPersisterService implements iResultListener {
 
     public static final String STATIC_PART_WATERFALL_ANCHOR = '#waterfall_view'
 
@@ -69,7 +69,7 @@ class ResultPersisterService implements iResultListener {
      */
     @Override
     String getListenerName() {
-        return "ResultPersisterService"
+        return "EventResultPersisterService"
     }
 
     @Override
@@ -191,12 +191,6 @@ class ResultPersisterService implements iResultListener {
 
     /**
      * Persists a single Run result
-     * @param singleViewNode the node of the result
-     * @param medianRunIdentificator the id of the median node corresponding to the
-     * @param xmlResultVersion
-     * @param testStepZeroBasedIndex
-     * @param jobRungrails -app/services/de/iteratec/ispc/ResultPersisterService.groovy
-     * @param event
      * @return True if the step is valid, false otherwise
      */
     private boolean persistSingleResult(

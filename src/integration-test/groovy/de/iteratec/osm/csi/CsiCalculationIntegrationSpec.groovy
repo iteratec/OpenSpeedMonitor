@@ -22,8 +22,8 @@ import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserver.EventResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserver.JobResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -43,7 +43,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 @Rollback
 class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     JobResultPersisterService jobResultPersisterService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
 
     WptResultXml xmlResult
     CsiConfiguration csiConfiguration_all_1
@@ -59,8 +59,8 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     def cleanup() {
-        resultPersisterService.timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
-        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
+        eventResultPersisterService.timeToCsMappingService = grailsApplication.mainContext.getBean('timeToCsMappingService')
+        eventResultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
     }
 
     void "csi won't be calculated without csi-configuration"() {
@@ -132,8 +132,8 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
             else if (csiConfiguration.label == csiConfiguration_all_1.label) return 100d
             else if (csiConfiguration.label == csiConfiguration_all_05.label) return 50d
         }
-        resultPersisterService.timeToCsMappingService = service
-        resultPersisterService.configService = Stub(ConfigService) {
+        eventResultPersisterService.timeToCsMappingService = service
+        eventResultPersisterService.configService = Stub(ConfigService) {
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }

@@ -1,7 +1,7 @@
 package de.iteratec.osm.measurement.environment.wptserver
 
 /**
- * Used in {@link ResultPersisterService}.
+ * Used in {@link EventResultPersisterService}.
  * Created by nkuhn on 17.03.16.
  */
 class OsmResultPersistanceException extends Exception{

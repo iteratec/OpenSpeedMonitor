@@ -41,7 +41,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 @Build([WebPageTestServer, Location, Job])
 class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     Closure doWithSpring() {
         return {

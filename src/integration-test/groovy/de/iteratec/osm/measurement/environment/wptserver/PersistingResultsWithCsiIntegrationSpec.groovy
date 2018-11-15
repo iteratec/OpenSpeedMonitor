@@ -44,7 +44,7 @@ import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MIN_VALID_LOADTIME
 @Rollback
 class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegrationSpec {
 
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
     JobResultPersisterService jobResultPersisterService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
 
@@ -58,8 +58,8 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     }
 
     def cleanup() {
-        resultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
-        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
+        eventResultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
+        eventResultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
@@ -149,9 +149,9 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
 
     void mockMetricReportingService() {
         MetricReportingService metricReportingService = Stub(MetricReportingService)
-        resultPersisterService.metricReportingService = metricReportingService
+        eventResultPersisterService.metricReportingService = metricReportingService
 
-        resultPersisterService.configService = Stub(ConfigService) {
+        eventResultPersisterService.configService = Stub(ConfigService) {
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }

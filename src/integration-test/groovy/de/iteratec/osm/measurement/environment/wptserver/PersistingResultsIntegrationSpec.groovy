@@ -60,13 +60,13 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     def cleanup() {
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).timeToCsMappingService =
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).timeToCsMappingService =
                 grailsApplication.mainContext.getBean('timeToCsMappingService')
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).csiAggregationUpdateService =
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).csiAggregationUpdateService =
                 grailsApplication.mainContext.getBean('csiAggregationUpdateService')
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).metricReportingService =
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).metricReportingService =
                 grailsApplication.mainContext.getBean('metricReportingService')
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).configService =
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).configService =
                 grailsApplication.mainContext.getBean('configService')
     }
 
@@ -208,9 +208,9 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     void createMocksCommonToAllTests() {
         TimeToCsMappingService timeToCsMappingService = Stub(TimeToCsMappingService)
         timeToCsMappingService.getCustomerSatisfactionInPercent(_, _, _) >> 42
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).timeToCsMappingService = timeToCsMappingService
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).timeToCsMappingService = timeToCsMappingService
 
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).configService = Stub(ConfigService) {
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).configService = Stub(ConfigService) {
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }
@@ -221,7 +221,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         csiAggregationUpdateService.createOrUpdateDependentMvs(_) >> {
              throw new RuntimeException('Faked failing of csi aggregation in integration test')
         }
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).csiAggregationUpdateService = csiAggregationUpdateService
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).csiAggregationUpdateService = csiAggregationUpdateService
     }
 
     void mockMetricReportingService() {
@@ -229,6 +229,6 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         metricReportingService.reportEventResultToGraphite(_) >> {
             throw new RuntimeException('Faked failing of metric reporting in integration test')
         }
-        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).metricReportingService = metricReportingService
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).metricReportingService = metricReportingService
     }
 }
