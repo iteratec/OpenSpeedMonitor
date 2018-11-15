@@ -191,14 +191,6 @@ databaseChangeLog = {
         ''')
     }
 
-    changeSet(author: "pal", id: "Task-5_update_wpt_status") {
-        sql('''
-            UPDATE job_result
-            SET wpt_status = 'WAITING'
-            WHERE wpt_status = 'PENDING';
-        ''')
-    }
-
     changeSet(author: "pal", id: "Task-6_update_description_type") {
         sql('''
             ALTER TABLE job_result
