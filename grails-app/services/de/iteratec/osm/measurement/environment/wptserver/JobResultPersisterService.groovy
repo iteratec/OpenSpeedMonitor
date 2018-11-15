@@ -84,13 +84,18 @@ class JobResultPersisterService {
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {
+            JobResultStatus fallbackStatus = resultXml.getTestStepCount() > 0 ? JobResultStatus.INCOMPLETE : JobResultStatus.FAILED
             JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
             if (!jobResult) {
                 log.error("There is no job result for finished job id ${job.id} and test id ${testId}!")
-                return JobResultStatus.FAILED
+                return fallbackStatus
+            }
+            int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
+            if (numExpectedResults < 1) {
+                log.warn("Number of expected results for job id ${job.id} and test id ${testId} is 0!")
+                return fallbackStatus
             }
             int numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
-            int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
             if (numValidResults < 1) {
                 return JobResultStatus.FAILED
             }

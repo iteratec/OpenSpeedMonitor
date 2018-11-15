@@ -41,9 +41,7 @@ import java.util.zip.GZIPOutputStream
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 /**
- * Persists locations and results. Observer of WptInstructionService.
- * @author rschuett , nkuhn
- * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
+ * Persists locations and results. Observer of JobResultPersisterService.
  */
 class ResultPersisterService implements iResultListener {
 
@@ -168,7 +166,7 @@ class ResultPersisterService implements iResultListener {
         String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
         if (!measuredEventName) {
             log.error("there is no testStep ${testStepZeroBasedIndex + 1} for testId ${resultXml.getTestId()}")
-            return false
+            return true
         }
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
         MeasuredEvent event = getMeasuredEvent(measuredEventName);
@@ -178,7 +176,7 @@ class ResultPersisterService implements iResultListener {
         log.debug("runCount=${runCount}")
 
         for (int runNumber = 0; runNumber < resultXml.getRunCount(); runNumber++) {
-            for (CachedView cached : [CachedView.CACHED, CachedView.UNCACHED]) {
+            for (CachedView cached : [CachedView.UNCACHED, CachedView.CACHED]) {
                 if (resultXml.resultExistForRunAndView(runNumber, cached) &&
                         (job.persistNonMedianResults || resultXml.isMedian(runNumber, cached, testStepZeroBasedIndex))) {
                     if (!persistSingleResult(resultXml, runNumber, cached, testStepZeroBasedIndex, jobResult, event)) {

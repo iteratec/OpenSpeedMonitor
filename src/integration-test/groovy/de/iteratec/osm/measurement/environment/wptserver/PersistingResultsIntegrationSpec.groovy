@@ -27,9 +27,11 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
+import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
@@ -40,11 +42,16 @@ import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MIN_VALID_LOADTIME
 @Rollback
 class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
-    ResultPersisterService resultPersisterService
+    JobResultPersisterService jobResultPersisterService
 
     private static final String LOCATION_IDENTIFIER = 'Agent1-wptdriver:Firefox'
     WebPageTestServer server
     Job job
+    Script script
+    String navigationScript = "setEventName\tHP:::LH_Homepage_2\n" +
+            "navigate\thttps://www.example.de\n" +
+            "setEventName\tMES:::LH_Moduleinstieg_2\n" +
+            "navigate\thttps://www.example.de/subsite/"
 
     def setupData() {
         OsmConfiguration.build()
@@ -53,13 +60,13 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     def cleanup() {
-        resultPersisterService.timeToCsMappingService =
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).timeToCsMappingService =
                 grailsApplication.mainContext.getBean('timeToCsMappingService')
-        resultPersisterService.csiAggregationUpdateService =
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).csiAggregationUpdateService =
                 grailsApplication.mainContext.getBean('csiAggregationUpdateService')
-        resultPersisterService.metricReportingService =
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).metricReportingService =
                 grailsApplication.mainContext.getBean('metricReportingService')
-        resultPersisterService.configService =
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).configService =
                 grailsApplication.mainContext.getBean('configService')
     }
 
@@ -70,7 +77,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
@@ -84,7 +92,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
@@ -98,7 +107,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
@@ -113,7 +123,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         mockCsiAggregationUpdateService()
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
@@ -128,7 +139,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         mockMetricReportingService()
 
         when: "the results get persisted"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "1 run, 2 successful events + 2 cached views should be persisted"
         JobResult.list().size() == 1
@@ -143,10 +155,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         xmlResult.getTestId() >> null
 
         when: "the service tries to persist the results an exception gets thrown"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "nothing should be persisted"
-        JobResult.list().size() == 0
+        thrown OsmResultPersistanceException
         EventResult.list().size() == 0
     }
 
@@ -155,10 +168,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
         setupData()
         WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
-        xmlResult.getStepNode(0) >> null
+        xmlResult.getEventName(_, 0) >> null
 
         when: "the results get persisted but the first step throws an exception"
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
         then: "1 run, 1 successful events + 1 cached views should be persisted"
         JobResult.list().size() == 1
@@ -176,9 +190,13 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 uniqueIdentifierForServer: LOCATION_IDENTIFIER,
                 browser: browser
         )
+        script = Script.build(navigationScript: navigationScript).save(flush: true)
         job = Job.build(
                 label: 'FF_BV1_Multistep_2',
-                location: loc
+                location: loc,
+                script: script,
+                runs: 1,
+                firstViewOnly: false
         )
 
         Job.build(
@@ -190,9 +208,9 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     void createMocksCommonToAllTests() {
         TimeToCsMappingService timeToCsMappingService = Stub(TimeToCsMappingService)
         timeToCsMappingService.getCustomerSatisfactionInPercent(_, _, _) >> 42
-        resultPersisterService.timeToCsMappingService = timeToCsMappingService
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).timeToCsMappingService = timeToCsMappingService
 
-        resultPersisterService.configService = Stub(ConfigService) {
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).configService = Stub(ConfigService) {
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }
@@ -203,7 +221,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         csiAggregationUpdateService.createOrUpdateDependentMvs(_) >> {
              throw new RuntimeException('Faked failing of csi aggregation in integration test')
         }
-        resultPersisterService.csiAggregationUpdateService = csiAggregationUpdateService
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).csiAggregationUpdateService = csiAggregationUpdateService
     }
 
     void mockMetricReportingService() {
@@ -211,6 +229,6 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         metricReportingService.reportEventResultToGraphite(_) >> {
             throw new RuntimeException('Faked failing of metric reporting in integration test')
         }
-        resultPersisterService.metricReportingService = metricReportingService
+        (jobResultPersisterService.resultListeners[0] as ResultPersisterService).metricReportingService = metricReportingService
     }
 }

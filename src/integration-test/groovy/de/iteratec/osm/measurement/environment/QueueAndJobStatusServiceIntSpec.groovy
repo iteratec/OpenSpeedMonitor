@@ -1,8 +1,8 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
+import de.iteratec.osm.measurement.environment.wptserver.JobResultPersisterService
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobRunService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
@@ -15,7 +15,7 @@ import static de.iteratec.osm.result.JobResultStatus.*
 @Rollback
 class QueueAndJobStatusServiceIntSpec extends NonTransactionalIntegrationSpec {
 
-    JobRunService jobRunService
+    JobResultPersisterService jobResultPersisterService
     QueueAndJobStatusService queueAndJobStatusService
 
     void "getRunningAndRecentlyFinishedJobs test"() {
@@ -26,7 +26,7 @@ class QueueAndJobStatusServiceIntSpec extends NonTransactionalIntegrationSpec {
 
         when: "creating and persisting jobResults with statusCodes and a job"
         inputStatusCodes.reverse().eachWithIndex { JobResultStatus jobResultStatus, int i ->
-            JobResult result = jobRunService.persistUnfinishedJobResult(job.id, null, jobResultStatus, WptStatus.UNKNOWN)
+            JobResult result = jobResultPersisterService.persistUnfinishedJobResult(job, null, jobResultStatus, WptStatus.UNKNOWN)
             result.date = now - i
             result.save(flush: true, failOnError: true)
         }

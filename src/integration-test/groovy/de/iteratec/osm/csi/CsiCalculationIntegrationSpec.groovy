@@ -22,11 +22,14 @@ import de.iteratec.osm.csi.transformation.TimeToCsMappingService
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.measurement.environment.wptserver.JobResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
 import de.iteratec.osm.measurement.environment.wptserver.WptResultXml
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.EventResult
+import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
@@ -39,6 +42,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 @Integration(applicationClass = openspeedmonitor.Application.class)
 @Rollback
 class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
+    JobResultPersisterService jobResultPersisterService
     ResultPersisterService resultPersisterService
 
     WptResultXml xmlResult
@@ -47,6 +51,7 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     static String jobLabelFromXML = 'FF_LH_BV1_hetzner'
 
     WebPageTestServer server1
+    Location location
 
     def setup() {
         createTestDataCommonForAllTests()
@@ -60,10 +65,12 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     void "csi won't be calculated without csi-configuration"() {
         setup: "prepare Job and JobGroup"
-        Job job = Job.build(label: jobLabelFromXML)
+        Job job = Job.build(label: jobLabelFromXML, location: location)
+        JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
+                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
         when: "larpService listens to result of JobGroup without csi configuration"
-        resultPersisterService.listenToResult(xmlResult, server1, job.id)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
         Collection<EventResult> resultsWithCsiCalculated = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
         then: "persisted EventResult has no csi value"
@@ -73,10 +80,12 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     void "csi must be calculated with csi-configuration, all values are 100%"() {
         setup: "prepare Job and JobGroup"
         JobGroup jobGroupWithCsiConf = JobGroup.build(csiConfiguration: csiConfiguration_all_1)
-        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf)
+        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf, location: location)
+        JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
+                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
-        resultPersisterService.listenToResult(xmlResult, server1, job.id)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
         List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
         then: "persisted EventResult has csi value of 100%"
@@ -87,10 +96,12 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     void "csi must be calculated with csi-configuration, all values are 50%"() {
         setup: "prepare Job and JobGroup"
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration_all_05)
-        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroup)
+        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroup, location: location)
+        JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
+                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
         when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
-        resultPersisterService.listenToResult(xmlResult, server1, job.id)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
         List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
         then: "persisted EventResult has csi value of 50%"
@@ -105,7 +116,7 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
 
         server1 = WebPageTestServer.build(active: true, baseUrl: 'http://wpt.server.de')
         Browser browser = Browser.build()
-        Location.build(wptServer: server1, uniqueIdentifierForServer: 'otto-prod-hetzner:Firefox', browser: browser)
+        location = Location.build(wptServer: server1, uniqueIdentifierForServer: 'otto-prod-hetzner:Firefox', browser: browser)
         createCsiConfigurations()
     }
 
