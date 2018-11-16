@@ -136,7 +136,7 @@ class JobProcessingService {
                 traceCategories: job.traceCategories,
                 spof           : job.spof,
                 heroElementTimes    : job.heroElementTimes,
-                heroElements        : job.heroElements
+                heroElements        : job.heroElementTimes ? job.heroElements : null
         ]
         if (job.takeScreenshots == Job.TakeScreenshots.NONE) {
             parameters.noimages = true
