@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.external.MetricReportingService
+import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
@@ -70,9 +71,9 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 grailsApplication.mainContext.getBean('configService')
     }
 
-    void "Results don't get persisted if the TTFB of first result is 0."() {
+    void "Only first step of cached view gets persisted if TTFB of the first uncached step is invalid"() {
 
-        given: "a wpt result and a faulty result (TTFB is 0)"
+        given: "a wpt result and a faulty result (TTFB is 0) in firstView"
         setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
 
@@ -82,11 +83,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
-        EventResult.list().size() == 0
+        EventResult.list().size() == 1
+        EventResult.list()[0].cachedView == CachedView.CACHED
     }
 
-    void "Results don't get persisted if the LoadTime is larger than max threshold."() {
-
+    void "Only first step of cached view gets persisted if LoadTime  of the first uncached step is larger than max"() {
         given: "a wpt result and a faulty result (LoadTime is larger than the allowed max value)"
         setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
@@ -97,11 +98,11 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
-        EventResult.list().size() == 0
+        EventResult.list().size() == 1
+        EventResult.list()[0].cachedView == CachedView.CACHED
     }
 
-    void "Results don't get persisted if the result was not successfully."() {
-
+    void "Only first step of cached view gets persisted if result of the first uncached step was not successfully"() {
         given: "a wpt result and a faulty result (Result Code is 404)"
         setupData()
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
@@ -112,7 +113,8 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
         then: "1 run, 1 successful events, but first result is faulty"
         JobResult.list().size() == 1
-        EventResult.list().size() == 0
+        EventResult.list().size() == 1
+        EventResult.list()[0].cachedView == CachedView.CACHED
     }
 
     void "Results get persisted even after failed csi aggregation."() {
@@ -168,7 +170,9 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
         given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
         setupData()
         WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
-        xmlResult.getEventName(_, 0) >> null
+        xmlResult.getEventName(_, 0) >> { job, step ->
+            throw new RuntimeException()
+        }
 
         when: "the results get persisted but the first step throws an exception"
         jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)

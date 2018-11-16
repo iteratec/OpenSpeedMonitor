@@ -166,7 +166,7 @@ class EventResultPersisterService implements iResultListener {
         String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
         if (!measuredEventName) {
             log.error("there is no testStep ${testStepZeroBasedIndex + 1} for testId ${resultXml.getTestId()}")
-            return true
+            return false
         }
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
         MeasuredEvent event = getMeasuredEvent(measuredEventName);
@@ -175,18 +175,19 @@ class EventResultPersisterService implements iResultListener {
         int runCount = resultXml.getRunCount()
         log.debug("runCount=${runCount}")
 
+        boolean allResultsValid = true
         for (int runNumber = 0; runNumber < resultXml.getRunCount(); runNumber++) {
             for (CachedView cached : [CachedView.UNCACHED, CachedView.CACHED]) {
                 if (resultXml.resultExistForRunAndView(runNumber, cached) &&
                         (job.persistNonMedianResults || resultXml.isMedian(runNumber, cached, testStepZeroBasedIndex))) {
                     if (!persistSingleResult(resultXml, runNumber, cached, testStepZeroBasedIndex, jobResult, event)) {
-                        return false
+                        allResultsValid = false
                     }
                 }
             }
         }
 
-        return true
+        return allResultsValid
     }
 
     /**
