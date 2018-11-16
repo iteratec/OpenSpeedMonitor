@@ -171,7 +171,15 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserTimings for ${command as JSON}", 0, {
-            def userTimings = getAllUserAndHeroTimings(command).findAll { it[1] != UserTimingType.HERO_MARK }
+            def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
+                projections {
+                    userTimings {
+                        'in'('type', [UserTimingType.MARK, UserTimingType.MEASURE])
+                        groupProperty('name')
+                        groupProperty('type')
+                    }
+                }
+            })
             return userTimings.collect {
                 SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
             }.unique { a, b -> a.id <=> b.id }
@@ -186,23 +194,20 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getHeroTimings for ${command as JSON}", 0, {
-            def heroTimings = getAllUserAndHeroTimings(command).findAll { it[1] == UserTimingType.HERO_MARK }
+            def heroTimings = query(command, ResultSelectionType.UserTimings, { existing ->
+                projections {
+                    userTimings {
+                        eq('type', UserTimingType.HERO_MARK)
+                        groupProperty('name')
+                        groupProperty('type')
+                    }
+                }
+            })
             return heroTimings.collect {
                 SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
             }.unique { a, b -> a.id <=> b.id }
         })
         ControllerUtils.sendObjectAsJSON(response, dtos)
-    }
-
-    private def getAllUserAndHeroTimings(ResultSelectionCommand command) {
-        return query(command, ResultSelectionType.UserTimings, { existing ->
-            projections {
-                userTimings {
-                    groupProperty('name')
-                    groupProperty('type')
-                }
-            }
-        })
     }
 
     @RestAction
