@@ -203,7 +203,7 @@ class WptInstructionService {
         return httpRequestService.getWptServerHttpGetResponse(
             wptserverOfResult,
             '/xmlResult.php',
-            ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1'],
+            ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1', 'breakdown': '1'],
                 'application/xml',
             [Accept: 'application/xml']
         )

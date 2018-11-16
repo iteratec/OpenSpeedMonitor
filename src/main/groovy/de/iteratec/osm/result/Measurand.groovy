@@ -20,7 +20,11 @@ enum Measurand{
     CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent", "cs-by-wpt-doc-complete", null),
     CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete", null),
     FIRST_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "firstInteractiveInMillisecs", "first-interactive", "FirstInteractive"),
-    CONSISTENTLY_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "consistentlyInteractiveInMillisecs", "consistently-interactive", "TimeToInteractive")
+    CONSISTENTLY_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "consistentlyInteractiveInMillisecs", "consistently-interactive", "TimeToInteractive"),
+    JS_TOTAL(MeasurandGroup.REQUEST_SIZES, "jsTotal", "javascript-total", "js"),
+    IMAGE_TOTAL(MeasurandGroup.REQUEST_SIZES, "imageTotal", "image-total", "image"),
+    CSS_TOTAL(MeasurandGroup.REQUEST_SIZES, "cssTotal", "css-total", "css"),
+    HTML_TOTAL(MeasurandGroup.REQUEST_SIZES, "htmlTotal", "html-total", "html")
 
     private MeasurandGroup group
     private String eventResultField

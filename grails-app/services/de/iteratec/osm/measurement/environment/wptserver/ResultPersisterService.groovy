@@ -389,6 +389,7 @@ class ResultPersisterService implements iResultListener {
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
+        setBreakdownMeasurands(viewTag, result)
 
         result.save(failOnError: true, flush: true)
         return result
@@ -453,6 +454,15 @@ class ResultPersisterService implements iResultListener {
 
     private boolean checkIfTagIsThere(GPathResult viewTag, String tag) {
         return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
+    }
+
+    private void setBreakdownMeasurands(GPathResult viewtag, EventResult result) {
+        viewtag.parent().breakdown?.children()?.forEach { measurand ->
+            if(measurand.name() in Measurand.values().collect{it.getTagInResultXml()}) {
+                String property = Measurand.values().find{it.getTagInResultXml() == measurand.name()}.getEventResultField()
+                result.setProperty(property, measurand.toInteger())
+            }
+        }
     }
 
     private void setAllUserTimings(GPathResult viewTag, EventResult result){
