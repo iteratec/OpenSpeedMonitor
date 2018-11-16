@@ -221,7 +221,6 @@ OpenSpeedMonitor.resultSelection = (function () {
             dataType: "json",
             success: function (data) {
                 var updateWasEnabled = enableUpdates(false);
-                console.log(data)
                 handler(data);
                 enableUpdates(updateWasEnabled);
                 if (spinner) {
