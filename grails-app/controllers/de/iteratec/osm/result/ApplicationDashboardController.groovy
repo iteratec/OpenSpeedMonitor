@@ -2,10 +2,13 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
+import org.hibernate.criterion.CriteriaSpecification
 
 class ApplicationDashboardController {
 
@@ -66,6 +69,13 @@ class ApplicationDashboardController {
         def jobsWithErrors = applicationDashboardService.getFailingJobStatistics(jobGroupId)
 
         return ControllerUtils.sendObjectAsJSON(response, [numberOfFailingJobs: jobsWithErrors[0], minimumFailedJobSuccessRate: jobsWithErrors[1]])
+    }
+
+    def getJobHealthGraphiteServers(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        def jobHealthGraphiteServers = applicationDashboardService.getJobHealthGraphiteServers(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, jobHealthGraphiteServers)
     }
 }
 

@@ -15,6 +15,7 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import grails.gorm.transactions.Transactional
+import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
 
 @Transactional
@@ -211,5 +212,30 @@ class ApplicationDashboardService {
             }
         }
         return jobsWithErrors
+    }
+
+    def getJobHealthGraphiteServers(Long jobGroupId) {
+        def jobHealthGraphiteServers = Job.createCriteria().list {
+            eq 'jobGroup.id', jobGroupId
+            eq 'active', true
+            eq 'deleted', false
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                jobGroup {
+                    jobHealthGraphiteServers {
+                        distinct ('id', 'id')
+                        property ('serverAdress', 'address')
+                        property ('port', 'port')
+                        property ('reportProtocol', 'protocol')
+                        property ('webappUrl', 'webAppAddress')
+                        property ('prefix', 'prefix')
+                    }
+                }
+            }
+        }
+        jobHealthGraphiteServers.each {
+            it.protocol = it.protocol.toString()
+        }
+        return jobHealthGraphiteServers
     }
 }
