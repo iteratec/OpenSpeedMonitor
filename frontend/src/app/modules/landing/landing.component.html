@@ -33,19 +33,19 @@
   <section class="card">
     <h2>{{ 'frontend.de.iteratec.osm.landing.healthIssues' | translate }}</h2>
 
-    <ng-container *ngFor="let application of applications$ | async">
-      <p class="applicationName">{{ application.name }}</p>
+    <ng-container *ngFor="let failingJob of failingJobStatistics$ | async">
+      <p class="applicationName">{{ failingJob.name }}</p>
       <ul class="clickable-list">
-        <li class="red">
-          <a [routerLink]="['/applicationDashboard', application.id]">
+        <li class="error">
+          <a [routerLink]="['/applicationDashboard', failingJob.id]">
             <aside class="percentage-aside">
-              <p class="percentage percentage-big">70%</p>
+              <p class="percentage percentage-big">{{ failingJob.percentage }}%</p>
               <p class="percentage">failure</p>
             </aside>
             <span class="title">
-              {{ application.name }}
+                job
               <span class="detail">
-                {{ 'frontend.de.iteratec.osm.landing.page-count' | translate:{pageCount: application.pageCount} }}
+                browser
               </span>
             </span>
           </a>

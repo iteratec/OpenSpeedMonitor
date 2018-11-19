@@ -4,6 +4,7 @@ import {ApplicationService} from "../../services/application.service";
 import {combineLatest, Observable} from "rxjs";
 import {ApplicationWithCsi} from "./models/application-with-csi.model";
 import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
+import { FailingJobStatistic } from '../application-dashboard/models/failing-job-statistic.model';
 
 @Component({
   selector: 'osm-landing',
@@ -15,6 +16,7 @@ export class LandingComponent {
   showApplicationEmptyState$: Observable<boolean>;
   hasData$: Observable<boolean>;
   applications$: Observable<ApplicationWithCsi[]>;
+  failingJobStatistics$: Observable<FailingJobStatistic[]>;
 
   constructor(private applicationService: ApplicationService) {
     this.hasData$ = this.applicationService.applications$.pipe(map(response => this.dataHasLoaded(response)));
@@ -27,6 +29,7 @@ export class LandingComponent {
     );
     this.applicationService.loadApplications();
     this.applicationService.loadRecentCsiForApplications();
+    this.failingJobStatistics$ = this.applicationService.loadAllFailingJobStatistics();
   }
 
   private dataHasLoaded(response: ResponseWithLoadingState<object>): boolean {

@@ -67,6 +67,26 @@ class ApplicationDashboardController {
 
         return ControllerUtils.sendObjectAsJSON(response, [numberOfFailingJobs: jobsWithErrors[0], minimumFailedJobSuccessRate: jobsWithErrors[1]])
     }
+
+
+    def getAllFailingJobStatistics() {
+        List<JobGroup> jobGroups = jobGroupService.getAllActiveAndRecent();
+        List failingJobStatistics = new ArrayList<>();
+        jobGroups.forEach({
+            def jobsWithErrors = applicationDashboardService.getFailingJobStatistics(it.id);
+            if (jobsWithErrors[0] > 0) {
+                failingJobStatistics.add([
+                        id: it.id,
+                        name: it.name,
+                        numberOfFailingJobs: jobsWithErrors[0],
+                        minimumFailedJobSuccessRate: jobsWithErrors[1],
+                        percentage: (100 - jobsWithErrors[1] / jobsWithErrors[0])
+                ]);
+            }
+        });
+
+        return ControllerUtils.sendObjectAsJSON(response, failingJobStatistics)
+    }
 }
 
 class DefaultApplicationCommand implements Validateable {

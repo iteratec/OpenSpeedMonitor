@@ -1,5 +1,6 @@
 @import "../../../styles/colors";
 @import "../../../styles/variables";
+@import "../../../styles/clickable-list";
 
 .logo {
   display: block;
@@ -26,67 +27,19 @@ p.applicationName {
   font-weight: bold;
 }
 
-p.percentage {
-  font-weight: bold;
-  margin: 0;
-}
-
-p.percentage-big {
-  font-size: 20px;
-}
-
-aside.percentage-aside {
-  text-align: center;
-  color: $color-error;
-}
-
-li.red {
-  background: $color-error-light;
-}
-
 .clickable-list {
-  list-style: none;
-  padding: 0;
-  margin-bottom: 30px;
-
   li {
-    border-radius: 4px;
-    padding: 0 4px;
-    &:hover, &:focus {
-      background: $color-contour-light;
-    }
+    a {
+      margin-bottom: 2px;
 
-    &:last-child a {
-      border-bottom: 0;
-    }
-  }
+      p.percentage-big {
+        font-size: 18px;
+      }
 
-  li a {
-    min-width: 30em;
-    border-bottom: 1px $color-contour-light solid;
-    padding: 0.5em 0;
-    color: $color-text-medium;
-    display: flex;
-    align-items: center;
-
-    &:hover, &:focus {
-      text-decoration: none;
-    }
-
-    .title, .detail {
-      display: block;
-    }
-
-    .detail {
-      color: $color-text-light;
-    }
-
-    aside {
-      display: block;
-      margin: 0 5px 0 0;
+      p.percentage {
+        font-weight: bold;
+        margin: 0;
+      }
     }
   }
-
 }
-
-

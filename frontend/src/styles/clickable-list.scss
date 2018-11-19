@@ -44,4 +44,29 @@
     }
   }
 
+  li.error {
+    background: $color-error-light;
+
+    a {
+      span {
+        color: $color-error;
+      }
+
+      .detail {
+        font-size: 12px;
+      }
+
+      aside.percentage-aside {
+        text-align: center;
+        color: $color-error;
+        line-height: 120%;
+        margin: 0 12px 0 8px
+      }
+    }
+  }
+
+  li.warning {
+
+  }
+
 }

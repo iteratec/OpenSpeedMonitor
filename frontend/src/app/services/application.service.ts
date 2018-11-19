@@ -17,14 +17,12 @@ import {
   map,
   startWith,
   switchMap,
-  tap,
   withLatestFrom
 } from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
 import {
   FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
-import {error} from "util";
 
 
 @Injectable()
@@ -162,6 +160,13 @@ export class ApplicationService {
   loadFailingJobStatistics(application: Application): Observable<FailingJobStatistic> {
     const params = this.createParams(application.id);
     return this.http.get<FailingJobStatistic>('/applicationDashboard/rest/getFailingJobStatistics', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+  loadAllFailingJobStatistics(): Observable<FailingJobStatistic[]> {
+    return this.http.get<FailingJobStatistic[]>('/applicationDashboard/rest/getAllFailingJobStatistics').pipe(
       handleError(),
       startWith(null)
     )
