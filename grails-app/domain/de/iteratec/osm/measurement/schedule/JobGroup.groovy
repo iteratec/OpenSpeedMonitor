@@ -47,12 +47,17 @@ class JobGroup implements Taggable{
     /**
      * Graphite-Servers to which results of this JobGroup should be sent.
      */
-    Collection<GraphiteServer> graphiteServers = []
-    static hasMany = [graphiteServers: GraphiteServer]
+    Collection<GraphiteServer> resultGraphiteServers = []
+    Collection<GraphiteServer> jobHealthGraphiteServers = []
+    static hasMany = [
+            resultGraphiteServers: GraphiteServer,
+            jobHealthGraphiteServers: GraphiteServer
+    ]
 
     static constraints = {
         name unique: true, maxSize: 255
-        graphiteServers nullable: false
+        resultGraphiteServers nullable: false
+        jobHealthGraphiteServers nullable: true
         csiConfiguration nullable: true
     }
 

@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'graphiteServers', 'error')} ">
+<div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'resultGraphiteServers', 'error')} ">
     <label for="graphiteServers" class="control-label col-md-3">
         <g:message code="jobGroup.graphiteServers.label" default="Graphite Servers"/>
     </label>
@@ -20,7 +20,7 @@
         <g:select id="graphiteServers" name="graphiteServers"
                   from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
                   keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.id}"
-                  multiple="true" optionKey="id" size="5" value="${jobGroup?.graphiteServers*.id}"
+                  multiple="true" optionKey="id" size="5" value="${jobGroup?.resultGraphiteServers*.id}"
                   class="many-to-many form-control"/>
     </div>
 

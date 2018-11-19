@@ -169,7 +169,7 @@
                                                      default="Graphite Servers"/></td>
             <td valign="top" style="text-align: left;" class="value">
                 <ul>
-                    <g:each in="${jobGroup.graphiteServers}" var="g">
+                    <g:each in="${jobGroup.resultGraphiteServers}" var="g">
                         <li><g:link controller="graphiteServer" action="show"
                                     id="${g.id}">${g?.encodeAsHTML()}</g:link></li>
                     </g:each>

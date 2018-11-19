@@ -48,7 +48,7 @@
         });
 
         function selectAllGraphiteServer(select) {
-            var obj = $("#graphiteServers")[0];
+            var obj = $(resultGraphiteServers)[0];
             for (var i=0; i<obj.options.length; i++) {
                 obj.options[i].selected = select;
             }

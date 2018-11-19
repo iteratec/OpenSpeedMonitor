@@ -425,7 +425,7 @@ class BootStrap {
 
     void removeDomainSpecificProperties(Class domainClass, Map propertiesToRepresent) {
         if (domainClass == de.iteratec.osm.measurement.environment.BrowserAlias) propertiesToRepresent.remove('browser')
-        else if (domainClass == de.iteratec.osm.measurement.schedule.JobGroup) propertiesToRepresent.remove('graphiteServers')
+        else if (domainClass == de.iteratec.osm.measurement.schedule.JobGroup) propertiesToRepresent.remove('resultGraphiteServers')
     }
 
     void removeAllServices(Map propertiesToRepresent) {

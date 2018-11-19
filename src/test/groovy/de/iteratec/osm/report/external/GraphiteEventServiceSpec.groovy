@@ -105,7 +105,7 @@ class GraphiteEventServiceSpec extends Specification implements BuildDataTest, S
         )
         JobGroup jobGroup = new JobGroup(
                 name: jobGroupName,
-                graphiteServers: [server],
+                resultGraphiteServers: [server],
         )
         GraphiteEventSourcePath eventSourcePath = new GraphiteEventSourcePath(
                 staticPrefix: 'from graphite|',
