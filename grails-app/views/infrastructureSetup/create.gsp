@@ -28,7 +28,7 @@
 
 <div class="card">
     <h1 id="headline"><g:message code="landing.headline" default="Welcome" /></h1>
-    <form action="InfrastructureSetup/save" data-toggle="validator" role="form" id="setServersForm"
+    <form action="/infrastructureSetup/save" data-toggle="validator" role="form" id="setServersForm"
           data-feedback="{success: 'fa-check', error: 'fa-times'}">
         <div class="tab-content">
             <div class="tab-pane active" id="setServers">

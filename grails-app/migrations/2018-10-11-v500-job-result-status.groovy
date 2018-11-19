@@ -18,7 +18,7 @@ databaseChangeLog = {
     changeSet(author: "pal", id: "Task-2_transform_http_status") {
         sql('''
             UPDATE job_result
-            SET wpt_status = 'IN_PROGRESS'
+            SET wpt_status = 'PENDING'
             WHERE http_status_code = 100;
         ''')
     }
@@ -26,7 +26,7 @@ databaseChangeLog = {
     changeSet(author: "pal", id: "Task-3_transform_http_status") {
         sql('''
             UPDATE job_result
-            SET wpt_status = 'WAITING'
+            SET wpt_status = 'IN_PROGRESS'
             WHERE http_status_code = 101;
         ''')
     }
@@ -74,7 +74,7 @@ databaseChangeLog = {
     changeSet(author: "pal", id: "Task-9_transform_http_status") {
         sql('''
             UPDATE job_result
-            SET job_result_status = 'RUNNING'
+            SET job_result_status = 'WAITING'
             WHERE http_status_code = 100;
         ''')
     }
@@ -82,7 +82,7 @@ databaseChangeLog = {
     changeSet(author: "pal", id: "Task-10_transform_http_status") {
         sql('''
             UPDATE job_result
-            SET job_result_status = 'WAITING'
+            SET job_result_status = 'RUNNING'
             WHERE http_status_code = 101;
         ''')
     }
@@ -188,14 +188,6 @@ databaseChangeLog = {
             UPDATE job_result
             SET wpt_status = 'IN_PROGRESS'
             WHERE wpt_status = 'RUNNING';
-        ''')
-    }
-
-    changeSet(author: "pal", id: "Task-5_update_wpt_status") {
-        sql('''
-            UPDATE job_result
-            SET wpt_status = 'WAITING'
-            WHERE wpt_status = 'PENDING';
         ''')
     }
 

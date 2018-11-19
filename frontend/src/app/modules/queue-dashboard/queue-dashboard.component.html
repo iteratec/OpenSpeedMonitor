@@ -1,0 +1,34 @@
+<h1>
+  {{'frontend.de.iteratec.osm.queueDashboard.title' | translate}}
+</h1>
+<div class="card" *ngFor="let wptserver of wptServer$ | async" #thisCard isOpened="false" isLoaded="false">
+
+  <div>
+    <span>
+      <h2>{{wptserver.label}}</h2>
+      <span class="fas chevron-large"
+            *ngIf="thisCard.isLoaded"
+            (click)="thisCard.isOpened = !thisCard.isOpened"
+            [class.fa-chevron-up]="thisCard.isOpened"
+            [class.fa-chevron-down]="!thisCard.isOpened">bla</span>
+    </span>
+  </div>
+
+  <div *ngIf="!thisCard.isLoaded">
+    <button id="load-data-button"
+            class="btn btn-primary pull-right"
+            (click)="loadQueueContent(wptserver.id);
+            thisCard.isOpened=true;
+            thisCard.isLoaded=true">
+      {{'frontend.de.iteratec.osm.queueDashboard.load-information.label' | translate}}
+    </button>
+  </div>
+
+  <div id="data-table-id" *ngIf="thisCard.isOpened">
+    <osm-queue-list
+      [serverInfo]="serverInfo$ | async"
+      [wptServerID]="wptserver.id">
+    </osm-queue-list>
+  </div>
+
+</div>

@@ -32,9 +32,7 @@
             "scripts": [],
             "lazyModules": [
               "src/app/modules/page-comparison/page-comparison.module",
-              "src/app/modules/application-dashboard/application-dashboard.module",
-              "src/app/modules/job-threshold/job-threshold.module",
-              "src/app/modules/landing/landing.module"
+              "src/app/modules/job-threshold/job-threshold.module"
             ],
             "vendorChunk": false,
             "extractCss": true
@@ -84,7 +82,7 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "styles.scss"
+              "src/styles.scss"
             ],
             "scripts": [],
             "assets": [
