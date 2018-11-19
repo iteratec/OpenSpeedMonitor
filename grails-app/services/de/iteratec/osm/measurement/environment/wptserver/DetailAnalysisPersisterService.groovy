@@ -32,9 +32,7 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.WptXmlResultVersion
 import grails.web.mapping.LinkGenerator
 /**
- * Persists locations and results. Observer of WptInstructionService.
- * @author rschuett, nkuhn
- * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
+ * Sends results to OSM DetailAnalysis
  */
 class DetailAnalysisPersisterService implements iResultListener {
 

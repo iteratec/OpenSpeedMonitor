@@ -569,7 +569,7 @@
                     <testStep>
                         <eventName>HP:::LH_Homepage_2</eventName>
                         <URL>https://www.example.de</URL>
-                        <loadTime>1770</loadTime>
+                        <loadTime>200000</loadTime>
                         <TTFB>160</TTFB>
                         <bytesOut>93351</bytesOut>
                         <bytesOutDoc>25151</bytesOutDoc>

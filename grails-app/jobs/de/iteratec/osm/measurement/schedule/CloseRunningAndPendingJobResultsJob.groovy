@@ -18,11 +18,11 @@
 package de.iteratec.osm.measurement.schedule
 /**
  * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
- * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobProcessingService}).
+ * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobSchedulingService}).
  */
 class CloseRunningAndPendingJobResultsJob {
 
-    JobProcessingService jobProcessingService
+    JobRunService jobRunService
 
     static triggers = {
         /**
@@ -35,6 +35,6 @@ class CloseRunningAndPendingJobResultsJob {
      * Entrypoint for all the dynamically scheduled and unscheduled quartz triggers
      */
     def execute() {
-        jobProcessingService.closeRunningAndPengingJobResults()
+        jobRunService.closeRunningAndWaitingJobRuns()
     }
 }

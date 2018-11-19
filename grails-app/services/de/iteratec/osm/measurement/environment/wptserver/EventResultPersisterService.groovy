@@ -41,11 +41,9 @@ import java.util.zip.GZIPOutputStream
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
 /**
- * Persists locations and results. Observer of WptInstructionService.
- * @author rschuett , nkuhn
- * grails-app/services/de/iteratec/ispc/ResultPersisterService.groovy
+ * Persists locations and results. Observer of JobResultPersisterService.
  */
-class ResultPersisterService implements iResultListener {
+class EventResultPersisterService implements iResultListener {
 
     public static final String STATIC_PART_WATERFALL_ANCHOR = '#waterfall_view'
 
@@ -71,7 +69,7 @@ class ResultPersisterService implements iResultListener {
      */
     @Override
     String getListenerName() {
-        return "ResultPersisterService"
+        return "EventResultPersisterService"
     }
 
     @Override
@@ -82,7 +80,6 @@ class ResultPersisterService implements iResultListener {
 
         try {
             checkJobAndLocation(resultXml, wptserverOfResult, jobId)
-            persistJobResult(resultXml, jobId)
             persistResultsForAllTeststeps(resultXml, jobId)
             informDependents(resultXml, jobId)
 
@@ -108,41 +105,7 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    void persistJobResult(WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
 
-        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
-            String testId = resultXml.getTestId()
-            log.debug("test-ID for which results should get persisted now=${testId}")
-
-            if (testId == null) {
-                throw new OsmResultPersistanceException("No test id in result xml file from wpt server!")
-            }
-
-            log.debug("Deleting pending JobResults and create finished ...")
-            removePendingAndCreateFinishedJobResult(resultXml, testId, jobId)
-            log.debug("Deleting pending JobResults and create finished ... DONE")
-        }
-
-    }
-
-    private void removePendingAndCreateFinishedJobResult(resultXml, String testId, long jobId) {
-        Job job = jobDaoService.getJob(jobId)
-        deleteResultsMarkedAsPendingAndRunning(job, testId)
-
-        JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
-        if (!jobResult) {
-            persistNewJobRun(job, resultXml)
-        } else {
-            updateJobResult(jobResult, resultXml)
-        }
-    }
-
-    private void updateJobResult(JobResult jobResult, WptResultXml resultXml) {
-        jobResult.testAgent = resultXml.getTestAgent()
-        jobResult.wptVersion = resultXml.version.toString()
-        jobResult.save(failOnError: true, flush: true)
-    }
 
     /**
      * <p>
@@ -172,78 +135,26 @@ class ResultPersisterService implements iResultListener {
         }
     }
 
-    protected void persistNewJobRun(Job job, WptResultXml resultXml) {
-
-        String testId = resultXml.getTestId()
-
-        if (!testId) {
-            return
-        }
-        log.debug("persisting new JobResult ${testId}")
-
-        WptStatus wptStatus = resultXml.getWptStatus()
-        Date testCompletion = resultXml.getCompletionDate()
-        job.lastRun = testCompletion
-        job.merge(failOnError: true)
-
-        JobResult result = new JobResult(
-                job: job,
-                date: testCompletion,
-                testId: testId,
-                wptStatus: wptStatus,
-                jobResultStatus: wptStatus.isFailed() ? JobResultStatus.FAILED : JobResultStatus.SUCCESS,
-                jobConfigLabel: job.label,
-                jobConfigRuns: job.runs,
-                wptServerLabel: job.location.wptServer.label,
-                wptServerBaseurl: job.location.wptServer.baseUrl,
-                locationLabel: job.location.label,
-                locationLocation: job.location.location,
-                locationUniqueIdentifierForServer: job.location.uniqueIdentifierForServer,
-                locationBrowser: job.location.browser.name,
-                jobGroupName: job.jobGroup.name,
-                testAgent: resultXml.getTestAgent(),
-                wptVersion: resultXml.version.toString()
-        )
-
-        //new 'feature' of grails 2.3: empty strings get converted to null in map-constructors
-        result.setDescription('')
-        result.save(failOnError: true, flush: true)
-    }
-
     void persistResultsForAllTeststeps(WptResultXml resultXml, long jobId) {
         Integer testStepCount = resultXml.getTestStepCount()
-
         log.debug("starting persistance of ${testStepCount} event results for test steps")
-        //TODO: possible to catch non median results at this position  and check if they should persist or not
 
         for (int zeroBasedTeststepIndex = 0; zeroBasedTeststepIndex < testStepCount; zeroBasedTeststepIndex++) {
-            if (resultXml.getStepNode(zeroBasedTeststepIndex)) {
-                try {
-                    if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)) {
-                        break
-                    }
-                } catch (Exception e) {
-                    log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
+            try {
+                if (!persistResultsOfOneTeststep(zeroBasedTeststepIndex, resultXml, jobId)) {
+                    break
                 }
-
-            } else {
-                log.error("there is no testStep ${zeroBasedTeststepIndex + 1} for testId ${resultXml.getTestId()}")
+            } catch (Exception e) {
+                log.error("an error occurred while persisting EventResults of testId ${resultXml.getTestId()} of teststep ${zeroBasedTeststepIndex}", e)
             }
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected boolean persistResultsOfOneTeststep(Integer testStepZeroBasedIndex, WptResultXml resultXml, long jobId) throws OsmResultPersistanceException {
-        List<EventResult> resultsOfTeststep = []
-        String testId = resultXml.getTestId()      
+        String testId = resultXml.getTestId()
         Job job = jobDaoService.getJob(jobId)
         JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
-
-        if (!isEventResultValid(resultXml, testStepZeroBasedIndex)) {
-            log.debug("Invalid EventResult in the test:'${testId}' (Status code: ${resultXml.getResultCodeForStep(testStepZeroBasedIndex)}, " +
-                    "TTFB: ${resultXml.getFirstByteForStep(testStepZeroBasedIndex)}, LoadTime: ${resultXml.getLoadTimeForStep(testStepZeroBasedIndex)})")
-            return false
-        }
 
         if (jobResult == null) {
             throw new OsmResultPersistanceException(
@@ -253,60 +164,45 @@ class ResultPersisterService implements iResultListener {
 
         log.debug('getting event name from xml result ...')
         String measuredEventName = resultXml.getEventName(job, testStepZeroBasedIndex)
-        log.debug('getting event name from xml result ... DONE')
+        if (!measuredEventName) {
+            log.error("there is no testStep ${testStepZeroBasedIndex + 1} for testId ${resultXml.getTestId()}")
+            return false
+        }
         log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ...")
         MeasuredEvent event = getMeasuredEvent(measuredEventName);
-        log.debug("getting MeasuredEvent from eventname '${measuredEventName}' ... DONE")
 
         log.debug("persisting result for step=${event}")
-        Integer runCount = resultXml.getRunCount()
+        int runCount = resultXml.getRunCount()
         log.debug("runCount=${runCount}")
 
-        resultXml.getRunCount().times { Integer runNumber ->
-            if (resultXml.resultExistForRunAndView(runNumber, CachedView.UNCACHED) &&
-                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.UNCACHED, testStepZeroBasedIndex))) {
-                EventResult firstViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.UNCACHED, testStepZeroBasedIndex, jobResult, event)
-                if (firstViewOfTeststep != null) resultsOfTeststep.add(firstViewOfTeststep)
-            }
-            if (resultXml.resultExistForRunAndView(runNumber, CachedView.CACHED) &&
-                    (job.persistNonMedianResults || resultXml.isMedian(runNumber, CachedView.CACHED, testStepZeroBasedIndex))) {
-                EventResult repeatedViewOfTeststep = persistSingleResult(resultXml, runNumber, CachedView.CACHED, testStepZeroBasedIndex, jobResult, event)
-                if (repeatedViewOfTeststep != null) resultsOfTeststep.add(repeatedViewOfTeststep)
+        boolean allResultsValid = true
+        for (int runNumber = 0; runNumber < resultXml.getRunCount(); runNumber++) {
+            for (CachedView cached : [CachedView.UNCACHED, CachedView.CACHED]) {
+                if (resultXml.resultExistForRunAndView(runNumber, cached) &&
+                        (job.persistNonMedianResults || resultXml.isMedian(runNumber, cached, testStepZeroBasedIndex))) {
+                    if (!persistSingleResult(resultXml, runNumber, cached, testStepZeroBasedIndex, jobResult, event)) {
+                        allResultsValid = false
+                    }
+                }
             }
         }
 
-        return true
-    }
-
-
-    boolean isEventResultValid(WptResultXml resultXml, int testStepZeroBasedIndex) {
-        int minValidLoadTime = configService.getMinValidLoadtime()
-        int maxValidLoadTime = configService.getMaxValidLoadtime()
-        int loadTime = resultXml.getLoadTimeForStep(testStepZeroBasedIndex)
-
-        return (!WptStatus.byResultCode(resultXml.getResultCodeForStep(testStepZeroBasedIndex)).isFailed() &&
-                (resultXml.getFirstByteForStep(testStepZeroBasedIndex) > 0) &&
-                (loadTime >= minValidLoadTime) &&
-                (loadTime <= maxValidLoadTime))
+        return allResultsValid
     }
 
     /**
      * Persists a single Run result
-     * @param singleViewNode the node of the result
-     * @param medianRunIdentificator the id of the median node corresponding to the
-     * @param xmlResultVersion
-     * @param testStepZeroBasedIndex
-     * @param jobRungrails -app/services/de/iteratec/ispc/ResultPersisterService.groovy
-     * @param event
-     * @return Persisted result. Null if the view node is empty, i.e. the test was a "first view only" and this is the repeated view node
+     * @return True if the step is valid, false otherwise
      */
-    private EventResult persistSingleResult(
+    private boolean persistSingleResult(
             WptResultXml resultXml, Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex, JobResult jobRun, MeasuredEvent event) {
 
-        EventResult result
         GPathResult viewResultsNodeOfThisRun = resultXml.getResultsContainingNode(runZeroBasedIndex, cachedView, testStepZeroBasedIndex)
+        if (!resultXml.isValidTestStep(viewResultsNodeOfThisRun)) {
+            return false
+        }
         GString waterfallAnchor = getWaterfallAnchor(resultXml, event.name, testStepZeroBasedIndex + 1)
-        result = persistResult(
+        persistResult(
                 jobRun,
                 event,
                 cachedView,
@@ -316,8 +212,7 @@ class ResultPersisterService implements iResultListener {
                 testStepZeroBasedIndex + 1,
                 waterfallAnchor
         )
-
-        return result
+        return true
     }
 
     /**
@@ -389,6 +284,7 @@ class ResultPersisterService implements iResultListener {
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
+        setBreakdownMeasurands(viewTag, result)
 
         result.save(failOnError: true, flush: true)
         return result
@@ -417,7 +313,7 @@ class ResultPersisterService implements iResultListener {
         try {
             result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
         } catch (MalformedURLException mue) {
-            log.error("Failed to build test's detail url for result: ${result}!")
+            log.error("Failed to build test's detail url for result: ${result} and jobResult: ${jobRun}!", mue)
         } catch (Exception e) {
             log.error("An unexpected error occurred while trying to build test's detail url (result=${result})!", e)
         }
@@ -446,13 +342,24 @@ class ResultPersisterService implements iResultListener {
     }
 
     private void setPropertyWithinEventResult(Measurand measurand, GPathResult inputValues, EventResult result) {
-        if (checkIfTagIsThere(inputValues, measurand.getTagInResultXml())) {
+        if (tagExists(inputValues, measurand.getTagInResultXml())) {
             result.setProperty(measurand.getEventResultField(), inputValues.getProperty(measurand.getTagInResultXml()).toInteger())
         }
     }
 
-    private boolean checkIfTagIsThere(GPathResult viewTag, String tag) {
-        return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
+    private boolean tagExists(GPathResult viewTag, String tag) {
+        return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isBigInteger() && viewTag.getProperty(tag).toBigInteger() > 0
+    }
+
+    private void setBreakdownMeasurands(GPathResult viewtag, EventResult result) {
+        if(tagExists(viewtag.parent(), "breakdown")) {
+            viewtag.parent().breakdown.children().forEach { measurand ->
+                Measurand thisMeasurand = Measurand.byResultXmlTag(measurand.name())
+                if(thisMeasurand) {
+                    result.setProperty(thisMeasurand.getEventResultField(), measurand.toInteger())
+                }
+            }
+        }
     }
 
     private void setAllUserTimings(GPathResult viewTag, EventResult result){
@@ -636,13 +543,4 @@ class ResultPersisterService implements iResultListener {
         return zipped
     }
 
-    /**
-     * Clear pending/running {@link JobResult}s (i.e. wptStatus is 100 or 101) before persisting final {@link EventResult}s.
-     * @param jobLabel
-     * @param testId
-     */
-    void deleteResultsMarkedAsPendingAndRunning(Job job, String testId) {
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.IN_PROGRESS)?.delete(failOnError: true, flush: true)
-        JobResult.findByJobAndTestIdAndWptStatus(job, testId, WptStatus.PENDING)?.delete(failOnError: true, flush: true)
-    }
 }

@@ -95,6 +95,14 @@ class EventResult implements CsiValue, RepresentableWptResult {
      */
     Integer speedIndex
     Integer visuallyCompleteInMillisecs
+
+    Integer jsTotalBytes
+    Integer imageTotalBytes
+    Integer cssTotalBytes
+    Integer htmlTotalBytes
+    Integer firstMeaningfulPaint
+    Integer firstContentfulPaint
+
     /** tester from result xml */
     String testAgent
     Integer downloadAttempts
@@ -155,6 +163,13 @@ class EventResult implements CsiValue, RepresentableWptResult {
         csByWptVisuallyCompleteInPercent(nullable: true)
         speedIndex(nullable: true)
         visuallyCompleteInMillisecs(nullable: true)
+
+        jsTotalBytes(nullable: true)
+        imageTotalBytes(nullable: true)
+        cssTotalBytes(nullable: true)
+        htmlTotalBytes(nullable: true)
+        firstMeaningfulPaint(nullable: true)
+        firstContentfulPaint(nullable: true)
 
         consistentlyInteractiveInMillisecs(nullable: true)
         firstInteractiveInMillisecs(nullable: true)
