@@ -5,6 +5,7 @@ import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ApplicationService} from "../../../../services/application.service";
 import {Application} from "../../../../models/application.model";
 import {FailingJobStatistic} from "../../models/failing-job-statistic.model";
+import {GraphiteIntegrationComponent} from "./graphite-integration/graphite-integration.component";
 
 describe('ApplicationJobStatusComponent', () => {
   let component: ApplicationJobStatusComponent;
@@ -26,7 +27,8 @@ describe('ApplicationJobStatusComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [
-        ApplicationJobStatusComponent
+        ApplicationJobStatusComponent,
+        GraphiteIntegrationComponent
       ],
       imports: [
         SharedMocksModule

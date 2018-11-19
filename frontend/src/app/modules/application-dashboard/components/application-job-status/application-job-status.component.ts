@@ -1,6 +1,9 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {FailingJobStatistic} from "../../models/failing-job-statistic.model";
 import {Application} from "../../../../models/application.model";
+import {ApplicationService} from "../../../../services/application.service";
+import {Observable} from "rxjs";
+import {JobHealthGraphiteServers} from "../../models/job-health-graphite-servers.model";
 
 @Component({
   selector: 'osm-application-job-status',
@@ -10,13 +13,18 @@ import {Application} from "../../../../models/application.model";
 export class ApplicationJobStatusComponent implements OnChanges {
   @Input() failingJobStatistic: FailingJobStatistic;
   @Input() selectedApplication: Application;
-  @Input() isLoading: boolean;
+
+  jobHealthGraphiteServers$: Observable<JobHealthGraphiteServers>;
 
   iconClass: string;
   infoText: string;
   jobStatus: string;
 
   hasFailingJobs: boolean;
+
+  constructor(private applicationService: ApplicationService) {
+    this.jobHealthGraphiteServers$ = this.applicationService.jobHealthGraphiteServers$;
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.setInformation();
@@ -60,5 +68,4 @@ export class ApplicationJobStatusComponent implements OnChanges {
       return 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.multipleFailingJobs';
     }
   }
-
 }

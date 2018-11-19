@@ -6,11 +6,13 @@ import {CsiValueBigComponent} from "./components/csi-value/csi-value-big/csi-val
 import {CsiValueMediumComponent} from "./components/csi-value/csi-value-medium/csi-value-medium.component";
 import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi-value-small.component";
 import {EmptyStateComponent} from './components/empty-state/empty-state.component';
+import {NgxSmartModalModule} from "ngx-smart-modal";
 
 @NgModule({
   imports: [
     CommonModule,
-    TranslateModule.forChild()
+    TranslateModule.forChild(),
+    NgxSmartModalModule.forChild()
   ],
   declarations: [
     CsiValueBaseComponent,
@@ -25,7 +27,8 @@ import {EmptyStateComponent} from './components/empty-state/empty-state.componen
     CsiValueBigComponent,
     CsiValueMediumComponent,
     CsiValueSmallComponent,
-    EmptyStateComponent
+    EmptyStateComponent,
+    NgxSmartModalModule
   ]
 })
 export class SharedModule {

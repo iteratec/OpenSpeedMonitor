@@ -22,10 +22,8 @@ import {
 } from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
-import {
-  FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
-import {error} from "util";
-
+import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
+import {JobHealthGraphiteServers} from "../modules/application-dashboard/models/job-health-graphite-servers.model";
 
 @Injectable()
 export class ApplicationService {
@@ -34,6 +32,7 @@ export class ApplicationService {
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
   failingJobStatistics$: ReplaySubject<FailingJobStatistic> = new ReplaySubject<FailingJobStatistic>(1);
+  jobHealthGraphiteServers$: ReplaySubject<JobHealthGraphiteServers> = new ReplaySubject<JobHealthGraphiteServers>(1);
 
   selectedApplication$ = new ReplaySubject<Application>(1);
 
@@ -49,6 +48,10 @@ export class ApplicationService {
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.loadFailingJobStatistics(application))
     ).subscribe(this.failingJobStatistics$);
+
+    this.selectedApplication$.pipe(
+      switchMap((application: Application) => this.loadJobHealthGraphiteServers(application))
+    ).subscribe(this.jobHealthGraphiteServers$);
 
     this.selectSelectedApplicationCsi().pipe(
       withLatestFrom(this.selectedApplication$, (_, application) => application),
@@ -162,6 +165,14 @@ export class ApplicationService {
   loadFailingJobStatistics(application: Application): Observable<FailingJobStatistic> {
     const params = this.createParams(application.id);
     return this.http.get<FailingJobStatistic>('/applicationDashboard/rest/getFailingJobStatistics', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+  loadJobHealthGraphiteServers(application: Application): Observable<JobHealthGraphiteServers> {
+    const params = this.createParams(application.id);
+    return this.http.get<JobHealthGraphiteServers>('/applicationDashboard/rest/getJobHealthGraphiteServers', {params: params}).pipe(
       handleError(),
       startWith(null)
     )
