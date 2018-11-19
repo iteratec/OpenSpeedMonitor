@@ -20,7 +20,13 @@ enum Measurand{
     CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent", "cs-by-wpt-doc-complete", null),
     CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete", null),
     FIRST_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "firstInteractiveInMillisecs", "first-interactive", "FirstInteractive"),
-    CONSISTENTLY_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "consistentlyInteractiveInMillisecs", "consistently-interactive", "TimeToInteractive")
+    CONSISTENTLY_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "consistentlyInteractiveInMillisecs", "consistently-interactive", "TimeToInteractive"),
+    JS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "jsTotalBytes", "javascript-total", "js"),
+    IMAGE_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "imageTotalBytes", "image-total", "image"),
+    CSS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "cssTotalBytes", "css-total", "css"),
+    HTML_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "htmlTotalBytes", "html-total", "html"),
+    FIRST_MEANINGFUL_PAINT(MeasurandGroup.LOAD_TIMES, "firstMeaningfulPaint", "first-meaningful-paint", "firstMeaningfulPaint"),
+    FIRST_CONTENTFUL_PAINT(MeasurandGroup.LOAD_TIMES, "firstContentfulPaint", "first-contentful-paint", "firstContentfulPaint")
 
     private MeasurandGroup group
     private String eventResultField
@@ -45,5 +51,9 @@ enum Measurand{
     }
     String getTagInResultXml(){
         return tagInResultXml
+    }
+
+    static Measurand byResultXmlTag( String xmlTag ) {
+        return values().find{it.getTagInResultXml() == xmlTag}
     }
 }

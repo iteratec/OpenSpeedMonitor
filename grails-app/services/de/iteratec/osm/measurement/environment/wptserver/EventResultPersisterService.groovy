@@ -284,6 +284,7 @@ class EventResultPersisterService implements iResultListener {
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
         setAllUserTimings(viewTag, result)
+        setBreakdownMeasurands(viewTag, result)
 
         result.save(failOnError: true, flush: true)
         return result
@@ -341,13 +342,24 @@ class EventResultPersisterService implements iResultListener {
     }
 
     private void setPropertyWithinEventResult(Measurand measurand, GPathResult inputValues, EventResult result) {
-        if (checkIfTagIsThere(inputValues, measurand.getTagInResultXml())) {
+        if (tagExists(inputValues, measurand.getTagInResultXml())) {
             result.setProperty(measurand.getEventResultField(), inputValues.getProperty(measurand.getTagInResultXml()).toInteger())
         }
     }
 
-    private boolean checkIfTagIsThere(GPathResult viewTag, String tag) {
-        return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isInteger() && viewTag.getProperty(tag).toInteger() > 0
+    private boolean tagExists(GPathResult viewTag, String tag) {
+        return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isBigInteger() && viewTag.getProperty(tag).toBigInteger() > 0
+    }
+
+    private void setBreakdownMeasurands(GPathResult viewtag, EventResult result) {
+        if(tagExists(viewtag.parent(), "breakdown")) {
+            viewtag.parent().breakdown.children().forEach { measurand ->
+                Measurand thisMeasurand = Measurand.byResultXmlTag(measurand.name())
+                if(thisMeasurand) {
+                    result.setProperty(thisMeasurand.getEventResultField(), measurand.toInteger())
+                }
+            }
+        }
     }
 
     private void setAllUserTimings(GPathResult viewTag, EventResult result){
