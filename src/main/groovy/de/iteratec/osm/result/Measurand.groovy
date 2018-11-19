@@ -52,4 +52,8 @@ enum Measurand{
     String getTagInResultXml(){
         return tagInResultXml
     }
+
+    static Measurand byResultXmlTag( String xmlTag ) {
+        return values().find{it.getTagInResultXml() == xmlTag}
+    }
 }
