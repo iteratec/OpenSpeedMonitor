@@ -19,7 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.EventResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -37,7 +37,7 @@ class WeeklyPageMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
 
     /** injected by grails */
     PageCsiAggregationService pageCsiAggregationService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
 
     CsiAggregationInterval hourly
     CsiAggregationInterval weekly
@@ -181,7 +181,7 @@ class WeeklyPageMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
         }
 
         EventResult.findAll().each {
-            resultPersisterService.informDependentCsiAggregations(it)
+            eventResultPersisterService.informDependentCsiAggregations(it)
         }
     }
 

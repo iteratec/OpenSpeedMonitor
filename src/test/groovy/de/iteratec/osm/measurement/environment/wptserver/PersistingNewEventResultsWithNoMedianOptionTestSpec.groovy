@@ -28,10 +28,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
-import de.iteratec.osm.result.EventResult
-import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.MeasuredEvent
-import de.iteratec.osm.result.PageService
+import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
@@ -42,10 +39,9 @@ import spock.lang.Unroll
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
 import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
-
 @Build([WebPageTestServer, Location, Job])
 class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     Closure doWithSpring() {
         return {
@@ -74,6 +70,7 @@ class PersistingNewEventResultsWithNoMedianOptionTestSpec extends Specification 
         WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
         Location.build(uniqueIdentifierForServer: locationIdentifier, wptServer: wptServer)
         Job job = Job.build(label: jobLabel, persistNonMedianResults: doPersistNonMedianResults)
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
 
         when: "the services listens to the XML file"
         service.listenToResult(xmlResult, wptServer, job.id)

@@ -19,7 +19,7 @@ package de.iteratec.osm.measurement.schedule.quartzjobs
 
 import de.iteratec.osm.InMemoryConfigService
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobRunService
 import de.iteratec.osm.measurement.schedule.TriggerGroup
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.quartz.JobExecutionContext
@@ -28,14 +28,13 @@ import java.util.concurrent.locks.ReentrantLock
 
 import static de.iteratec.osm.util.Constants.UNIQUE_STRING_DELIMITTER
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-
 /**
  * This class doesn't represent one static quartz job like the other job classes under grails-app/jobs.
- * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link JobProcessingService}).
+ * It provides the entrypoint for all the dynamically scheduled and unscheduled quartz triggers (see {@link de.iteratec.osm.measurement.schedule.JobSchedulingService}).
  */
 class JobProcessingQuartzHandlerJob {
 
-    JobProcessingService jobProcessingService
+    JobRunService jobRunService
     PerformanceLoggingService performanceLoggingService
     InMemoryConfigService inMemoryConfigService
 
@@ -92,7 +91,7 @@ class JobProcessingQuartzHandlerJob {
     private void handleLaunching(Job job) {
         performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", 1) {
             try {
-                jobProcessingService.launchJobRun(job)
+                jobRunService.launchJobRun(job)
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception)
             }
@@ -104,7 +103,7 @@ class JobProcessingQuartzHandlerJob {
         if (pollingLocks[lockKey].tryLock()) {
             try {
                 performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", 1) {
-                    jobProcessingService.pollJobRun(job, testId)
+                    jobRunService.pollJobRun(job, testId)
                 }
             } finally {
                 if (pollingLocks[lockKey]) pollingLocks[lockKey].unlock()
@@ -115,7 +114,7 @@ class JobProcessingQuartzHandlerJob {
     private void handleTimeout(Job job, String testId) {
         performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Handle Job run timeout for job ${job.label}", 1) {
             removePollingLock(job, testId)
-            jobProcessingService.handleJobRunTimeout(job, testId)
+            jobRunService.handleJobRunTimeout(job, testId)
         }
     }
 
