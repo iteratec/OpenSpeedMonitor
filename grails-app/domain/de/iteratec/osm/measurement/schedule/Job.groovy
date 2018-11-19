@@ -36,7 +36,7 @@ import org.quartz.CronExpression
 @Entity
 class Job implements Taggable {
 
-    def jobProcessingService
+    def jobSchedulingService
 
     Long id;
 
@@ -335,9 +335,9 @@ class Job implements Taggable {
     private void performQuartzScheduling(boolean start) {
         if (Environment.getCurrent() != Environment.TEST) {
             if (start) {
-                jobProcessingService.scheduleJob(this)
+                jobSchedulingService.scheduleJob(this)
             } else {
-                jobProcessingService.unscheduleJob(this)
+                jobSchedulingService.unscheduleJob(this)
             }
         }
     }

@@ -2,8 +2,7 @@ package de.iteratec.osm.api
 
 import de.iteratec.osm.api.dto.JobDto
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobExecutionException
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobRunService
 import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.util.ControllerUtils
 import groovy.json.JsonSlurper
@@ -11,12 +10,12 @@ import io.swagger.annotations.*
 import org.quartz.CronExpression
 import org.springframework.http.HttpStatus
 
-import static de.iteratec.osm.util.Constants.*
+import static de.iteratec.osm.util.Constants.DEFAULT_ACCESS_DENIED_MESSAGE
 
 @Api(value = "/rest", tags = ["Measurement Jobs"], description = "Measurement Jobs Api", position = 1)
 class JobApiController {
 
-    JobProcessingService jobProcessingService
+    JobRunService jobRunService
     JobService jobService
 
     @ApiOperation(
@@ -64,9 +63,9 @@ class JobApiController {
         String testId
         try {
             if (priority){
-                testId = jobProcessingService.launchJobRun(job, priority)
+                testId = jobRunService.launchJobRun(job, priority)
             } else {
-                testId = jobProcessingService.launchJobRun(job)
+                testId = jobRunService.launchJobRun(job)
             }
         } catch(IllegalStateException exception) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.CONFLICT, exception.getMessage())
