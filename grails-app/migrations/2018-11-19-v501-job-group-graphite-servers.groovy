@@ -37,5 +37,9 @@ databaseChangeLog = {
         dropColumn(columnName: "job_group_graphite_servers_id", tableName: "job_group_graphite_server")
     }
 
-
+    changeSet(author: "finn (generated)", id: "1542627777036-1") {
+        addColumn(tableName: "graphite_server") {
+            column(name: "prefix", type: "varchar(255)")
+        }
+    }
 }
