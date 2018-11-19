@@ -458,9 +458,9 @@ class ResultPersisterService implements iResultListener {
 
     private void setBreakdownMeasurands(GPathResult viewtag, EventResult result) {
         viewtag.parent().breakdown?.children()?.forEach { measurand ->
-            if(measurand.name() in Measurand.values().collect{it.getTagInResultXml()}) {
-                String property = Measurand.values().find{it.getTagInResultXml() == measurand.name()}.getEventResultField()
-                result.setProperty(property, measurand.toInteger())
+            Measurand thisMeasurand = Measurand.values().find{it.getTagInResultXml() == measurand.name()}
+            if(thisMeasurand) {
+                result.setProperty(thisMeasurand.getEventResultField(), measurand.toInteger())
             }
         }
     }

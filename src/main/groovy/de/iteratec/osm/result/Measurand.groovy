@@ -21,10 +21,12 @@ enum Measurand{
     CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete", null),
     FIRST_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "firstInteractiveInMillisecs", "first-interactive", "FirstInteractive"),
     CONSISTENTLY_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "consistentlyInteractiveInMillisecs", "consistently-interactive", "TimeToInteractive"),
-    JS_TOTAL(MeasurandGroup.REQUEST_SIZES, "jsTotal", "javascript-total", "js"),
-    IMAGE_TOTAL(MeasurandGroup.REQUEST_SIZES, "imageTotal", "image-total", "image"),
-    CSS_TOTAL(MeasurandGroup.REQUEST_SIZES, "cssTotal", "css-total", "css"),
-    HTML_TOTAL(MeasurandGroup.REQUEST_SIZES, "htmlTotal", "html-total", "html")
+    JS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "jsTotalBytes", "javascript-total", "js"),
+    IMAGE_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "imageTotalBytes", "image-total", "image"),
+    CSS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "cssTotalBytes", "css-total", "css"),
+    HTML_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "htmlTotalBytes", "html-total", "html"),
+    FIRST_MEANINGFUL_PAINT(MeasurandGroup.LOAD_TIMES, "firstMeaningfulPaint", "first-meaningful-paint", "firstMeaningfulPaint"),
+    FIRST_CONTENTFUL_PAINT(MeasurandGroup.LOAD_TIMES, "firstContentfulPaint", "first-contentful-paint", "firstContentfulPaint")
 
     private MeasurandGroup group
     private String eventResultField
