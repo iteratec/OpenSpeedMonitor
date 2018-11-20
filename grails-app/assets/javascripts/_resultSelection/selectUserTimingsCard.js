@@ -6,16 +6,21 @@ OpenSpeedMonitor.selectUserTimings = (function () {
     var resetButtonElement = $(".reset-result-selection");
 
     var updateUserTimings = function (userTimings) {
-        loopOverOptGroups(executeUpdate, userTimings);
+        loopOverOptGroups(executeUpdate, userTimings, '.measurand-opt-group-USER_TIMINGS');
+    };
+
+    var updateHeroTimings = function (userTimings) {
+        loopOverOptGroups(executeUpdate, userTimings, '.measurand-opt-group-HERO_TIMINGS');
     };
 
     function init() {
-        loopOverOptGroups(executeInit);
+        loopOverOptGroups(executeInit, [], '.measurand-opt-group-USER_TIMINGS');
+        loopOverOptGroups(executeInit, [], '.measurand-opt-group-HERO_TIMINGS');
     }
 
-    function loopOverOptGroups(executeOperation, userTimings) {
+    function loopOverOptGroups(executeOperation, userTimings, measurandGroup) {
         $('.measurand-select').each(function (index, optGroupElement) {
-            var optGroupUserTimings = $(optGroupElement).find('.measurand-opt-group-USER_TIMINGS');
+            var optGroupUserTimings = $(optGroupElement).find(measurandGroup);
             if (optGroupUserTimings) {
                 executeOperation(optGroupUserTimings, userTimings);
                 if (userTimings && userTimings.length > 0) {
@@ -50,6 +55,7 @@ OpenSpeedMonitor.selectUserTimings = (function () {
 
     init();
     return {
-        updateUserTimings: updateUserTimings
+        updateUserTimings: updateUserTimings,
+        updateHeroTimings: updateHeroTimings
     }
 })();

@@ -26,6 +26,9 @@ class SelectedMeasurand {
         } else if (optionValue.startsWith(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix)) {
             name = optionValue.substring(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix.length())
             selectedType = SelectedMeasurandType.USERTIMING_MEASURE
+        } else if (optionValue.startsWith(SelectedMeasurandType.HEROTIMING_MARK.optionPrefix)) {
+            name = optionValue.substring(SelectedMeasurandType.HEROTIMING_MARK.optionPrefix.length())
+            selectedType = SelectedMeasurandType.HEROTIMING_MARK
         } else {
             throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
         }
@@ -66,6 +69,7 @@ class SelectedMeasurand {
             result.put(measurandGroup.toString(), Measurand.values().findAll { it.measurandGroup == measurandGroup }.collect {it.toString()})
             if (measurandGroup == MeasurandGroup.LOAD_TIMES) {
                 result.put("USER_TIMINGS", [])
+                result.put("HERO_TIMINGS", [])
             }
         }
         return result
@@ -81,6 +85,6 @@ class SelectedMeasurand {
 
     boolean isValid(String name) {
         name = name ?: ""
-        return isMeasurand(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name)
+        return isMeasurand(name) || couldBeUserTiming(UserTimingType.MARK, name) || couldBeUserTiming(UserTimingType.MEASURE, name) || couldBeUserTiming(UserTimingType.HERO_MARK, name)
     }
 }

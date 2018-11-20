@@ -166,15 +166,24 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     @RestAction
     def getUserTimings(ResultSelectionCommand command) {
+        getUserOrHeroTiming(command, [UserTimingType.MARK, UserTimingType.MEASURE])
+    }
+
+    @RestAction
+    def getHeroTimings(ResultSelectionCommand command) {
+        getUserOrHeroTiming(command, [UserTimingType.HERO_MARK])
+    }
+
+    private def getUserOrHeroTiming(ResultSelectionCommand command, List<UserTimingType> selection) {
         if (command.hasErrors()) {
             sendError(command)
             return
         }
-
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserTimings for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserOrHeroTimings for ${command as JSON}", 0, {
             def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
                 projections {
                     userTimings {
+                        'in'('type', selection)
                         groupProperty('name')
                         groupProperty('type')
                     }
