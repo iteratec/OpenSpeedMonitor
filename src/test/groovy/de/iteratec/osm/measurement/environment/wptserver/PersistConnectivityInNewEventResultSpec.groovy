@@ -52,7 +52,7 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
  */
 @Build([Job, Location, WebPageTestServer, MeasuredEvent, ConnectivityProfile])
 class PersistConnectivityInNewEventResultSpec extends Specification implements BuildDataTest,
-        ServiceUnitTest<ResultPersisterService> {
+        ServiceUnitTest<EventResultPersisterService> {
 
     static WebPageTestServer WPT_SERVER
 
@@ -93,8 +93,9 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setPredefinedConnectivity(MULTISTEP_JOB)
         int numberRuns = 1
         int numberSteps = 3
+        JobResult.build(job: MULTISTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result xml."
+        when: "EventResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Connectivity profile of Job is assigned to every new EventResult."
@@ -114,8 +115,9 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setCustomConnectivity(MULTISTEP_JOB)
         int numberRuns = 1
         int numberSteps = 3
+        JobResult.build(job: MULTISTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result xml."
+        when: "EventResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Custom connectivity of Job is set for every new EventResult."
@@ -135,8 +137,9 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setNativeConnectivity(MULTISTEP_JOB)
         int numberRuns = 1
         int numberSteps = 3
+        JobResult.build(job: MULTISTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result xml."
+        when: "EventResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, MULTISTEP_JOB.id)
 
         then: "Native connectivity of Job is set for every new EventResult."
@@ -156,8 +159,9 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setPredefinedConnectivity(SINGLESTEP_JOB)
         int numberRuns = 1
         int numberSteps = 2
+        JobResult.build(job: SINGLESTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result xml."
+        when: "EventResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Connectivity profile of Job is assigned to every new EventResult."
@@ -177,8 +181,9 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setCustomConnectivity(SINGLESTEP_JOB)
         int numberRuns = 1
         int numberSteps = 2
+        JobResult.build(job: SINGLESTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result xml."
+        when: "EventResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Custom connectivity of Job is set for every new EventResult."
@@ -198,8 +203,9 @@ class PersistConnectivityInNewEventResultSpec extends Specification implements B
         setNativeConnectivity(SINGLESTEP_JOB)
         int numberRuns = 1
         int numberSteps = 2
+        JobResult.build(job: SINGLESTEP_JOB, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS)
 
-        when: "ResultPersisterService listens to result xml."
+        when: "EventResultPersisterService listens to result xml."
         service.listenToResult(xmlResult, WPT_SERVER, SINGLESTEP_JOB.id)
 
         then: "Native connectivity of Job is set for every new EventResult."

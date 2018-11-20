@@ -20,7 +20,7 @@ package de.iteratec.osm.csi
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.EventResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -44,7 +44,7 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
     def log = LogFactory.getLog(getClass())
 
     JobGroupCsiAggregationService jobGroupCsiAggregationService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
 
     CsiAggregationInterval weekly
     Long jobGroupId
@@ -233,7 +233,7 @@ class WeeklyJobGroupIntegrationSpec extends NonTransactionalIntegrationSpec {
         jobGroup.csiConfiguration = csiConfiguration
         jobGroup.save(failOnError: true)
         EventResult.findAll().each {
-            resultPersisterService.informDependentCsiAggregations(it)
+            eventResultPersisterService.informDependentCsiAggregations(it)
         }
     }
 

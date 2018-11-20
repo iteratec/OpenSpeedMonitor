@@ -1161,7 +1161,7 @@
                     <results>
                         <URL>https://www.example.org</URL>
                         <loadTime>10</loadTime>
-                        <TTFB>0</TTFB>
+                        <TTFB>10</TTFB>
                         <bytesOut>644</bytesOut>
                         <bytesOutDoc>0</bytesOutDoc>
                         <bytesIn>7330</bytesIn>
@@ -1825,8 +1825,8 @@
                     <eventName>testExecution</eventName>
                     <results>
                         <URL>https://www.example.org</URL>
-                        <loadTime>9</loadTime>
-                        <TTFB>0</TTFB>
+                        <loadTime>10</loadTime>
+                        <TTFB>10</TTFB>
                         <bytesOut>644</bytesOut>
                         <bytesOutDoc>0</bytesOutDoc>
                         <bytesIn>7330</bytesIn>

@@ -71,6 +71,27 @@ enum SelectedMeasurandType {
         boolean isUserTiming() {
             return true
         }
+    },
+    HEROTIMING_MARK{
+        Double getValue(RepresentableWptResult eventResult, String name) {
+            return  getUsertimingValue(eventResult,name,UserTimingType.HERO_MARK)
+        }
+
+        MeasurandGroup getMeasurandGroup(String name) {
+            return UserTimingType.MEASURE.getMeasurandGroup()
+        }
+
+        String getOptionPrefix() {
+            return "_HERO_"
+        }
+
+        String getDatabaseName(String name) {
+            return name
+        }
+
+        boolean isUserTiming() {
+            return true
+        }
     }
 
     abstract boolean isUserTiming()
