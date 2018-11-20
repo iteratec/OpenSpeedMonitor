@@ -37,8 +37,10 @@
       <ng-container *ngFor="let application of objectKeys(failingJobs)">
         <p class="applicationName">{{ application }}</p>
         <ul class="clickable-list">
-          <li *ngFor="let failingJob of failingJobs[application]" [class.error]="failingJob.percentageFailLast5 >= 20" [class.warning]="failingJob.percentageFailLast5 < 20">
-            <a [routerLink]="['/job/edit', failingJob.job_id]">
+          <li *ngFor="let failingJob of failingJobs[application]"
+              [class.error]="failingJob.percentageFailLast5 >= 20"
+              [class.warning]="failingJob.percentageFailLast5 < 20">
+            <a  href="/jobResult/listFailed?jobId={{failingJob.job_id}}">
               <aside class="percentage-aside">
                 <p class="percentage percentage-big">{{ failingJob.percentageFailLast5 }}%</p>
                 <p class="percentage">{{ 'frontend.de.iteratec.osm.landing.failure' | translate }}</p>
@@ -53,6 +55,13 @@
           </li>
         </ul>
       </ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="!failingJobs$">
+      <div class="healthy">
+        <i class="fas fa-check-circle"></i>
+        <p>{{ 'frontend.de.iteratec.osm.landing.healthy' | translate }}</p>
+      </div>
     </ng-container>
 
     <a href="/job/index" class="btn btn-default" id="show-jobs">

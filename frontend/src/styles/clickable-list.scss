@@ -67,6 +67,10 @@
     }
   }
 
+  li.error:hover {
+    background: darken($color-error-light, 5);
+  }
+
   li.warning {
     background: $color-warning-light;
 
@@ -88,5 +92,9 @@
         margin: 0 12px 0 8px
       }
     }
+  }
+
+  li.warning:hover {
+    background: darken($color-error-light, 5);
   }
 }
