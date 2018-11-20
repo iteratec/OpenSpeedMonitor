@@ -6,7 +6,7 @@ databaseChangeLog = {
                 constraints(nullable: "false")
             }
 
-            column(name: "hero_elements", type: "varchar(255)") {
+            column(name: "hero_elements", type: "text") {
                 constraints(nullable: "true")
             }
         }

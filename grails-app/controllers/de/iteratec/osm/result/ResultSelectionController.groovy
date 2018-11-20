@@ -166,44 +166,30 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     @RestAction
     def getUserTimings(ResultSelectionCommand command) {
+        getUserOrHeroTiming(command, [UserTimingType.MARK, UserTimingType.MEASURE])
+    }
+
+    @RestAction
+    def getHeroTimings(ResultSelectionCommand command) {
+        getUserOrHeroTiming(command, [UserTimingType.HERO_MARK])
+    }
+
+    private def getUserOrHeroTiming(ResultSelectionCommand command, List<UserTimingType> selection) {
         if (command.hasErrors()) {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserTimings for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserOrHeroTimings for ${command as JSON}", 0, {
             def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
                 projections {
                     userTimings {
-                        'in'('type', [UserTimingType.MARK, UserTimingType.MEASURE])
+                        'in'('type', selection)
                         groupProperty('name')
                         groupProperty('type')
                     }
                 }
             })
             return userTimings.collect {
-                SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
-            }.unique { a, b -> a.id <=> b.id }
-        })
-        ControllerUtils.sendObjectAsJSON(response, dtos)
-    }
-
-    @RestAction
-    def getHeroTimings(ResultSelectionCommand command) {
-        if (command.hasErrors()) {
-            sendError(command)
-            return
-        }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getHeroTimings for ${command as JSON}", 0, {
-            def heroTimings = query(command, ResultSelectionType.UserTimings, { existing ->
-                projections {
-                    userTimings {
-                        eq('type', UserTimingType.HERO_MARK)
-                        groupProperty('name')
-                        groupProperty('type')
-                    }
-                }
-            })
-            return heroTimings.collect {
                 SelectedMeasurand.createUserTimingOptionFor(it[0], it[1])
             }.unique { a, b -> a.id <=> b.id }
         })
