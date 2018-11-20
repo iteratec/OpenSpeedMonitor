@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
-import {filter, map} from "rxjs/operators";
+import { filter, map } from 'rxjs/operators';
 import {ApplicationService} from "../../services/application.service";
 import {combineLatest, Observable} from "rxjs";
 import {ApplicationWithCsi} from "./models/application-with-csi.model";
 import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
-import { FailingJobStatistic } from '../application-dashboard/models/failing-job-statistic.model';
+import { FailingJob } from './models/failing-jobs.model';
 
 @Component({
   selector: 'osm-landing',
@@ -12,11 +12,11 @@ import { FailingJobStatistic } from '../application-dashboard/models/failing-job
   styleUrls: ['./landing.component.scss']
 })
 export class LandingComponent {
-
+  objectKeys = Object.keys;
   showApplicationEmptyState$: Observable<boolean>;
   hasData$: Observable<boolean>;
   applications$: Observable<ApplicationWithCsi[]>;
-  failingJobStatistics$: Observable<FailingJobStatistic[]>;
+  failingJobs$: Observable<{[application: string]: FailingJob[]}>;
 
   constructor(private applicationService: ApplicationService) {
     this.hasData$ = this.applicationService.applications$.pipe(map(response => this.dataHasLoaded(response)));
@@ -29,7 +29,20 @@ export class LandingComponent {
     );
     this.applicationService.loadApplications();
     this.applicationService.loadRecentCsiForApplications();
-    this.failingJobStatistics$ = this.applicationService.loadAllFailingJobStatistics();
+    this.failingJobs$ = this.applicationService.getFailingJobs().pipe(
+      map(failingJobs => {
+        if (failingJobs) {
+          return failingJobs.reduce((failingJobsByApplication, currentValue) => {
+            if (!failingJobsByApplication[currentValue.application]) {
+              failingJobsByApplication[currentValue.application] = [];
+            }
+            failingJobsByApplication[currentValue.application].push(currentValue);
+            return failingJobsByApplication;
+          }, {});
+        }
+      }
+      )
+    );
   }
 
   private dataHasLoaded(response: ResponseWithLoadingState<object>): boolean {

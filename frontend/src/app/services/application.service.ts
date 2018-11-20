@@ -23,6 +23,9 @@ import {ResponseWithLoadingState} from "../models/response-with-loading-state.mo
 import {Csi, CsiDTO} from "../models/csi.model";
 import {
   FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
+import {
+  FailingJob, FailingJobDTO
+} from '../modules/landing/models/failing-jobs.model';
 
 
 @Injectable()
@@ -165,8 +168,9 @@ export class ApplicationService {
     )
   }
 
-  loadAllFailingJobStatistics(): Observable<FailingJobStatistic[]> {
-    return this.http.get<FailingJobStatistic[]>('/applicationDashboard/rest/getAllFailingJobStatistics').pipe(
+  getFailingJobs(): Observable<FailingJob[]> {
+    return this.http.get<FailingJobDTO[]>('/applicationDashboard/rest/getFailingJobs').pipe(
+      map(failingJobs => failingJobs.map(dto => new FailingJob(dto))),
       handleError(),
       startWith(null)
     )

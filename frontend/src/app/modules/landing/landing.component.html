@@ -33,24 +33,26 @@
   <section class="card">
     <h2>{{ 'frontend.de.iteratec.osm.landing.healthIssues' | translate }}</h2>
 
-    <ng-container *ngFor="let failingJob of failingJobStatistics$ | async">
-      <p class="applicationName">{{ failingJob.name }}</p>
-      <ul class="clickable-list">
-        <li class="error">
-          <a [routerLink]="['/applicationDashboard', failingJob.id]">
-            <aside class="percentage-aside">
-              <p class="percentage percentage-big">{{ failingJob.percentage }}%</p>
-              <p class="percentage">failure</p>
-            </aside>
-            <span class="title">
-                job
+    <ng-container *ngIf="failingJobs$ | async as failingJobs">
+      <ng-container *ngFor="let application of objectKeys(failingJobs)">
+        <p class="applicationName">{{ application }}</p>
+        <ul class="clickable-list">
+          <li *ngFor="let failingJob of failingJobs[application]" [class.error]="failingJob.percentageFailLast5 >= 20" [class.warning]="failingJob.percentageFailLast5 < 20">
+            <a [routerLink]="['/job/edit', failingJob.job_id]">
+              <aside class="percentage-aside">
+                <p class="percentage percentage-big">{{ failingJob.percentageFailLast5 }}%</p>
+                <p class="percentage">{{ 'frontend.de.iteratec.osm.landing.failure' | translate }}</p>
+              </aside>
+              <span class="title">
+                {{ failingJob.script }}
               <span class="detail">
-                browser
+                {{ failingJob.browser }} ({{ failingJob.location }})
               </span>
             </span>
-          </a>
-        </li>
-      </ul>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
     </ng-container>
 
     <a href="/job/index" class="btn btn-default" id="show-jobs">
