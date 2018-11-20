@@ -4,7 +4,6 @@ import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -13,7 +12,6 @@ import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
-import org.joda.time.Days
 import org.springframework.http.HttpStatus
 
 import java.util.concurrent.ConcurrentHashMap

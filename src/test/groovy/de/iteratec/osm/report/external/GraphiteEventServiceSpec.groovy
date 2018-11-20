@@ -32,7 +32,6 @@ import grails.testing.services.ServiceUnitTest
 import org.joda.time.DateTime
 import org.junit.Rule
 import software.betamax.Configuration
-import software.betamax.ProxyConfiguration
 import software.betamax.junit.Betamax
 import software.betamax.junit.RecorderRule
 import spock.lang.Ignore
@@ -46,7 +45,7 @@ class GraphiteEventServiceSpec extends Specification implements BuildDataTest, S
     public static final int minutesInPast = 1
     GraphiteEventService serviceUnderTest
 
-    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    Configuration configuration = Configuration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
     @Rule
     public RecorderRule recorder = new RecorderRule(configuration)
     public static final String jobGroupName = 'associated JobGroup'

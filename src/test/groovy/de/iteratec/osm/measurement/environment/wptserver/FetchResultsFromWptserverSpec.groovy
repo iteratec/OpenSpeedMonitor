@@ -36,7 +36,6 @@ import grails.testing.services.ServiceUnitTest
 import groovy.util.slurpersupport.GPathResult
 import org.junit.Rule
 import software.betamax.Configuration
-import software.betamax.ProxyConfiguration
 import software.betamax.junit.Betamax
 import software.betamax.junit.RecorderRule
 import spock.lang.Ignore
@@ -44,7 +43,6 @@ import spock.lang.Specification
 
 import static org.hamcrest.Matchers.is
 import static org.junit.Assert.assertThat
-
 /**
  * Unit tests in this class test fetching of results from wptservers. In that they use wptservers getLocations.php function to
  * get xml result and proof the data registered {@link iResultListener}s get in their called fetchResults() method.
@@ -58,7 +56,7 @@ class FetchResultsFromWptserverTests extends Specification implements ServiceUni
     private static final String LOCATION_IDENTIFIER_SINGLESTEP = 'iteratec-dev-netlab-win7:IE'
     WptInstructionService serviceUnderTest
 
-    Configuration configuration = ProxyConfiguration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
+    Configuration configuration = Configuration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
     @Rule
     public RecorderRule recorder = new RecorderRule(configuration)
 
