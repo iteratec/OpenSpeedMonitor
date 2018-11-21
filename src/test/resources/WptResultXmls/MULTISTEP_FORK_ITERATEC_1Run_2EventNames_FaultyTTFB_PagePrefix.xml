@@ -570,7 +570,7 @@
                         <eventName>HP:::LH_Homepage_2</eventName>
                         <URL>https://www.example.de</URL>
                         <loadTime>1770</loadTime>
-                        <TTFB>160</TTFB>
+                        <TTFB>0</TTFB>
                         <bytesOut>93351</bytesOut>
                         <bytesOutDoc>25151</bytesOutDoc>
                         <bytesIn>1353670</bytesIn>

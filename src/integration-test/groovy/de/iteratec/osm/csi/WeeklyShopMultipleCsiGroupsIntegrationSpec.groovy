@@ -19,7 +19,7 @@ package de.iteratec.osm.csi
 
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
+import de.iteratec.osm.measurement.environment.wptserver.EventResultPersisterService
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -41,7 +41,7 @@ import static org.junit.Assert.assertTrue
 class WeeklyShopMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegrationSpec {
 
     JobGroupCsiAggregationService jobGroupCsiAggregationService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
 
     static CsiAggregationInterval weeklyInterval
     static List<JobGroup> csiGroups
@@ -138,7 +138,7 @@ class WeeklyShopMultipleCsiGroupsIntegrationSpec extends NonTransactionalIntegra
         }
 
         EventResult.findAll().each {
-            resultPersisterService.informDependentCsiAggregations(it)
+            eventResultPersisterService.informDependentCsiAggregations(it)
         }
     }
 

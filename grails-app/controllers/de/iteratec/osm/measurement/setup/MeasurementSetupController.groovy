@@ -7,7 +7,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobRunService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
@@ -20,7 +20,7 @@ import grails.converters.JSON
 
 class MeasurementSetupController extends ExceptionHandlerController {
     ScriptService scriptService
-    JobProcessingService jobProcessingService
+    JobRunService jobRunService
     PageService pageService
 
     def index() {
@@ -68,7 +68,7 @@ class MeasurementSetupController extends ExceptionHandlerController {
             if (customError == null) {
                 scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))
                 try {
-                    jobProcessingService.launchJobRun(job)
+                    jobRunService.launchJobRun(job)
                 } catch (Exception exception) {
                     log.error(exception.getMessage(), exception)
                 }

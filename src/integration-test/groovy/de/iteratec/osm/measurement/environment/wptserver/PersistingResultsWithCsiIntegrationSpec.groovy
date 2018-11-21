@@ -32,6 +32,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.MeasuredEvent
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
@@ -43,7 +44,8 @@ import static de.iteratec.osm.OsmConfiguration.getDEFAULT_MIN_VALID_LOADTIME
 @Rollback
 class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegrationSpec {
 
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
+    JobResultPersisterService jobResultPersisterService
     DefaultTimeToCsMappingService defaultTimeToCsMappingService
 
 
@@ -56,8 +58,8 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     }
 
     def cleanup() {
-        resultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
-        resultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
+        eventResultPersisterService.metricReportingService = grailsApplication.mainContext.getBean('metricReportingService')
+        eventResultPersisterService.configService = grailsApplication.mainContext.getBean('configService')
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
@@ -66,9 +68,11 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         createTestDataCommonToAllTests()
         File file = new File("src/test/resources/WptResultXmls/MULTISTEP_1Run_5Steps.xml")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
+        JobResult.build(job: job, expectedSteps: 5, jobConfigRuns: 1, firstViewOnly: true,
+                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
         when: ""
-        resultPersisterService.listenToResult(xmlResult, server, job.id)
+        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
         List<EventResult> eventResults = EventResult.list()
 
         then: ""
@@ -100,7 +104,9 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         job = Job.build(
                 label: 'CH_OTTO_ADS_hetzner',
                 location: loc,
-                jobGroup: jobGroup
+                jobGroup: jobGroup,
+                firstViewOnly: true,
+                runs: 1
         )
 
         defaultTimeToCsMappingService.copyDefaultMappingToPage(adsEntry, '3', csiConf)
@@ -143,9 +149,9 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
 
     void mockMetricReportingService() {
         MetricReportingService metricReportingService = Stub(MetricReportingService)
-        resultPersisterService.metricReportingService = metricReportingService
+        eventResultPersisterService.metricReportingService = metricReportingService
 
-        resultPersisterService.configService = Stub(ConfigService) {
+        eventResultPersisterService.configService = Stub(ConfigService) {
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }

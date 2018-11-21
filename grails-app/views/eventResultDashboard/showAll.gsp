@@ -164,7 +164,7 @@
                                default="Jobs filtern"/>
                 </a>
             </li>
-            <li>
+            <li >
                 <a data-toggle="tab" href="#tabVariableSelection" id="tabVariableSelectionElement">
                     <g:message code="de.iteratec.sri.wptrd.measurement.filter.heading"
                                default="Messwerte auw&auml;hlen"/>

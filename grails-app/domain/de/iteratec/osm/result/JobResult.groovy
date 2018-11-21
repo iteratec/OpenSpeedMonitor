@@ -68,28 +68,9 @@ class JobResult {
     //from Job
     String jobConfigLabel
     Integer jobConfigRuns
-
     boolean firstViewOnly
-    boolean captureVideo
-    boolean downloadResultXml
-    boolean downloadDetails
-    Integer frequencyInMin
-    Integer maxDownloadAttempts
+    Integer expectedSteps
 
-    //from Script
-    String scriptUrl
-    String scriptNavigationscript
-    boolean provideAuthenticateInformation
-    String authUsername
-    String authPassword
-    boolean multistep
-    boolean applyValidateRule
-    String validationRequest
-    Integer validationType
-    Integer validationMarkas
-    Integer validationMarkaselse
-
-    //from WptServer / WptLoction
     String wptServerLabel
     String wptServerBaseurl
     String locationLabel
@@ -97,10 +78,6 @@ class JobResult {
     String locationUniqueIdentifierForServer
     String locationBrowser
 
-    //from Job
-    /**
-     * This is a copy of {@link JobGroup#name}. It doesn't get updated.
-     */
     String jobGroupName
 
     static constraints = {
@@ -116,24 +93,7 @@ class JobResult {
         jobConfigLabel(maxSize: 255, blank: false)
         jobConfigRuns(blank: false)
         firstViewOnly(nullable: true)
-        captureVideo(nullable: true)
-        downloadResultXml(nullable: true)
-        downloadDetails(nullable: true)
-        frequencyInMin(nullable: true)
-        maxDownloadAttempts(nullable: true)
-
-        //from Script
-        scriptUrl(nullable: true, url: true)
-        scriptNavigationscript(nullable: true, widget: 'textarea')
-        provideAuthenticateInformation(nullable: true)
-        authUsername(nullable: true)
-        authPassword(nullable: true)
-        multistep(nullable: true)
-        applyValidateRule(nullable: true)
-        validationRequest(nullable: true)
-        validationType(nullable: true)
-        validationMarkas(nullable: true)
-        validationMarkaselse(nullable: true)
+        expectedSteps(nullable: false)
 
         //from WptServer / WptLoction
         wptServerLabel(nullable: true)
@@ -148,16 +108,14 @@ class JobResult {
     }
 
     static mapping = {
-        scriptUrl(type: 'text')
         description(type: 'text')
-        scriptNavigationscript(type: 'text')
         date(index: 'date_idx')
         testId(index: 'testId_and_jobConfigLabel_idx')
         jobConfigLabel(index: 'testId_and_jobConfigLabel_idx')
         autowire true
     }
 
-    static transients = ['eventResults', 'jobStatisticService']
+    static transients = ['jobStatisticService']
 
     String toString() {
         return (testId ?: id) ?: super.toString()
@@ -194,22 +152,6 @@ class JobResult {
         }
 
         return results
-    }
-    /**
-     * Returns the median {@link EventResult} of the uncached view for one {@link MeasuredEvent}.
-     *
-     * <p>
-     * This must be unique by definition. The Agents grants that a MeasuredEvent is unique per Job.
-     * </p>
-     * @param event MeasuredEvent
-     * @return null only if event isn't measured within this JobResult
-     *
-     */
-     EventResult findMedianUncachedEventResult(MeasuredEvent event) {
-        Collection<EventResult> results = this.getEventResults()
-        return results.find {
-            it.measuredEvent == event && it.cachedView == CachedView.UNCACHED && it.medianValue == true
-        }
     }
 
     /**

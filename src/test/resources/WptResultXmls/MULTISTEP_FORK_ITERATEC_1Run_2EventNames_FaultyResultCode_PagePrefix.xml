@@ -581,7 +581,7 @@
                         <responses_200>97</responses_200>
                         <responses_404>0</responses_404>
                         <responses_other>5</responses_other>
-                        <result>0</result>
+                        <result>404</result>
                         <render>1543</render>
                         <fullyLoaded>4304</fullyLoaded>
                         <cached>0</cached>
