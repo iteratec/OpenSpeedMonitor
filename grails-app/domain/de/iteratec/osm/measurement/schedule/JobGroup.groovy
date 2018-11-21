@@ -20,6 +20,7 @@ package de.iteratec.osm.measurement.schedule
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.report.external.GraphiteServer
 import grails.gorm.annotation.Entity
+import grails.gorm.hibernate.mapping.MappingBuilder
 import grails.plugins.taggable.Taggable
 import groovy.transform.EqualsAndHashCode
 
@@ -53,6 +54,15 @@ class JobGroup implements Taggable{
             resultGraphiteServers: GraphiteServer,
             jobHealthGraphiteServers: GraphiteServer
     ]
+
+    static mapping = MappingBuilder.orm {
+        property('resultGraphiteServers') {
+            joinTable { name 'job_group_result_graphite_server' }
+        }
+        property('jobHealthGraphiteServers') {
+            joinTable { name 'job_group_job_health_graphite_server' }
+        }
+    }
 
     static constraints = {
         name unique: true, maxSize: 255

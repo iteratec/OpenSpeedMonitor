@@ -1,43 +1,62 @@
 databaseChangeLog = {
 
-    changeSet(author: "fmartens (generated)", id: "1542619311106-1") {
-        addColumn(tableName: "job_group_graphite_server") {
-            column(name: "job_group_job_health_graphite_servers_id", type: "bigint")
+    changeSet(author: "fmartens (generated)", id: "1542818276176-1") {
+        createTable(tableName: "job_group_job_health_graphite_server") {
+            column(name: "job_group_job_health_graphite_servers_id", type: "BIGINT") {
+                constraints(nullable: "false")
+            }
+
+            column(name: "graphite_server_id", type: "BIGINT")
         }
     }
 
-    changeSet(author: "fmartens (generated)", id: "1542619311106-2") {
-        addColumn(tableName: "job_group_graphite_server") {
-            column(name: "job_group_result_graphite_servers_id", type: "bigint") {
+    changeSet(author: "fmartens (generated)", id: "1542818276176-2") {
+        createTable(tableName: "job_group_result_graphite_server") {
+            column(name: "job_group_result_graphite_servers_id", type: "BIGINT") {
                 constraints(nullable: "false")
             }
+
+            column(name: "graphite_server_id", type: "BIGINT")
         }
+    }
+
+    changeSet(author: "fmartens (generated)", id: "1542818276176-6") {
+        addForeignKeyConstraint(baseColumnNames: "graphite_server_id", baseTableName: "job_group_result_graphite_server", constraintName: "FK5tujea0954ys419lpvuwh7j7v", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_server")
+    }
+
+    changeSet(author: "fmartens (generated)", id: "1542818276176-7") {
+        addForeignKeyConstraint(baseColumnNames: "job_group_job_health_graphite_servers_id", baseTableName: "job_group_job_health_graphite_server", constraintName: "FK9u6fbxgma0mkqt5ty19cca3c1", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group")
+    }
+
+    changeSet(author: "fmartens (generated)", id: "1542818276176-8") {
+        addForeignKeyConstraint(baseColumnNames: "job_group_result_graphite_servers_id", baseTableName: "job_group_result_graphite_server", constraintName: "FKbwn4g8e5i52gqkj0blbg9nnpg", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group")
+    }
+
+    changeSet(author: "fmartens (generated)", id: "1542818276176-9") {
+        addForeignKeyConstraint(baseColumnNames: "graphite_server_id", baseTableName: "job_group_job_health_graphite_server", constraintName: "FKtr53abjdih801s0wir346d7wk", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_server")
+    }
+
+    changeSet(author: "fmartens (generated)", id: "1542818276176-10") {
+        dropForeignKeyConstraint(baseTableName: "job_group_graphite_server", constraintName: "FK_graphite_server")
+    }
+
+    changeSet(author: "fmartens (generated)", id: "1542818276176-11") {
+        dropForeignKeyConstraint(baseTableName: "job_group_graphite_server", constraintName: "FKpsg9lbtc0vi09j7pxl0kl7ljm")
     }
 
     changeSet(author: "fmartens", id: "Task-1_copy_existing_ids") {
         sql('''
-            UPDATE job_group_graphite_server
-            SET job_group_result_graphite_servers_id = job_group_graphite_servers_id;
+            INSERT INTO job_group_result_graphite_server (job_group_result_graphite_servers_id, graphite_server_id)
+            SELECT job_group_result_graphite_servers_id, graphite_server_id
+            FROM job_group_graphite_server;
         ''')
     }
 
-    changeSet(author: "fmartens (generated)", id: "1542619311106-6") {
-        addForeignKeyConstraint(baseColumnNames: "job_group_job_health_graphite_servers_id", baseTableName: "job_group_graphite_server", constraintName: "FKaleqoqn1ue7wyw4jhv4kpb800", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group")
+    changeSet(author: "fmartens (generated)", id: "1542818276176-12") {
+        dropTable(tableName: "job_group_graphite_server")
     }
 
-    changeSet(author: "fmartens (generated)", id: "1542619311106-7") {
-        addForeignKeyConstraint(baseColumnNames: "job_group_result_graphite_servers_id", baseTableName: "job_group_graphite_server", constraintName: "FKpsg9lbtc0vi09j7pxl0kl7ljm", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "job_group")
-    }
-
-    changeSet(author: "fmartens (generated)", id: "1542619311106-8") {
-        dropForeignKeyConstraint(baseTableName: "job_group_graphite_server", constraintName: "FK4CA1B9942DF50285")
-    }
-
-    changeSet(author: "fmartens (generated)", id: "1542619311106-9") {
-        dropColumn(columnName: "job_group_graphite_servers_id", tableName: "job_group_graphite_server")
-    }
-
-    changeSet(author: "finn (generated)", id: "1542627777036-1") {
+    changeSet(author: "fmartens (generated)", id: "1542806179265-1") {
         addColumn(tableName: "graphite_server") {
             column(name: "prefix", type: "varchar(255)")
         }
