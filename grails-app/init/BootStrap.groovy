@@ -24,13 +24,10 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserver.DetailAnalysisPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.LocationPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
+import de.iteratec.osm.measurement.environment.wptserver.*
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobSchedulingService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -50,9 +47,10 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 class BootStrap {
 
     CsiAggregationUtilService csiAggregationUtilService
-    JobProcessingService jobProcessingService
+    JobSchedulingService jobSchedulingService
+    JobResultPersisterService jobResultPersisterService
     I18nService i18nService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
     LocationPersisterService locationPersisterService
     DetailAnalysisPersisterService detailAnalysisPersisterService
     WptInstructionService wptInstructionService
@@ -151,7 +149,7 @@ class BootStrap {
         createConnectivityProfileIfMissing(384, 384, 140, 'UMTS', 0)
         createConnectivityProfileIfMissing(3600, 1500, 40, 'UMTS - HSDPA', 0)
 
-        jobProcessingService.scheduleAllActiveJobs()
+        jobSchedulingService.scheduleAllActiveJobs()
 
         log.info "initJobScheduling() OSM ends"
     }
@@ -375,7 +373,7 @@ class BootStrap {
     def registerProxyListener = {
         log.info "registerProxyListener OSM ends"
         wptInstructionService.addLocationListener(locationPersisterService)
-        wptInstructionService.addResultListener(resultPersisterService)
+        jobResultPersisterService.addResultListener(eventResultPersisterService)
 
         // enable persistence of detailAnalysisData for JobResults if configured
         boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
@@ -387,7 +385,7 @@ class BootStrap {
             }
             microserviceUrl = microserviceUrl.endsWith("/") ? microserviceUrl : microserviceUrl + "/"
             detailAnalysisPersisterService.enablePersistenceOfDetailAnalysisDataForJobResults(microserviceUrl)
-            wptInstructionService.addResultListener(detailAnalysisPersisterService)
+            jobResultPersisterService.addResultListener(detailAnalysisPersisterService)
         }
 
         log.info "persistence of detailAnalysisData is enabled: " + persistenceEnabled

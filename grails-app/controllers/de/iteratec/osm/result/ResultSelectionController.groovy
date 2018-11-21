@@ -4,7 +4,6 @@ import de.iteratec.osm.annotations.RestAction
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -13,7 +12,6 @@ import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
 import org.hibernate.type.StandardBasicTypes
 import org.joda.time.DateTime
-import org.joda.time.Days
 import org.springframework.http.HttpStatus
 
 import java.util.concurrent.ConcurrentHashMap
@@ -166,15 +164,24 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     @RestAction
     def getUserTimings(ResultSelectionCommand command) {
+        getUserOrHeroTiming(command, [UserTimingType.MARK, UserTimingType.MEASURE])
+    }
+
+    @RestAction
+    def getHeroTimings(ResultSelectionCommand command) {
+        getUserOrHeroTiming(command, [UserTimingType.HERO_MARK])
+    }
+
+    private def getUserOrHeroTiming(ResultSelectionCommand command, List<UserTimingType> selection) {
         if (command.hasErrors()) {
             sendError(command)
             return
         }
-
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserTimings for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserOrHeroTimings for ${command as JSON}", 0, {
             def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
                 projections {
                     userTimings {
+                        'in'('type', selection)
                         groupProperty('name')
                         groupProperty('type')
                     }

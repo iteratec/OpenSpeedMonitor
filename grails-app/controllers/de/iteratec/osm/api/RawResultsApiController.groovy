@@ -4,7 +4,7 @@ import de.iteratec.osm.api.dto.EventResultDto
 import de.iteratec.osm.de.iteratec.osm.api.ResultsRequestCommand
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.schedule.Job
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobRunService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MvQueryParams
@@ -31,7 +31,7 @@ class RawResultsApiController {
     PerformanceLoggingService performanceLoggingService
     EventResultDaoService eventResultDaoService
     ThresholdService thresholdService
-    JobProcessingService jobProcessingService
+    JobRunService jobRunService
 
     /**
      * The maximum duration of time-frame sent to {@link
@@ -401,7 +401,7 @@ class RawResultsApiController {
         if (!params?.validApiKey?.allowedForMeasurementActivation) {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.FORBIDDEN, DEFAULT_ACCESS_DENIED_MESSAGE)
         }
-        def handleOldJobResultsReturnValueMap = jobProcessingService.handleOldJobResults()
+        def handleOldJobResultsReturnValueMap = jobRunService.handleOldJobResults()
         return ControllerUtils.sendResponseAsStreamWithoutModifying(response, HttpStatus.OK, "Deleted ${handleOldJobResultsReturnValueMap["JobResultsToDeleteCount"]} JobResults and rescheduled ${handleOldJobResultsReturnValueMap["JobResultsToRescheduleCount"]} JobResults")
     }
 }
