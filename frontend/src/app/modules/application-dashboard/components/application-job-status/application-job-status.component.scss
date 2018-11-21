@@ -5,9 +5,8 @@ p {
   font-weight: bold;
 }
 
-.clickable-list {
+.clickable-list.job-status-field {
   li {
-    border: 1px solid $color-contour-light;
     a {
       margin-left: 10px;
       min-width: initial;
@@ -17,14 +16,9 @@ p {
     }
   }
 
-  .job-status-error, .job-status-warning, .integrations {
-    flex-wrap: wrap;
+  .job-status-error, .job-status-warning {
     .right-hand-icon {
       margin-left: auto;
-    }
-    small {
-      flex-basis: 100%;
-      margin-left: 22.5px;
     }
   }
 
@@ -59,12 +53,6 @@ p {
     }
     i {
       color: $color-good;
-    }
-  }
-
-  .integrations {
-    i {
-      color: darken($color-contour-light, 10%);
     }
   }
 }

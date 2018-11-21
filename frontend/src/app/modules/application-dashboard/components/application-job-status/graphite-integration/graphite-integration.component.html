@@ -1,6 +1,6 @@
-<ul class="clickable-list">
+<ul class="clickable-list integrations">
   <li>
-    <a href="#" (click)="ngxSmartModalService.getModal('graphiteIntegrationModal').open()" class="integrations">
+    <a href="#" (click)="ngxSmartModalService.getModal('graphiteIntegrationModal').open()" class="integration-info">
       <aside>
         <i class="fas fa-rss"></i>
       </aside>
@@ -12,3 +12,56 @@
     </a>
   </li>
 </ul>
+
+<ngx-smart-modal id="graphiteIntegrationModal" #graphiteIntegrationModal identifier="graphiteIntegrationModal" (onAnyCloseEventFinished)="detailData = null">
+  <h2>Graphite</h2>
+  <hr>
+  <main>
+    <section class="server-overview">
+      <ul class="clickable-list">
+        <li *ngFor="let jobHealthGraphiteServer of graphiteIntegrationModal.getData()">
+          <a href="#" (click)="detailData = jobHealthGraphiteServer">
+          <span class="title">
+            {{ jobHealthGraphiteServer.address }}
+            <span class="detail">
+              {{ jobHealthGraphiteServer.prefix ? jobHealthGraphiteServer.prefix : 'none' }}.job-health.
+            </span>
+          </span>
+            <aside class="right-hand-icon">
+              <i class="fas fa-times"></i>
+            </aside>
+          </a>
+        </li>
+      </ul>
+    </section>
+    <section class="server-detail" *ngIf="detailData">
+      <table>
+        <tr>
+          <td>Graphite Server Address</td>
+          <td>{{detailData.address}}</td>
+        </tr>
+        <tr>
+          <td>Graphite Server Port</td>
+          <td>{{detailData.port}}</td>
+        </tr>
+        <tr>
+          <td>Graphite Protocol</td>
+          <td>{{detailData.protocol}}</td>
+        </tr>
+        <tr>
+          <td>Web App URL</td>
+          <td>{{detailData.webAppAddress}}</td>
+        </tr>
+        <tr>
+          <td>Path Prefix</td>
+          <td>{{detailData.prefix ? detailData.prefix : "none"}}</td>
+        </tr>
+      </table>
+    </section>
+  </main>
+  <footer>
+    For each job of this application three different metrics will be reported to graphite: last5, last25 and last150.
+    Each metric shows the precentage of successful results.
+  </footer>
+  <hr>
+</ngx-smart-modal>

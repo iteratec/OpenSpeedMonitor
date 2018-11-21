@@ -1,6 +1,7 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {JobHealthGraphiteServers} from "../../../models/job-health-graphite-servers.model";
+import {GraphiteServer} from "../../../models/graphite-server.model";
 
 @Component({
   selector: 'osm-graphite-integration',

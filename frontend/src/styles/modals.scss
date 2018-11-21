@@ -1,1 +1,9 @@
+$dialog-position-top: 10%;
+
 @import "~ngx-smart-modal/ngx-smart-modal";
+
+#graphiteIntegrationModal {
+  .nsm-dialog {
+    max-width: 1000px;
+  }
+}
