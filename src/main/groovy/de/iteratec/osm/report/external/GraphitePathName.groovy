@@ -185,10 +185,10 @@ final class GraphitePathName {
 	 */
 	@Override
 	boolean equals(final Object obj) {
-		if (this == obj) {
+		if (this.is(obj)) {
 			return true
 		}
-		if (obj == null) {
+		if (obj.is(null)) {
 			return false
 		}
 		if (!(obj instanceof GraphitePathName)) {

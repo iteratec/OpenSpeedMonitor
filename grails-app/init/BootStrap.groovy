@@ -49,7 +49,6 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 class BootStrap {
 
-    EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
     JobProcessingService jobProcessingService
     I18nService i18nService

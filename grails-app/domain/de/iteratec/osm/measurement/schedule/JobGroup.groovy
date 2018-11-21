@@ -57,7 +57,7 @@ class JobGroup implements Taggable{
     static constraints = {
         name unique: true, maxSize: 255
         resultGraphiteServers nullable: false
-        jobHealthGraphiteServers nullable: true
+        jobHealthGraphiteServers nullable: false
         csiConfiguration nullable: true
     }
 
