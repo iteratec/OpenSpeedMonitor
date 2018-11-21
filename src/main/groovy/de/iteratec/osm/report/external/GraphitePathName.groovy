@@ -38,13 +38,17 @@ import de.iteratec.osm.result.Contract
  */
 final class GraphitePathName {
 
-	private static final List<String> INVALID_GRAPHITE_PATH_CHARACTERS = ['.', ' ']
-	private static final String REPLACEMENT_FOR_INVALID_GRAPHITE_PATH_CHARACTERS = '_'
+	private static final List<String> INVALID_GRAPHITE_PATH_CHARACTERS = ['.', ' ', '(', ')']
+	private static final List<String> REPLACEMENTS_FOR_INVALID_GRAPHITE_PATH_CHARACTERS = ['_', '']
 
 	static String replaceInvalidGraphitePathCharacters(String graphitePathElement) {
 		String replaced = graphitePathElement
 		INVALID_GRAPHITE_PATH_CHARACTERS.each { String invalidChar ->
-			replaced = replaced.replace(invalidChar, REPLACEMENT_FOR_INVALID_GRAPHITE_PATH_CHARACTERS)
+			if (invalidChar == '(' || invalidChar == ')') {
+				replaced = replaced.replace(invalidChar, REPLACEMENTS_FOR_INVALID_GRAPHITE_PATH_CHARACTERS[1])
+			} else {
+				replaced = replaced.replace(invalidChar, REPLACEMENTS_FOR_INVALID_GRAPHITE_PATH_CHARACTERS[0])
+			}
 		}
 		return replaced
 	}

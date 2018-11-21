@@ -19,20 +19,14 @@ class JobHealthReportService {
         }
 
         if (jobsToReport) {
+            log.debug("Starting job health report for the jobs: ${jobsToReport}")
             jobsToReport.each { job ->
                 Collection<GraphiteServer> graphiteServers = job.jobGroup.jobHealthGraphiteServers
 
                 graphiteServers.each { graphiteServer ->
                     GraphiteSocket socket = graphiteSocketProvider.getSocket(graphiteServer)
 
-                    List<String> pathElements = []
-                    pathElements.add(graphiteServer.prefix ?: 'no-prefix')
-                    pathElements.add('job-health')
-                    pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.jobGroup.name))
-                    pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.script.label))
-                    pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.location.location))
-                    pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.id.toString()))
-                    String basePath = pathElements.join('.')
+                    String basePath = determineBasePath(job, graphiteServer)
 
                     if (job.jobStatistic.percentageSuccessfulTestsOfLast5 != null) {
                         socket.sendDate(GraphitePathName.valueOf(basePath + ".percentageSuccessfulTestsOfLast5"), job.jobStatistic.percentageSuccessfulTestsOfLast5, date)
@@ -46,5 +40,18 @@ class JobHealthReportService {
                 }
             }
         }
+    }
+
+    private static String determineBasePath(Job job, GraphiteServer graphiteServer) {
+        List<String> pathElements = []
+        pathElements.add(graphiteServer.prefix ?: 'no-prefix')
+        pathElements.add('job-health')
+        pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.jobGroup.name))
+        pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.script.label))
+        pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.location.location))
+        pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.location.browser.name))
+        pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.id.toString()))
+        String basePath = pathElements.join('.')
+        return basePath
     }
 }
