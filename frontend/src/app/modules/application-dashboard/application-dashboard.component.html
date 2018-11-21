@@ -27,12 +27,3 @@
   <osm-page *ngFor="let metric of pages$ | async" [metricsForPage]="metric"
             [lastDateOfResult]="selectedApplication.dateOfLastResults" class="card"></osm-page>
 </div>
-
-<ngx-smart-modal #graphiteIntegrationModal identifier="graphiteIntegrationModal">
-  <div *ngIf="graphiteIntegrationModal.hasData()">
-    <h1>Graphite Integration</h1>
-    <div *ngFor="let jobHealthGraphiteServer of graphiteIntegrationModal.getData()">
-      {{jobHealthGraphiteServer | json}}
-    </div>
-  </div>
-</ngx-smart-modal>
