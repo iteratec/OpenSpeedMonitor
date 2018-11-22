@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="layout" content="kickstart_osm" />
+	<meta name="layout" content="layoutOsm" />
 	<g:set var="entityName" value="${message(code: 'register.label', default: 'Register')}" />
 	<title><g:message code="spring.security.ui.register.title" args="[entityName]" /></title>
 </head>

@@ -1,7 +1,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.osm.failedJobResults.title" default="Failed JobResults"/></title>
 </head>
 

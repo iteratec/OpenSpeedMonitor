@@ -2,7 +2,7 @@
 <html>
     <head>
         <g:set var="entityName" value="${message(code: 'graphiteServer.label', default: 'GraphiteServer')}" scope="request"/>
-        <meta name="layout" content="kickstart" />
+        <meta name="layout" content="layoutOsm" />
         <title><g:message code="default.create.label" args="[entityName]" /></title>
     </head>
     <body>

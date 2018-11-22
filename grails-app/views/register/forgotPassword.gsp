@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta name="layout" content="kickstart_osm" />
+	<meta name="layout" content="layoutOsm" />
 	<title><g:message code="spring.security.ui.forgotPassword.title" args="[entityName]" /></title>
 </head>
 <body>
