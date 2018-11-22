@@ -71,20 +71,20 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 grailsApplication.mainContext.getBean('configService')
     }
 
-    void "Only first step of cached view gets persisted if TTFB of the first uncached step is invalid"() {
+    void "All steps get persisted, even if TTFB of the first uncached step is invalid"() {
 
         given: "a wpt result and a faulty result (TTFB is 0) in firstView"
         setupData()
+        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).csiAggregationUpdateService = Mock(CsiAggregationUpdateService)
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
 
         when: "the results get persisted"
         jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
         jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
-        then: "1 run, 1 successful events, but first result is faulty"
+        then: "all steps should be persisted but first result is faulty"
         JobResult.list().size() == 1
-        EventResult.list().size() == 1
-        EventResult.list()[0].cachedView == CachedView.CACHED
+        EventResult.list().size() == 4
     }
 
     void "Only first step of cached view gets persisted if LoadTime  of the first uncached step is larger than max"() {
