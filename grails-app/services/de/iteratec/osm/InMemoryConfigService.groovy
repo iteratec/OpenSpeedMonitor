@@ -63,8 +63,11 @@ class InMemoryConfigService {
      * Activates measurements generally.
      */
     void setActiveStatusOfMeasurementsGenerally(Boolean activationToSet){
-        if (activationToSet == true) activateMeasurementsGenerally()
-        else if (activationToSet == false) deactivateMeasurementsGenerally()
+        if (activationToSet) {
+            activateMeasurementsGenerally()
+        } else {
+            deactivateMeasurementsGenerally()
+        }
     }
 
     /**

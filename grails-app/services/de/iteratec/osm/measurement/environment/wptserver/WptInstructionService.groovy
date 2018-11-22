@@ -167,24 +167,15 @@ class WptInstructionService {
      * @return
      */
     WptResultXml fetchResult(WebPageTestServer wptserverOfResult, String resultId) {
-        log.info("Fetching result ${wptserverOfResult.baseUrl}result/${resultId}")
-        GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, resultId)
-        return convertGPathToWptResultXML(xmlResultResponse)
-    }
-
-    private WptResultXml convertGPathToWptResultXML(GPathResult xmlResultResponse) {
-        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
-        return resultXml
-    }
-
-    private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, String resultId) {
-        return httpRequestService.getWptServerHttpGetResponse(
-            wptserverOfResult,
-            '/xmlResult.php',
-            ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1', 'breakdown': '1'],
+        log.info("Fetching result ${resultId} from ${wptserverOfResult.baseUrl}")
+        GPathResult xmlResultResponse = httpRequestService.getWptServerHttpGetResponse(
+                wptserverOfResult,
+                '/xmlResult.php',
+                ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1', 'breakdown': '1'],
                 'application/xml',
-            [Accept: 'application/xml']
+                [Accept: 'application/xml']
         )
+        return new WptResultXml(xmlResultResponse)
     }
 
     /**
