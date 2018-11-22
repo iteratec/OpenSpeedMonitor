@@ -2,7 +2,7 @@ package de.iteratec.osm.system
 
 class MissingJobResultCheckJob {
 
-    public static final int FREQUENCY_IN_HOURS = 2
+    public static final int FREQUENCY_IN_HOURS = 1
     MissingJobResultCheckService missingJobResultCheckService
 
     static triggers = {

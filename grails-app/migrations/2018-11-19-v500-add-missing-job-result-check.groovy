@@ -24,4 +24,10 @@ databaseChangeLog = {
             column(name: "execution_date", type: "datetime")
         }
     }
+
+    changeSet(author: "fwieczorek", id: "201811220853") {
+        addColumn(tableName: "job") {
+            column(name: "last_change", type: "datetime")
+        }
+    }
 }

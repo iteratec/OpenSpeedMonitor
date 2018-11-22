@@ -1,5 +1,6 @@
 package de.iteratec.osm.system
 
+import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
@@ -47,6 +48,22 @@ class MissingJobResultCheckServiceSpec extends Specification implements BuildDat
         date == mockDates[dateNr]
     }
 
+    void "Find corresponding Date with 5 potential candidates"() {
+        given:
+        int dateNr = 3
+        mockDates.add( new DateTime(2018, 11, 4,7, 59) )
+        mockDates.add( new DateTime(2018, 11, 4, 7, 58) )
+        mockDates.add( new DateTime(2018, 11, 4,8, 02) )
+        mockDates.add( new DateTime(2018, 11, 4, 8, 01) )
+        JobResult jobResult = new JobResult(executionDate: mockDates[dateNr].toDate())
+
+        when:
+        DateTime date = service.findDateForJobResult(mockDates, jobResult)
+
+        then:
+        date == mockDates[dateNr]
+    }
+
     void "Find no corresponding Date"() {
         given:
         JobResult jobResult = new JobResult(executionDate: mockDates[3].plusHours(1).toDate())
@@ -74,7 +91,7 @@ class MissingJobResultCheckServiceSpec extends Specification implements BuildDat
         given:
         DateTime from = new DateTime(2018, 11, 1, 11, 45)
         DateTime to = new DateTime(2018, 11, 1, 14, 15)
-        CronExpression cron = new CronExpression("0 0/30 * ? * *")
+        String cron = "0 0/30 * ? * *"
         def expectedDates = [new DateTime(2018, 11, 1, 12, 0),
                          new DateTime(2018, 11, 1, 12, 30),
                          new DateTime(2018, 11, 1, 13, 0),
@@ -82,7 +99,7 @@ class MissingJobResultCheckServiceSpec extends Specification implements BuildDat
                          new DateTime(2018, 11, 1, 14, 0)]
 
         when:
-        def dates = service.getScheduledDates(from.toDate(), to.toDate(), cron)
+        def dates = service.getScheduledDates(from.toDate(), to.toDate(), new Job(executionSchedule: cron))
 
         then:
         dates == expectedDates

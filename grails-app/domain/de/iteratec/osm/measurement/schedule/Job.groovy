@@ -44,6 +44,7 @@ class Job implements Taggable {
     Script script;
     Location location;
     Date lastRun;
+    Date lastChange
 
     @BindUsing({ obj, source -> source['description'] })
     String description = "";
@@ -223,6 +224,7 @@ class Job implements Taggable {
         location(nullable: false)
         lastRun(nullable: true)
         jobGroup(nullable: false)
+        lastChange(nullable: true)
 
         description(widget: 'textarea', maxSize: 255)
         runs(range: 1..25)
