@@ -51,7 +51,8 @@
             browsers: "${createLink(controller: 'resultSelection', action: 'getLocations')}",
             connectivity: "${createLink(controller: 'resultSelection', action: 'getConnectivityProfiles')}",
             resultCount: "${createLink(controller: 'resultSelection', action: 'getResultCount')}",
-            userTimings: "${createLink(controller: 'resultSelection', action: 'getUserTimings')}"
+            userTimings: "${createLink(controller: 'resultSelection', action: 'getUserTimings')}",
+            heroTimings: "${createLink(controller: 'resultSelection', action: 'getHeroTimings')}"
         },
         jobTags: {
             getTagsForJobs: "${createLink(controller: 'job', action: 'getTagsForJobs')}",

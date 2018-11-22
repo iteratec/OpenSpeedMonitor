@@ -66,7 +66,7 @@ class JobResultPersisterService {
 
     JobResultStatus handleWptResult(WptResultXml resultXml, String testId, Job job) {
         JobResultStatus jobResultStatus = determineJobResultStatusFromWptResult(resultXml, testId, job)
-        log.debug("Jobrun ${testId} has status ${jobResultStatus}")
+        log.info("Jobrun ${testId} has status ${jobResultStatus}")
         if (jobResultStatus.isTerminated()) {
             performanceLoggingService.logExecutionTime(DEBUG, "Persisting finished jobrun ${testId} of job ${job.id}.", 1) {
                 processFinishedJobResult(resultXml, jobResultStatus, job)
@@ -82,33 +82,38 @@ class JobResultPersisterService {
 
     private JobResultStatus determineJobResultStatusFromWptResult(WptResultXml resultXml, String testId, Job job) {
         WptStatus wptStatus = resultXml.wptStatus
-        log.info("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
-        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}")
-        log.info("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
+        log.debug("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
+        log.debug("resultXml.hasRuns()=${resultXml.hasRuns()}")
+        log.debug("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {
-            JobResultStatus fallbackStatus = resultXml.getTestStepCount() > 0 ? JobResultStatus.INCOMPLETE : JobResultStatus.FAILED
-            JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
-            if (!jobResult) {
-                log.error("There is no job result for finished job id ${job.id} and test id ${testId}!")
-                return fallbackStatus
-            }
-            int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
-            if (numExpectedResults < 1) {
-                log.warn("Number of expected results for job id ${job.id} and test id ${testId} is 0!")
-                return fallbackStatus
-            }
-            int numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
-            if (numValidResults < 1) {
-                return JobResultStatus.FAILED
-            }
-            return numValidResults < numExpectedResults ? JobResultStatus.INCOMPLETE : JobResultStatus.SUCCESS
+            return determineJobResultStatusFromCompletedTest(resultXml, job, testId)
         }
         if (wptStatus == WptStatus.IN_PROGRESS) {
             return JobResultStatus.RUNNING
         }
         return JobResultStatus.WAITING // keep polling
+    }
+
+    private JobResultStatus determineJobResultStatusFromCompletedTest(WptResultXml resultXml, Job job, String testId) {
+        JobResultStatus fallbackStatus = resultXml.getTestStepCount() > 0 ? JobResultStatus.INCOMPLETE : JobResultStatus.FAILED
+        JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
+        if (!jobResult) {
+            log.error("There is no job result for finished job id ${job.id} and test id ${testId}!")
+            return fallbackStatus
+        }
+        int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
+        if (numExpectedResults < 1) {
+            log.warn("Number of expected results for job id ${job.id} and test id ${testId} is 0!")
+            return fallbackStatus
+        }
+        int numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
+        if (numValidResults < numExpectedResults) {
+            log.info("Test ${testId} from job ${job.id} has only ${numValidResults} valid results, expected ${numExpectedResults}")
+            return numValidResults < 1 ? JobResultStatus.FAILED : JobResultStatus.INCOMPLETE
+        }
+        return JobResultStatus.SUCCESS
     }
 
     private processFinishedJobResult(WptResultXml resultXml, JobResultStatus jobResultStatus, Job job) {

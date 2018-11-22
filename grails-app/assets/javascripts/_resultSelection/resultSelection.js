@@ -178,6 +178,7 @@ OpenSpeedMonitor.resultSelection = (function () {
         }
         if(OpenSpeedMonitor.selectUserTimings){
             updateCard(resultSelectionUrls["userTimings"], OpenSpeedMonitor.selectUserTimings.updateUserTimings, spinner);
+            updateCard(resultSelectionUrls["heroTimings"], OpenSpeedMonitor.selectUserTimings.updateHeroTimings, spinner);
             updateStarted = true;
         }
 

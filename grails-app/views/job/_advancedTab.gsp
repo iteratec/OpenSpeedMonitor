@@ -71,6 +71,16 @@
 <g:render template="checkbox" model="${['booleanAttribute': 'ignoreSSL','label': "${message(code: 'job.ignoreSSL.label', default: 'Ignore SSL Certificate Errors')}", 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'standards','label': "${message(code: 'job.standards.label', default: 'Disable Compatibility View (IE Only)')}", 'job': job]}"/>
 <g:render template="checkbox" model="${['booleanAttribute': 'tcpdump','label': "${message(code: 'job.tcpdump.label', default: 'Capture network packet trace (tcpdump)')}", 'job': job]}"/>
+<g:render template="checkbox" model="${['booleanAttribute': 'heroElementTimes','label': "${message(code: 'job.heroElementTimes.label', default: 'Hero element time')}", 'job': job]}"/>
+
+<div id="heroElements" class="form-group">
+    <label class="col-md-4 control-label" for="heroElements">
+        <g:message code="job.heroElements.label" default="Custom Hero Elements (JSON)"/>
+    </label>
+    <div class="col-md-6">
+        <textarea  class="form-control" name="heroElements" rows="3" id="inputField-heroElements">${job?.heroElements?.trim()}</textarea>
+    </div>
+</div>
 
 <div id="saveBodies" class="form-group">
 
