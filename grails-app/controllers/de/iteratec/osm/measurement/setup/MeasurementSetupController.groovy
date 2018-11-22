@@ -64,6 +64,7 @@ class MeasurementSetupController extends ExceptionHandlerController {
                 if (!job.save()) {
                     customError = "de.iteratec.osm.measurement.setup.jobPersistenceError"
                 }
+                log.info("Created new job ${job.id} with script ${script.label} and connectiviy ${connectivityProfile.name}")
             }
             if (customError == null) {
                 scriptService.createNewPagesAndMeasuredEvents(new ScriptParser(pageService, script.navigationScript, script.label))

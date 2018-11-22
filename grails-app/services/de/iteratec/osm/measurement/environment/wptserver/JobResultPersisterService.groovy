@@ -62,7 +62,7 @@ class JobResultPersisterService {
 
     JobResultStatus handleWptResult(WptResultXml resultXml, String testId, Job job) {
         JobResultStatus jobResultStatus = determineJobResultStatusFromWptResult(resultXml, testId, job)
-        log.debug("Jobrun ${testId} has status ${jobResultStatus}")
+        log.info("Jobrun ${testId} has status ${jobResultStatus}")
         if (jobResultStatus.isTerminated()) {
             performanceLoggingService.logExecutionTime(DEBUG, "Persisting finished jobrun ${testId} of job ${job.id}.", 1) {
                 processFinishedJobResult(resultXml, jobResultStatus, job)
@@ -78,9 +78,9 @@ class JobResultPersisterService {
 
     private JobResultStatus determineJobResultStatusFromWptResult(WptResultXml resultXml, String testId, Job job) {
         WptStatus wptStatus = resultXml.wptStatus
-        log.info("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
-        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}")
-        log.info("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
+        log.debug("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
+        log.debug("resultXml.hasRuns()=${resultXml.hasRuns()}")
+        log.debug("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {

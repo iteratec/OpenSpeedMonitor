@@ -85,6 +85,7 @@ class BootStrap {
                 break
         }
 
+        log.info("Finished Bootstrap")
     }
 
     def destroy = {
@@ -92,7 +93,7 @@ class BootStrap {
 
     def initApplicationData = { boolean createDefaultUsers ->
 
-        log.info "initApplicationData() OSM starts with createDefaultUsers=${createDefaultUsers}"
+        log.debug("initApplicationData() OSM starts with createDefaultUsers=${createDefaultUsers}")
 
         initConfig()
         initUserData(createDefaultUsers)
@@ -104,21 +105,21 @@ class BootStrap {
         initHealthReporting()
         updateScripts()
 
-        log.info "initApplicationData() OSM ends"
+        log.debug("initApplicationData() OSM ends")
 
     }
 
 
     void initHealthReporting() {
-        log.info("initHealthReporting() OSM starts")
+        log.debug("initHealthReporting() OSM starts")
         GraphiteServer.findAllByReportHealthMetrics(true).each {
             healthReportService.handleGraphiteServer(it)
         }
-        log.info("initHealthReporting() OSM ends")
+        log.debug("initHealthReporting() OSM ends")
     }
 
     void initConfig() {
-        log.info "initConfig() OSM starts"
+        log.debug "initConfig() OSM starts"
 
         List<OsmConfiguration> configs = OsmConfiguration.list()
 
@@ -126,7 +127,7 @@ class BootStrap {
             deleteAllInvalidAndCreateNewOsmConfig(configs)
         }
 
-        log.info "initConfig() OSM ends"
+        log.debug "initConfig() OSM ends"
     }
 
     void deleteAllInvalidAndCreateNewOsmConfig(List<OsmConfiguration> configs) {
@@ -143,7 +144,7 @@ class BootStrap {
     }
 
     void initJobScheduling() {
-        log.info "initJobScheduling() OSM starts"
+        log.debug("initJobScheduling() OSM starts")
 
         createConnectivityProfileIfMissing(6000, 512, 50, 'DSL 6.000', 0)
         createConnectivityProfileIfMissing(384, 384, 140, 'UMTS', 0)
@@ -151,11 +152,11 @@ class BootStrap {
 
         jobSchedulingService.scheduleAllActiveJobs()
 
-        log.info "initJobScheduling() OSM ends"
+        log.debug("initJobScheduling() OSM ends")
     }
 
     void initUserData(boolean createDefaultUsers) {
-        log.info "initUserData() OSM starts"
+        log.debug("initUserData() OSM starts")
 
         // Roles ////////////////////////////////////////////////////////////////////////
         Role adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
@@ -207,7 +208,7 @@ class BootStrap {
 
 
     void initCsiData() {
-        log.info "initCsiData starts"
+        log.debug("initCsiData starts")
 
         def csiGroupName = JobGroup.UNDEFINED_CSI
         JobGroup.findByName(csiGroupName) ?: new JobGroup(
@@ -283,7 +284,7 @@ class BootStrap {
             initCsiConfiguration.save(failOnError: true)
         }
 
-        log.info "initCsiData ends"
+        log.debug("initCsiData ends")
     }
 
     /**
@@ -334,7 +335,7 @@ class BootStrap {
 
     void initMeasurementInfrastructure() {
 
-        log.info "init measurement infrastructure OSM starts"
+        log.debug("init measurement infrastructure OSM starts")
 
         //undefined
         String browserName = Browser.UNDEFINED
@@ -366,12 +367,12 @@ class BootStrap {
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Chrome"))
                 .save(failOnError: true)
 
-        log.info "init measurement infrastructure OSM ends"
+        log.debug("init measurement infrastructure OSM ends")
 
     }
 
     def registerProxyListener = {
-        log.info "registerProxyListener OSM ends"
+        log.debug("registerProxyListener OSM ends")
         wptInstructionService.addLocationListener(locationPersisterService)
         jobResultPersisterService.addResultListener(eventResultPersisterService)
 
@@ -388,8 +389,8 @@ class BootStrap {
             jobResultPersisterService.addResultListener(detailAnalysisPersisterService)
         }
 
-        log.info "persistence of detailAnalysisData is enabled: " + persistenceEnabled
-        log.info "registerProxyListener OSM ends"
+        log.info("persistence of detailAnalysisData is enabled: " + persistenceEnabled)
+        log.debug("registerProxyListener OSM ends")
     }
 
     void cancelActiveBatchActivity() {
