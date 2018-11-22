@@ -88,6 +88,7 @@ class WptInstructionService {
         parameters['priority'] = priority
         Map paramsNotNull = parameters.findAll { k, v -> v != null }
         def result = null
+        log.debug("Try to launch job at wptserver=${wptServer} with params=${parameters}")
         performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
             result = httpRequestService.getRestClientFrom(wptServer).post {
                 request.uri.path = '/runtest.php'
@@ -107,7 +108,7 @@ class WptInstructionService {
         if (!testId) {
             throw new JobExecutionException("Jobrun failed for: wptserver=${wptServer}, sent params=${parameters} => got no testId in response", wptStatus, testId)
         }
-        log.info("Jobrun successfully launched: wptserver=${wptServer}, sent params=${parameters}, got testID: ${testId}")
+        log.info("Jobrun successfully launched: wptserver=${wptServer}, got testID: ${testId}")
         return testId
     }
 
@@ -139,6 +140,7 @@ class WptInstructionService {
     List<Location> fetchLocations(WebPageTestServer wptserver, Map queryParams){
         List<Location> addedLocations = []
 
+        log.info("Fetching locations for wptserver ${wptserver.baseUrl}")
         def locationsResponse = httpRequestService.getWptServerHttpGetResponse(
             wptserver,
             '/getLocations.php',
@@ -147,9 +149,9 @@ class WptInstructionService {
             [Accept: 'application/xml']
         )
 
-        log.info("${this.locationListeners.size} iResultListener(s) listen to the fetching of locations")
+        log.debug("${this.locationListeners.size} iResultListener(s) listen to the fetching of locations")
         this.locationListeners.each {
-            log.info("calling listenToLocations for iLocationListener ${it.getListenerName()}")
+            log.debug("calling listenToLocations for iLocationListener ${it.getListenerName()}")
             addedLocations.addAll(it.listenToLocations(locationsResponse, wptserver))
         }
 
@@ -165,24 +167,15 @@ class WptInstructionService {
      * @return
      */
     WptResultXml fetchResult(WebPageTestServer wptserverOfResult, String resultId) {
-        log.info("Fetching result ${wptserverOfResult.baseUrl}result/${resultId}")
-        GPathResult xmlResultResponse = getXmlResult(wptserverOfResult, resultId)
-        return convertGPathToWptResultXML(xmlResultResponse)
-    }
-
-    private WptResultXml convertGPathToWptResultXML(GPathResult xmlResultResponse) {
-        WptResultXml resultXml = new WptResultXml(xmlResultResponse)
-        return resultXml
-    }
-
-    private GPathResult getXmlResult(WebPageTestServer wptserverOfResult, String resultId) {
-        return httpRequestService.getWptServerHttpGetResponse(
-            wptserverOfResult,
-            '/xmlResult.php',
-            ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1', 'breakdown': '1'],
+        log.info("Fetching result ${resultId} from ${wptserverOfResult.baseUrl}")
+        GPathResult xmlResultResponse = httpRequestService.getWptServerHttpGetResponse(
+                wptserverOfResult,
+                '/xmlResult.php',
+                ['f': 'xml', 'test': resultId, 'r': resultId, 'multistepFormat': '1', 'breakdown': '1'],
                 'application/xml',
-            [Accept: 'application/xml']
+                [Accept: 'application/xml']
         )
+        return new WptResultXml(xmlResultResponse)
     }
 
     /**

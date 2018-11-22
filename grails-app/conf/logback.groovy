@@ -3,6 +3,7 @@ import ch.qos.logback.classic.Level
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.classic.filter.ThresholdFilter
 import grails.util.BuildSettings
+import grails.util.Environment
 
 import static ch.qos.logback.classic.Level.*
 
@@ -14,6 +15,7 @@ def catalinaBase = System.properties.getProperty('catalina.base')
 if (!catalinaBase) catalinaBase = '.'   // just in case
 def logFolder = "${catalinaBase}/logs"
 
+def isDevelopment = Environment.current == Environment.DEVELOPMENT
 def logToFile = Boolean.getBoolean('logToFile')
 def logHibernateDetails = Boolean.getBoolean('logHibernateDetails')
 def defaultLevel = System.properties.getProperty('logLevel')
@@ -35,35 +37,37 @@ def consoleLog = ["CONSOLE"]
 def fileLog = ["osmAppender", "asyncOsmAppenderDetails"]
 def detailLog = ["asyncOsmAppenderDetails"]
 def hibernateStats = ["osmHibernateStatsAppender"]
-
 def defaultLogConfig = [
         ["de.iteratec.osm", ALL],
         ["de.iteratec.osm.da", ALL],
-        ["grails.app", ERROR],
+        ["grails", WARN],
         ["org.grails.commons", ERROR],
         ["org.grails.web.mapping", ERROR],
         ["org.grails.web.mapping.filter", ERROR],
         ["org.grails.web.pages", ERROR],
         ["org.grails.web.servlet", ERROR],
         ["org.grails.web.sitemesh", ERROR],
-        ["org.grails.plugins", ERROR],
-        ["org.springframework", ERROR],
-        ["net.sf.ehcache.hibernate", ERROR],
         ["org.grails.orm.hibernate", ERROR],
-        ["org.hibernate.SQL", ERROR],
+        ["org.grails.datastore.gorm", WARN],
+        ["org.springframework", ERROR],
+        ["org.hibernate.cache.ehcache", ERROR],
+        ["org.hibernate", ERROR],
         ["org.hibernate.transaction", ERROR],
+        ["net.sf.ehcache.hibernate", ERROR],
         ["org.hibernate", WARN],
-        ["org.grails.datastore.gorm", ERROR]
+        ["org.quartz", WARN],
+        ["org.apache", ERROR]
 ]
+
 
 def consoleLogConfig = [
     (consoleLog) : [
             *defaultLogConfig,
-            ["liquibase", INFO]]
+            ["liquibase", WARN]]
 ]
 applyLoggers(consoleLogConfig)
 
-if (logToFile && targetDir) {
+if ((logToFile || isDevelopment) && targetDir) {
     def fileLogConfig = [
         (fileLog) : [*defaultLogConfig],
         (detailLog) : [
@@ -93,9 +97,10 @@ def applyLoggers(Map config) {
 }
 
 def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
+    String encoderPattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
     appender('CONSOLE', ConsoleAppender) {
         encoder(PatternLayoutEncoder) {
-            pattern = "%logger %m%n"
+            pattern = encoderPattern
         }
         filter(ThresholdFilter) {
             level = thresholdLevel
@@ -110,7 +115,7 @@ def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
             FileNamePattern = "${logFolder}/OpenSpeedMonitor-%d{yyyy-MM-dd}.zip"
         }
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
+            pattern = encoderPattern
         }
         filter(ThresholdFilter) {
             level = thresholdLevel
@@ -130,7 +135,7 @@ def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
             maxFileSize= '20MB'
         }
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
+            pattern = encoderPattern
         }
         filter(ThresholdFilter) {
             level = DEBUG
@@ -149,7 +154,7 @@ def initAppenders(List appenders, Level thresholdLevel, String logFolder) {
             FileNamePattern = "logs/OpenSpeedMonitorHibernateStats-%d{yyyy-MM-dd}.zip"
         }
         encoder(PatternLayoutEncoder) {
-            pattern = "[%d{dd.MM.yyyy HH:mm:ss,SSS}] [THREAD ID=%t] %-5p %logger : %m%n"
+            pattern = encoderPattern
         }
         filter(ThresholdFilter) {
             level = DEBUG

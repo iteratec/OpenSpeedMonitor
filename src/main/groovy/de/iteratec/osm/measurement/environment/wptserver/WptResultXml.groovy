@@ -238,7 +238,7 @@ class WptResultXml {
                 (loadTime >= minValidLoadTime) &&
                 (loadTime <= maxValidLoadTime))
         if (!valid) {
-            log.debug("Invalid EventResult in the test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, LoadTime: ${loadTime})")
+            log.info("Invalid EventResult in the test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, LoadTime: ${loadTime})")
         }
         return valid
     }
