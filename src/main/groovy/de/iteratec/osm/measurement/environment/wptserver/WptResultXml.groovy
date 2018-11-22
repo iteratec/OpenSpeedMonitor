@@ -230,15 +230,15 @@ class WptResultXml {
         if (!testStepNode || testStepNode.isEmpty()) {
             return false
         }
-        Integer loadTime = testStepNode.loadTime?.toInteger()
+        Integer fullyLoaded = testStepNode.fullyLoaded?.toInteger()
         WptStatus wptStatus = WptStatus.byResultCode(testStepNode.result?.toInteger())
         Integer ttfb = testStepNode.TTFB?.toInteger()
-        boolean valid = (wptStatus.isSuccess() &&
-                (testStepNode.TTFB?.toInteger() > 0) &&
-                (loadTime >= minValidLoadTime) &&
-                (loadTime <= maxValidLoadTime))
+        if (ttfb <= 0) {
+            log.warn("Invalid TTFB '${ttfb}' in test:'${getTestId()}', regarding it as valid anyway because of known WPT problems.")
+        }
+        boolean valid = wptStatus.isSuccess() && fullyLoaded >= minValidLoadTime && fullyLoaded <= maxValidLoadTime
         if (!valid) {
-            log.info("Invalid EventResult in the test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, LoadTime: ${loadTime})")
+            log.info("Invalid EventResult in test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, fullyLoaded: ${fullyLoaded})")
         }
         return valid
     }
