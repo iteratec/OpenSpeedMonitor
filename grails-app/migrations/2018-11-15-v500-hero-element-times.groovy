@@ -2,7 +2,7 @@ databaseChangeLog = {
 
     changeSet(author: "fwieczorek", id: "20181115-hero-elements") {
         addColumn(tableName: "job") {
-            column(name: "hero_element_times", type: "bit") {
+            column(name: "hero_element_times", type: "boolean", valueBoolean: true) {
                 constraints(nullable: "false")
             }
 
