@@ -161,6 +161,8 @@ class Job implements Taggable {
     String  traceCategories = "blink,v8,cc,gpu,blink.net,netlog,disabled-by-default-v8.runtime_stats"
     String  spof
     boolean useGlobalUASuffix = true
+    boolean heroElementTimes = true
+    String heroElements
 
     enum TakeScreenshots {
         NONE,
@@ -241,6 +243,8 @@ class Job implements Taggable {
         tcpdump(nullable: true)
         continuousVideo(nullable: true)
         keepua(nullable: true)
+        heroElementTimes(nullable: true)
+        heroElements(nullable: true)
 
         script(nullable: true, validator: { script, instance ->
             return script != null || instance.deleted

@@ -134,7 +134,7 @@ class EventResult implements CsiValue, RepresentableWptResult {
 
     //static belongsTo = JobResult
     static belongsTo = [jobResult: JobResult]
-    static  hasMany = [userTimings : UserTiming]
+    static hasMany = [userTimings : UserTiming]
 
     static constraints = {
         measuredEvent(nullable: false)

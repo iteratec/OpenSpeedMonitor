@@ -21,12 +21,13 @@ class UserTiming {
         startTime(nullable: false)
         duration(nullable: true, validator: { currentDuration, userTimingInstance ->
             boolean  isMark = userTimingInstance.type == UserTimingType.MARK && currentDuration == null
+            boolean  isHero = userTimingInstance.type == UserTimingType.HERO_MARK && currentDuration == null
             boolean isMeasure = userTimingInstance.type == UserTimingType.MEASURE && currentDuration != null
-            return isMark || isMeasure
+            return isMark || isMeasure || isHero
         })
     }
 
     Double getValue(){
-        return this.type == UserTimingType.MARK ? this.startTime : this.duration
+        return this.type == (UserTimingType.MARK || UserTimingType.HERO_MARK) ? this.startTime : this.duration
     }
 }

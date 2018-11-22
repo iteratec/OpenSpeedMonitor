@@ -27,9 +27,7 @@ class MissingJobResultCheckService {
             missingResults = fillMissingJobResultsSinceDate( dateDaysAgo )
             new MissingJobResultCheck(date: new Date(), missingResults: missingResults).save()
         }
-        if(missingResults){
-            log.info("Fixed Missing JobResults: $missingResults")
-        }
+        log.info("Fixed Missing JobResults: $missingResults")
     }
 
     private int fillMissingJobResultsSinceDate(DateTime since) {
