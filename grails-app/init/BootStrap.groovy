@@ -158,50 +158,45 @@ class BootStrap {
     void initUserData(boolean createDefaultUsers) {
         log.debug("initUserData() OSM starts")
 
-        // Roles ////////////////////////////////////////////////////////////////////////
         Role adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         Role rootRole = Role.findByAuthority('ROLE_SUPER_ADMIN') ?: new Role(authority: 'ROLE_SUPER_ADMIN').save(failOnError: true)
 
-        // Users ////////////////////////////////////////////////////////////////////////
 
-        //read config entries
-        String appAdminUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.username.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.username
-        String appAdminPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.password.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.password
-        String appRootUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.username.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.username
-        String appRootPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.password.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.password
-        String warnMessage = createDefaultUsers ? 'A default user will be created if no one existed.' : 'No such user will be created.'
+        String appAdminUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.username
+        String appAdminPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.password
+        createUser(appAdminUserName, appAdminPassword, adminRole, "admin", createDefaultUsers)
 
-        // admin user
-        if (appAdminUserName == null || appAdminPassword == null) {
-            log.warn("You haven't set environment variables to create an admin user. ${warnMessage}")
-            if (createDefaultUsers) createUser('admin', 'admin', adminRole)
-        } else {
-            createUser(appAdminUserName, appAdminPassword, adminRole)
-        }
-        //root user
-        if (appRootUserName == null || appRootPassword == null) {
-            log.warn("You haven't set environment variables to create a root user. ${warnMessage}")
-            if (createDefaultUsers) createUser('root', 'root', rootRole)
-        } else {
-            createUser(appRootUserName, appRootPassword, rootRole)
-        }
-
-        log.info "initUserData() OSM ends"
+        String appRootUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.username
+        String appRootPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.password
+        createUser(appRootUserName, appRootPassword, rootRole, "root", createDefaultUsers)
+        log.debug("initUserData() OSM ends")
     }
 
-    void createUser(String username, String password, Role role) {
-        User user = User.findByUsername(username) ?: new User(
+    void createUser(String username, String password, Role role, String defaultUser, boolean createDefaultUsers) {
+        String warnMessage = createDefaultUsers ? 'A default user will be created if no one existed.' : 'No such user will be created.'
+        if (!username || !password) {
+            log.warn("You haven't set environment variables to create an ${defaultUser} user. ${warnMessage}")
+            if (!createDefaultUsers) {
+                return
+            }
+            username = defaultUser
+            password = defaultUser
+        }
+        User user = User.findByUsername(username)
+        if (!user) {
+            user = new User(
                 username: username,
                 password: password,
                 enabled: true,
                 accountExpired: false,
                 accountLocked: false,
-                passwordExpired: false).save(failOnError: true)
-        UserRole.findByUser(user) ?: new UserRole(user: user, role: role).save(failOnError: true)
+                    passwordExpired: false
+            ).save(failOnError: true)
+            log.info("Created user ${username}.")
+        }
+        if (!UserRole.findByUser(user)) {
+            new UserRole(user: user, role: role).save(failOnError: true)
+        }
     }
 
 
