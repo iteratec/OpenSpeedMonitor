@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
 <head>
-    <meta name="layout" content="kickstart_osm" />
+    <meta name="layout" content="layoutOsm" />
     <g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Skript')}" />
     <title><g:message code="de.iteratec.iss.scripts" /></title>
 </head>

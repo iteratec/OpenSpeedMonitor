@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8"%>
 <html>
     <head>
-        <meta name="layout" content="kickstart_osm" />
+        <meta name="layout" content="layoutOsm" />
         <g:set var="entityName" value="${message(code: 'connectivityProfile.label', default: 'Connection')}" />
         <title><g:message code="connectivityProfile.label.plural" /></title>
     </head>

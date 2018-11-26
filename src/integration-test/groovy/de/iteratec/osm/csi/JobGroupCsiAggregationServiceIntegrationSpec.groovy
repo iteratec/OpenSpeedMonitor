@@ -24,6 +24,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
@@ -51,6 +52,7 @@ class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalInteg
     DateTime startDate = new DateTime(2013, 5, 16, 0, 0, 0)
 
     JobGroupCsiAggregationService jobGroupCsiAggregationService
+    CsiAggregationDaoService csiAggregationDaoService
 
     def setup() {
         createTestDataCommonToAllTests()
@@ -58,29 +60,6 @@ class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalInteg
 
     def cleanup() {
         jobGroupCsiAggregationService.csiValueService = grailsApplication.mainContext.getBean('csiValueService')
-    }
-
-    void "test findAll"() {
-        Integer countCsiAgg = 3
-
-        expect: "find all csiAgg"
-        jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, JobGroup.list()).size() == countCsiAgg
-    }
-
-    void "test findAllByJobGroups"() {
-        when: "job groups are searched"
-        def numberOfJobGroups = jobGroupCsiAggregationService.findAll(startDate.toDate(), startDate.toDate(), weeklyInterval, jobGroups).size()
-
-        then: "the number of jobs is equal to the expected number"
-        numberOfJobGroups == expectedNumberOfJobGroups
-
-        where: "the job groups are searched"
-        expectedNumberOfJobGroups | jobGroups
-        3                         | [jobGroup1, jobGroup2, jobGroup3]
-        2                         | [jobGroup1, jobGroup2]
-        2                         | [jobGroup2, jobGroup3]
-        1                         | [jobGroup2]
-
     }
 
     /**
@@ -94,12 +73,12 @@ class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalInteg
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: 12d, weight: 1d), underlyingEventResultIds: [1, 2, 3])]
         mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
-        List<CsiAggregation> csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> csiAgg = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
         assertEquals(0, csiAgg.size())
 
         when: "a csi is calculated"
         List<CsiAggregation> calculatedCsiAgg = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        csiAgg = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
         then: "there is one calculated csiAgg"
         assertEquals(1, calculatedCsiAgg.size())
@@ -129,12 +108,12 @@ class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalInteg
                 new WeightedCsiValue(weightedValue: new WeightedValue(value: valueThirdCsiAgg, weight: pageWeightThirdCsiAgg), underlyingEventResultIds: [5, 6])]
         mockCsiValueService(weightedCsiValuesToReturnInMock, [])
 
-        List<CsiAggregation> csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> csiAgg = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
         assertEquals(0, csiAgg.size())
 
         when:"a csi is calculated"
         List<CsiAggregation> calculatedCsiAgg = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        csiAgg = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
         then: "there is one calculated csiAgg"
         assertEquals(1, calculatedCsiAgg.size())
@@ -156,12 +135,12 @@ class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalInteg
         given: "a start time and a mocked CsiValueService with no weighted csi values"
         DateTime startedTime = new DateTime(2013, 5, 16, 12, 12, 11)
         mockCsiValueService([], [])
-        List<CsiAggregation> csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        List<CsiAggregation> csiAgg = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
         assertEquals(0, csiAgg.size())
 
         when:"a csi is calculated"
         List<CsiAggregation> calculatedCsiAgg = jobGroupCsiAggregationService.getOrCalculateShopCsiAggregations(startedTime.toDate(), startedTime.toDate(), dailyInterval, [jobGroup1])
-        csiAgg = jobGroupCsiAggregationService.findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
+        csiAgg = findAll(startedTime.toDate(), startedTime.toDate(), dailyInterval, JobGroup.list())
 
         then: "there is one calculated csiAgg with no data"
         assertEquals(1, calculatedCsiAgg.size())
@@ -219,6 +198,15 @@ class JobGroupCsiAggregationServiceIntegrationSpec extends NonTransactionalInteg
         jobGroupCsiAggregationService.csiValueService = Stub(CsiValueService){
             getWeightedCsiValues(_, _, _) >> toReturnFromGetWeightedCsiValues
             getWeightedCsiValuesByVisuallyComplete(_, _, _) >> toReturnFromGetWeightedCsiValuesByVisuallyComplete
+        }
+    }
+
+    private List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, List<JobGroup> csiGroups) {
+        if(csiGroups.size() > 0) {
+            return csiAggregationDaoService.getJobGroupCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
+        }
+        else {
+            return []
         }
     }
 }

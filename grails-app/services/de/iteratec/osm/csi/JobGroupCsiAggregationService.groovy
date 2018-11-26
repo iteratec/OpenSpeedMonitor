@@ -44,25 +44,6 @@ class JobGroupCsiAggregationService {
     CsiAggregationUtilService csiAggregationUtilService
     CsiValueService csiValueService
     CsiAggregationUpdateEventDaoService csiAggregationUpdateEventDaoService
-    
-    /**
-     * Just gets {@link CsiAggregation}s from DB. No creation or calculation.
-     * @param fromDate
-     * @param toDate
-     * @param targetInterval
-     * @param csiGroups
-     * @return
-     */
-    List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, List<JobGroup> csiGroups) {
-        List<CsiAggregation> result = []
-        if (csiGroups.size() == 0) {
-            return result
-        }
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', 1) {
-            result = csiAggregationDaoService.getJobGroupCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
-        }
-        return result
-    }
 
     /**
      * Marks {@link CsiAggregation}s which depend from param newResult and who's interval contains newResult as outdated.

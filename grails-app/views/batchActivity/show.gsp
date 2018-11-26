@@ -6,7 +6,7 @@
 <head>
     <g:set var="entityName" value="${message(code: 'de.iteratec.osm.ui.batchActivity.label', default: 'Batch Activity')}" scope="request" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="layout" content="kickstart_osm" />
+    <meta name="layout" content="layoutOsm" />
 	<title><g:message code="default.show.label" args="[entityName]" /></title>
 </head>
 

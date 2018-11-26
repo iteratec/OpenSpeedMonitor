@@ -4,7 +4,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <g:set var="entityName" value="${message(code: 'apiKey.label', default: 'ApiKey')}" scope="request"/>
-    <meta name="layout" content="kickstart"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>
 </head>
 
