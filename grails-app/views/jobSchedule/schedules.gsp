@@ -2,7 +2,7 @@
 <%@ defaultCodec="none" %>
 <html>
 <head>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="queue.status.label"/></title>
     <asset:stylesheet src="queueStatus/list.css"/>
     <style>

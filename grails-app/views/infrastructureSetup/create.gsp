@@ -3,7 +3,7 @@
 <%@ page import="org.springframework.web.util.HtmlUtils" %>
 <html>
 <head>
-    <meta name="layout" content="kickstart_osm" />
+    <meta name="layout" content="layoutOsm" />
     <title><g:message code="de.iteratec.osm.ui.setupwizards.infra.title" default="Setup infrastructure"></g:message></title>
 
     <asset:stylesheet src="script/scriptManifest.css"/>
