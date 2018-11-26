@@ -24,6 +24,8 @@ import {ResponseWithLoadingState} from "../models/response-with-loading-state.mo
 import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {JobHealthGraphiteServers} from "../modules/application-dashboard/models/job-health-graphite-servers.model";
+import {log} from "util";
+import {GraphiteServer} from "../modules/application-dashboard/models/graphite-server.model";
 
 @Injectable()
 export class ApplicationService {
@@ -33,6 +35,7 @@ export class ApplicationService {
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
   failingJobStatistics$: ReplaySubject<FailingJobStatistic> = new ReplaySubject<FailingJobStatistic>(1);
   jobHealthGraphiteServers$: ReplaySubject<JobHealthGraphiteServers> = new ReplaySubject<JobHealthGraphiteServers>(1);
+  availableGraphiteServers$: ReplaySubject<JobHealthGraphiteServers> = new ReplaySubject<JobHealthGraphiteServers>(1);
 
   selectedApplication$ = new ReplaySubject<Application>(1);
 
@@ -50,8 +53,12 @@ export class ApplicationService {
     ).subscribe(this.failingJobStatistics$);
 
     this.selectedApplication$.pipe(
-      switchMap((application: Application) => this.loadJobHealthGraphiteServers(application))
+      switchMap((application: Application) => this.loadActiveJobHealthGraphiteServers(application))
     ).subscribe(this.jobHealthGraphiteServers$);
+
+    this.selectedApplication$.pipe(
+      switchMap((application: Application) => this.loadAvailableGraphiteServers(application))
+    ).subscribe(this.availableGraphiteServers$);
 
     this.selectSelectedApplicationCsi().pipe(
       withLatestFrom(this.selectedApplication$, (_, application) => application),
@@ -138,6 +145,26 @@ export class ApplicationService {
       });
   }
 
+  addJobHealthGraphiteServer(application: Application, graphiteServer: GraphiteServer) {
+    return this.http.post('/applicationDashboard/rest/addJobHealthGraphiteServer', {applicationId: application.id, graphiteServerId: graphiteServer.id})
+      .pipe(handleError())
+      .subscribe((res: any) => {
+        if (res.added === true) {
+          console.log("Added.");
+        }
+      })
+  }
+
+  removeJobHealthGraphiteServer(application: Application, graphiteServer: GraphiteServer) {
+    return this.http.post('/applicationDashboard/rest/removeJobHealthGraphiteServer', {applicationId: application.id, graphiteServerId: graphiteServer.id})
+      .pipe(handleError())
+      .subscribe((res: any) => {
+        if (res.removed === true) {
+          console.log("Deleted.");
+        }
+      })
+  }
+
   private sortApplicationsByName(applications: Application[]): Application[] {
     return applications.sort((a, b) => a.name.localeCompare(b.name, [], {sensitivity: 'base'}));
   }
@@ -170,9 +197,17 @@ export class ApplicationService {
     )
   }
 
-  loadJobHealthGraphiteServers(application: Application): Observable<JobHealthGraphiteServers> {
+  loadActiveJobHealthGraphiteServers(application: Application): Observable<JobHealthGraphiteServers> {
     const params = this.createParams(application.id);
-    return this.http.get<JobHealthGraphiteServers>('/applicationDashboard/rest/getJobHealthGraphiteServers', {params: params}).pipe(
+    return this.http.get<JobHealthGraphiteServers>('/applicationDashboard/rest/getActiveJobHealthGraphiteServers', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+  loadAvailableGraphiteServers(application: Application): Observable<JobHealthGraphiteServers> {
+    const params = this.createParams(application.id);
+    return this.http.get<JobHealthGraphiteServers>('/applicationDashboard/rest/getAvailableGraphiteServers', {params: params}).pipe(
       handleError(),
       startWith(null)
     )

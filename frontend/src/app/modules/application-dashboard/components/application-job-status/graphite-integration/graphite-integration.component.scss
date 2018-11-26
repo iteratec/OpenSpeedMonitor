@@ -40,10 +40,30 @@ ngx-smart-modal {
 
   footer {
     font-style: italic;
+    margin: 0 2em;
   }
 
   .server-overview {
     min-width: 20em;
+
+    .dropdown {
+      margin-bottom: 1em;
+      .select-graphite-server {
+        width: 100%;
+        border: 1px solid $color-contour-light;
+        border-radius: 5px;
+        background-color: transparent;
+        i {
+          margin-left: auto;
+          background: $color-background;
+        }
+      }
+      .dropdown-item {
+        cursor: pointer;
+      }
+    }
+
+
     .clickable-list li a {
       min-width: initial;
       .right-hand-icon {

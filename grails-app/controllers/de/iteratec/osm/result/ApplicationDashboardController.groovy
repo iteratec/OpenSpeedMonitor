@@ -2,13 +2,11 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
-import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
-import org.hibernate.criterion.CriteriaSpecification
 
 class ApplicationDashboardController {
 
@@ -71,16 +69,40 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, [numberOfFailingJobs: jobsWithErrors[0], minimumFailedJobSuccessRate: jobsWithErrors[1]])
     }
 
-    def getJobHealthGraphiteServers(DefaultApplicationCommand command) {
+    def getActiveJobHealthGraphiteServers(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        def jobHealthGraphiteServers = applicationDashboardService.getJobHealthGraphiteServers(jobGroupId)
+        def jobHealthGraphiteServers = applicationDashboardService.getActiveJobHealthGraphiteServers(jobGroupId)
 
         return ControllerUtils.sendObjectAsJSON(response, jobHealthGraphiteServers)
+    }
+
+    def getAvailableGraphiteServers(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        Collection<GraphiteServer> availableGraphiteServers = applicationDashboardService.getAvailableGraphiteServers(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, availableGraphiteServers)
+    }
+
+    def addJobHealthGraphiteServer(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        Long graphiteServerId = command.graphiteServerId
+        def message = applicationDashboardService.addJobHealthGraphiteServer(jobGroupId, graphiteServerId)
+
+        return ControllerUtils.sendObjectAsJSON(response, message)
+    }
+
+    def removeJobHealthGraphiteServer(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        Long graphiteServerId = command.graphiteServerId
+        def message = applicationDashboardService.removeJobHealthGraphiteServer(jobGroupId, graphiteServerId)
+
+        return ControllerUtils.sendObjectAsJSON(response, message)
     }
 }
 
 class DefaultApplicationCommand implements Validateable {
     Long applicationId
+    Long graphiteServerId
 
     static constraints = {
         applicationId(nullable: false)

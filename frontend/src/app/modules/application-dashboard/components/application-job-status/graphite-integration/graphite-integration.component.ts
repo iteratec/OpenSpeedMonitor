@@ -1,23 +1,41 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {JobHealthGraphiteServers} from "../../../models/job-health-graphite-servers.model";
 import {GraphiteServer} from "../../../models/graphite-server.model";
+import {ApplicationService} from "../../../../../services/application.service";
+import {Application} from "../../../../../models/application.model";
+import {Observable} from "rxjs";
+import {GrailsBridgeService} from "../../../../../services/grails-bridge.service";
 
 @Component({
   selector: 'osm-graphite-integration',
   templateUrl: './graphite-integration.component.html',
   styleUrls: ['./graphite-integration.component.scss']
 })
-export class GraphiteIntegrationComponent implements OnChanges {
+export class GraphiteIntegrationComponent {
 
-  @Input() jobHealthGraphiteServers: JobHealthGraphiteServers;
+  @Input() selectedApplication: Application;
 
-  constructor(public ngxSmartModalService: NgxSmartModalService) { }
+  jobHealthGraphiteServers$: Observable<JobHealthGraphiteServers>;
+  availableGraphiteServers$: Observable<JobHealthGraphiteServers>;
 
-  ngOnChanges(changes: SimpleChanges): void {
-    setTimeout(() => {
-      this.ngxSmartModalService.resetModalData('graphiteIntegrationModal');
-      this.ngxSmartModalService.setModalData(this.jobHealthGraphiteServers, 'graphiteIntegrationModal');
-    });
+  constructor(public ngxSmartModalService: NgxSmartModalService, private applicationService: ApplicationService, private grailsBridgeService: GrailsBridgeService) {
+    this.jobHealthGraphiteServers$ = this.applicationService.jobHealthGraphiteServers$;
+    this.availableGraphiteServers$ = this.applicationService.availableGraphiteServers$;
   }
+
+  addGraphiteServer(graphiteServer: GraphiteServer): void {
+    if (this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
+      this.applicationService.addJobHealthGraphiteServer(this.selectedApplication, graphiteServer);
+    } else {
+      window.location.href = '/login/auth';
+    }
+  }
+
+  removeGraphiteServer(graphiteServer: GraphiteServer) {
+    if (this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
+      this.applicationService.removeJobHealthGraphiteServer(this.selectedApplication, graphiteServer)
+    }
+  }
+
 }

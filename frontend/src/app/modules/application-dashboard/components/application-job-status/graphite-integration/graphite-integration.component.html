@@ -13,13 +13,28 @@
   </li>
 </ul>
 
-<ngx-smart-modal id="graphiteIntegrationModal" #graphiteIntegrationModal identifier="graphiteIntegrationModal" (onAnyCloseEventFinished)="detailData = null">
+<ngx-smart-modal id="graphiteIntegrationModal" identifier="graphiteIntegrationModal" (onAnyCloseEventFinished)="detailData = null">
   <h2>Graphite</h2>
   <hr>
   <main>
     <section class="server-overview">
+
+      <div class="dropdown">
+        <button class="select-graphite-server dropdown-toggle" type="button" id="selectGraphiteServer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Select Graphite Server
+          <i class="fas fa-caret-down"></i>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="selectGraphiteServerId">
+          <li>
+            <a class="dropdown-item" *ngFor="let graphiteServer of availableGraphiteServers$ | async" (click)="addGraphiteServer(graphiteServer)">
+              {{ graphiteServer.address }}
+            </a>
+          </li>
+        </ul>
+      </div>
+
       <ul class="clickable-list">
-        <li *ngFor="let jobHealthGraphiteServer of graphiteIntegrationModal.getData()">
+        <li *ngFor="let jobHealthGraphiteServer of jobHealthGraphiteServers$ | async">
           <a href="#" (click)="detailData = jobHealthGraphiteServer">
           <span class="title">
             {{ jobHealthGraphiteServer.address }}
@@ -27,7 +42,7 @@
               {{ jobHealthGraphiteServer.prefix ? jobHealthGraphiteServer.prefix : 'none' }}.job-health.
             </span>
           </span>
-            <aside class="right-hand-icon">
+            <aside class="right-hand-icon" (click)="removeGraphiteServer(jobHealthGraphiteServer)">
               <i class="fas fa-times"></i>
             </aside>
           </a>
@@ -60,7 +75,7 @@
     </section>
   </main>
   <footer>
-    For each job of this application three different metrics will be reported to graphite: last5, last25 and last150.
+    For each job of this application three different metrics will be reported to graphite: last5, last25 and last150.<br>
     Each metric shows the precentage of successful results.
   </footer>
   <hr>

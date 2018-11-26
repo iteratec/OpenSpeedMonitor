@@ -1,9 +1,6 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {FailingJobStatistic} from "../../models/failing-job-statistic.model";
 import {Application} from "../../../../models/application.model";
-import {ApplicationService} from "../../../../services/application.service";
-import {Observable} from "rxjs";
-import {JobHealthGraphiteServers} from "../../models/job-health-graphite-servers.model";
 
 @Component({
   selector: 'osm-application-job-status',
@@ -14,17 +11,11 @@ export class ApplicationJobStatusComponent implements OnChanges {
   @Input() failingJobStatistic: FailingJobStatistic;
   @Input() selectedApplication: Application;
 
-  jobHealthGraphiteServers$: Observable<JobHealthGraphiteServers>;
-
   iconClass: string;
   infoText: string;
   jobStatus: string;
 
   hasFailingJobs: boolean;
-
-  constructor(private applicationService: ApplicationService) {
-    this.jobHealthGraphiteServers$ = this.applicationService.jobHealthGraphiteServers$;
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.setInformation();
