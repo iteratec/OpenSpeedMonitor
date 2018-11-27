@@ -4,7 +4,7 @@
 
 <html xmlns="http://www.w3.org/1999/html">
 <head>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isj.jobs"/></title>
 
     <g:set var="entityName" value="${message(code: 'de.iteratec.isj.job', default: 'Job')}"/>

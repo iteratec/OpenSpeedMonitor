@@ -24,13 +24,10 @@ import de.iteratec.osm.csi.*
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserAlias
 import de.iteratec.osm.measurement.environment.WebPageTestServer
-import de.iteratec.osm.measurement.environment.wptserver.DetailAnalysisPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.LocationPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.ResultPersisterService
-import de.iteratec.osm.measurement.environment.wptserver.WptInstructionService
+import de.iteratec.osm.measurement.environment.wptserver.*
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.measurement.schedule.JobProcessingService
+import de.iteratec.osm.measurement.schedule.JobSchedulingService
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.CsiAggregationUtilService
@@ -49,11 +46,11 @@ import static de.iteratec.osm.OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
 
 class BootStrap {
 
-    EventCsiAggregationService eventCsiAggregationService
     CsiAggregationUtilService csiAggregationUtilService
-    JobProcessingService jobProcessingService
+    JobSchedulingService jobSchedulingService
+    JobResultPersisterService jobResultPersisterService
     I18nService i18nService
-    ResultPersisterService resultPersisterService
+    EventResultPersisterService eventResultPersisterService
     LocationPersisterService locationPersisterService
     DetailAnalysisPersisterService detailAnalysisPersisterService
     WptInstructionService wptInstructionService
@@ -88,6 +85,7 @@ class BootStrap {
                 break
         }
 
+        log.info("Finished Bootstrap")
     }
 
     def destroy = {
@@ -95,7 +93,7 @@ class BootStrap {
 
     def initApplicationData = { boolean createDefaultUsers ->
 
-        log.info "initApplicationData() OSM starts with createDefaultUsers=${createDefaultUsers}"
+        log.debug("initApplicationData() OSM starts with createDefaultUsers=${createDefaultUsers}")
 
         initConfig()
         initUserData(createDefaultUsers)
@@ -107,21 +105,21 @@ class BootStrap {
         initHealthReporting()
         updateScripts()
 
-        log.info "initApplicationData() OSM ends"
+        log.debug("initApplicationData() OSM ends")
 
     }
 
 
     void initHealthReporting() {
-        log.info("initHealthReporting() OSM starts")
+        log.debug("initHealthReporting() OSM starts")
         GraphiteServer.findAllByReportHealthMetrics(true).each {
             healthReportService.handleGraphiteServer(it)
         }
-        log.info("initHealthReporting() OSM ends")
+        log.debug("initHealthReporting() OSM ends")
     }
 
     void initConfig() {
-        log.info "initConfig() OSM starts"
+        log.debug "initConfig() OSM starts"
 
         List<OsmConfiguration> configs = OsmConfiguration.list()
 
@@ -129,7 +127,7 @@ class BootStrap {
             deleteAllInvalidAndCreateNewOsmConfig(configs)
         }
 
-        log.info "initConfig() OSM ends"
+        log.debug "initConfig() OSM ends"
     }
 
     void deleteAllInvalidAndCreateNewOsmConfig(List<OsmConfiguration> configs) {
@@ -146,71 +144,66 @@ class BootStrap {
     }
 
     void initJobScheduling() {
-        log.info "initJobScheduling() OSM starts"
+        log.debug("initJobScheduling() OSM starts")
 
         createConnectivityProfileIfMissing(6000, 512, 50, 'DSL 6.000', 0)
         createConnectivityProfileIfMissing(384, 384, 140, 'UMTS', 0)
         createConnectivityProfileIfMissing(3600, 1500, 40, 'UMTS - HSDPA', 0)
 
-        jobProcessingService.scheduleAllActiveJobs()
+        jobSchedulingService.scheduleAllActiveJobs()
 
-        log.info "initJobScheduling() OSM ends"
+        log.debug("initJobScheduling() OSM ends")
     }
 
     void initUserData(boolean createDefaultUsers) {
-        log.info "initUserData() OSM starts"
+        log.debug("initUserData() OSM starts")
 
-        // Roles ////////////////////////////////////////////////////////////////////////
         Role adminRole = Role.findByAuthority('ROLE_ADMIN') ?: new Role(authority: 'ROLE_ADMIN').save(failOnError: true)
         Role rootRole = Role.findByAuthority('ROLE_SUPER_ADMIN') ?: new Role(authority: 'ROLE_SUPER_ADMIN').save(failOnError: true)
 
-        // Users ////////////////////////////////////////////////////////////////////////
 
-        //read config entries
-        String appAdminUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.username.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.username
-        String appAdminPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.password.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.password
-        String appRootUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.username.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.username
-        String appRootPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.password.isEmpty() ?
-                null : grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.password
-        String warnMessage = createDefaultUsers ? 'A default user will be created if no one existed.' : 'No such user will be created.'
+        String appAdminUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.username
+        String appAdminPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmAdminUser.password
+        createUser(appAdminUserName, appAdminPassword, adminRole, "admin", createDefaultUsers)
 
-        // admin user
-        if (appAdminUserName == null || appAdminPassword == null) {
-            log.warn("You haven't set environment variables to create an admin user. ${warnMessage}")
-            if (createDefaultUsers) createUser('admin', 'admin', adminRole)
-        } else {
-            createUser(appAdminUserName, appAdminPassword, adminRole)
-        }
-        //root user
-        if (appRootUserName == null || appRootPassword == null) {
-            log.warn("You haven't set environment variables to create a root user. ${warnMessage}")
-            if (createDefaultUsers) createUser('root', 'root', rootRole)
-        } else {
-            createUser(appRootUserName, appRootPassword, rootRole)
-        }
-
-        log.info "initUserData() OSM ends"
+        String appRootUserName = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.username
+        String appRootPassword = grailsApplication.config.grails.de.iteratec.osm.security.initialOsmRootUser.password
+        createUser(appRootUserName, appRootPassword, rootRole, "root", createDefaultUsers)
+        log.debug("initUserData() OSM ends")
     }
 
-    void createUser(String username, String password, Role role) {
-        User user = User.findByUsername(username) ?: new User(
+    void createUser(String username, String password, Role role, String defaultUser, boolean createDefaultUsers) {
+        String warnMessage = createDefaultUsers ? 'A default user will be created if no one existed.' : 'No such user will be created.'
+        if (!username || !password) {
+            log.warn("You haven't set environment variables to create an ${defaultUser} user. ${warnMessage}")
+            if (!createDefaultUsers) {
+                return
+            }
+            username = defaultUser
+            password = defaultUser
+        }
+        User user = User.findByUsername(username)
+        if (!user) {
+            user = new User(
                 username: username,
                 password: password,
                 enabled: true,
                 accountExpired: false,
                 accountLocked: false,
-                passwordExpired: false).save(failOnError: true)
-        UserRole.findByUser(user) ?: new UserRole(user: user, role: role).save(failOnError: true)
+                    passwordExpired: false
+            ).save(failOnError: true)
+            log.info("Created user ${username}.")
+        }
+        if (!UserRole.findByUser(user)) {
+            new UserRole(user: user, role: role).save(failOnError: true)
+        }
     }
 
 
 
 
     void initCsiData() {
-        log.info "initCsiData starts"
+        log.debug("initCsiData starts")
 
         def csiGroupName = JobGroup.UNDEFINED_CSI
         JobGroup.findByName(csiGroupName) ?: new JobGroup(
@@ -286,7 +279,7 @@ class BootStrap {
             initCsiConfiguration.save(failOnError: true)
         }
 
-        log.info "initCsiData ends"
+        log.debug("initCsiData ends")
     }
 
     /**
@@ -337,7 +330,7 @@ class BootStrap {
 
     void initMeasurementInfrastructure() {
 
-        log.info "init measurement infrastructure OSM starts"
+        log.debug("init measurement infrastructure OSM starts")
 
         //undefined
         String browserName = Browser.UNDEFINED
@@ -369,14 +362,14 @@ class BootStrap {
                 .addToBrowserAliases(BrowserAlias.findOrCreateByAlias("Chrome"))
                 .save(failOnError: true)
 
-        log.info "init measurement infrastructure OSM ends"
+        log.debug("init measurement infrastructure OSM ends")
 
     }
 
     def registerProxyListener = {
-        log.info "registerProxyListener OSM ends"
+        log.debug("registerProxyListener OSM ends")
         wptInstructionService.addLocationListener(locationPersisterService)
-        wptInstructionService.addResultListener(resultPersisterService)
+        jobResultPersisterService.addResultListener(eventResultPersisterService)
 
         // enable persistence of detailAnalysisData for JobResults if configured
         boolean persistenceEnabled = grailsApplication.config.grails.de?.iteratec?.osm?.detailAnalysis?.enablePersistenceOfDetailAnalysisData
@@ -388,11 +381,11 @@ class BootStrap {
             }
             microserviceUrl = microserviceUrl.endsWith("/") ? microserviceUrl : microserviceUrl + "/"
             detailAnalysisPersisterService.enablePersistenceOfDetailAnalysisDataForJobResults(microserviceUrl)
-            wptInstructionService.addResultListener(detailAnalysisPersisterService)
+            jobResultPersisterService.addResultListener(detailAnalysisPersisterService)
         }
 
-        log.info "persistence of detailAnalysisData is enabled: " + persistenceEnabled
-        log.info "registerProxyListener OSM ends"
+        log.info("persistence of detailAnalysisData is enabled: " + persistenceEnabled)
+        log.debug("registerProxyListener OSM ends")
     }
 
     void cancelActiveBatchActivity() {

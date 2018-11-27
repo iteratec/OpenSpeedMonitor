@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	<meta name="layout" content="kickstart_osm" />
+	<meta name="layout" content="layoutOsm" />
 	
 	<title>openSpeed &mdash; Events from which the value was calculated</title>
 	

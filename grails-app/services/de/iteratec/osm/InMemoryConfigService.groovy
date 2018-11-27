@@ -63,8 +63,11 @@ class InMemoryConfigService {
      * Activates measurements generally.
      */
     void setActiveStatusOfMeasurementsGenerally(Boolean activationToSet){
-        if (activationToSet == true) activateMeasurementsGenerally()
-        else if (activationToSet == false) deactivateMeasurementsGenerally()
+        if (activationToSet) {
+            activateMeasurementsGenerally()
+        } else {
+            deactivateMeasurementsGenerally()
+        }
     }
 
     /**
@@ -74,6 +77,7 @@ class InMemoryConfigService {
      * Activates measurements generally.
      */
     void activateMeasurementsGenerally(){
+        log.info("Activated measurements generally.")
         measurementsGenerallyEnabled = true
     }
 
@@ -81,6 +85,7 @@ class InMemoryConfigService {
      * Sets measurementsGenerallyEnabled to false
      */
     void deactivateMeasurementsGenerally(){
+        log.info("Deactivated measurements generally.")
         measurementsGenerallyEnabled = false
     }
 

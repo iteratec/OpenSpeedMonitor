@@ -43,6 +43,10 @@ enum WptStatus {
         return wptStatusCode > COMPLETED.wptStatusCode && wptStatusCode < TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.wptStatusCode
     }
 
+    boolean isSuccess() {
+        return wptStatusCode in [COMPLETED.wptStatusCode, SUCCESSFUL.wptStatusCode, TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.wptStatusCode]
+    }
+
     boolean isFinished() {
         return wptStatusCode >= COMPLETED.wptStatusCode || wptStatusCode == SUCCESSFUL.wptStatusCode
     }

@@ -6,7 +6,7 @@
 <html>
 <head>
 
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
 </head>
@@ -164,7 +164,7 @@
                                default="Jobs filtern"/>
                 </a>
             </li>
-            <li>
+            <li >
                 <a data-toggle="tab" href="#tabVariableSelection" id="tabVariableSelectionElement">
                     <g:message code="de.iteratec.sri.wptrd.measurement.filter.heading"
                                default="Messwerte auw&auml;hlen"/>

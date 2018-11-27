@@ -1,9 +1,11 @@
 package de.iteratec.osm.measurement.environment.wptserver
 
+import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.result.WptXmlResultVersion
+import groovy.util.logging.Slf4j
 import groovy.util.slurpersupport.GPathResult
 
 /**
@@ -11,6 +13,7 @@ import groovy.util.slurpersupport.GPathResult
  * @author nkuhn
  * @see https://sites.google.com/a/webpagetest.org/docs/advanced-features/webpagetest-restful-apis#TOC-XML-response
  */
+@Slf4j
 class WptResultXml {
     /**
      * Base node of results xml.
@@ -22,7 +25,16 @@ class WptResultXml {
      */
     WptXmlResultVersion version
 
-    public WptResultXml(GPathResult baseNode) {
+    int minValidLoadTime = OsmConfiguration.DEFAULT_MIN_VALID_LOADTIME
+    int maxValidLoadTime = OsmConfiguration.DEFAULT_MAX_VALID_LOADTIME
+
+    WptResultXml(GPathResult baseNode, int minValidLoadTime, int maxValidLoadTime) {
+        this(baseNode)
+        this.minValidLoadTime = minValidLoadTime
+        this.maxValidLoadTime = maxValidLoadTime
+    }
+
+    WptResultXml(GPathResult baseNode) {
         this.responseNode = baseNode
         version = WptXmlResultVersion.BEFORE_MULTISTEP
         if (!this.responseNode.data.median.firstView.testStep.isEmpty()) {
@@ -57,6 +69,10 @@ class WptResultXml {
 
     WptStatus getWptStatus() {
         return WptStatus.byResultCode(responseNode?.statusCode?.toInteger())
+    }
+
+    String getStatusText() {
+        return responseNode?.statusText?.toString()
     }
 
     Date getCompletionDate() {
@@ -102,9 +118,9 @@ class WptResultXml {
             case WptXmlResultVersion.BEFORE_MULTISTEP:
                 return job.getEventNameIfUnknown() ?: job.getLabel()
             case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex).eventName.toString();
+                return responseNode.data.median.firstView.testStep.getAt(testStepZeroBasedIndex)?.eventName?.toString()
             case WptXmlResultVersion.MULTISTEP:
-                return responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex).eventName.toString();
+                return responseNode.data.run.getAt(0).firstView.step.getAt(testStepZeroBasedIndex)?.eventName?.toString()
             default:
                 throw new IllegalStateException("Version of result xml isn't specified!")
 
@@ -113,31 +129,6 @@ class WptResultXml {
 
     def getRunNodes() {
         return responseNode.data.run
-    }
-
-    def getStepNode(int stepZeroBasedIndex) {
-        switch (version) {
-            case WptXmlResultVersion.BEFORE_MULTISTEP:
-                return responseNode.data.median?.firstView
-            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return responseNode.data.median.firstView.testStep.getAt(stepZeroBasedIndex)
-            case WptXmlResultVersion.MULTISTEP:
-                return responseNode.data.run.getAt(0).firstView.step.getAt(stepZeroBasedIndex)?.results
-            default:
-                throw new IllegalStateException("Version of result xml isn't specified or result is no multistep result!")
-        }
-    }
-
-    int getResultCodeForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).result?.toInteger()
-    }
-
-    int getFirstByteForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).TTFB?.toInteger()
-    }
-
-    int getLoadTimeForStep(int stepZeroBasedIndex) {
-        return getStepNode(stepZeroBasedIndex).loadTime?.toInteger()
     }
 
     GPathResult getResultNodeForRunAndView(runZeroBasedIndex, cachedView) {
@@ -188,7 +179,7 @@ class WptResultXml {
      * @param currentRun
      * @return
      */
-    private boolean isMedian(Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex) {
+    boolean isMedian(Integer runZeroBasedIndex, CachedView cachedView, Integer testStepZeroBasedIndex) {
 
         if (version == null) throw new IllegalStateException("Version of result xml isn't specified!")
 
@@ -220,8 +211,35 @@ class WptResultXml {
         return responseNode.data.runs.toString().isInteger()
     }
 
-    boolean isFinishedWithResults() {
-        return this.wptStatus.isFinished() && hasRuns()
+    int countValidResults(int expectedRuns, int expectedSteps, boolean firstViewOnly) {
+        int validResults = 0
+        List<CachedView> expectedCached = firstViewOnly ? [CachedView.UNCACHED] : [CachedView.UNCACHED, CachedView.CACHED]
+        expectedRuns.times { run ->
+            expectedCached.each { cached ->
+                expectedSteps.times { step ->
+                    if (isValidTestStep(getResultsContainingNode(run, cached, step))) {
+                        validResults++
+                    }
+                }
+            }
+        }
+        return validResults
     }
 
+    boolean isValidTestStep(GPathResult testStepNode) {
+        if (!testStepNode || testStepNode.isEmpty()) {
+            return false
+        }
+        Integer fullyLoaded = testStepNode.fullyLoaded?.toInteger()
+        WptStatus wptStatus = WptStatus.byResultCode(testStepNode.result?.toInteger())
+        Integer ttfb = testStepNode.TTFB?.toInteger()
+        if (ttfb <= 0) {
+            log.warn("Invalid TTFB '${ttfb}' in test:'${getTestId()}', regarding it as valid anyway because of known WPT problems.")
+        }
+        boolean valid = wptStatus.isSuccess() && fullyLoaded >= minValidLoadTime && fullyLoaded <= maxValidLoadTime
+        if (!valid) {
+            log.info("Invalid EventResult in test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, fullyLoaded: ${fullyLoaded})")
+        }
+        return valid
+    }
 }
