@@ -28,6 +28,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
+import de.iteratec.osm.report.external.GraphiteReportJob
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -81,8 +82,8 @@ class EventResultPersisterService implements iResultListener {
         try {
             checkJobAndLocation(resultXml, wptserverOfResult, jobId)
             persistResultsForAllTeststeps(resultXml, jobId)
-            informDependents(resultXml, jobId)
-
+            Map dataMap = [jobId: jobId, resultXml: resultXml]
+            GraphiteReportJob.schedule(new Date(), dataMap)
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
         }
@@ -424,7 +425,7 @@ class EventResultPersisterService implements iResultListener {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void informDependents(WptResultXml resultXml, long jobId) {
+    void informDependents(WptResultXml resultXml, long jobId) {
         Job job = jobDaoService.getJob(jobId)
         JobResult jobResult = JobResult.findByJobAndTestId(job, resultXml.getTestId())
         if (jobResult == null) {
