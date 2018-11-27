@@ -35,7 +35,7 @@
 
     <ng-container *ngIf="failingJobs$ | async as failingJobs">
       <ng-container *ngFor="let application of objectKeys(failingJobs)">
-        <p class="applicationName">{{ application }}</p>
+        <p class="applicationName">{{ application }} </p>
         <ul class="clickable-list">
           <li *ngFor="let failingJob of failingJobs[application]"
               [class.error]="failingJob.percentageFailLast5 >= 20"
@@ -47,9 +47,9 @@
               </aside>
               <span class="title">
                 {{ failingJob.script }}
-              <span class="detail">
-                {{ failingJob.browser }} ({{ failingJob.location }})
-              </span>
+                <span class="detail">
+                  {{ failingJob.browser }} ({{ failingJob.location }})
+                </span>
             </span>
             </a>
           </li>
@@ -57,7 +57,7 @@
       </ng-container>
     </ng-container>
 
-    <ng-container *ngIf="!failingJobs$">
+    <ng-container *ngIf="isHealthy$ | async">
       <div class="healthy">
         <i class="fas fa-check-circle"></i>
         <p>{{ 'frontend.de.iteratec.osm.landing.healthy' | translate }}</p>

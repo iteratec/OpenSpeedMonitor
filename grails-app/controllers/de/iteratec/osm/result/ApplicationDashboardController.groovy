@@ -85,8 +85,7 @@ class ApplicationDashboardController {
      * ]
      */
     def getFailingJobs() {
-        def jobsWithErrors = applicationDashboardService.getFailingJobs()
-        return ControllerUtils.sendObjectAsJSON(response, jobsWithErrors)
+        return ControllerUtils.sendObjectAsJSON(response, applicationDashboardService.getFailingJobs());
     }
 }
 

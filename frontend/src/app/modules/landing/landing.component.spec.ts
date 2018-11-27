@@ -8,6 +8,7 @@ import {By} from "@angular/platform-browser";
 import {Application} from "../../models/application.model";
 import {CsiValueSmallComponent} from "../shared/components/csi-value/csi-value-small/csi-value-small.component";
 import {ApplicationCsi} from "../../models/application-csi.model";
+import { of } from 'rxjs';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -112,5 +113,44 @@ describe('LandingComponent', () => {
     expect(links[1].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestTwo");
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(70);
-  })
+  });
+
+  it('should show a button to view all jobs', () => {
+    applicationService.applications$.next({
+      isLoading: false,
+      data: []
+    });
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css("a#show-jobs"));
+    expect(button.nativeElement).toBeTruthy();
+    expect(button.nativeElement.href).toMatch(".*/job/index");
+  });
+
+  it('should show empty state', () => {
+    applicationService.applications$.next({
+      isLoading: false,
+      data: []
+    });
+    applicationService.failingJobs$.next([]);
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css(".healthy"))).toBeTruthy();
+  });
+
+  it('should show failed measurements', () => {
+    applicationService.applications$.next({
+      isLoading: false,
+      data: []
+    });
+    applicationService.failingJobs$.next({
+      'some_app': [{
+        job_id: 771,
+        percentageFailLast5: 100,
+        location: "otto-prod-netlab",
+        application: "develop_Desktop",
+        script: "OTTO_ADS und HP"
+      }]
+    });
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css(".error"))).toBeTruthy();
+  });
 });

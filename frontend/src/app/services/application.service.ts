@@ -35,6 +35,7 @@ export class ApplicationService {
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
   failingJobStatistics$: ReplaySubject<FailingJobStatistic> = new ReplaySubject<FailingJobStatistic>(1);
+  failingJobs$: ReplaySubject<{}> = new ReplaySubject<{}>(1);
 
   selectedApplication$ = new ReplaySubject<Application>(1);
 
@@ -56,6 +57,21 @@ export class ApplicationService {
       distinctUntilKeyChanged("id"),
       switchMap((application: Application) => this.updateCsiForPages(application))
     ).subscribe(this.pageCsis$);
+
+    this.getFailingJobs().pipe(
+      map(failingJobs => {
+        if (failingJobs) {
+          return failingJobs.reduce((failingJobsByApplication, currentValue) => {
+            if (!failingJobsByApplication[currentValue.application]) {
+              failingJobsByApplication[currentValue.application] = [];
+            }
+            failingJobsByApplication[currentValue.application].push(currentValue);
+            return failingJobsByApplication;
+          }, {});
+        }
+      }
+    )
+    ).subscribe(next => this.failingJobs$.next(next));
   }
 
   loadApplications() {
@@ -173,7 +189,7 @@ export class ApplicationService {
       map(failingJobs => failingJobs.map(dto => new FailingJob(dto))),
       handleError(),
       startWith(null)
-    )
+    );
   }
 }
 
