@@ -9,6 +9,9 @@
       i {
         margin-right: 5px;
       }
+      .active-integration {
+        color: $color-primary;
+      }
     }
   }
 
@@ -30,7 +33,7 @@
 ngx-smart-modal {
 
   main {
-    min-height: 15em;
+    min-height: 20em;
     display: flex;
     flex-wrap: wrap;
     section {
@@ -41,10 +44,11 @@ ngx-smart-modal {
   footer {
     font-style: italic;
     margin: 0 2em;
+    text-align: center;
   }
 
   .server-overview {
-    min-width: 20em;
+    width: 25em;
 
     .dropdown {
       margin-bottom: 1em;
@@ -55,25 +59,37 @@ ngx-smart-modal {
         background-color: transparent;
         i {
           margin-left: auto;
-          background: $color-background;
         }
       }
-      .dropdown-item {
-        cursor: pointer;
+      .dropdown-menu {
+        width: 100%;
+        a {
+          cursor: pointer;
+          &:hover {
+            background: $color-contour-light;
+          }
+        }
       }
     }
 
-
     .clickable-list li a {
+      cursor: pointer;
       min-width: initial;
       .right-hand-icon {
         margin-left: auto;
         align-self: flex-start;
         color: darken($color-contour-light, 10%);
       }
+      .right-hand-icon:hover {
+        color: darken($color-contour-light, 30%);
+      }
+    }
+    .detail {
+      font-size: smaller;
     }
   }
   .server-detail {
+    margin-left: 50px;
     table {
       border-spacing: 1em;
       border-collapse: initial;
@@ -83,6 +99,15 @@ ngx-smart-modal {
       td:nth-of-type(2) {
         font-weight: bold;
       }
+    }
+  }
+
+  .buttons {
+    height: 3em;
+    a {
+      float: right;
+      width: 100px;
+      margin: 0 10px;
     }
   }
 }

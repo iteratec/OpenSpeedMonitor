@@ -1,10 +1,8 @@
 import {Component, Input} from '@angular/core';
 import {NgxSmartModalService} from "ngx-smart-modal";
-import {JobHealthGraphiteServers} from "../../../models/job-health-graphite-servers.model";
 import {GraphiteServer} from "../../../models/graphite-server.model";
 import {ApplicationService} from "../../../../../services/application.service";
 import {Application} from "../../../../../models/application.model";
-import {Observable} from "rxjs";
 import {GrailsBridgeService} from "../../../../../services/grails-bridge.service";
 
 @Component({
@@ -16,25 +14,65 @@ export class GraphiteIntegrationComponent {
 
   @Input() selectedApplication: Application;
 
-  jobHealthGraphiteServers$: Observable<JobHealthGraphiteServers>;
-  availableGraphiteServers$: Observable<JobHealthGraphiteServers>;
+  jobHealthGraphiteServers: GraphiteServer[];
+  availableGraphiteServers: GraphiteServer[];
+
+  graphiteServersToAdd: GraphiteServer[] = [];
+  graphiteServersToRemove: GraphiteServer[] = [];
+
+  selectedGraphiteServer: GraphiteServer;
 
   constructor(public ngxSmartModalService: NgxSmartModalService, private applicationService: ApplicationService, private grailsBridgeService: GrailsBridgeService) {
-    this.jobHealthGraphiteServers$ = this.applicationService.jobHealthGraphiteServers$;
-    this.availableGraphiteServers$ = this.applicationService.availableGraphiteServers$;
+    this.applicationService.jobHealthGraphiteServers$.subscribe(value => {this.jobHealthGraphiteServers = value});
+    this.applicationService.availableGraphiteServers$.subscribe(value => {this.availableGraphiteServers = value});
   }
 
-  addGraphiteServer(graphiteServer: GraphiteServer): void {
+  save(): void {
     if (this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
-      this.applicationService.addJobHealthGraphiteServer(this.selectedApplication, graphiteServer);
+      if (this.graphiteServersToAdd.length) {
+        this.applicationService.saveJobHealthGraphiteServers(this.selectedApplication, this.graphiteServersToAdd);
+      }
+      if (this.graphiteServersToRemove.length) {
+        this.applicationService.removeJobHealthGraphiteServers(this.selectedApplication, this.graphiteServersToRemove);
+      }
+      this.ngxSmartModalService.close('graphiteIntegrationModal');
     } else {
       window.location.href = '/login/auth';
     }
   }
 
-  removeGraphiteServer(graphiteServer: GraphiteServer) {
-    if (this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
-      this.applicationService.removeJobHealthGraphiteServer(this.selectedApplication, graphiteServer)
+  cancel(): void {
+    this.applicationService.loadAvailableGraphiteServers(this.selectedApplication);
+    this.applicationService.loadActiveJobHealthGraphiteServers(this.selectedApplication);
+    this.graphiteServersToAdd = [];
+    this.graphiteServersToRemove = [];
+    this.selectedGraphiteServer = null;
+  }
+
+  add(graphiteServer: GraphiteServer): void {
+    this.graphiteServersToAdd.push(graphiteServer);
+    this.availableGraphiteServers = this.availableGraphiteServers.filter(value => value !== graphiteServer);
+    this.jobHealthGraphiteServers.push(graphiteServer);
+  }
+
+  remove(graphiteServer: GraphiteServer): void {
+    if (this.graphiteServersToAdd.includes(graphiteServer)) {
+      this.graphiteServersToAdd = this.graphiteServersToAdd.filter(value => value !== graphiteServer);
+      this.jobHealthGraphiteServers = this.jobHealthGraphiteServers.filter(value => value !== graphiteServer);
+      this.availableGraphiteServers.push(graphiteServer);
+    } else {
+      this.graphiteServersToRemove.push(graphiteServer);
+      this.jobHealthGraphiteServers = this.jobHealthGraphiteServers.filter(value => value !== graphiteServer);
+      this.availableGraphiteServers.push(graphiteServer);
+    }
+    this.selectedGraphiteServer = null;
+  }
+
+  toggleSelectedGraphiteServer(graphiteServer: GraphiteServer): void {
+    if (this.selectedGraphiteServer === graphiteServer) {
+      this.selectedGraphiteServer = null;
+    } else {
+      this.selectedGraphiteServer = graphiteServer;
     }
   }
 

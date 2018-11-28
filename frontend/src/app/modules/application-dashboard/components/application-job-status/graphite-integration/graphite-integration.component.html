@@ -1,82 +1,96 @@
 <ul class="clickable-list integrations">
   <li>
-    <a href="#" (click)="ngxSmartModalService.getModal('graphiteIntegrationModal').open()" class="integration-info">
+    <a href="#" (click)="ngxSmartModalService.open('graphiteIntegrationModal')" class="integration-info">
       <aside>
-        <i class="fas fa-rss"></i>
+        <i class="fas fa-rss" [ngClass]="{'active-integration': jobHealthGraphiteServers?.length}"></i>
       </aside>
       Job Status Integration
       <aside class="right-hand-icon">
         <i class="fas fa-cog"></i>
       </aside>
-      <small>Graphite server not configured</small>
+      <small *ngIf="jobHealthGraphiteServers?.length">
+        <ng-container>{{jobHealthGraphiteServers[0]?.webAppAddress}}
+          <ng-container *ngIf="jobHealthGraphiteServers?.length > 1"> (+{{jobHealthGraphiteServers?.length-1}})</ng-container>
+        </ng-container>
+      </small>
+      <small *ngIf="!jobHealthGraphiteServers?.length">Graphite server not configured</small>
     </a>
   </li>
 </ul>
 
-<ngx-smart-modal id="graphiteIntegrationModal" identifier="graphiteIntegrationModal" (onAnyCloseEventFinished)="detailData = null">
+<ngx-smart-modal id="graphiteIntegrationModal" identifier="graphiteIntegrationModal" (onAnyCloseEvent)="cancel()">
   <h2>Graphite</h2>
   <hr>
   <main>
     <section class="server-overview">
 
       <div class="dropdown">
-        <button class="select-graphite-server dropdown-toggle" type="button" id="selectGraphiteServer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button class="select-graphite-server dropdown-toggle" id="selectGraphiteServer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Select Graphite Server
           <i class="fas fa-caret-down"></i>
         </button>
+
+
         <ul class="dropdown-menu" aria-labelledby="selectGraphiteServerId">
-          <li>
-            <a class="dropdown-item" *ngFor="let graphiteServer of availableGraphiteServers$ | async" (click)="addGraphiteServer(graphiteServer)">
-              {{ graphiteServer.address }}
-            </a>
-          </li>
-        </ul>
+            <li *ngIf="!availableGraphiteServers?.length">
+              <a class="dropdown-item">No available Graphite Servers</a>
+            </li>
+            <li *ngFor="let graphiteServer of availableGraphiteServers">
+              <a class="dropdown-item" (click)="add(graphiteServer)">
+                {{graphiteServer.address}}
+              </a>
+            </li>
+          </ul>
       </div>
 
       <ul class="clickable-list">
-        <li *ngFor="let jobHealthGraphiteServer of jobHealthGraphiteServers$ | async">
-          <a href="#" (click)="detailData = jobHealthGraphiteServer">
-          <span class="title">
+        <li *ngFor="let jobHealthGraphiteServer of jobHealthGraphiteServers">
+          <a>
+            <span class="title" (click)="toggleSelectedGraphiteServer(jobHealthGraphiteServer)">
             {{ jobHealthGraphiteServer.address }}
-            <span class="detail">
-              {{ jobHealthGraphiteServer.prefix ? jobHealthGraphiteServer.prefix : 'none' }}.job-health.
+              <span class="detail">
+              {{ jobHealthGraphiteServer.prefix ? jobHealthGraphiteServer.prefix : 'none' }}.job-health.&lt;job_group&gt;.&lt;script&gt;.&lt;location&gt;&lt;jobId&gt;
             </span>
           </span>
-            <aside class="right-hand-icon" (click)="removeGraphiteServer(jobHealthGraphiteServer)">
+            <aside class="right-hand-icon" (click)="remove(jobHealthGraphiteServer)">
               <i class="fas fa-times"></i>
             </aside>
           </a>
         </li>
       </ul>
     </section>
-    <section class="server-detail" *ngIf="detailData">
-      <table>
+    <section class="server-detail">
+      <table *ngIf="selectedGraphiteServer">
         <tr>
           <td>Graphite Server Address</td>
-          <td>{{detailData.address}}</td>
+          <td>{{selectedGraphiteServer.address}}</td>
         </tr>
         <tr>
           <td>Graphite Server Port</td>
-          <td>{{detailData.port}}</td>
+          <td>{{selectedGraphiteServer.port}}</td>
         </tr>
         <tr>
           <td>Graphite Protocol</td>
-          <td>{{detailData.protocol}}</td>
+          <td>{{selectedGraphiteServer.protocol}}</td>
         </tr>
         <tr>
           <td>Web App URL</td>
-          <td>{{detailData.webAppAddress}}</td>
+          <td>{{selectedGraphiteServer.webAppAddress}}</td>
         </tr>
         <tr>
           <td>Path Prefix</td>
-          <td>{{detailData.prefix ? detailData.prefix : "none"}}</td>
+          <td>{{selectedGraphiteServer.prefix ? selectedGraphiteServer.prefix : "no prefix"}}</td>
         </tr>
       </table>
     </section>
+
   </main>
   <footer>
-    For each job of this application three different metrics will be reported to graphite: last5, last25 and last150.<br>
-    Each metric shows the precentage of successful results.
+    For each job of this application three different metrics will be reported to graphite: last5, last25 and last150. <br>Each metric shows the precentage of successful results.
   </footer>
   <hr>
+  <div class="buttons">
+    <a (click)="save()" class="btn btn-primary">Save</a>
+    <a (click)="ngxSmartModalService.close('graphiteIntegrationModal')" class="btn btn-default">Cancel</a>
+  </div>
 </ngx-smart-modal>
