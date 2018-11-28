@@ -44,7 +44,7 @@ class JobHealthReportService {
 
     private static String determineBasePath(Job job, GraphiteServer graphiteServer) {
         List<String> pathElements = []
-        pathElements.add(graphiteServer.prefix ?: 'no-prefix')
+        pathElements.add(graphiteServer.prefix ?: 'osm')
         pathElements.add('job-health')
         pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.jobGroup.name))
         pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.script.label))

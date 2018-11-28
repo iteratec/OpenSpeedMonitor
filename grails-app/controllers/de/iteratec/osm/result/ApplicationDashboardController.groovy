@@ -83,18 +83,18 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, availableGraphiteServers)
     }
 
-    def addJobHealthGraphiteServer(DefaultApplicationCommand command) {
+    def saveJobHealthGraphiteServers(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        Long graphiteServerId = command.graphiteServerId
-        def message = applicationDashboardService.addJobHealthGraphiteServer(jobGroupId, graphiteServerId)
+        List<Long> graphiteServerIds = command.graphiteServerIds
+        def message = applicationDashboardService.saveJobHealthGraphiteServers(jobGroupId, graphiteServerIds)
 
         return ControllerUtils.sendObjectAsJSON(response, message)
     }
 
-    def removeJobHealthGraphiteServer(DefaultApplicationCommand command) {
+    def removeJobHealthGraphiteServers(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
-        Long graphiteServerId = command.graphiteServerId
-        def message = applicationDashboardService.removeJobHealthGraphiteServer(jobGroupId, graphiteServerId)
+        List<Long> graphiteServerIds = command.graphiteServerIds
+        def message = applicationDashboardService.removeJobHealthGraphiteServers(jobGroupId, graphiteServerIds)
 
         return ControllerUtils.sendObjectAsJSON(response, message)
     }
@@ -102,7 +102,7 @@ class ApplicationDashboardController {
 
 class DefaultApplicationCommand implements Validateable {
     Long applicationId
-    Long graphiteServerId
+    List<Long> graphiteServerIds
 
     static constraints = {
         applicationId(nullable: false)

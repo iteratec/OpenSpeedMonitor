@@ -279,12 +279,12 @@ class ApplicationDashboardService {
         }
     }
 
-    def addJobHealthGraphiteServer(Long jobGroupId, Long graphiteServerId) {
+    def saveJobHealthGraphiteServers(Long jobGroupId, List<Long> graphiteServerIds) {
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
-        GraphiteServer graphiteServer = GraphiteServer.findById(graphiteServerId)
+        Collection<GraphiteServer> graphiteServers = GraphiteServer.findAllByIdInList(graphiteServerIds)
 
-        if (!jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
-            jobGroup.jobHealthGraphiteServers.add(graphiteServer)
+        if (!jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
+            jobGroup.jobHealthGraphiteServers.addAll(graphiteServers)
             jobGroup.save(failOnError: true, flush: true)
             return [added: true]
         } else {
@@ -292,12 +292,12 @@ class ApplicationDashboardService {
         }
     }
 
-    def removeJobHealthGraphiteServer(Long jobGroupId, Long graphiteServerId) {
+    def removeJobHealthGraphiteServers(Long jobGroupId, List<Long> graphiteServerIds) {
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
-        GraphiteServer graphiteServer = GraphiteServer.findById(graphiteServerId)
+        Collection<GraphiteServer> graphiteServers = GraphiteServer.findAllByIdInList(graphiteServerIds)
 
-        if (jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
-            jobGroup.jobHealthGraphiteServers.remove(graphiteServer)
+        if (jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
+            jobGroup.jobHealthGraphiteServers.removeAll(graphiteServers)
             jobGroup.save(failOnError: true, flush: true)
             return [removed: true]
         } else {
