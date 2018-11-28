@@ -4,7 +4,7 @@
       <aside>
         <i class="fas fa-rss" [ngClass]="{'active-integration': jobHealthGraphiteServers?.length}"></i>
       </aside>
-      Job Status Integration
+      {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.title' | translate }}
       <aside class="right-hand-icon">
         <i class="fas fa-cog"></i>
       </aside>
@@ -13,27 +13,27 @@
           <ng-container *ngIf="jobHealthGraphiteServers?.length > 1"> (+{{jobHealthGraphiteServers?.length-1}})</ng-container>
         </ng-container>
       </small>
-      <small *ngIf="!jobHealthGraphiteServers?.length">Graphite server not configured</small>
+      <small *ngIf="!jobHealthGraphiteServers?.length">{{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.notConfigured' | translate }}
+      </small>
     </a>
   </li>
 </ul>
 
 <ngx-smart-modal id="graphiteIntegrationModal" identifier="graphiteIntegrationModal" (onAnyCloseEvent)="cancel()">
-  <h2>Graphite</h2>
+  <h2>{{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.modalTitle' | translate }}</h2>
   <hr>
   <main>
     <section class="server-overview">
 
       <div class="dropdown">
-        <button class="select-graphite-server dropdown-toggle" id="selectGraphiteServer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Select Graphite Server
+        <a class="btn btn-default select-graphite-server dropdown-toggle" id="selectGraphiteServer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select' | translate }}
           <i class="fas fa-caret-down"></i>
-        </button>
-
+        </a>
 
         <ul class="dropdown-menu" aria-labelledby="selectGraphiteServerId">
             <li *ngIf="!availableGraphiteServers?.length">
-              <a class="dropdown-item">No available Graphite Servers</a>
+              <a class="dropdown-item">{{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select.noneAvailable' | translate }}</a>
             </li>
             <li *ngFor="let graphiteServer of availableGraphiteServers">
               <a class="dropdown-item" (click)="add(graphiteServer)">
@@ -59,6 +59,7 @@
         </li>
       </ul>
     </section>
+
     <section class="server-detail">
       <table *ngIf="selectedGraphiteServer">
         <tr>
@@ -86,11 +87,12 @@
 
   </main>
   <footer>
-    For each job of this application three different metrics will be reported to graphite: last5, last25 and last150. <br>Each metric shows the precentage of successful results.
+    {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerTop' | translate }}<br>
+    {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerBottom' | translate }}
   </footer>
   <hr>
   <div class="buttons">
-    <a (click)="save()" class="btn btn-primary">Save</a>
-    <a (click)="ngxSmartModalService.close('graphiteIntegrationModal')" class="btn btn-default">Cancel</a>
+    <a (click)="save()" class="btn btn-primary">{{ 'frontend.default.button.save' | translate }}</a>
+    <a (click)="ngxSmartModalService.close('graphiteIntegrationModal')" class="btn btn-default">{{ 'frontend.default.button.cancel' | translate }}</a>
   </div>
 </ngx-smart-modal>
