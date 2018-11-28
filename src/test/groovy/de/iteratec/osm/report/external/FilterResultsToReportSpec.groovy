@@ -44,13 +44,14 @@ class FilterResultsToReportSpec extends Specification implements BuildDataTest,
             page: page,
             medianValue: true
         )
+        service.graphiteReportService = Mock(GraphiteReportService)
         service.metricReportingService = Mock(MetricReportingService)
 
         when: "EventResultPersisterService.informDependent() is called with the Result."
         service.informDependent(er)
 
         then: "The Result is reported to Graphite."
-        1 * service.metricReportingService.reportEventResultToGraphite(er)
+        1 * service.graphiteReportService.report(er)
 
         where:
         pageName            |   _

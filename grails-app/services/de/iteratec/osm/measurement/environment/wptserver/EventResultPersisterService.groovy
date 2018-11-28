@@ -29,6 +29,7 @@ import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.GraphiteReportJob
+import de.iteratec.osm.report.external.GraphiteReportService
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -60,6 +61,7 @@ class EventResultPersisterService implements iResultListener {
     LinkGenerator grailsLinkGenerator
     JobDaoService jobDaoService
     ConfigService configService
+    GraphiteReportService graphiteReportService
 
     /**
      * Persisting fetched {@link EventResult}s. If associated JobResults and/or Jobs and/or Locations don't exist they will be persisted, too.
@@ -82,8 +84,7 @@ class EventResultPersisterService implements iResultListener {
         try {
             checkJobAndLocation(resultXml, wptserverOfResult, jobId)
             persistResultsForAllTeststeps(resultXml, jobId)
-            Map dataMap = [jobId: jobId, resultXml: resultXml]
-            GraphiteReportJob.schedule(new Date(), dataMap)
+            informDependents(resultXml, jobId)
         } catch (OsmResultPersistanceException e) {
             log.error(e.message, e)
         }
@@ -454,7 +455,7 @@ class EventResultPersisterService implements iResultListener {
                 log.debug('informing dependent measured values ... DONE')
             }
             log.debug('reporting persisted event result ...')
-            report(result)
+            graphiteReportService.report(result)
             log.debug('reporting persisted event result ... DONE')
 
         }
@@ -468,16 +469,6 @@ class EventResultPersisterService implements iResultListener {
             }
         } catch (Exception e) {
             log.error("An error occurred while creating EventResult-dependent CsiAggregations for result: ${result}", e)
-        }
-    }
-
-    void report(EventResult result) {
-        try {
-            metricReportingService.reportEventResultToGraphite(result)
-        } catch (GraphiteComunicationFailureException gcfe) {
-            log.error("Can't report EventResult to graphite-server: ${gcfe.message}")
-        } catch (Exception e) {
-            log.error("An error occurred while reporting EventResult to graphite.", e)
         }
     }
 
