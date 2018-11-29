@@ -32,7 +32,7 @@ class MissingJobResultCheckService {
         return missingJobResults
     }
 
-    private List<Map> getPreparedJobList() {
+    private List<Job> getPreparedJobList() {
         return Job.findAllByDeletedAndActiveAndExecutionScheduleIsNotNull(false, true)
     }
 
