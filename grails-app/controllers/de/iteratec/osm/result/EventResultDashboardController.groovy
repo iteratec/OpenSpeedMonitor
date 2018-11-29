@@ -18,13 +18,15 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
-import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
 import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.report.UserspecificEventResultDashboard
-import de.iteratec.osm.report.chart.*
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.chart.EventService
+import de.iteratec.osm.report.chart.OsmChartAxis
+import de.iteratec.osm.report.chart.OsmRickshawChart
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -34,13 +36,7 @@ import grails.web.mapping.LinkGenerator
 import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
 import org.joda.time.Interval
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
-import org.joda.time.format.ISODateTimeFormat
 import org.springframework.dao.DataIntegrityViolationException
-import org.supercsv.encoder.DefaultCsvEncoder
-import org.supercsv.io.CsvListWriter
-import org.supercsv.prefs.CsvPreference
 
 class EventResultDashboardController {
 
@@ -356,183 +352,6 @@ class EventResultDashboardController {
         i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
 
         modelToRender.put('i18n', i18n as JSON)
-    }
-
-    /**
-     * <p>
-     * WARNING: This method is a duplicate of CsiDashboardController's
-     * version.
-     * </p>
-     *
-     * <p>
-     * Performs a redirect with HTTP status code 303 (see other).
-     * </p>
-     *
-     * <p>
-     * Using this redirect enforces the client to perform the next request
-     * with the HTTP method GET.
-     * This method SHOULD be used in a redirect-after-post situation.
-     * </p>
-     *
-     * <p>
-     * After using this method, the response should be considered to be
-     * committed and should not be written to.
-     * </p>
-     *
-     * @param actionNameToRedirectTo
-     *        The Name of the action to redirect to;
-     *        not <code>null</code>.
-     * @param urlParams
-     *        The parameters to add as query string;
-     *        not <code>null</code>.
-     *
-     * @see <a href="http://tools.ietf.org/html/rfc2616#section-10.3.4"
-     *      >http://tools.ietf.org/html/rfc2616#section-10.3.4</a>
-     *
-     * @since copy since: IT-188
-     */
-    private void redirectWith303(String actionNameToRedirectTo, Map urlParams) {
-        // There is a missing feature to do this:
-        // http://jira.grails.org/browse/GRAILS-8829
-
-        // Workaround based on:
-        // http://fillinginthegaps.wordpress.com/2008/12/26/grails-301-moved-permanently-redirect/
-        Map paramsWithoutGrailsActionNameOfOldAction = urlParams.findAll({ Map.Entry m -> !m.getKey().toString().startsWith('_action') });
-        String uri = grailsLinkGenerator.link(action: actionNameToRedirectTo, params: paramsWithoutGrailsActionNameOfOldAction)
-        response.setStatus(303)
-        response.setHeader("Location", uri)
-        render(status: 303)
-    }
-
-    /**
-     * <p>
-     * WARNING: This constant is a duplicate of CsiDashboardController's
-     * version.
-     * </p>
-     *
-     * The {@link DateTimeFormat} used for CSV export and table view.
-     * @since copy since: IT-188
-     */
-    private static
-    final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss");
-
-    /**
-     * <p>
-     * WARNING: This method is a duplicate of CsiDashboardController's
-     * version.
-     * </p>
-     *
-     * <p>
-     * Converts the specified result values in the source map to a CSV
-     * corresponding to RFC 4180 written to specified {@link Writer}.
-     * </p>
-     *
-     * @param source
-     *         The result values a List of OsmChartGraph,
-     *         not <code>null</code>.
-     * @param target
-     *         The {@link Writer} to write CSV to,
-     *         not <code>null</code>.
-     * @param localeForNumberFormat
-     *         The locale used to format the numeric values,
-     *         not <code>null</code>.
-     *
-     * @throws IOException if write on {@code target} failed.
-     * @since copy since: IT-188
-     */
-    private
-    static void writeCSV(List<OsmChartGraph> source, Writer target) throws IOException {
-        // Sort graph points by time
-        Map pointsByGraphByTime = [:].withDefault { [:] }
-        for (OsmChartGraph eachCSIValueEntry : source) {
-            for (OsmChartPoint eachPoint : eachCSIValueEntry.getPoints()) {
-                pointsByGraphByTime[eachPoint.time][eachCSIValueEntry.getLabel()] = eachPoint
-            }
-        }
-
-        CsvListWriter csvWriter = new CsvListWriter(
-                target,
-                new CsvPreference.Builder(CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE).useEncoder(new DefaultCsvEncoder()).build()
-        )
-
-        // Create CSV header:
-        List<String> csvHeader = new LinkedList<String>();
-        csvHeader.add('Zeitpunkt'); // TODO i18n?
-
-        List<String> graphLabelsInOrderOfHeader = new LinkedList<String>();
-
-        for (OsmChartGraph eachGraph : source) {
-            csvHeader.add(eachGraph.getLabel());
-            graphLabelsInOrderOfHeader.add(eachGraph.getLabel());
-        }
-
-        csvWriter.writeHeader(csvHeader.toArray(new String[csvHeader.size()]));
-
-        for (Map.Entry<Long, TreeMap<String, OsmChartPoint>> eachPointByGraphOfTime : pointsByGraphByTime) {
-            List<String> row = new LinkedList<String>();
-
-            DateTime time = new DateTime(eachPointByGraphOfTime.getKey());
-            row.add(CSV_TABLE_DATE_TIME_FORMAT.print(time));
-
-            for (String eachGraphLabel : graphLabelsInOrderOfHeader) {
-                OsmChartPoint point = eachPointByGraphOfTime.getValue().get(eachGraphLabel);
-                if (point != null) {
-                    row.add(point.csiAggregation?.round(2));
-                } else {
-                    row.add("");
-                }
-            }
-
-            csvWriter.writeRow(row);
-        }
-
-        csvWriter.flush();
-    }
-
-    /**
-     * <p>
-     * Creates a CSV based on the selection passed as {@link EventResultDashboardShowAllCommand}.
-     * </p>
-     *
-     * @param cmd
-     *         The command with the users selections;
-     *         not <code>null</code>.
-     * @return nothing , immediately renders a CSV to response' output stream.
-     * @see <a href="http://tools.ietf.org/html/rfc4180">http://tools.ietf.org/html/rfc4180</a>
-     */
-    public Map<String, Object> downloadCsv(EventResultDashboardShowAllCommand cmd) {
-
-        Map<String, Object> modelToRender = new HashMap<String, Object>();
-
-        if (request.queryString && cmd.validate()) {
-            cmd.copyRequestDataToViewModelMap(modelToRender)
-            fillWithEventResultData(modelToRender, cmd)
-        } else {
-            redirectWith303('showAll', params)
-            return
-        }
-        String filename = ""
-        List<JobGroup> selectedJobGroups = JobGroup.findAllByIdInList(cmd.selectedFolder)
-
-        selectedJobGroups.each { jobGroup ->
-            filename += jobGroup.name + '_'
-        }
-        if (modelToRender['selectedInterval'] != -1) {
-            filename += modelToRender['selectedInterval'] + 'm_'
-        }
-        DateTimeFormatter dateFormatter = ISODateTimeFormat.date()
-        filename += dateFormatter.print(cmd.from) + '_to_' + dateFormatter.print(cmd.to) + '.csv'
-
-        response.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        response.setContentType("text/csv;header=present;charset=UTF-8");
-
-        Writer responseWriter = new OutputStreamWriter(response.getOutputStream());
-
-        List<OsmChartGraph> csiValues = modelToRender['eventResultValues'];
-        writeCSV(csiValues, responseWriter);
-
-        response.getOutputStream().flush()
-        return null;
     }
 
     /**
