@@ -11,10 +11,56 @@
 main {
   display: flex;
   width: 100%;
+  align-content: space-between;
+  align-items: flex-start;
 
   &.center {
     justify-content: center;
   }
 }
 
+h2 {
+  font-weight: normal;
+}
 
+p.applicationName {
+  font-weight: bold;
+}
+
+.clickable-list {
+  li {
+    a {
+      margin-bottom: 2px;
+
+      p.percentage-big {
+        font-size: 18px;
+      }
+
+      p.percentage {
+        font-weight: bold;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.healthy {
+  font-size: 1em;
+  color: #606060;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 20em;
+  width: 30em;
+
+  p {
+    align-self: center;
+  }
+
+  i {
+    align-self: center;
+    font-size: 6.5em;
+    color: #9DDEA9;
+    margin-bottom: .2em;
+  }
+}

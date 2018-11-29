@@ -125,6 +125,7 @@ class JobController {
         job.persistNonMedianResults = false
         job.captureVideo = true
         job.isPrivate = true
+        job.lastChange = new Date()
 
         return [job: job] << getStaticModelPartForEditOrCreateView()
     }
@@ -152,6 +153,7 @@ class JobController {
                 // This is why Job needs to be saved again.
                 def tags = [tagParam].flatten()
                 job.tags = tags
+                job.lastChange = new Date()
                 job.save(flush: true)
 
                 def flashMessageArgs = [getJobI18n(), job.label]
@@ -204,6 +206,7 @@ class JobController {
             def tags = params.remove("tags")
             job.properties = params
             job.tags = [tags].flatten()
+            job.lastChange = new Date()
             if (!job.save()) {
                 render(view: 'edit', model: [job: job] << getStaticModelPartForEditOrCreateView())
                 return
