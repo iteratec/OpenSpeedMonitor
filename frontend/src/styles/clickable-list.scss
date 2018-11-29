@@ -44,4 +44,57 @@
     }
   }
 
+  li.error {
+    background: $color-error-light;
+
+    a {
+      border-bottom: none;
+
+      span {
+        color: $color-error;
+      }
+
+      .detail {
+        font-size: 12px;
+      }
+
+      aside.percentage-aside {
+        text-align: center;
+        color: $color-error-percentage;
+        line-height: 120%;
+        margin: 0 12px 0 8px
+      }
+    }
+  }
+
+  li.error:hover {
+    background: darken($color-error-light, 5);
+  }
+
+  li.warning {
+    background: $color-warning-light;
+
+    a {
+      border-bottom: none;
+
+      span {
+        color: $color-warning;
+      }
+
+      .detail {
+        font-size: 12px;
+      }
+
+      aside.percentage-aside {
+        text-align: center;
+        color: $color-warning-percentage;
+        line-height: 120%;
+        margin: 0 12px 0 8px
+      }
+    }
+  }
+
+  li.warning:hover {
+    background: darken($color-error-light, 5);
+  }
 }

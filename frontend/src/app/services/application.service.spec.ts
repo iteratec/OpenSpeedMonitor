@@ -64,6 +64,17 @@ const applicationCsiMultipleValuesDto: ApplicationCsiDTO = {
   hasInvalidJobResults: false
 };
 
+const failingJob: Object = {
+  develop_desktop: {
+    job_id: 771,
+    percentageFailLast5: 100,
+    location: "otto-prod-netlab",
+    application: "develop_Desktop",
+    script: "OTTO_ADS und HP",
+    browser: "Chrome"
+  }
+};
+
 describe('ApplicationService', () => {
 
   beforeEach(() => {
@@ -86,6 +97,7 @@ describe('ApplicationService', () => {
     (httpMock: HttpTestingController, service: ApplicationService) => {
       service.loadRecentCsiForApplications();
       httpMock.expectOne("/applicationDashboard/rest/getCsiValuesForApplications").flush(applicationCsiDTOById);
+      httpMock.expectOne("/applicationDashboard/rest/getFailingJobs").flush([]);
       const applicationCsiById: ApplicationCsiById = service.applicationCsiById$.getValue();
       expect(applicationCsiById[1].recentCsi().csiDocComplete).toBe(40);
       expect(applicationCsiById[3].recentCsi().csiDocComplete).toBe(20);
@@ -110,6 +122,16 @@ describe('ApplicationService', () => {
       expect(applicationCsiById[3].csiValues.length).toEqual(4);
       expect(applicationCsiById[3].csiValues[2].date.getTime()).toEqual(parseDate("2018-10-15").getTime());
       expect(applicationCsiById[3].csiValues[2].csiDocComplete).toEqual(100);
+    }));
+
+  it('should be able to load failing jobs', inject(
+    [HttpTestingController, ApplicationService],
+    (httpMock: HttpTestingController, service: ApplicationService) => {
+      service.failingJobs$.next(failingJob);
+      service.getFailingJobs();
+      httpMock.expectOne("/applicationDashboard/rest/getFailingJobs").flush(failingJob);
+      service.failingJobs$.subscribe(next => expect(next).toBe(failingJob));
+      httpMock.verify();
     }));
 });
 
