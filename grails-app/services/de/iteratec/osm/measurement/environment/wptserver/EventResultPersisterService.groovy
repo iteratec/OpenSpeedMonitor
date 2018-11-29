@@ -28,7 +28,6 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.external.GraphiteComunicationFailureException
-import de.iteratec.osm.report.external.GraphiteReportJob
 import de.iteratec.osm.report.external.GraphiteReportService
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
@@ -439,25 +438,19 @@ class EventResultPersisterService implements iResultListener {
 
         log.debug("informing event result dependents about ${results.size()} new results...")
         results.each { EventResult result ->
-            informDependent(result)
+            informCsiAggregations(result)
         }
+        graphiteReportService.report(job.id, resultXml.getTestId())
         log.debug('informing event result dependents ... DONE')
-
     }
 
-    private void informDependent(EventResult result) {
-
+    private void informCsiAggregations(EventResult result) {
         if (result.medianValue) {
-
             if (result.cachedView == CachedView.UNCACHED && !result.measuredEvent.testedPage.isUndefinedPage()) {
                 log.debug('informing dependent measured values ...')
                 informDependentCsiAggregations(result)
                 log.debug('informing dependent measured values ... DONE')
             }
-            log.debug('reporting persisted event result ...')
-            graphiteReportService.report(result)
-            log.debug('reporting persisted event result ... DONE')
-
         }
     }
 
