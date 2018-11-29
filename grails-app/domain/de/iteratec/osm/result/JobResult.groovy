@@ -50,6 +50,8 @@ class JobResult {
     static belongsTo = [job: Job]
 
     /** timestamp of execution */
+    Date executionDate
+    /** timestamp of completion*/
     Date date
     /** wpt-test-id */
     String testId
@@ -83,6 +85,7 @@ class JobResult {
     static constraints = {
         testId(nullable: false)
         testAgent(nullable: true)
+        executionDate(nullable: true)
         date(nullable: false)
         wptStatus(nullable: false)
         jobResultStatus(nullable: false)

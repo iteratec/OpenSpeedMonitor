@@ -11,7 +11,8 @@ enum JobResultStatus {
     TIMEOUT(504, "Timed out"),
     FAILED(505, "Failed"),
     CANCELED(506, "Canceled"),
-    ORPHANED(507, "Orphaned")
+    ORPHANED(507, "Orphaned"),
+    DID_NOT_START(701, "Did not start")
 
     private int jobResultStatusCode
     private String message

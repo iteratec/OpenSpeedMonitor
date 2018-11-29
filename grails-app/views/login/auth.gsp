@@ -2,7 +2,7 @@
 <html>
 <head>
 	<title><g:message code="springSecurity.login.title" locale="${lang}"/></title>
-	<meta name="layout" content="kickstart_osm" />
+	<meta name="layout" content="layoutOsm" />
 	<style>
 		#login {
 			width: 30em;

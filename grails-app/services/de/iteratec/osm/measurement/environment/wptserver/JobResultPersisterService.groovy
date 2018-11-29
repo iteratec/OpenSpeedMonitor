@@ -53,11 +53,15 @@ class JobResultPersisterService {
     JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
         JobResult result = testId ? JobResult.findByJobAndTestId(job, testId) : null
         if (!result) {
-            result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
+            result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description, new Date())
         } else if (wptStatus != result.wptStatus || jobResultStatus != result.jobResultStatus) {
             updateAndPersistJobResult(result, testId, jobResultStatus, wptStatus, description)
         }
         return result
+    }
+
+    def persistMissingJobResult(Job job, Date executionDate) {
+        persistNewUnfinishedJobResult(job, "", JobResultStatus.DID_NOT_START, WptStatus.TEST_DID_NOT_START, "Missing JobResult", executionDate)
     }
 
     JobResultStatus handleWptResult(WptResultXml resultXml, String testId, Job job) {
@@ -153,10 +157,11 @@ class JobResultPersisterService {
 
             log.debug("Deleting pending JobResults and create finished ...")
             Job job = jobDaoService.getJob(jobId)
+            Date executionDate = getExecutionDateFromUnfinished(job, testId)
             deleteUnfinishedJobResults(job, testId)
             JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
             if (!jobResult) {
-                persistNewFinishedJobResult(job, testId, jobResultStatus, resultXml)
+                persistNewFinishedJobResult(job, testId, jobResultStatus, resultXml, executionDate)
             } else {
                 updateJobResult(jobResult, jobResultStatus, resultXml)
             }
@@ -185,10 +190,17 @@ class JobResultPersisterService {
         }
     }
 
-    private JobResult persistNewUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
+    private JobResult persistNewUnfinishedJobResult(
+            Job job,
+            String testId,
+            JobResultStatus jobResultStatus,
+            WptStatus wptStatus,
+            String description,
+            Date execDate) {
         JobResult result = new JobResult(
                 job: job,
                 date: new Date(),
+                executionDate: execDate,
                 testId: testId ?: UUID.randomUUID() as String,
                 description: description,
                 jobConfigLabel: job.label,
@@ -214,11 +226,16 @@ class JobResultPersisterService {
         }
     }
 
-    private void persistNewFinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptResultXml resultXml) {
+    private Date getExecutionDateFromUnfinished(Job job, String testId) {
+        return JobResult.findByJobAndTestIdAndJobResultStatusInList(job, testId, [JobResultStatus.WAITING, JobResultStatus.RUNNING])?.executionDate
+    }
+
+    private void persistNewFinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptResultXml resultXml, Date execDate) {
         log.debug("persisting new JobResult ${testId}")
         Date testCompletion = resultXml.getCompletionDate() ?: new Date()
         JobResult result = new JobResult(
                 job: job,
+                executionDate: execDate,
                 date: testCompletion,
                 testId: testId,
                 wptStatus: resultXml.getWptStatus(),

@@ -3,7 +3,7 @@
 <head>
     <g:set var="entityName" value="${message(code: 'de.iteratec.osmConfiguration.label', default: 'OSM Configuration')}"
            scope="request"/>
-    <meta name="layout" content="kickstart"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="default.show.label" args="[entityName]"/></title>
 </head>
 

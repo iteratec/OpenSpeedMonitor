@@ -70,4 +70,5 @@ databaseChangeLog = {
     include file: '2018-11-06-v500-job-result-expected-results.groovy'
     include file: '2018-11-15-v500-hero-element-times.groovy'
     include file: '2018-11-16-v500-add-new-measurands.groovy'
+    include file: '2018-11-19-v500-add-missing-job-result-check.groovy'
 }

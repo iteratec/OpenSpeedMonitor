@@ -2,7 +2,7 @@
 <%@ defaultCodec="none" %>
 <html>
 <head>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title>CSI CheckDashboard</title>
     <style>
     .chart {

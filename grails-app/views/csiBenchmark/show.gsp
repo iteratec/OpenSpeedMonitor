@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isocsi.csiBenchmark.title" default="Csi Benchmark"/></title>
     <asset:stylesheet src="/csiBenchmark/show.less"/>
 
