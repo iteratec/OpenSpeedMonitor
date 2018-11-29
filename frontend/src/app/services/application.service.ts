@@ -60,18 +60,24 @@ export class ApplicationService {
 
     this.getFailingJobs().pipe(
       map(failingJobs => {
-        if (failingJobs) {
-          return failingJobs.reduce((failingJobsByApplication, currentValue) => {
-            if (!failingJobsByApplication[currentValue.application]) {
-              failingJobsByApplication[currentValue.application] = [];
-            }
-            failingJobsByApplication[currentValue.application].push(currentValue);
-            return failingJobsByApplication;
-          }, {});
+          return this.reduceFailingJobs(failingJobs);
         }
-      }
-    )
+      )
     ).subscribe(next => this.failingJobs$.next(next));
+  }
+
+  private reduceFailingJobs(failingJobs) {
+    if (!failingJobs) {
+      return null;
+    }
+
+    return failingJobs.reduce((failingJobsByApplication, currentValue) => {
+      if (!failingJobsByApplication[currentValue.application]) {
+        failingJobsByApplication[currentValue.application] = [];
+      }
+      failingJobsByApplication[currentValue.application].push(currentValue);
+      return failingJobsByApplication;
+    }, {});
   }
 
   loadApplications() {
