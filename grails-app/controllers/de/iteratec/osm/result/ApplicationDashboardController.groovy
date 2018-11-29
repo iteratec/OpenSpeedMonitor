@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
+import grails.converters.JSON
 
 class ApplicationDashboardController {
 
@@ -50,8 +51,8 @@ class ApplicationDashboardController {
 
     def getCsiValuesForApplications() {
         List<JobGroup> jobGroups = jobGroupService.getAllActiveAndRecent()
-        def csiVales = applicationDashboardService.getTodaysCsiValueForJobGroups(jobGroups)
-        return ControllerUtils.sendObjectAsJSON(response, csiVales)
+        def csiValues = applicationDashboardService.getTodaysCsiValueForJobGroups(jobGroups)
+        return ControllerUtils.sendObjectAsJSON(response, csiValues)
     }
 
     def createCsiConfiguration(DefaultApplicationCommand command) {
@@ -66,6 +67,25 @@ class ApplicationDashboardController {
         def jobsWithErrors = applicationDashboardService.getFailingJobStatistics(jobGroupId)
 
         return ControllerUtils.sendObjectAsJSON(response, [numberOfFailingJobs: jobsWithErrors[0], minimumFailedJobSuccessRate: jobsWithErrors[1]])
+    }
+
+
+    /**
+     * Rest controller that returns all jobs where at least one of the last five measurements failed.
+     * @return JSON in the form of:
+     * [
+     *     {
+     *         "percentageFailLast5": 40,
+     *         "location": "otto-prod-netlab",
+     *         "application": "develop_Desktop",
+     *         "job_id": 773,
+     *         "script": "OTTO_PL_Einstiegsseite",
+     *         "browser": "Chrome"
+     *     }, ...
+     * ]
+     */
+    def getFailingJobs() {
+        return ControllerUtils.sendObjectAsJSON(response, applicationDashboardService.getFailingJobs());
     }
 }
 
