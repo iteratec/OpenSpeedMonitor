@@ -132,7 +132,6 @@ describe("QueueDashboardComponent", () => {
     fixture.detectChanges();
 
     const datarows2 : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
-    console.log(datarows2);
     expect(datarows2).toBeTruthy();
     expect(datarows2[0].firstElementChild.textContent ).toEqual(mockinformation[0].id);
   });

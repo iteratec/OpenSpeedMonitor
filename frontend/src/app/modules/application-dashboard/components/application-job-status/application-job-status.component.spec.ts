@@ -6,6 +6,7 @@ import {ApplicationService} from "../../../../services/application.service";
 import {Application} from "../../../../models/application.model";
 import {FailingJobStatistic} from "../../models/failing-job-statistic.model";
 import {GraphiteIntegrationComponent} from "./graphite-integration/graphite-integration.component";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 
 describe('ApplicationJobStatusComponent', () => {
   let component: ApplicationJobStatusComponent;
@@ -34,7 +35,8 @@ describe('ApplicationJobStatusComponent', () => {
         SharedMocksModule
       ],
       providers: [
-        ApplicationService
+        ApplicationService,
+        GrailsBridgeService
       ]
     })
     .compileComponents();
@@ -159,7 +161,7 @@ describe('ApplicationJobStatusComponent', () => {
   });
 
   it('should only show one job status message', () => {
-    let errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
+    let errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integration-info)');
     expect(errorMessagesEl.length).toEqual(1);
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -169,7 +171,7 @@ describe('ApplicationJobStatusComponent', () => {
     component.ngOnChanges({});
     fixture.detectChanges();
 
-    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
+    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integration-info)');
     expect(errorMessagesEl.length).toEqual(1);
 
     component.failingJobStatistic = new FailingJobStatistic({
@@ -179,7 +181,7 @@ describe('ApplicationJobStatusComponent', () => {
     component.ngOnChanges({});
     fixture.detectChanges();
 
-    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integrations)');
+    errorMessagesEl = fixture.nativeElement.querySelectorAll('.clickable-list li a:not(.integration-info)');
     expect(errorMessagesEl.length).toEqual(1);
   });
 
