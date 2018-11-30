@@ -316,6 +316,8 @@ grails:
                             {pattern: '/page/getPagesForMeasuredEvents/**',             access: ["permitAll"]},
                             {pattern: '/infrastructureSetup/**',                        access: ["permitAll"]},
                             {pattern: '/landing/**',                                    access: ["permitAll"]},
+                            {pattern: '/applicationDashboard/rest/saveJobHealthGraphiteServers',  access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
+                            {pattern: '/applicationDashboard/rest/removeJobHealthGraphiteServers',  access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/rest/createCsiConfiguration', access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/**',                       access: ["permitAll"]},
                             {pattern: '/queueDashboard/**',                             access: ["permitAll"]},
