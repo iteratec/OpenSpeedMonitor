@@ -201,7 +201,6 @@ class EventResultPersisterService implements iResultListener {
         if (!resultXml.isValidTestStep(viewResultsNodeOfThisRun)) {
             return false
         }
-        GString waterfallAnchor = getWaterfallAnchor(resultXml, event.name, testStepZeroBasedIndex + 1)
         persistResult(
                 jobRun,
                 event,
@@ -209,8 +208,7 @@ class EventResultPersisterService implements iResultListener {
                 runZeroBasedIndex + 1,
                 resultXml.isMedian(runZeroBasedIndex, cachedView, testStepZeroBasedIndex),
                 viewResultsNodeOfThisRun,
-                testStepZeroBasedIndex + 1,
-                waterfallAnchor
+                testStepZeroBasedIndex + 1
         )
         return true
     }
@@ -226,10 +224,10 @@ class EventResultPersisterService implements iResultListener {
      * @return
      */
     protected EventResult persistResult(
-            JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, testStepOneBasedIndex, GString waterfallAnchor) {
+            JobResult jobRun, MeasuredEvent event, CachedView view, Integer run, Boolean median, GPathResult viewTag, testStepOneBasedIndex) {
 
         EventResult result = jobRun.findEventResult(event, view, run) ?: new EventResult()
-        return saveResult(result, jobRun, event, view, run, median, viewTag, testStepOneBasedIndex, waterfallAnchor)
+        return saveResult(result, jobRun, event, view, run, median, viewTag, testStepOneBasedIndex)
 
     }
 
@@ -259,7 +257,7 @@ class EventResultPersisterService implements iResultListener {
      * @return Saved {@link EventResult}.
      */
     protected EventResult saveResult(EventResult result, JobResult jobRun, MeasuredEvent step, CachedView view, Integer run, Boolean median,
-                                     GPathResult viewTag, Integer testStepOneBasedIndex, GString waterfallAnchor) {
+                                     GPathResult viewTag, Integer testStepOneBasedIndex) {
 
         log.debug("persisting result: jobRun=${jobRun.testId}, run=${run}, cachedView=${view}, medianValue=${median}")
 
@@ -279,7 +277,6 @@ class EventResultPersisterService implements iResultListener {
         result.browser = jobRun.job.location.browser
         result.location = jobRun.job.location
         setAllMeasurands(viewTag, result)
-        setWaterfallUrl(result, jobRun, waterfallAnchor)
         result.testAgent = jobRun.testAgent
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
@@ -306,29 +303,6 @@ class EventResultPersisterService implements iResultListener {
             }
         } catch (Exception e) {
             log.warn("No customer satisfaction can be written for EventResult: ${result}: ${e.message}", e)
-        }
-    }
-
-    private void setWaterfallUrl(EventResult result, JobResult jobRun, GString waterfallAnchor) {
-        try {
-            result.testDetailsWaterfallURL = result.buildTestDetailsURL(jobRun, waterfallAnchor);
-        } catch (MalformedURLException mue) {
-            log.error("Failed to build test's detail url for result: ${result} and jobResult: ${jobRun}!", mue)
-        } catch (Exception e) {
-            log.error("An unexpected error occurred while trying to build test's detail url (result=${result})!", e)
-        }
-    }
-
-    private GString getWaterfallAnchor(WptResultXml xmlResult, String eventName, Integer testStepOneBasedIndex) {
-        switch (xmlResult.version) {
-            case WptXmlResultVersion.BEFORE_MULTISTEP:
-                return "${STATIC_PART_WATERFALL_ANCHOR}${eventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
-            case WptXmlResultVersion.MULTISTEP_FORK_ITERATEC:
-                return "${STATIC_PART_WATERFALL_ANCHOR}${eventName.replace(PageService.STEPNAME_DELIMITTER, '').replace('.', '')}"
-            case WptXmlResultVersion.MULTISTEP:
-                return "${STATIC_PART_WATERFALL_ANCHOR}_step${testStepOneBasedIndex}"
-            default:
-                throw new IllegalStateException("Version of result xml isn't specified!")
         }
     }
 
