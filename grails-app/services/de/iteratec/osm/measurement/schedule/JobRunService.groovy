@@ -119,7 +119,8 @@ class JobRunService {
      */
     String launchJobRun(Job job, int priority = 5) {
         if (!inMemoryConfigService.areMeasurementsGenerallyEnabled()) {
-            throw new IllegalStateException("Job run of Job ${job} is skipped cause measurements are generally disabled.")
+            log.warn("Job run of Job ${job} is skipped cause measurements are generally disabled.")
+            return
         }
         if (inMemoryConfigService.pauseJobProcessingForOverloadedLocations) {
             throw new IllegalStateException("Job run of Job ${job} is skipped cause overloaded locations.")
@@ -163,6 +164,7 @@ class JobRunService {
             }
         }
         log.debug("Cleanup done.")
+        return jobResultsToDelete.size()
     }
 
     private int rescheduleJobRunsYoungerThan(Date date) {

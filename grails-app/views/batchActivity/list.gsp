@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <g:set var="entityName"
            value="${message(code: 'de.iteratec.osm.batch.batchactivity.list.heading', default: 'Batch Activities')}"/>
     <title><g:message code="default.list.label" args="[entityName]"/></title>

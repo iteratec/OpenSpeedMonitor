@@ -43,8 +43,6 @@ import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.CharSet
 import org.joda.time.DateTime
 
-import java.util.concurrent.ThreadLocalRandom
-
 /**
  * Reports osm-metrics to external tools.
  */
@@ -77,13 +75,12 @@ class MetricReportingService {
 
         Contract.requiresArgumentNotNull("result", result)
 
-        log.info("reporting Eventresult")
-
         JobGroup jobGroup = result.jobGroup
         Collection<GraphiteServer> servers = jobGroup.resultGraphiteServers.findAll { it.reportEventResultsToGraphiteServer }
         if (servers.size() < 1) {
             return
         }
+        log.info("reporting EventResult ${result.id} to ${servers.size()} servers")
 
         MeasuredEvent event = result.measuredEvent
         Page page = result.page
@@ -95,7 +92,7 @@ class MetricReportingService {
 
             GraphiteSocket socket
             try {
-                log.info("now the graphiteSocket should be retrieved ...")
+                log.debug("now the graphiteSocket should be retrieved ...")
                 socket = graphiteSocketProvider.getSocket(graphiteServer)
             } catch (Exception e) {
                 log.error("GraphiteServer ${graphiteServer} couldn't be reached. The following result couldn't be be sent: ${result}")

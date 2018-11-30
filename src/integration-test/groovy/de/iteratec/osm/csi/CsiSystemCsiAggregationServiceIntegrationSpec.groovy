@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
+import de.iteratec.osm.report.chart.CsiAggregationDaoService
 import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
@@ -32,6 +33,7 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
     EventCsiAggregationService eventCsiAggregationService
     PageCsiAggregationService pageCsiAggregationService
     JobGroupCsiAggregationService jobGroupCsiAggregationService
+    CsiAggregationDaoService csiAggregationDaoService
 
     CsiAggregationInterval hourly
     CsiAggregationInterval daily
@@ -69,8 +71,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
 
     void "Find no JobGroup CsiAggregations if no existing"() {
         expect: "No Aggregations"
-        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1, jobGroup2]).isEmpty()
-        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1, jobGroup2]).isEmpty()
+        findAll(fromHourly, toHourly, daily, [jobGroup1, jobGroup2]).isEmpty()
+        findAll(fromHourly, toHourly, weekly, [jobGroup1, jobGroup2]).isEmpty()
     }
 
     void "Find no CsiSystem CsiAggregations if no existing"() {
@@ -183,8 +185,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         isDocCompleteAndVisualComplete(csiSystemDailyAggregations[0], DEFAULT_MV_VALUE)
 
         and: "The cascading values should also be calculated"
-        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1]).size() == 1
-        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1]).size() == 1
+        findAll(fromHourly, toHourly, daily, [jobGroup1]).size() == 1
+        findAll(fromHourly, toHourly, weekly, [jobGroup1]).size() == 1
         pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1], [page1]).size() == 1
         pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1], [page1]).size() == 1
         eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 1
@@ -215,8 +217,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         isDocCompleteAndVisualComplete(pageWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
         when:
-        List<CsiAggregation> jobGroupDailyAggregations = jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, JobGroup.list())
-        List<CsiAggregation> jobGroupWeeklyAggregations = jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, JobGroup.list())
+        List<CsiAggregation> jobGroupDailyAggregations = findAll(fromHourly, toHourly, daily, JobGroup.list())
+        List<CsiAggregation> jobGroupWeeklyAggregations = findAll(fromHourly, toHourly, weekly, JobGroup.list())
         then:
         jobGroupDailyAggregations.size() == 0
         jobGroupWeeklyAggregations.size() == csiSystem.affectedJobGroups.size()
@@ -281,8 +283,8 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
         isDocCompleteAndVisualComplete(csiSystemWeeklyAggregations[0], DEFAULT_MV_VALUE)
 
         and: "The cascading values should also be calculated"
-        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1]).size() == 1
-        jobGroupCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1]).size() == 1
+        findAll(fromHourly, toHourly, daily, [jobGroup1]).size() == 1
+        findAll(fromHourly, toHourly, weekly, [jobGroup1]).size() == 1
         pageCsiAggregationService.findAll(fromHourly, toHourly, weekly, [jobGroup1], [page1, page2]).size() == Page.count()
         pageCsiAggregationService.findAll(fromHourly, toHourly, daily, [jobGroup1], [page1, page2]).size() == Page.count()
         eventCsiAggregationService.findAll(fromHourly, toHourly, hourly).size() == 2
@@ -423,5 +425,14 @@ class CsiSystemCsiAggregationServiceIntegrationSpec extends NonTransactionalInte
                 closedAndCalculated: true,
                 connectivityProfile: connectivityProfile,
                 underlyingEventResultsByWptDocComplete: '1,2,3,4')
+    }
+
+    private List<CsiAggregation> findAll(Date fromDate, Date toDate, CsiAggregationInterval targetInterval, List<JobGroup> csiGroups) {
+        if(csiGroups.size() > 0) {
+            return csiAggregationDaoService.getJobGroupCsiAggregations(fromDate, toDate, csiGroups, targetInterval)
+        }
+        else {
+            return []
+        }
     }
 }

@@ -6,7 +6,7 @@
 <html>
 <head>
 
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isocsi.eventResultDashboard"/></title>
     <asset:stylesheet src="rickshaw/rickshaw_custom.css"/>
 </head>
@@ -148,9 +148,6 @@
                 </g:else>
             </ul>
         </div>
-        <g:actionSubmit value="${message(code: 'de.iteratec.ism.ui.labels.download.csv', 'default': 'Export as CSV')}"
-                        action="downloadCsv" class="btn btn-primary pull-right space-right show-button"/>
-
 
         <g:render template="/_resultSelection/hiddenWarnings"/>
         <!-- Actual tabs -->

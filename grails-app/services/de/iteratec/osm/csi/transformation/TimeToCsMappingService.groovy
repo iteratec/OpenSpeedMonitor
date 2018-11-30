@@ -74,9 +74,7 @@ class TimeToCsMappingService {
             Double fractionOfUpperCs = (upperCs - lowerCs) * ((loadtimeIncrement - diffDocreadyToLowerIncrementBoundary) / loadtimeIncrement)
             customerSatisfaction = lowerCs + fractionOfUpperCs
         }
-        if (log.infoEnabled) {
-            log.info("customerSatisfaction=$customerSatisfaction")
-        }
+        log.debug("customerSatisfaction=${customerSatisfaction}")
         return customerSatisfaction
     }
 

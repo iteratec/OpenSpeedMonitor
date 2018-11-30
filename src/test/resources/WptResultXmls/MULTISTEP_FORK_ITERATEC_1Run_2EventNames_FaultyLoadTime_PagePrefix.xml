@@ -294,7 +294,7 @@
                     <eventName>HP:::LH_Homepage_2</eventName>
                     <run>1</run>
                     <URL>https://www.example.de</URL>
-                    <loadTime>200000</loadTime>
+                    <loadTime>1772</loadTime>
                     <TTFB>160</TTFB>
                     <bytesOut>93351</bytesOut>
                     <bytesOutDoc>25151</bytesOutDoc>
@@ -308,7 +308,7 @@
                     <responses_other>5</responses_other>
                     <result>0</result>
                     <render>1543</render>
-                    <fullyLoaded>4304</fullyLoaded>
+                    <fullyLoaded>200000</fullyLoaded>
                     <cached>0</cached>
                     <docTime>1770</docTime>
                     <domTime>0</domTime>
@@ -569,7 +569,7 @@
                     <testStep>
                         <eventName>HP:::LH_Homepage_2</eventName>
                         <URL>https://www.example.de</URL>
-                        <loadTime>200000</loadTime>
+                        <loadTime>1772</loadTime>
                         <TTFB>160</TTFB>
                         <bytesOut>93351</bytesOut>
                         <bytesOutDoc>25151</bytesOutDoc>
@@ -583,7 +583,7 @@
                         <responses_other>5</responses_other>
                         <result>0</result>
                         <render>1543</render>
-                        <fullyLoaded>4304</fullyLoaded>
+                        <fullyLoaded>200000</fullyLoaded>
                         <cached>0</cached>
                         <docTime>1770</docTime>
                         <domTime>0</domTime>

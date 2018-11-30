@@ -10,6 +10,7 @@ import {ResponseWithLoadingState} from "../models/response-with-loading-state.mo
 import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {GraphiteServer} from "../modules/application-dashboard/models/graphite-server.model";
+import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
 
 @Injectable()
 export class ApplicationService {
@@ -18,6 +19,7 @@ export class ApplicationService {
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
   failingJobStatistics$: ReplaySubject<FailingJobStatistic> = new ReplaySubject<FailingJobStatistic>(1);
+  failingJobs$: ReplaySubject<{}> = new ReplaySubject<{}>(1);
   jobHealthGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
   availableGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
 
@@ -49,6 +51,27 @@ export class ApplicationService {
       distinctUntilKeyChanged("id"),
       switchMap((application: Application) => this.updateCsiForPages(application))
     ).subscribe(this.pageCsis$);
+
+    this.getFailingJobs().pipe(
+      map(failingJobs => {
+          return this.reduceFailingJobs(failingJobs);
+        }
+      )
+    ).subscribe(next => this.failingJobs$.next(next));
+  }
+
+  private reduceFailingJobs(failingJobs) {
+    if (!failingJobs) {
+      return null;
+    }
+
+    return failingJobs.reduce((failingJobsByApplication, currentValue) => {
+      if (!failingJobsByApplication[currentValue.application]) {
+        failingJobsByApplication[currentValue.application] = [];
+      }
+      failingJobsByApplication[currentValue.application].push(currentValue);
+      return failingJobsByApplication;
+    }, {});
   }
 
   loadApplications() {
@@ -191,6 +214,14 @@ export class ApplicationService {
       handleError(),
       startWith(null)
     )
+  }
+
+  getFailingJobs(): Observable<FailingJob[]> {
+    return this.http.get<FailingJobDTO[]>('/applicationDashboard/rest/getFailingJobs').pipe(
+      map(failingJobs => failingJobs.map(dto => new FailingJob(dto))),
+      handleError(),
+      startWith(null)
+    );
   }
 
   updateActiveJobHealthGraphiteServers(application: Application): Observable<GraphiteServer[]> {

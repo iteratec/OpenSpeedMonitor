@@ -4,7 +4,7 @@
 
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <meta name="layout" content="kickstart_osm"/>
+        <meta name="layout" content="layoutOsm"/>
         <g:set var="entityName"	value="${message(code: 'de.iteratec.iss.script', default: 'Script')}" />
         <title><g:message code="default.${mode}.label" args="[entityDisplayName]"/></title>
 

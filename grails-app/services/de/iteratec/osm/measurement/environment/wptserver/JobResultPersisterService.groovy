@@ -53,16 +53,20 @@ class JobResultPersisterService {
     JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
         JobResult result = testId ? JobResult.findByJobAndTestId(job, testId) : null
         if (!result) {
-            result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
+            result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description, new Date())
         } else if (wptStatus != result.wptStatus || jobResultStatus != result.jobResultStatus) {
             updateAndPersistJobResult(result, testId, jobResultStatus, wptStatus, description)
         }
         return result
     }
 
+    def persistMissingJobResult(Job job, Date executionDate) {
+        persistNewUnfinishedJobResult(job, "", JobResultStatus.DID_NOT_START, WptStatus.TEST_DID_NOT_START, "Missing JobResult", executionDate)
+    }
+
     JobResultStatus handleWptResult(WptResultXml resultXml, String testId, Job job) {
         JobResultStatus jobResultStatus = determineJobResultStatusFromWptResult(resultXml, testId, job)
-        log.debug("Jobrun ${testId} has status ${jobResultStatus}")
+        log.info("Jobrun ${testId} has status ${jobResultStatus}")
         if (jobResultStatus.isTerminated()) {
             performanceLoggingService.logExecutionTime(DEBUG, "Persisting finished jobrun ${testId} of job ${job.id}.", 1) {
                 processFinishedJobResult(resultXml, jobResultStatus, job)
@@ -78,33 +82,38 @@ class JobResultPersisterService {
 
     private JobResultStatus determineJobResultStatusFromWptResult(WptResultXml resultXml, String testId, Job job) {
         WptStatus wptStatus = resultXml.wptStatus
-        log.info("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
-        log.info("resultXml.hasRuns()=${resultXml.hasRuns()}")
-        log.info("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
+        log.debug("WptStatus of ${testId}: ${wptStatus.toString()} (${wptStatus.wptStatusCode})")
+        log.debug("resultXml.hasRuns()=${resultXml.hasRuns()}")
+        log.debug("resultXml.runCount=${resultXml.hasRuns() ? resultXml.runCount : null}")
         if (wptStatus.isFailed()) {
             return JobResultStatus.FAILED
         } else if (wptStatus.isSuccess() && resultXml.hasRuns()) {
-            JobResultStatus fallbackStatus = resultXml.getTestStepCount() > 0 ? JobResultStatus.INCOMPLETE : JobResultStatus.FAILED
-            JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
-            if (!jobResult) {
-                log.error("There is no job result for finished job id ${job.id} and test id ${testId}!")
-                return fallbackStatus
-            }
-            int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
-            if (numExpectedResults < 1) {
-                log.warn("Number of expected results for job id ${job.id} and test id ${testId} is 0!")
-                return fallbackStatus
-            }
-            int numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
-            if (numValidResults < 1) {
-                return JobResultStatus.FAILED
-            }
-            return numValidResults < numExpectedResults ? JobResultStatus.INCOMPLETE : JobResultStatus.SUCCESS
+            return determineJobResultStatusFromCompletedTest(resultXml, job, testId)
         }
         if (wptStatus == WptStatus.IN_PROGRESS) {
             return JobResultStatus.RUNNING
         }
         return JobResultStatus.WAITING // keep polling
+    }
+
+    private JobResultStatus determineJobResultStatusFromCompletedTest(WptResultXml resultXml, Job job, String testId) {
+        JobResultStatus fallbackStatus = resultXml.getTestStepCount() > 0 ? JobResultStatus.INCOMPLETE : JobResultStatus.FAILED
+        JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
+        if (!jobResult) {
+            log.error("There is no job result for finished job id ${job.id} and test id ${testId}!")
+            return fallbackStatus
+        }
+        int numExpectedResults = jobResult.jobConfigRuns * jobResult.expectedSteps * (jobResult.firstViewOnly ? 1 : 2)
+        if (numExpectedResults < 1) {
+            log.warn("Number of expected results for job id ${job.id} and test id ${testId} is 0!")
+            return fallbackStatus
+        }
+        int numValidResults = resultXml.countValidResults(jobResult.jobConfigRuns, jobResult.expectedSteps, jobResult.firstViewOnly)
+        if (numValidResults < numExpectedResults) {
+            log.info("Test ${testId} from job ${job.id} has only ${numValidResults} valid results, expected ${numExpectedResults}")
+            return numValidResults < 1 ? JobResultStatus.FAILED : JobResultStatus.INCOMPLETE
+        }
+        return JobResultStatus.SUCCESS
     }
 
     private processFinishedJobResult(WptResultXml resultXml, JobResultStatus jobResultStatus, Job job) {
@@ -148,10 +157,11 @@ class JobResultPersisterService {
 
             log.debug("Deleting pending JobResults and create finished ...")
             Job job = jobDaoService.getJob(jobId)
+            Date executionDate = getExecutionDateFromUnfinished(job, testId)
             deleteUnfinishedJobResults(job, testId)
             JobResult jobResult = JobResult.findByJobAndTestId(job, testId)
             if (!jobResult) {
-                persistNewFinishedJobResult(job, testId, jobResultStatus, resultXml)
+                persistNewFinishedJobResult(job, testId, jobResultStatus, resultXml, executionDate)
             } else {
                 updateJobResult(jobResult, jobResultStatus, resultXml)
             }
@@ -180,10 +190,17 @@ class JobResultPersisterService {
         }
     }
 
-    private JobResult persistNewUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description) {
+    private JobResult persistNewUnfinishedJobResult(
+            Job job,
+            String testId,
+            JobResultStatus jobResultStatus,
+            WptStatus wptStatus,
+            String description,
+            Date execDate) {
         JobResult result = new JobResult(
                 job: job,
                 date: new Date(),
+                executionDate: execDate,
                 testId: testId ?: UUID.randomUUID() as String,
                 description: description,
                 jobConfigLabel: job.label,
@@ -209,11 +226,16 @@ class JobResultPersisterService {
         }
     }
 
-    private void persistNewFinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptResultXml resultXml) {
+    private Date getExecutionDateFromUnfinished(Job job, String testId) {
+        return JobResult.findByJobAndTestIdAndJobResultStatusInList(job, testId, [JobResultStatus.WAITING, JobResultStatus.RUNNING])?.executionDate
+    }
+
+    private void persistNewFinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptResultXml resultXml, Date execDate) {
         log.debug("persisting new JobResult ${testId}")
         Date testCompletion = resultXml.getCompletionDate() ?: new Date()
         JobResult result = new JobResult(
                 job: job,
+                executionDate: execDate,
                 date: testCompletion,
                 testId: testId,
                 wptStatus: resultXml.getWptStatus(),

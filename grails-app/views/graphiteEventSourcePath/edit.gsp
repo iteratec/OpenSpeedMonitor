@@ -2,7 +2,7 @@
 <html>
     <head>
         <g:set var="entityName" value="${message(code: 'graphiteEventSourcePath.label', default: 'GraphiteEventSourcePath')}" scope="request"/>
-        <meta name="layout" content="kickstart" />
+        <meta name="layout" content="layoutOsm" />
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
     </head>
     <body>

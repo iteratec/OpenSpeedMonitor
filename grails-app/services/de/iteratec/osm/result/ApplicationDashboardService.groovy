@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import org.hibernate.criterion.CriteriaSpecification
 import com.codahale.metrics.graphite.Graphite
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
@@ -215,6 +216,37 @@ class ApplicationDashboardService {
             }
         }
         return jobsWithErrors
+    }
+
+    def getFailingJobs() {
+        def results = Job.withCriteria {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                property 'id', 'job_id'
+                jobGroup { property 'name', 'application'}
+                script { property 'label', 'script' }
+                location { property 'location', 'location' }
+                location { browser { property 'name', 'browser' } }
+                jobStatistic { property 'percentageSuccessfulTestsOfLast5', 'percentageFailLast5' }
+            }
+            and {
+                eq 'deleted', false
+                eq 'active', true
+                jobStatistic {
+                    lt 'percentageSuccessfulTestsOfLast5', 90d
+                }
+            }
+        }
+
+        /**
+         * Object JobStatistic saves percentage of successful measurements. Since we are interested in failed
+         * measurements, value is subtracted from 100.
+         */
+        results.each { result ->
+            result.percentageFailLast5 = (100 - result.percentageFailLast5);
+        }
+
+        return results
     }
 
     def getActiveJobHealthGraphiteServers(Long jobGroupId) {

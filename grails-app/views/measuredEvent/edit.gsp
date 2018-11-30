@@ -2,7 +2,7 @@
 <html>
 <head>
     <g:set var="entityName" value="${message(code: 'measuredEvent.label', default: 'MeasuredEvent')}" scope="request"/>
-    <meta name="layout" content="kickstart_osm"/>
+    <meta name="layout" content="layoutOsm"/>
     <title><g:message code="default.edit.label" args="[entityName]"/></title>
 </head>
 

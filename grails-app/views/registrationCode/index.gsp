@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta name="layout" content="kickstart_osm" />
+        <meta name="layout" content="layoutOsm" />
         <g:set var="entityName" value="${message(code: 'role.label', default: 'Registration Code')}" />
         <title><g:message code="default.list.label" args="[entityName]" /></title>
     </head>
