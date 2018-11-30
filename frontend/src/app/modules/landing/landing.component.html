@@ -38,8 +38,8 @@
         <p class="applicationName">{{ application }} </p>
         <ul class="clickable-list">
           <li *ngFor="let failingJob of failingJobs[application]"
-              [class.error]="failingJob.percentageFailLast5 >= 20"
-              [class.warning]="failingJob.percentageFailLast5 < 20">
+              [class.error]="failingJob.percentageFailLast5 >= 21"
+              [class.warning]="failingJob.percentageFailLast5 < 21">
             <a  href="/jobResult/listFailed?jobId={{failingJob.job_id}}">
               <aside class="percentage-aside">
                 <p class="percentage percentage-big">{{ failingJob.percentageFailLast5 }}%</p>
