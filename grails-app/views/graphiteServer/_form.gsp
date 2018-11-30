@@ -9,6 +9,14 @@
     </div>
 </div>
 
+<div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'prefix', 'error')}">
+    <label for="port" class="control-label col-md-3"><g:message code="graphiteServer.prefix.label" default="Prefix" /></label>
+
+    <div class="col-md-6">
+        <g:textField name="prefix" value="${graphiteServer?.prefix}" class="form-control"></g:textField>
+    </div>
+</div>
+
 <div class="form-group fieldcontain ${hasErrors(bean: graphiteServer, field: 'port', 'error')} required">
     <label for="port" class="control-label col-md-3"><g:message code="graphiteServer.port.label" default="Port" /><span
             class="required-indicator">*</span></label>

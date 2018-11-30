@@ -47,8 +47,15 @@
 
         });
 
-        function selectAllGraphiteServer(select) {
-            var obj = $(resultGraphiteServers)[0];
+        function selectAllResultGraphiteServer(select) {
+            var obj = $("#resultGraphiteServers")[0];
+            for (var i=0; i<obj.options.length; i++) {
+                obj.options[i].selected = select;
+            }
+        }
+
+        function selectAllJobHealthGraphiteServer(select) {
+            var obj = $("#jobHealthGraphiteServers")[0];
             for (var i=0; i<obj.options.length; i++) {
                 obj.options[i].selected = select;
             }

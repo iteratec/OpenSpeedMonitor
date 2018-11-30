@@ -136,6 +136,7 @@ class JobGroupController {
         }
 
         jobGroup.resultGraphiteServers.clear()
+        jobGroup.jobHealthGraphiteServers.clear()
         if (params.version) {
             def version = params.version.toLong()
             if (jobGroup.version > version) {
@@ -156,10 +157,15 @@ class JobGroupController {
 
 
         jobGroup.resultGraphiteServers.clear()
+        jobGroup.jobHealthGraphiteServers.clear()
         params.list('resultGraphiteServers').each {
             jobGroup.resultGraphiteServers.add(GraphiteServer.findById(it))
         }
+        params.list('jobHealthGraphiteServers').each {
+            jobGroup.jobHealthGraphiteServers.add(GraphiteServer.findById(it))
+        }
         params.remove('resultGraphiteServers')
+        params.remove('jobHealthGraphiteServers')
         def tagParam = params.remove('tags')
         def tags = [tagParam].flatten()
         jobGroup.tags = tags

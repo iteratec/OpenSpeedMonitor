@@ -42,8 +42,15 @@
                     $("ul[name='jobGroupTags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags')}'});
                 });
 
-                function selectAllGraphiteServer(select) {
-                    var obj = $(resultGraphiteServers)[0];
+                function selectAllResultGraphiteServer(select) {
+                    var obj = $("#resultGraphiteServers")[0];
+                    for (var i=0; i<obj.options.length; i++) {
+                        obj.options[i].selected = select;
+                    }
+                }
+
+                function selectAllJobHealthtGraphiteServer(select) {
+                    var obj = $("#jobHealthGraphiteServers")[0];
                     for (var i=0; i<obj.options.length; i++) {
                         obj.options[i].selected = select;
                     }

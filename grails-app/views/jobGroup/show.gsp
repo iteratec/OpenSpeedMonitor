@@ -166,7 +166,7 @@
 
         <tr class="prop">
             <td valign="top" class="name"><g:message code="jobGroup.graphiteServers.label"
-                                                     default="Graphite Servers"/></td>
+                                                     default="Result Graphite Servers"/></td>
             <td valign="top" style="text-align: left;" class="value">
                 <ul>
                     <g:each in="${jobGroup.resultGraphiteServers}" var="g">
@@ -176,6 +176,20 @@
                 </ul>
             </td>
         </tr>
+
+        <tr class="prop">
+            <td valign="top" class="name"><g:message code="jobGroup.graphiteServers.label"
+                                                     default="Job Health Graphite Servers"/></td>
+            <td valign="top" style="text-align: left;" class="value">
+                <ul>
+                    <g:each in="${jobGroup.jobHealthGraphiteServers}" var="g">
+                        <li><g:link controller="graphiteServer" action="show"
+                                    id="${g.id}">${g?.encodeAsHTML()}</g:link></li>
+                    </g:each>
+                </ul>
+            </td>
+        </tr>
+
         <g:if test="${jobGroup.csiConfiguration}">
             <tr class="prop">
                 <td valign="top" class="name"><g:message code="jobGroup.csiConfiguration.label"

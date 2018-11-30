@@ -12,12 +12,12 @@
 </div>
 
 <div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'resultGraphiteServers', 'error')} ">
-    <label for="graphiteServers" class="control-label col-md-3">
-        <g:message code="jobGroup.graphiteServers.label" default="Graphite Servers"/>
+    <label for="resultGraphiteServers" class="control-label col-md-3">
+        <g:message code="jobGroup.graphiteServers.label" default="Result Graphite Servers"/>
     </label>
 
     <div class="col-md-6">
-        <g:select id="graphiteServers" name="graphiteServers"
+        <g:select id="resultGraphiteServers" name="resultGraphiteServers"
                   from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
                   keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.id}"
                   multiple="true" optionKey="id" size="5" value="${jobGroup?.resultGraphiteServers*.id}"
@@ -25,12 +25,35 @@
     </div>
 
     <div class="col-md-3">
-        <a href="#" id="deselectAllGraphiteServer" onclick="selectAllGraphiteServer(false)">
+        <a href="#" id="deselectAllResultGraphiteServer" onclick="selectAllResultGraphiteServer(false)">
             <i class="fas fa-undo" aria-hidden="true"></i>
             <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all"/>
         </a>
     </div>
 </div>
+
+
+<div class="form-group fieldcontain ${hasErrors(bean: jobGroup, field: 'jobHealthGraphiteServers', 'error')} ">
+    <label for="jobHealthGraphiteServers" class="control-label col-md-3">
+        <g:message code="jobGroup.graphiteServers.label" default="Job Health Graphite Servers"/>
+    </label>
+
+    <div class="col-md-6">
+        <g:select id="jobHealthGraphiteServers" name="jobHealthGraphiteServers"
+                  from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
+                  keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.id}"
+                  multiple="true" optionKey="id" size="5" value="${jobGroup?.jobHealthGraphiteServers*.id}"
+                  class="many-to-many form-control"/>
+    </div>
+
+    <div class="col-md-3">
+        <a href="#" id="deselectAllJobHealthGraphiteServer" onclick="selectAllJobHealthGraphiteServer(false)">
+            <i class="fas fa-undo" aria-hidden="true"></i>
+            <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all"/>
+        </a>
+    </div>
+</div>
+
 
 <div class="form-group fieldcontain">
     <label for="jobGroupTags" class="control-label col-md-3">

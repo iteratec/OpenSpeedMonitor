@@ -5,6 +5,8 @@
 
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('serverAdress'); return false;" >${message(code: 'graphiteServer.serverAdress.label', default: 'Server Adress')}</g:link></th>
 
+        <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('prefix'); return false;" >${message(code: 'graphiteServer.prefix.label', default: 'Prefix')}</g:link></th>
+
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('port'); return false;" >${message(code: 'graphiteServer.port.label', default: 'Port')}</g:link></th>
 
         <th><g:link action="index" onclick="OpenSpeedMonitor.responsiveTable.sortBy('webappUrl'); return false;" >${message(code: 'graphiteServer.webappUrl.label', default: 'Webapp Url')}</g:link></th>
@@ -26,6 +28,8 @@
         <tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
 
             <td><g:link action="show" id="${graphiteServerInstance.id}">${fieldValue(bean: graphiteServerInstance, field: "serverAdress")}</g:link></td>
+
+            <td>${fieldValue(bean: graphiteServerInstance, field: "prefix")}</td>
 
             <td>${fieldValue(bean: graphiteServerInstance, field: "port")}</td>
 
