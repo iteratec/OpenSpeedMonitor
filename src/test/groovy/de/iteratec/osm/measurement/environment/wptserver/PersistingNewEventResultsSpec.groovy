@@ -96,14 +96,12 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         medianUncachedResults[0].docCompleteTimeInMillisecs == 5873
         medianUncachedResults[0].docCompleteRequests == 157
         medianUncachedResults[0].wptStatus == WptStatus.SUCCESSFUL.getWptStatusCode()
-        medianUncachedResults[0].testDetailsWaterfallURL.toString() == 'http://wpt.org/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=2&cached=0#waterfall_viewFF_BV1_Step01_Homepage - netlab'
 
         List<EventResult> cachedRun3Results = EventResult.findAllByCachedViewAndNumberOfWptRun(CACHED, 3)
         cachedRun3Results.size() == 1
         cachedRun3Results[0].docCompleteTimeInMillisecs == 3977
         cachedRun3Results[0].docCompleteRequests == 36
         cachedRun3Results[0].wptStatus == WptStatus.SUCCESSFUL.getWptStatusCode()
-        cachedRun3Results[0].testDetailsWaterfallURL.toString() == 'http://wpt.org/details.php?test=121212_NH_6a2777a9c09ac89e108d1f2b94e74b83&run=3&cached=1#waterfall_viewFF_BV1_Step01_Homepage - netlab'
 
         where:
         fileName                                              | jobLabel                               | pageName
@@ -141,8 +139,6 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         productResults[0].docCompleteTimeInMillisecs == 2218
         productResults[0].docCompleteRequests == 29
         productResults[0].wptStatus == WptStatus.TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.getWptStatusCode()
-        productResults[0].getTestDetailsWaterfallURL().toString() == "http://wpt.org/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=0#waterfall_viewProdukt auswaehlen"
-
 
         MeasuredEvent measuredEventSearch = MeasuredEvent.findByName('Artikel suchen')
         List<EventResult> searchResults = EventResult.findAllByMeasuredEventAndMedianValueAndCachedViewAndNumberOfWptRun(
@@ -152,7 +148,6 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         searchResults[0].docCompleteTimeInMillisecs == 931
         searchResults[0].docCompleteRequests == 6
         searchResults[0].wptStatus == WptStatus.TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.getWptStatusCode()
-        searchResults[0].getTestDetailsWaterfallURL().toString() == "http://wpt.org/details.php?test=130425_W1_f606bebc977a3b22c1a9205f70d07a00&run=1&cached=1#waterfall_viewArtikel suchen"
 
         where:
         fileName                                                     | productPageName | searchPageName | jobLabel
@@ -298,40 +293,6 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         ["docCompleteTimeInMillisecs": null, "visuallyCompleteInMillisecs": 2]    | 0                              | 1
         ["docCompleteTimeInMillisecs": 1, "visuallyCompleteInMillisecs": null]    | 1                              | 0
         ["docCompleteTimeInMillisecs": null, "visuallyCompleteInMillisecs": null] | 0                              | 0
-    }
-
-    void "test waterfall URL creation for WPT >2.19 with multistep"(int run, String measuredEvent, CachedView cachedView, String expectedUrl) {
-        setup:
-        File file = new File("src/test/resources/WptResultXmls/MULTISTEP_2Run.xml")
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        WebPageTestServer wptServer = WebPageTestServer.build(baseUrl: "http://wpt.org")
-        Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
-        Job job = Job.build(label: "FF_Otto_multistep")
-        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
-
-        when: "the service listens to results from a WPT server > 2.19 with multistep"
-        service.listenToResult(xmlResult, wptServer, job.id)
-
-        then: "all event results are created and the new URL format is used to create the waterfall URL"
-        List<EventResult> eventResults = EventResult.list()
-        eventResults.size() == 8
-        !eventResults.any { it.getTestDetailsWaterfallURL() == null }
-
-        EventResult result = eventResults.find {
-            it.numberOfWptRun == run && it.measuredEvent.name == measuredEvent && it.cachedView == cachedView
-        }
-        result.getTestDetailsWaterfallURL().toString() == expectedUrl
-
-        where:
-        run | measuredEvent   | cachedView | expectedUrl
-        1   | 'beforeTest'    | UNCACHED   | 'http://wpt.org/details.php?test=160727_EV_4&run=1&cached=0#waterfall_view_step1'
-        1   | 'beforeTest'    | CACHED     | 'http://wpt.org/details.php?test=160727_EV_4&run=1&cached=1#waterfall_view_step1'
-        1   | 'testExecution' | UNCACHED   | 'http://wpt.org/details.php?test=160727_EV_4&run=1&cached=0#waterfall_view_step2'
-        1   | 'testExecution' | CACHED     | 'http://wpt.org/details.php?test=160727_EV_4&run=1&cached=1#waterfall_view_step2'
-        2   | 'beforeTest'    | UNCACHED   | 'http://wpt.org/details.php?test=160727_EV_4&run=2&cached=0#waterfall_view_step1'
-        2   | 'beforeTest'    | CACHED     | 'http://wpt.org/details.php?test=160727_EV_4&run=2&cached=1#waterfall_view_step1'
-        2   | 'testExecution' | UNCACHED   | 'http://wpt.org/details.php?test=160727_EV_4&run=2&cached=0#waterfall_view_step2'
-        2   | 'testExecution' | CACHED     | 'http://wpt.org/details.php?test=160727_EV_4&run=2&cached=1#waterfall_view_step2'
     }
 
     void "test handling of failure in multistep result"() {

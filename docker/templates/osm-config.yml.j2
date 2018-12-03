@@ -33,7 +33,6 @@ environments:
       username: '{{ default .Env.MYSQL_USER "osm" }}'
       password: '{{ default .Env.MYSQL_PASSWORD "osm123" }}'
       dbCreate: "managed by liquibase"
-      driverClassName: "com.mysql.jdbc.Driver"
       pooled: true
       properties:
         minEvictableIdleTimeMillis: 60000
