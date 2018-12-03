@@ -53,7 +53,6 @@ class EventResult implements CsiValue, RepresentableWptResult {
     Long id
     Date dateCreated
     Date lastUpdated
-    URL testDetailsWaterfallURL
     MeasuredEvent measuredEvent
     JobGroup jobGroup
     Page page
@@ -147,7 +146,6 @@ class EventResult implements CsiValue, RepresentableWptResult {
         medianValue(nullable: false)
         numberOfWptRun(nullable: false)
         cachedView(nullable: false)
-        testDetailsWaterfallURL(nullable: true)
 
         docCompleteIncomingBytes(nullable: true)
         docCompleteRequests(nullable: true)
