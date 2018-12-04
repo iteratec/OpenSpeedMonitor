@@ -164,6 +164,7 @@ class JobRunService {
             }
         }
         log.debug("Cleanup done.")
+        return jobResultsToDelete.size()
     }
 
     private int rescheduleJobRunsYoungerThan(Date date) {

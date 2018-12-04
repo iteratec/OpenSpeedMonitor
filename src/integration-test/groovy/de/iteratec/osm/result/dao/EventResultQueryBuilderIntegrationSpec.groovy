@@ -25,7 +25,6 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
     Page page
     ConnectivityProfile connectivityProfile
     DateTime runDate = new DateTime(DateTimeZone.UTC)
-    URL testDetailsWaterfallURL = new URL("https://www.test.details.waterfall.url.de")
 
     void "check minimal specification"(boolean medianValue, def fullyLoaded) {
         given: "two matching and 10 other Eventresults"
@@ -84,7 +83,6 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                     numberOfWptRun: 23,
                     cachedView: CachedView.UNCACHED,
                     oneBasedStepIndexInJourney: 15,
-                    testDetailsWaterfallURL: testDetailsWaterfallURL,
                     jobResultDate: runDate.toDate(),
                     medianValue: true,
                     testAgent: "testAgent",
@@ -113,9 +111,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
                     it.testId == jobResult.testId &&
                     it.numberOfWptRun == 23 &&
                     it.cachedView == CachedView.UNCACHED &&
-                    it.oneBasedStepIndexInJourney == 15 &&
-                    it.testDetailsWaterfallURL == testDetailsWaterfallURL
-
+                    it.oneBasedStepIndexInJourney == 15
         }
     }
 

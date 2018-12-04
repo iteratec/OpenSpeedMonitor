@@ -10,8 +10,10 @@
       <li *ngFor="let application of applications$ | async">
         <a [routerLink]="['/applicationDashboard', application.id]">
           <aside>
-            <osm-csi-value-small [csiValue]="application.recentCsi?.csiDocComplete" [csiDate]="application.recentCsi?.date"
-                                 [lastResultDate]="application.dateOfLastResults" [showLoading]="application.csiIsLoading">
+            <osm-csi-value-small [csiValue]="application.recentCsi?.csiDocComplete"
+                                 [csiDate]="application.recentCsi?.date"
+                                 [lastResultDate]="application.dateOfLastResults"
+                                 [showLoading]="application.csiIsLoading">
             </osm-csi-value-small>
           </aside>
           <span class="title">{{application.name}}
@@ -25,6 +27,45 @@
     <a href="/measurementSetup/create" class="btn btn-primary" id="create-measurement">
       <i class="fas fa-plus"></i>
       {{ 'frontend.de.iteratec.osm.landing.setupNewMeasurement' | translate}}
+    </a>
+  </section>
+
+  <section class="card">
+    <h2>{{ 'frontend.de.iteratec.osm.landing.healthIssues' | translate }}</h2>
+
+    <ng-container *ngIf="failingJobs$ | async as failingJobs">
+      <ng-container *ngFor="let application of objectKeys(failingJobs)">
+        <p class="applicationName">{{ application }} </p>
+        <ul class="clickable-list">
+          <li *ngFor="let failingJob of failingJobs[application]"
+              [class.error]="failingJob.percentageFailLast5 > 20"
+              [class.warning]="failingJob.percentageFailLast5 <= 20">
+            <a  href="/jobResult/listFailed?jobId={{failingJob.job_id}}">
+              <aside class="percentage-aside">
+                <p class="percentage percentage-big">{{ failingJob.percentageFailLast5 }}%</p>
+                <p class="percentage">{{ 'frontend.de.iteratec.osm.landing.failure' | translate }}</p>
+              </aside>
+              <span class="title">
+                {{ failingJob.script }}
+                <span class="detail">
+                  {{ failingJob.browser }} ({{ failingJob.location }})
+                </span>
+            </span>
+            </a>
+          </li>
+        </ul>
+      </ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="isHealthy$ | async">
+      <div class="healthy">
+        <i class="fas fa-check-circle"></i>
+        <p>{{ 'frontend.de.iteratec.osm.landing.healthy' | translate }}</p>
+      </div>
+    </ng-container>
+
+    <a href="/job/index" class="btn btn-default" id="show-jobs">
+      {{ 'frontend.de.iteratec.osm.landing.showJobs' | translate }}
     </a>
   </section>
 </main>
