@@ -36,10 +36,6 @@ databaseChangeLog = {
         addForeignKeyConstraint(baseColumnNames: "graphite_server_id", baseTableName: "job_group_job_health_graphite_server", constraintName: "FKtr53abjdih801s0wir346d7wk", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "graphite_server")
     }
 
-    changeSet(author: "fmartens", id: "Task-1_drop_all_foreign_keys") {
-        dropAllForeignKeyConstraints(baseTableName: "job_group_graphite_server")
-    }
-
     changeSet(author: "fmartens", id: "Task-2_copy_existing_ids") {
         sql('''
             INSERT INTO job_group_result_graphite_server (job_group_result_graphite_servers_id, graphite_server_id)
