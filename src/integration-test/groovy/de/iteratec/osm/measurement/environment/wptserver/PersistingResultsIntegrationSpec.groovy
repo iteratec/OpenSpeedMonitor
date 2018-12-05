@@ -201,7 +201,7 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
                 script: script,
                 runs: 1,
                 firstViewOnly: false
-        )
+        ).save(flush: true)
 
         Job.build(
                 label: '1Run_11events_4Faulty',

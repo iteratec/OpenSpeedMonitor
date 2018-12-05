@@ -46,11 +46,12 @@ class JobResultPersisterService {
     JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, String description = '') {
         JobResult result = JobResult.findByJobAndTestId(job, testId)
         WptStatus wptStatus = result ? result.wptStatus : WptStatus.UNKNOWN
-        return persistUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description)
+        return persistUnfinishedJobResult(job.id, testId, jobResultStatus, wptStatus, description)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    JobResult persistUnfinishedJobResult(Job job, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
+    JobResult persistUnfinishedJobResult(Long jobId, String testId, JobResultStatus jobResultStatus, WptStatus wptStatus, String description = '') {
+        Job job = jobDaoService.getJob(jobId)
         JobResult result = testId ? JobResult.findByJobAndTestId(job, testId) : null
         if (!result) {
             result = persistNewUnfinishedJobResult(job, testId, jobResultStatus, wptStatus, description, new Date())
@@ -73,7 +74,7 @@ class JobResultPersisterService {
             }
         } else {
             performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
-                persistUnfinishedJobResult(job, testId, jobResultStatus, resultXml.wptStatus, "Polling job run.")
+                persistUnfinishedJobResult(job.id, testId, jobResultStatus, resultXml.wptStatus, "Polling job run.")
             }
         }
         return jobResultStatus
@@ -128,7 +129,7 @@ class JobResultPersisterService {
         }
     }
 
-    private invokeResultPersisters(WptResultXml resultXml, WebPageTestServer wptServer, long jobId) {
+    private invokeResultPersisters(WptResultXml resultXml, WebPageTestServer wptServer, Long jobId) {
         this.resultListeners.each { listener ->
             log.info("calling listener ${listener.listenerName} for job id ${jobId}")
             if (listener.callListenerAsync()) {
@@ -146,7 +147,7 @@ class JobResultPersisterService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private void persistFinishedJobResult(WptResultXml resultXml, JobResultStatus jobResultStatus, long jobId) throws OsmResultPersistanceException {
+    private void persistFinishedJobResult(WptResultXml resultXml, JobResultStatus jobResultStatus, Long jobId) throws OsmResultPersistanceException {
         performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
             String testId = resultXml.getTestId()
             log.debug("test-ID for which results should get persisted now=${testId}, jobResultStatus=${jobResultStatus}")

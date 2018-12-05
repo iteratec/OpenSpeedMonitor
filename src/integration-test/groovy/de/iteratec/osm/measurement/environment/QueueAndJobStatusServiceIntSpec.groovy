@@ -26,7 +26,7 @@ class QueueAndJobStatusServiceIntSpec extends NonTransactionalIntegrationSpec {
 
         when: "creating and persisting jobResults with statusCodes and a job"
         inputStatusCodes.reverse().eachWithIndex { JobResultStatus jobResultStatus, int i ->
-            JobResult result = jobResultPersisterService.persistUnfinishedJobResult(job, null, jobResultStatus, WptStatus.UNKNOWN)
+            JobResult result = jobResultPersisterService.persistUnfinishedJobResult(job.id, null, jobResultStatus, WptStatus.UNKNOWN)
             result.date = now - i
             result.save(flush: true, failOnError: true)
         }
