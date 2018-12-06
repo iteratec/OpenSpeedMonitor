@@ -25,7 +25,6 @@ import de.iteratec.osm.report.chart.CsiAggregationUtilService
 import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import grails.gorm.transactions.Transactional
-import groovy.util.slurpersupport.GPathResult
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
@@ -83,7 +82,7 @@ class GraphiteEventService {
     private List<Event> createEvents(GraphiteEventSourcePath eventSourcePath, GraphiteServer server, String from, String until){
         log.debug("Fetching of graphite events: Create events for graphite server: $server, eventSourcePath: $eventSourcePath, from: $from, until: $until.")
         def events = []
-        GPathResult json = getEventJSON(eventSourcePath.targetMetricName, server, from, until)
+        def json = getEventJSON(eventSourcePath.targetMetricName, server, from, until)
         log.debug("Fetching of graphite events: Fetched json from server: $json")
         json.each{
             String shortName = it.target
@@ -108,7 +107,7 @@ class GraphiteEventService {
      * @param until
      * @return
      */
-    private GPathResult getEventJSON(String eventSourceMetricName, GraphiteServer server, String from, String until){
+    private def getEventJSON(String eventSourceMetricName, GraphiteServer server, String from, String until){
 
         String webappUrl = createWebappUrlOf(server)
         LinkedHashMap<String, String> queryParams = ['format': 'json', 'from': from, 'until': until, 'target': eventSourceMetricName]

@@ -38,7 +38,7 @@ class HttpRequestService {
         return getRestClient(wptserver?.baseUrl)
     }
 
-    GPathResult getJsonResponse(String url, String path, queryParams) {
+    def getJsonResponse(String url, String path, queryParams) {
         return getRestClient(url).get{
             request.uri.path = addLeadingSlashIfMissing(path)
             request.uri.query = queryParams
