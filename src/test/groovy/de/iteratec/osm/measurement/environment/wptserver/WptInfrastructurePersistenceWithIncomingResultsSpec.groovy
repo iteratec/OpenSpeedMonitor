@@ -13,6 +13,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.report.external.GraphiteReportService
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
@@ -195,6 +196,8 @@ class WptInfrastructurePersistenceWithIncomingResultsSpec extends Specification 
             getMaxValidLoadtime() >> DEFAULT_MAX_VALID_LOADTIME
             getMinValidLoadtime() >> DEFAULT_MIN_VALID_LOADTIME
         }
+
+        service.graphiteReportService = Mock(GraphiteReportService)
     }
 
     private void mockProxyService(String locationIdentifier) {
