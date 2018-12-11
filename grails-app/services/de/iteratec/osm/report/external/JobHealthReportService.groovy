@@ -8,16 +8,6 @@ class JobHealthReportService {
     GraphiteSocketProvider graphiteSocketProvider
 
     void reportJobHealthStatusToGraphite(Date date) {
-        List<Job> jobsToReport = Job.createCriteria().list {
-            eq 'deleted', false
-            eq 'active', true
-            isNotNull 'jobStatistic'
-            jobGroup {
-                isNotNull 'jobHealthGraphiteServers'
-                isNotEmpty 'jobHealthGraphiteServers'
-            }
-        }
-
         if (jobsToReport) {
             log.debug("Starting job health report for the jobs: ${jobsToReport}")
             jobsToReport.each { job ->
@@ -53,5 +43,17 @@ class JobHealthReportService {
         pathElements.add(GraphitePathName.replaceInvalidGraphitePathCharacters(job.id.toString()))
         String basePath = pathElements.join('.')
         return basePath
+    }
+
+    private List<Job> getJobsToReport() {
+        return Job.createCriteria().list {
+            eq 'deleted', false
+            eq 'active', true
+            isNotNull 'jobStatistic'
+            jobGroup {
+                isNotNull 'jobHealthGraphiteServers'
+                isNotEmpty 'jobHealthGraphiteServers'
+            }
+        }
     }
 }
