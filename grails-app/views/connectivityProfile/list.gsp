@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta name="layout" content="layoutOsm" />
-        <g:set var="entityName" value="${message(code: 'connectivityProfile.label', default: 'Connection')}" />
+        <g:set var="entityName" value="${message(code: 'connectivityProfile.label', default: 'Connection')}" scope="request"/>
         <title><g:message code="connectivityProfile.label.plural" /></title>
     </head>
 
