@@ -1,2 +1,0 @@
-The YAML-files in this folder represent http-responses. They get recorded by betamax (http://freeside.co/betamax/), 
-a library for mocking http-requests in tests.

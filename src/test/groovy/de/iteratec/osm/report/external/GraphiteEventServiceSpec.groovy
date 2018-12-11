@@ -29,25 +29,16 @@ import de.iteratec.osm.report.chart.Event
 import de.iteratec.osm.report.chart.EventDaoService
 import grails.buildtestdata.BuildDataTest
 import grails.testing.services.ServiceUnitTest
+import groovy.json.JsonSlurper
 import org.joda.time.DateTime
-import org.junit.Rule
-import software.betamax.Configuration
-import software.betamax.junit.Betamax
-import software.betamax.junit.RecorderRule
-import spock.lang.Ignore
 import spock.lang.Specification
 
-@Ignore
-class GraphiteEventServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<GraphiteEventService> {
-    //TODO: Re-Write these tests without mocking http requests (e.g. without betamax or similar libray)
+class GraphiteEventServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<GraphiteEventService>{
 
     public static final DateTime untilDateTime = new DateTime(2015, 5, 29, 5, 0, 0)
     public static final int minutesInPast = 1
     GraphiteEventService serviceUnderTest
 
-    Configuration configuration = Configuration.builder().tapeRoot(new File("src/test/resources/betamax_tapes")).ignoreLocalhost(false).build();
-    @Rule
-    public RecorderRule recorder = new RecorderRule(configuration)
     public static final String jobGroupName = 'associated JobGroup'
     public static String metricName = 'alias(drawAsInfinite(server.monitor02.*.load.load_fifteen),"my-graph")'
 
@@ -65,6 +56,14 @@ class GraphiteEventServiceSpec extends Specification implements BuildDataTest, S
         //mocks common for all tests/////////////////////////////////////////////////////////////////////////////////////////////
         mockBatchActivityService()
         serviceUnderTest.eventDaoService = grailsApplication.mainContext.getBean('eventDaoService')
+
+        File jsonFile = new File("src/test/resources/GraphiteEvents/GraphiteEventServiceSpec_retreive_events.json")
+        def jsonData = new JsonSlurper().parse(jsonFile)
+
+        serviceUnderTest.httpRequestService = Stub(HttpRequestService) {
+            getJsonResponse(_ as String, _ as String, _ as Object) >> jsonData
+        }
+
         mockCsiAggregationUtilService()
     }
 
@@ -72,7 +71,6 @@ class GraphiteEventServiceSpec extends Specification implements BuildDataTest, S
         mockDomains(GraphiteServer, BatchActivity, Event, JobGroup, GraphiteEventSourcePath)
     }
 
-    @Betamax(tape = 'GraphiteEventServiceSpec_retrieve_events')
     def "retrieve events from test graphite server test"() {
         given:
         createGraphiteServerWithSourcePaths()
