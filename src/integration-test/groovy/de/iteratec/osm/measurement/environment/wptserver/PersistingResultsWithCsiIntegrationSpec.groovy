@@ -63,22 +63,23 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
     }
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
+        Job.withNewSession {
+            given: ""
+            createTestDataCommonToAllTests()
+            File file = new File("src/test/resources/WptResultXmls/MULTISTEP_1Run_5Steps.xml")
+            WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
+            JobResult.build(job: job, expectedSteps: 5, jobConfigRuns: 1, firstViewOnly: true,
+                    testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
-        given: ""
-        createTestDataCommonToAllTests()
-        File file = new File("src/test/resources/WptResultXmls/MULTISTEP_1Run_5Steps.xml")
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
-        JobResult.build(job: job, expectedSteps: 5, jobConfigRuns: 1, firstViewOnly: true,
-                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
+            when: ""
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+            List<EventResult> eventResults = EventResult.list()
 
-        when: ""
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-        List<EventResult> eventResults = EventResult.list()
-
-        then: ""
-        JobResult.list().size() == 1
-        eventResults.size() == 5
-        eventResults.findAll { it.csByWptDocCompleteInPercent }.size() == 3
+            then: ""
+            JobResult.list().size() == 1
+            eventResults.size() == 5
+            eventResults.findAll { it.csByWptDocCompleteInPercent }.size() == 3
+        }
     }
 
     private createTestDataCommonToAllTests() {
@@ -101,6 +102,7 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
         )
         CsiConfiguration csiConf = CsiConfiguration.build()
         JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConf)
+
         job = Job.build(
                 label: 'CH_OTTO_ADS_hetzner',
                 location: loc,

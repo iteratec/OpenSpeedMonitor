@@ -178,63 +178,65 @@ class EventResultDashboardServiceLabelsIntegrationSpec extends NonTransactionalI
     }
 
     void "some legend parts in every event result the same, some different"(int csiAggregationInterval) {
-        setup: "build two event results where same label attributes are the same and some differ"
-        EventResult.build(
-                fullyLoadedTimeInMillisecs: 500,
-                medianValue: true,
+        EventResult.withNewSession {
+            setup: "build two event results where same label attributes are the same and some differ"
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
 
-                jobGroup: jobGroup1,
-                measuredEvent: measuredEvent1,
-                location: location1,
-                connectivityProfile: connectivityProfile1,
-                cachedView: CachedView.UNCACHED,
-                docCompleteTimeInMillisecs: 0
-        )
-        EventResult.build(
-                fullyLoadedTimeInMillisecs: 500,
-                medianValue: true,
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    location: location1,
+                    connectivityProfile: connectivityProfile1,
+                    cachedView: CachedView.UNCACHED,
+                    docCompleteTimeInMillisecs: 0
+            )
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
 
-                jobGroup: jobGroup1,
-                measuredEvent: measuredEvent1,
-                location: location2,
-                connectivityProfile: connectivityProfile2,
-                cachedView: CachedView.UNCACHED,
-                docCompleteTimeInMillisecs: 0
-        )
+                    jobGroup: jobGroup1,
+                    measuredEvent: measuredEvent1,
+                    location: location2,
+                    connectivityProfile: connectivityProfile2,
+                    cachedView: CachedView.UNCACHED,
+                    docCompleteTimeInMillisecs: 0
+            )
 
-        ErQueryParams erQueryParams = new ErQueryParams()
-        erQueryParams.jobGroupIds.add(jobGroup1.id)
-        erQueryParams.measuredEventIds.add(measuredEvent1.id)
-        erQueryParams.locationIds.addAll([location1.id, location2.id])
-        erQueryParams.connectivityProfileIds.addAll([connectivityProfile1.id, connectivityProfile2.id])
-        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(name: Measurand.DOC_COMPLETE_TIME.toString(), cachedView: CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND)
+            ErQueryParams erQueryParams = new ErQueryParams()
+            erQueryParams.jobGroupIds.add(jobGroup1.id)
+            erQueryParams.measuredEventIds.add(measuredEvent1.id)
+            erQueryParams.locationIds.addAll([location1.id, location2.id])
+            erQueryParams.connectivityProfileIds.addAll([connectivityProfile1.id, connectivityProfile2.id])
+            SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(name: Measurand.DOC_COMPLETE_TIME.toString(), cachedView: CachedView.UNCACHED, selectedType: SelectedMeasurandType.MEASURAND)
 
 
 
-        when: "the labels get analysed for common parts"
-        OsmRickshawChart chart = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
-                null,
-                null,
-                csiAggregationInterval,
-                [selectedMeasurand1],
-                erQueryParams)
-        List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
+            when: "the labels get analysed for common parts"
+            OsmRickshawChart chart = eventResultDashboardService.getEventResultDashboardHighchartGraphs(
+                    null,
+                    null,
+                    csiAggregationInterval,
+                    [selectedMeasurand1],
+                    erQueryParams)
+            List<OsmChartGraph> resultGraphs = chart.osmChartGraphs
 
-        then: "we get two graph labels and a common part label"
-        resultGraphs.size() == 2
-        List<String> graphLables = resultGraphs*.label
-        graphLables.containsAll([
-                "Location 1 | Connectivity Profile 1",
-                "Location 2 | Connectivity Profile 2",
-        ])
-        chart.osmChartGraphsCommonLabel == "<b>Measurand</b>: Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | <b>Job Group</b>: Job Group 1 | <b>Measured step</b>: Measured Event 1"
+            then: "we get two graph labels and a common part label"
+            resultGraphs.size() == 2
+            List<String> graphLables = resultGraphs*.label
+            graphLables.containsAll([
+                    "Location 1 | Connectivity Profile 1",
+                    "Location 2 | Connectivity Profile 2",
+            ])
+            chart.osmChartGraphsCommonLabel == "<b>Measurand</b>: Uncached " + Measurand.DOC_COMPLETE_TIME.toString() + " | <b>Job Group</b>: Job Group 1 | <b>Measured step</b>: Measured Event 1"
 
-        where: "all CSI aggregation intervals are tested"
-        csiAggregationInterval        | _
-        CsiAggregationInterval.RAW    | _
-        CsiAggregationInterval.HOURLY | _
-        CsiAggregationInterval.DAILY  | _
-        CsiAggregationInterval.WEEKLY | _
+            where: "all CSI aggregation intervals are tested"
+            csiAggregationInterval        | _
+            CsiAggregationInterval.RAW    | _
+            CsiAggregationInterval.HOURLY | _
+            CsiAggregationInterval.DAILY  | _
+            CsiAggregationInterval.WEEKLY | _
+        }
     }
 
     void "single legend parts in some but not all event results the same"(int csiAggregationInterval) {

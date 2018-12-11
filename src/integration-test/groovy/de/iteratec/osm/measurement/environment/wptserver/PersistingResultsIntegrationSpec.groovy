@@ -72,81 +72,88 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     void "All steps get persisted, even if TTFB of the first uncached step is invalid"() {
+        Job.withNewSession {
+            given: "a wpt result and a faulty result (TTFB is 0) in firstView"
+            setupData()
+            (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).csiAggregationUpdateService = Mock(CsiAggregationUpdateService)
+            WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
 
-        given: "a wpt result and a faulty result (TTFB is 0) in firstView"
-        setupData()
-        (jobResultPersisterService.resultListeners[0] as EventResultPersisterService).csiAggregationUpdateService = Mock(CsiAggregationUpdateService)
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyTTFB_PagePrefix.xml")))
+            when: "the results get persisted"
+            jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
-        when: "the results get persisted"
-        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-
-        then: "all steps should be persisted but first result is faulty"
-        JobResult.list().size() == 1
-        EventResult.list().size() == 4
+            then: "all steps should be persisted but first result is faulty"
+            JobResult.list().size() == 1
+            EventResult.list().size() == 4
+        }
     }
 
     void "Only first step of cached view gets persisted if LoadTime  of the first uncached step is larger than max"() {
-        given: "a wpt result and a faulty result (LoadTime is larger than the allowed max value)"
-        setupData()
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
+        Job.withNewSession {
+            given: "a wpt result and a faulty result (LoadTime is larger than the allowed max value)"
+            setupData()
+            WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyLoadTime_PagePrefix.xml")))
 
-        when: "the results get persisted"
-        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+            when: "the results get persisted"
+            jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
-        then: "1 run, 1 successful events, but first result is faulty"
-        JobResult.list().size() == 1
-        EventResult.list().size() == 1
-        EventResult.list()[0].cachedView == CachedView.CACHED
+            then: "1 run, 1 successful events, but first result is faulty"
+            JobResult.list().size() == 1
+            EventResult.list().size() == 1
+            EventResult.list()[0].cachedView == CachedView.CACHED
+        }
     }
 
     void "Only first step of cached view gets persisted if result of the first uncached step was not successfully"() {
-        given: "a wpt result and a faulty result (Result Code is 404)"
-        setupData()
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
+        Job.withNewSession {
+            given: "a wpt result and a faulty result (Result Code is 404)"
+            setupData()
+            WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_FaultyResultCode_PagePrefix.xml")))
 
-        when: "the results get persisted"
-        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+            when: "the results get persisted"
+            jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
-        then: "1 run, 1 successful events, but first result is faulty"
-        JobResult.list().size() == 1
-        EventResult.list().size() == 1
-        EventResult.list()[0].cachedView == CachedView.CACHED
+            then: "1 run, 1 successful events, but first result is faulty"
+            JobResult.list().size() == 1
+            EventResult.list().size() == 1
+            EventResult.list()[0].cachedView == CachedView.CACHED
+        }
     }
 
     void "Results get persisted even after failed csi aggregation."() {
+        Job.withNewSession {
+            given: "a wpt result and a failing CsiAggregationUpdateService"
+            setupData()
+            WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
+            mockCsiAggregationUpdateService()
 
-        given: "a wpt result and a failing CsiAggregationUpdateService"
-        setupData()
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        mockCsiAggregationUpdateService()
+            when: "the results get persisted"
+            jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
-        when: "the results get persisted"
-        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-
-        then: "1 run, 2 successful events + 2 cached views should be persisted"
-        JobResult.list().size() == 1
-        EventResult.list().size() == 4
+            then: "1 run, 2 successful events + 2 cached views should be persisted"
+            JobResult.list().size() == 1
+            EventResult.list().size() == 4
+        }
     }
 
     void "Results get persisted even after failed metric reporting."() {
+        Job.withNewSession {
+            given: "a wpt result and a failing MetricReportingService"
+            setupData()
+            WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
+            mockMetricReportingService()
 
-        given: "a wpt result and a failing MetricReportingService"
-        setupData()
-        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml")))
-        mockMetricReportingService()
+            when: "the results get persisted"
+            jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
 
-        when: "the results get persisted"
-        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-
-        then: "1 run, 2 successful events + 2 cached views should be persisted"
-        JobResult.list().size() == 1
-        EventResult.list().size() == 4
+            then: "1 run, 2 successful events + 2 cached views should be persisted"
+            JobResult.list().size() == 1
+            EventResult.list().size() == 4
+        }
     }
 
     void "No EventResults get persisted when Persistence of JobResults throws an exception."() {
@@ -166,21 +173,22 @@ class PersistingResultsIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     void "If saving of EventResults of one step throws an Exception EventResults of other steps will be saved even though."() {
+        Job.withNewSession {
+            given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
+            setupData()
+            WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
+            xmlResult.getEventName(_, 0) >> { job, step ->
+                throw new RuntimeException()
+            }
 
-        given: "a wpt result, a failing MetricReportingService and a failing CsiAggregationUpdateService"
-        setupData()
-        WptResultXml xmlResult = Spy(WptResultXml, constructorArgs: [new XmlSlurper().parse(new File("src/test/resources/WptResultXmls/MULTISTEP_FORK_ITERATEC_1Run_2EventNames_PagePrefix.xml"))])
-        xmlResult.getEventName(_, 0) >> { job, step ->
-            throw new RuntimeException()
+            when: "the results get persisted but the first step throws an exception"
+            jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+
+            then: "1 run, 1 successful events + 1 cached views should be persisted"
+            JobResult.list().size() == 1
+            EventResult.list().size() == 2
         }
-
-        when: "the results get persisted but the first step throws an exception"
-        jobResultPersisterService.persistUnfinishedJobResult(job, xmlResult.testId, JobResultStatus.RUNNING)
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-
-        then: "1 run, 1 successful events + 1 cached views should be persisted"
-        JobResult.list().size() == 1
-        EventResult.list().size() == 2
     }
 
     private createTestDataCommonToAllTests() {
