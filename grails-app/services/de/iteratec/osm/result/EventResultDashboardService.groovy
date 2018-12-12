@@ -279,7 +279,7 @@ public class EventResultDashboardService {
                     }
                     URL testsDetailsURL
                     performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', 2){
-                        testsDetailsURL = eventResult.testDetailsWaterfallURL ?: this.buildTestsDetailsURL(eventResult)
+                        testsDetailsURL = this.buildTestsDetailsURL(eventResult)
                     }
                     WptEventResultInfo chartPointWptInfo
                     performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', 2){

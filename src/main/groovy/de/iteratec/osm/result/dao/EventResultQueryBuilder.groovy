@@ -59,7 +59,6 @@ class EventResultQueryBuilder {
                 new ProjectionProperty(dbName: 'numberOfWptRun', alias: 'numberOfWptRun'),
                 new ProjectionProperty(dbName: 'cachedView', alias: 'cachedView'),
                 new ProjectionProperty(dbName: 'oneBasedStepIndexInJourney', alias: 'oneBasedStepIndexInJourney'),
-                new ProjectionProperty(dbName: 'testDetailsWaterfallURL', alias: 'testDetailsWaterfallURL'),
                 new ProjectionProperty(dbName: 'connectivityProfile.name', alias: 'connectivityProfile'),
                 new ProjectionProperty(dbName: 'customConnectivityName', alias: 'customConnectivityName'),
                 new ProjectionProperty(dbName: 'noTrafficShapingAtAll', alias: 'noTrafficShapingAtAll'),

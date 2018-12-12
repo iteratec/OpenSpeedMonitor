@@ -61,7 +61,7 @@ public class EventResultListingRow {
 		pageName= measuredEvent.testedPage.name;
 
 		label = jobResult.jobConfigLabel;
-		testsDetailsURL = eventResult.getTestDetailsWaterfallURL() != null ? eventResult.getTestDetailsWaterfallURL() : jobResult.tryToGetTestsDetailsURL();
+		testsDetailsURL = jobResult.tryToGetTestsDetailsURL();
 		
 		measuringDate = jobResult.date;
 

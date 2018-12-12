@@ -3,7 +3,6 @@ package de.iteratec.osm.system
 import de.iteratec.osm.measurement.environment.wptserver.JobResultPersisterService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.JobResult
-import de.iteratec.osm.result.JobResultStatus
 import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 import org.quartz.CronExpression
@@ -18,16 +17,18 @@ class MissingJobResultCheckService {
     def fillMissingJobResults() {
         Date latestCheckDate = getLatestCheck()?.date
         DateTime startDate = latestCheckDate ? new DateTime(latestCheckDate).minusMinutes(SCHEDULE_THRESHOLD_MINUTES) : new DateTime().minusDays(FIRST_CHECK_DAYS_AGO)
-        int missingResults = fillMissingJobResultsSinceDate( startDate )
-        persistMissingJobResultCheck(missingResults)
+        DateTime now = new DateTime().minusMinutes(SCHEDULE_THRESHOLD_MINUTES)
+        int missingResults = fillMissingJobResultsSinceDate( startDate, now)
+        persistMissingJobResultCheck(missingResults, now)
         log.info("Fixed Missing JobResults: $missingResults")
     }
 
-    private int fillMissingJobResultsSinceDate(DateTime since) {
+    private int fillMissingJobResultsSinceDate(DateTime since, DateTime until) {
+        log.debug("Look for Scheduled Dates between $since and $until for")
         int missingJobResults = 0
         getPreparedJobList().each{ job ->
-            List<JobResult> existingResults = getJobResultsSince(job, since)
-            missingJobResults += checkForMissingJobResults(existingResults, since, job)
+            List<JobResult> existingResults = getJobResultsBetween(job, since, until)
+            missingJobResults += checkForMissingJobResults(existingResults, since, until, job)
         }
         return missingJobResults
     }
@@ -36,13 +37,13 @@ class MissingJobResultCheckService {
         return Job.findAllByDeletedAndActiveAndExecutionScheduleIsNotNull(false, true)
     }
 
-    private List<JobResult> getJobResultsSince(Job job, DateTime since) {
-        return JobResult.findAllByJobAndExecutionDateBetween(job, since.toDate(), new Date())
+    private List<JobResult> getJobResultsBetween(Job job, DateTime since, DateTime until) {
+        return JobResult.findAllByJobAndExecutionDateBetween(job, since.toDate(), until.toDate())
     }
 
-    private int checkForMissingJobResults( List<JobResult> existingResults, DateTime since, Job job) {
-        DateTime now = new DateTime()
-        List<DateTime> scheduledDates = getScheduledDates(since.toDate(), now.toDate(), job)
+    private int checkForMissingJobResults( List<JobResult> existingResults, DateTime since, DateTime until, Job job) {
+        List<DateTime> scheduledDates = getScheduledDates(since.toDate(), until.toDate(), job)
+        log.debug("Found ${scheduledDates.size()} scheduled dates and ${existingResults.size()} existing jobResults for Job $job")
         existingResults.forEach{ jobResult ->
             DateTime jobResultDate = findDateForJobResult(scheduledDates, jobResult )
             if(jobResultDate) {
@@ -86,15 +87,15 @@ class MissingJobResultCheckService {
         }
     }
 
-    private void persistMissingJobResultCheck(int missingResults) {
+    private void persistMissingJobResultCheck(int missingResults, DateTime timestamp) {
         MissingJobResultCheck latest = getLatestCheck()
         if(latest) {
-            latest.date = new Date()
+            latest.date = timestamp.toDate()
             latest.missingResults = missingResults
             latest.save()
         }
         else {
-            new MissingJobResultCheck(date: new Date(), missingResults: missingResults).save()
+            new MissingJobResultCheck(date: timestamp.toDate(), missingResults: missingResults).save()
         }
     }
 
