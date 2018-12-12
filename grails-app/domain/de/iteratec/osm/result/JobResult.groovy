@@ -93,7 +93,7 @@ class JobResult {
         description(widget: 'textarea')
 
         //from Job
-        jobConfigLabel(maxSize: 255, blank: false)
+        jobConfigLabel(maxSize: 255, nullable: true)
         jobConfigRuns(blank: false)
         firstViewOnly(nullable: true)
         expectedSteps(nullable: false)
