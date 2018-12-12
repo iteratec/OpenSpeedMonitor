@@ -12,6 +12,7 @@ import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.report.chart.AggregationType
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.ApplicationDashboardService
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
@@ -31,6 +32,7 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
     JobResult jobResult1, jobResult2
     Script script1
     CsiConfiguration existingCsiConfiguration
+    GraphiteServer graphiteServer1, graphiteServer2
 
     private static final String NAVIGATION_SCRIPT =
             "setEventName\tHomepage:::Homepage\n" +
@@ -164,6 +166,51 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         then: "the returned statistic is correct"
         failingJobStatistics[0] == 1
         failingJobStatistics[1] == 80d
+    }
+
+    void "jobHealthGraphiteServers are correctly added and removed"() {
+        given: "one JobGroup and two GraphiteServer"
+        graphiteServer1 = GraphiteServer.build(serverAdress: "test-server.graphite")
+        graphiteServer2 = GraphiteServer.build(serverAdress: "test-server2.graphite")
+        jobGroup1.jobHealthGraphiteServers.add(graphiteServer2)
+        jobGroup1.save(failOnError: true, flush: true)
+        List<Long> allGraphiteServerIds = [graphiteServer1.id, graphiteServer2.id]
+        List<Long> graphiteServerIdToRemove = [graphiteServer1.id]
+
+        when: "GraphiteServers are added and removed"
+        applicationDashboardService.saveJobHealthGraphiteServers(jobGroup1.id, allGraphiteServerIds)
+        if (jobGroup1.jobHealthGraphiteServers.size() == 2) {
+            applicationDashboardService.removeJobHealthGraphiteServers(jobGroup1.id, graphiteServerIdToRemove)
+        }
+
+        then: "GraphiteServers are correctly attributed to the JobGroup"
+        jobGroup1.jobHealthGraphiteServers.size() == 1
+        jobGroup1.jobHealthGraphiteServers.contains(graphiteServer2)
+        !jobGroup1.jobHealthGraphiteServers.contains(graphiteServer1)
+    }
+
+    void "jobHealthGraphiteServers are correctly shown"() {
+        given: "one JobGroup and two GraphiteServer"
+        graphiteServer1 = GraphiteServer.build(serverAdress: "test-server.graphite")
+        graphiteServer2 = GraphiteServer.build(serverAdress: "test-server2.graphite")
+        jobGroup1.jobHealthGraphiteServers.add(graphiteServer1)
+        jobGroup1.save(failOnError: true, flush: true)
+
+        when: "active and available servers are retrieved"
+        def availableGraphiteServers = applicationDashboardService.getAvailableGraphiteServers(jobGroup1.id)
+        def activeGraphiteServers = applicationDashboardService.getActiveJobHealthGraphiteServers(jobGroup1.id)
+
+        applicationDashboardService.removeJobHealthGraphiteServers(jobGroup1.id, [graphiteServer1.id])
+        applicationDashboardService.saveJobHealthGraphiteServers(jobGroup1.id, [graphiteServer2.id])
+
+        def changedAvailableGraphiteServers = applicationDashboardService.getAvailableGraphiteServers(jobGroup1.id)
+        def changedActiveGraphiteServers = applicationDashboardService.getActiveJobHealthGraphiteServers(jobGroup1.id)
+
+        then: "the correct servers are shown respectively"
+        availableGraphiteServers[0].address == graphiteServer2.serverAdress
+        activeGraphiteServers[0].address == graphiteServer1.serverAdress
+        changedAvailableGraphiteServers[0].address == graphiteServer1.serverAdress
+        changedActiveGraphiteServers[0].address == graphiteServer2.serverAdress
     }
 
     private void createTestDataCommonForAllTests() {

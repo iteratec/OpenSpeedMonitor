@@ -315,9 +315,14 @@ class ApplicationDashboardService {
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
         Collection<GraphiteServer> graphiteServers = GraphiteServer.findAllByIdInList(graphiteServerIds)
 
-        if (!jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
-            jobGroup.jobHealthGraphiteServers.addAll(graphiteServers)
-            jobGroup.save(failOnError: true, flush: true)
+        graphiteServers.each { graphiteServer ->
+            if (!jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
+                jobGroup.jobHealthGraphiteServers.add(graphiteServer)
+            }
+        }
+        jobGroup.save(failOnError: true, flush: true)
+
+        if (jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
             return [added: true]
         } else {
             return [added: false]
@@ -328,9 +333,14 @@ class ApplicationDashboardService {
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
         Collection<GraphiteServer> graphiteServers = GraphiteServer.findAllByIdInList(graphiteServerIds)
 
-        if (jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
-            jobGroup.jobHealthGraphiteServers.removeAll(graphiteServers)
-            jobGroup.save(failOnError: true, flush: true)
+        graphiteServers.each { graphiteServer ->
+            if (jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
+                jobGroup.jobHealthGraphiteServers.remove(graphiteServer)
+            }
+        }
+        jobGroup.save(failOnError: true, flush: true)
+
+        if (!jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
             return [removed: true]
         } else {
             return [removed: false]
