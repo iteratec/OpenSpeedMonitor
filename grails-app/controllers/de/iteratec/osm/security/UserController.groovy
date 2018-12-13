@@ -28,16 +28,15 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
         if (params.password == "*****" ||params.password == "")
             params.password = User.findById(params.id).password
         doUpdate { user ->
-            /* grails-spring-security-ui issue 89, PR #95 */
-            //uiUserStrategy.updateUser params, user, roleNamesFromParams()
             updateUser(user as User, params, roleNamesFromParams())
         }
     }
 
+    @Transactional
     private def updateUser(User user, Map params, List roleNames) {
         changeProperties(user, params)
         updatePassword(user, params)
-        user.save(onFailError: true, flush: true)
+        user.save(failOnError: true, flush: true)
         changedAuthorities(user, roleNames)
     }
 
@@ -45,15 +44,15 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
         Map changedProperties = [:]
         ['username', 'email'].each { key ->
             if(params.containsKey(key) && user[key] != params[key]) {
-                changedProperties.put(key, params[key])
+                changedProperties[key] = params[key]
             }
         }
         ['enabled', 'accountExpired', 'accountLocked', 'passwordExpired'].each {key ->
             if(user[key] == true && !params.containsKey(key)) {
-                changedProperties.put(key, false)
+                changedProperties[key] = false
             }
             else if(user[key] == false && params[key] == "on") {
-                changedProperties.put(key, true)
+                changedProperties[key] = true
             }
         }
         changedProperties.each {entry ->
@@ -71,6 +70,7 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
         }
     }
 
+    @Transactional
     private def changedAuthorities(User u, List roleNames) {
         List<Role> newRoles = roleNames.collect{ Role.findByAuthority(it) }
         Set<Role> userRoles = u.getAuthorities()
@@ -80,7 +80,7 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
             UserRole.where {user == u && (role in rolesToDelete)}.deleteAll()
         }
         rolesToCreate.each {
-            new UserRole(user: u, role: it).save(onFailError: true, flush: true)
+            new UserRole(user: u, role: it).save(failOnError: true, flush: true)
         }
     }
 }
