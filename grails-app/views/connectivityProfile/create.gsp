@@ -5,7 +5,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="layout" content="layoutOsm" />
-        <g:set var="entityName" value="${message(code: 'connectivityProfile.label', default: 'ConnectivityProfile')}" />
+        <g:set var="entityName" value="${message(code: 'connectivityProfile.label', default: 'ConnectivityProfile')}" scope="request"/>
         <title><g:message code="default.create.label" args="[entityName]" /></title>
     </head>
 
