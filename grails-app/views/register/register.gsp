@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta name="layout" content="layoutOsm" />
-	<g:set var="entityName" value="${message(code: 'register.label', default: 'Register')}" />
+	<g:set var="entityName" value="${message(code: 'register.label', default: 'Register')}" scope="request"/>
 	<title><g:message code="spring.security.ui.register.title" args="[entityName]" /></title>
 </head>
 <body>
