@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta name="layout" content="layoutOsm" />
-        <g:set var="entityName" value="${message(code: 'role.label', default: 'Role')}" />
+        <g:set var="entityName" value="${message(code: 'role.label', default: 'Role')}" scope="request"/>
         <title><g:message code="default.edit.label" args="[entityName]" /></title>
     </head>
     <body>
