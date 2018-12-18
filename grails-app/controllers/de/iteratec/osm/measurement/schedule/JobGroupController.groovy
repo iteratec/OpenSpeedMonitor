@@ -135,8 +135,7 @@ class JobGroupController {
             return
         }
 
-        jobGroup.resultGraphiteServers.clear()
-        jobGroup.jobHealthGraphiteServers.clear()
+        clearGraphite()
         if (params.version) {
             def version = params.version.toLong()
             if (jobGroup.version > version) {
@@ -156,8 +155,7 @@ class JobGroupController {
         }
 
 
-        jobGroup.resultGraphiteServers.clear()
-        jobGroup.jobHealthGraphiteServers.clear()
+        clearGraphite()
         params.list('resultGraphiteServers').each {
             jobGroup.resultGraphiteServers.add(GraphiteServer.findById(it))
         }
@@ -177,6 +175,11 @@ class JobGroupController {
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
         redirect(action: "show", id: jobGroup.id)
+    }
+
+    def clearGraphite() {
+        jobGroup.resultGraphiteServers.clear()
+        jobGroup.jobHealthGraphiteServers.clear()
     }
 
     /**

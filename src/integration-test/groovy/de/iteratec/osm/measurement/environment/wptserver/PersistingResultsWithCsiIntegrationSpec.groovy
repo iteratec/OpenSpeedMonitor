@@ -64,18 +64,18 @@ class PersistingResultsWithCsiIntegrationSpec extends NonTransactionalIntegratio
 
     void "EventResults of all steps will be saved if some have a customer satisfaction while others have not."() {
         Job.withNewSession {
-            given: ""
+            given: "Get WPT results with 5 steps and build job result"
             createTestDataCommonToAllTests()
             File file = new File("src/test/resources/WptResultXmls/MULTISTEP_1Run_5Steps.xml")
             WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
             JobResult.build(job: job, expectedSteps: 5, jobConfigRuns: 1, firstViewOnly: true,
                     testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
-            when: ""
+            when: "Job result gets persisted"
             jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
             List<EventResult> eventResults = EventResult.list()
 
-            then: ""
+            then: "All 5 event results are saved, only 3 have customer satisfaction"
             JobResult.list().size() == 1
             eventResults.size() == 5
             eventResults.findAll { it.csByWptDocCompleteInPercent }.size() == 3

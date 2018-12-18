@@ -240,12 +240,18 @@ class MetricReportingService {
         activity.done()
     }
 
+    private Set<JobGroup> findCSIGroups() {
+        return jobGroupService.findCSIGroups().findAll {
+            it.resultGraphiteServers?.any {
+                server -> server.reportCsiAggregationsToGraphiteServer
+            }
+        }
+    }
+
     private void reportPageCSIValues(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivityUpdater activity) {
         log.debug("reporting page csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
 
-        def groups = jobGroupService.findCSIGroups().findAll {
-            it.resultGraphiteServers.size() > 0 && it.resultGraphiteServers.any { server -> server.reportCsiAggregationsToGraphiteServer }
-        }
+        def groups = findCSIGroups()
         int size = groups.size()
         activity.beginNewStage("Report page CSI Values", size)
         groups.eachWithIndex { JobGroup eachJobGroup, int index ->
@@ -317,9 +323,7 @@ class MetricReportingService {
 
     private void reportShopCSICsiAggregations(Integer intervalInMinutes, DateTime reportingTimeStamp, BatchActivityUpdater activity) {
         log.debug("reporting shop csi-values with intervalInMinutes ${intervalInMinutes} for reportingTimestamp: ${reportingTimeStamp}")
-        def groups = jobGroupService.findCSIGroups().findAll {
-            it.resultGraphiteServers.size() > 0 && it.resultGraphiteServers.any { server -> server.reportCsiAggregationsToGraphiteServer }
-        }
+        def groups = findCSIGroups()
         int size = groups.size()
         activity.beginNewStage("Report CSI-Values", size)
         groups.eachWithIndex { JobGroup currentJobGroup, int index ->
