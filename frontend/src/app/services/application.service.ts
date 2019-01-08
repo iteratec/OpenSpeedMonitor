@@ -160,10 +160,16 @@ export class ApplicationService {
       });
   }
 
+  removeAndAddJobHealthGraphiteServers(application: Application, add: GraphiteServer[], remove: GraphiteServer[]) {
+    return this.sendRemoveJobHealthGraphiteServersRequest(application, remove).subscribe((res: any) => {
+        if (res.removed === true) {
+          this.saveJobHealthGraphiteServers(application, add);
+        }
+      })
+  }
+
   saveJobHealthGraphiteServers(application: Application, graphiteServers: GraphiteServer[]) {
-    const graphiteServerIds = graphiteServers.map(value => value.id);
-    return this.http.post('/applicationDashboard/rest/saveJobHealthGraphiteServers', {applicationId: application.id, graphiteServerIds: graphiteServerIds})
-      .pipe(handleError())
+    return this.sendAddJobHealthGraphiteServersRequest(application, graphiteServers)
       .subscribe((res: any) => {
         if (res.added === true) {
           this.loadAvailableGraphiteServers(application);
@@ -173,15 +179,24 @@ export class ApplicationService {
   }
 
   removeJobHealthGraphiteServers(application: Application, graphiteServers: GraphiteServer[]) {
+    return this.sendRemoveJobHealthGraphiteServersRequest(application, graphiteServers).subscribe((res: any) => {
+      if (res.removed === true) {
+        this.loadAvailableGraphiteServers(application);
+        this.loadActiveJobHealthGraphiteServers(application);
+      }
+    });
+  }
+
+  private sendAddJobHealthGraphiteServersRequest(application: Application, graphiteServers: GraphiteServer[]) {
+    const graphiteServerIds = graphiteServers.map(value => value.id);
+    return this.http.post('/applicationDashboard/rest/saveJobHealthGraphiteServers', {applicationId: application.id, graphiteServerIds: graphiteServerIds})
+      .pipe(handleError());
+  }
+
+  private sendRemoveJobHealthGraphiteServersRequest(application: Application, graphiteServers: GraphiteServer[]) {
     const graphiteServerIds = graphiteServers.map(value => value.id);
     return this.http.post('/applicationDashboard/rest/removeJobHealthGraphiteServers', {applicationId: application.id, graphiteServerIds: graphiteServerIds})
-      .pipe(handleError())
-      .subscribe((res: any) => {
-        if (res.removed === true) {
-          this.loadAvailableGraphiteServers(application);
-          this.loadActiveJobHealthGraphiteServers(application);
-        }
-      })
+      .pipe(handleError());
   }
 
   private sortApplicationsByName(applications: Application[]): Application[] {

@@ -29,11 +29,12 @@ export class GraphiteIntegrationComponent {
 
   save(): void {
     if (this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
-      if (this.graphiteServersToAdd.length) {
-        this.applicationService.saveJobHealthGraphiteServers(this.selectedApplication, this.graphiteServersToAdd);
-      }
-      if (this.graphiteServersToRemove.length) {
+      if (this.graphiteServersToRemove.length && this.graphiteServersToAdd.length) {
+        this.applicationService.removeAndAddJobHealthGraphiteServers(this.selectedApplication, this.graphiteServersToAdd, this.graphiteServersToRemove)
+      } else if (this.graphiteServersToRemove.length) {
         this.applicationService.removeJobHealthGraphiteServers(this.selectedApplication, this.graphiteServersToRemove);
+      } else if (this.graphiteServersToAdd.length) {
+        this.applicationService.saveJobHealthGraphiteServers(this.selectedApplication, this.graphiteServersToAdd);
       }
       this.ngxSmartModalService.close('graphiteIntegrationModal');
     } else {
