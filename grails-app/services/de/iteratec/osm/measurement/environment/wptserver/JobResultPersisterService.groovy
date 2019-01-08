@@ -131,7 +131,7 @@ class JobResultPersisterService {
 
     private invokeResultPersisters(WptResultXml resultXml, WebPageTestServer wptServer, Long jobId) {
         this.resultListeners.each { listener ->
-            log.info("calling listener ${listener.listenerName} for job id ${jobId}")
+            log.debug("calling listener ${listener.listenerName} for job id ${jobId}")
             if (listener.callListenerAsync()) {
                 Promise p = task {
                     JobResult.withNewSession {
@@ -139,7 +139,7 @@ class JobResultPersisterService {
                     }
                 }
                 p.onError { Throwable err -> log.error("${listener.getListenerName()} failed persisting results", err) }
-                p.onComplete { log.info("${listener.getListenerName()} successfully returned from async task") }
+                p.onComplete { log.debug("${listener.getListenerName()} successfully returned from async task") }
             } else {
                 listener.listenToResult(resultXml, wptServer, jobId)
             }

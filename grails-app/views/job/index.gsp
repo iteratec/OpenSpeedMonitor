@@ -7,7 +7,7 @@
     <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isj.jobs"/></title>
 
-    <g:set var="entityName" value="${message(code: 'de.iteratec.isj.job', default: 'Job')}"/>
+    <g:set var="entityName" value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" scope="request"/>
 
     <asset:stylesheet src="job/list"/>
 
