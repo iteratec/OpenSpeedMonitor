@@ -14,7 +14,7 @@ class JobStatisticService {
      * @param job
      */
     @Transactional
-    public void updateStatsFor(Job job) {
+    void updateStatsFor(Job job) {
 
         List<JobResult> results = getLast150CompletedJobResultsFor(job)
 
@@ -33,7 +33,6 @@ class JobStatisticService {
         } catch (e) {
             System.out.println(e.toString())
         }
-
     }
 
     private JobStatistic getStatOf(Job job){

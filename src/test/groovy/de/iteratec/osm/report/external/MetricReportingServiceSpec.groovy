@@ -558,7 +558,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
         GraphitePathRawData graphitePathRawData = new GraphitePathRawData(prefix: GRAPHITE_PREFIX, measurand: measurandForGraphitePath, cachedView: cachedView)
         graphiteServer.graphitePathsRawData = [graphitePathRawData]
 
-        jobGroup.graphiteServers = [graphiteServer]
+        jobGroup.resultGraphiteServers = [graphiteServer]
 
         return jobGroup
     }
@@ -596,7 +596,7 @@ class MetricReportingServiceSpec extends Specification implements BuildDataTest,
 
             graphiteServer.reportCsiAggregationsToGraphiteServer = true
 
-            group.graphiteServers = [graphiteServer]
+            group.resultGraphiteServers = [graphiteServer]
             Set<JobGroup> groupSet = [group.save(validate: false)] as Set
 
             return groupSet

@@ -1,6 +1,7 @@
 package de.iteratec.osm.result
 
 import org.hibernate.criterion.CriteriaSpecification
+import com.codahale.metrics.graphite.Graphite
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.ApplicationCsiDto
@@ -13,9 +14,12 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.report.chart.CsiAggregation
 import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
+import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
+import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
 
 @Transactional
@@ -243,5 +247,103 @@ class ApplicationDashboardService {
         }
 
         return results
+    }
+
+    def getActiveJobHealthGraphiteServers(Long jobGroupId) {
+        def jobHealthGraphiteServers = Job.createCriteria().list {
+            eq 'jobGroup.id', jobGroupId
+            eq 'deleted', false
+            jobGroup {
+                isNotEmpty 'jobHealthGraphiteServers'
+            }
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            projections {
+                jobGroup {
+                    jobHealthGraphiteServers {
+                        distinct('id', 'id')
+                        property('serverAdress', 'address')
+                        property('port', 'port')
+                        property('reportProtocol', 'protocol')
+                        property('webappUrl', 'webAppAddress')
+                        property('prefix', 'prefix')
+                    }
+                }
+            }
+        }
+        jobHealthGraphiteServers.each {
+            it.protocol = it.protocol.toString()
+        }
+        return jobHealthGraphiteServers
+    }
+
+    def getAvailableGraphiteServers(Long jobGroupId) {
+
+        Collection<GraphiteServer> graphiteServers = GraphiteServer.list()
+        def availableGraphiteServers = []
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+
+        if (!jobGroup.jobHealthGraphiteServers) {
+            graphiteServers.each { graphiteServer ->
+                availableGraphiteServers << [
+                        id           : graphiteServer.id,
+                        address      : graphiteServer.serverAdress,
+                        port         : graphiteServer.port,
+                        protocol     : graphiteServer.reportProtocol.toString(),
+                        webAppAddress: graphiteServer.webappUrl,
+                        prefix       : graphiteServer.prefix
+                ]
+            }
+            return availableGraphiteServers
+        } else {
+            graphiteServers.each { graphiteServer ->
+                if (!jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
+                    availableGraphiteServers << [
+                            id           : graphiteServer.id,
+                            address      : graphiteServer.serverAdress,
+                            port         : graphiteServer.port,
+                            protocol     : graphiteServer.reportProtocol.toString(),
+                            webAppAddress: graphiteServer.webappUrl,
+                            prefix       : graphiteServer.prefix
+                    ]
+                }
+            }
+            return availableGraphiteServers
+        }
+    }
+
+    def saveJobHealthGraphiteServers(Long jobGroupId, List<Long> graphiteServerIds) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+        Collection<GraphiteServer> graphiteServers = GraphiteServer.findAllByIdInList(graphiteServerIds)
+
+        graphiteServers.each { graphiteServer ->
+            if (!jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
+                jobGroup.jobHealthGraphiteServers.add(graphiteServer)
+            }
+        }
+        jobGroup.save(failOnError: true, flush: true)
+
+        if (jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
+            return [added: true]
+        } else {
+            return [added: false]
+        }
+    }
+
+    def removeJobHealthGraphiteServers(Long jobGroupId, List<Long> graphiteServerIds) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+        Collection<GraphiteServer> graphiteServers = GraphiteServer.findAllByIdInList(graphiteServerIds)
+
+        graphiteServers.each { graphiteServer ->
+            if (jobGroup.jobHealthGraphiteServers.contains(graphiteServer)) {
+                jobGroup.jobHealthGraphiteServers.remove(graphiteServer)
+            }
+        }
+        jobGroup.save(failOnError: true, flush: true)
+
+        if (!jobGroup.jobHealthGraphiteServers.containsAll(graphiteServers)) {
+            return [removed: true]
+        } else {
+            return [removed: false]
+        }
     }
 }

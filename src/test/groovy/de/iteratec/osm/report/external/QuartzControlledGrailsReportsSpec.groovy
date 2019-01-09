@@ -296,8 +296,8 @@ class QuartzControlledGrailsReportsSpec extends Specification implements BuildDa
     private void mockJobGroupDaoService() {
         def jobGroupService = Stub(JobGroupService) {
             findCSIGroups() >> {
-                JobGroup jobGroupWithGraphiteServers = JobGroup.build(name: jobGroupWithServersName, graphiteServers: getGraphiteServers())
-                JobGroup jobGroupWithoutGraphiteServers = JobGroup.build(name: jobGroupWithoutServersName, graphiteServers: [])
+                JobGroup jobGroupWithGraphiteServers = JobGroup.build(name: jobGroupWithServersName, resultGraphiteServers: getGraphiteServers())
+                JobGroup jobGroupWithoutGraphiteServers = JobGroup.build(name: jobGroupWithoutServersName, resultGraphiteServers: [])
                 return [jobGroupWithGraphiteServers,jobGroupWithoutGraphiteServers ] as Set
             }
         }

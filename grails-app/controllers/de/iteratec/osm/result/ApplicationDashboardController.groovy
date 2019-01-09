@@ -4,6 +4,7 @@ import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
+import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
 import grails.converters.JSON
@@ -69,6 +70,36 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, [numberOfFailingJobs: jobsWithErrors[0], minimumFailedJobSuccessRate: jobsWithErrors[1]])
     }
 
+    def getActiveJobHealthGraphiteServers(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        def jobHealthGraphiteServers = applicationDashboardService.getActiveJobHealthGraphiteServers(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, jobHealthGraphiteServers)
+    }
+
+    def getAvailableGraphiteServers(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        Collection<GraphiteServer> availableGraphiteServers = applicationDashboardService.getAvailableGraphiteServers(jobGroupId)
+
+        return ControllerUtils.sendObjectAsJSON(response, availableGraphiteServers)
+    }
+
+    def saveJobHealthGraphiteServers(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        List<Long> graphiteServerIds = command.graphiteServerIds
+        def message = applicationDashboardService.saveJobHealthGraphiteServers(jobGroupId, graphiteServerIds)
+
+        return ControllerUtils.sendObjectAsJSON(response, message)
+    }
+
+    def removeJobHealthGraphiteServers(DefaultApplicationCommand command) {
+        Long jobGroupId = command.applicationId
+        List<Long> graphiteServerIds = command.graphiteServerIds
+        def message = applicationDashboardService.removeJobHealthGraphiteServers(jobGroupId, graphiteServerIds)
+
+        return ControllerUtils.sendObjectAsJSON(response, message)
+    }
+
 
     /**
      * Rest controller that returns all jobs where at least one of the last five measurements failed.
@@ -91,6 +122,7 @@ class ApplicationDashboardController {
 
 class DefaultApplicationCommand implements Validateable {
     Long applicationId
+    List<Long> graphiteServerIds
 
     static constraints = {
         applicationId(nullable: false)

@@ -64,49 +64,55 @@ class CsiCalculationIntegrationSpec extends NonTransactionalIntegrationSpec {
     }
 
     void "csi won't be calculated without csi-configuration"() {
-        setup: "prepare Job and JobGroup"
-        Job job = Job.build(label: jobLabelFromXML, location: location)
-        JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
-                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
+        Job.withNewSession {
+            setup: "prepare Job and JobGroup"
+            Job job = Job.build(label: jobLabelFromXML, location: location)
+            JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
+                    testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
-        when: "larpService listens to result of JobGroup without csi configuration"
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-        Collection<EventResult> resultsWithCsiCalculated = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
+            when: "larpService listens to result of JobGroup without csi configuration"
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+            Collection<EventResult> resultsWithCsiCalculated = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
-        then: "persisted EventResult has no csi value"
-        resultsWithCsiCalculated.size() == 0
+            then: "persisted EventResult has no csi value"
+            resultsWithCsiCalculated.size() == 0
+        }
     }
 
     void "csi must be calculated with csi-configuration, all values are 100%"() {
-        setup: "prepare Job and JobGroup"
-        JobGroup jobGroupWithCsiConf = JobGroup.build(csiConfiguration: csiConfiguration_all_1)
-        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf, location: location)
-        JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
-                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
+        Job.withNewSession {
+            setup: "prepare Job and JobGroup"
+            JobGroup jobGroupWithCsiConf = JobGroup.build(csiConfiguration: csiConfiguration_all_1)
+            Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroupWithCsiConf, location: location)
+            JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
+                    testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
-        when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-        List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
+            when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 100%"
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+            List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
-        then: "persisted EventResult has csi value of 100%"
-        results.size() > 0
-        results*.csByWptDocCompleteInPercent.unique(false) == [100d]
+            then: "persisted EventResult has csi value of 100%"
+            results.size() > 0
+            results*.csByWptDocCompleteInPercent.unique(false) == [100d]
+        }
     }
 
     void "csi must be calculated with csi-configuration, all values are 50%"() {
-        setup: "prepare Job and JobGroup"
-        JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration_all_05)
-        Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroup, location: location)
-        JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
-                testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
+        Job.withNewSession {
+            setup: "prepare Job and JobGroup"
+            JobGroup jobGroup = JobGroup.build(csiConfiguration: csiConfiguration_all_05)
+            Job job = Job.build(label: jobLabelFromXML, jobGroup: jobGroup, location: location)
+            JobResult.build(job: job, expectedSteps: 15, jobConfigRuns: 1, firstViewOnly: true,
+                    testId: xmlResult.testId, jobResultStatus: JobResultStatus.RUNNING)
 
-        when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
-        jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
-        List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
+            when: "larpService listens to result of JobGroup with csi configuration that translates all load times to 50%"
+            jobResultPersisterService.handleWptResult(xmlResult, xmlResult.testId, job)
+            List<EventResult> results = EventResult.findAllByCsByWptDocCompleteInPercentIsNotNull()
 
-        then: "persisted EventResult has csi value of 50%"
-        results.size() > 0
-        results*.csByWptDocCompleteInPercent.unique(false) == [50d]
+            then: "persisted EventResult has csi value of 50%"
+            results.size() > 0
+            results*.csByWptDocCompleteInPercent.unique(false) == [50d]
+        }
     }
 
     private void createTestDataCommonForAllTests() {

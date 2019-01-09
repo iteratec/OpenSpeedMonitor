@@ -103,7 +103,7 @@ class JobRunService {
             }
         } catch (Exception e) {
             log.error("Polling jobrun ${testId} of job ${job.label}: An unexpected exception occured. Error gets persisted as unfinished JobResult now", e)
-            jobResultPersisterService.persistUnfinishedJobResult(job, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.PERSISTANCE_ERROR, WptStatus.UNKNOWN, e.getMessage())
         } finally {
             if (jobResultStatus.isTerminated()) {
                 jobSchedulingService.unscheduleTest(job, testId)
@@ -127,13 +127,13 @@ class JobRunService {
         }
         try {
             String testId = wptInstructionService.runtest(job, priority)
-            jobResultPersisterService.persistUnfinishedJobResult(job, testId, JobResultStatus.WAITING, WptStatus.PENDING, "Launched.")
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.WAITING, WptStatus.PENDING, "Launched.")
             jobSchedulingService.scheduleJobRunPolling(job, testId, new Date())
             return testId
         } catch (Exception e) {
             WptStatus wptStatus = e instanceof JobExecutionException ? e.wptStatus : WptStatus.TEST_DID_NOT_START
             String testId = e instanceof JobExecutionException ? e.testId : null
-            jobResultPersisterService.persistUnfinishedJobResult(job, testId, JobResultStatus.LAUNCH_ERROR, wptStatus, e.getMessage())
+            jobResultPersisterService.persistUnfinishedJobResult(job.id, testId, JobResultStatus.LAUNCH_ERROR, wptStatus, e.getMessage())
             throw new RuntimeException("An error occurred while launching job ${job.label}. Unfinished JobResult with error code will get persisted now: ${ExceptionUtils.getFullStackTrace(e)}")
         }
     }

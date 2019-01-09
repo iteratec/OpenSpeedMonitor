@@ -1,0 +1,98 @@
+<ul class="clickable-list integrations">
+  <li>
+    <a href="#" (click)="ngxSmartModalService.open('graphiteIntegrationModal')" class="integration-info">
+      <aside>
+        <i class="fas fa-rss" [ngClass]="{'active-integration': jobHealthGraphiteServers?.length}"></i>
+      </aside>
+      {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.title' | translate }}
+      <aside class="right-hand-icon">
+        <i class="fas fa-cog"></i>
+      </aside>
+      <small *ngIf="jobHealthGraphiteServers?.length">
+        <ng-container>{{jobHealthGraphiteServers[0]?.webAppAddress}}
+          <ng-container *ngIf="jobHealthGraphiteServers?.length > 1"> (+{{jobHealthGraphiteServers?.length-1}})</ng-container>
+        </ng-container>
+      </small>
+      <small *ngIf="!jobHealthGraphiteServers?.length">{{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.notConfigured' | translate }}
+      </small>
+    </a>
+  </li>
+</ul>
+
+<ngx-smart-modal id="graphiteIntegrationModal" identifier="graphiteIntegrationModal" (onAnyCloseEvent)="cancel()">
+  <h2>{{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.modalTitle' | translate }}</h2>
+  <hr>
+  <main>
+    <section class="server-overview">
+
+      <div class="dropdown">
+        <a class="btn btn-default select-graphite-server dropdown-toggle" id="selectGraphiteServer" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select' | translate }}
+          <i class="fas fa-caret-down"></i>
+        </a>
+
+        <ul class="dropdown-menu" aria-labelledby="selectGraphiteServerId">
+            <li *ngIf="!availableGraphiteServers?.length">
+              <a class="dropdown-item">{{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select.noneAvailable' | translate }}</a>
+            </li>
+            <li *ngFor="let graphiteServer of availableGraphiteServers">
+              <a class="dropdown-item" (click)="add(graphiteServer)">
+                {{graphiteServer.address}}
+              </a>
+            </li>
+          </ul>
+      </div>
+
+      <ul class="clickable-list">
+        <li *ngFor="let jobHealthGraphiteServer of jobHealthGraphiteServers">
+          <a>
+            <span class="title" (click)="toggleSelectedGraphiteServer(jobHealthGraphiteServer)">
+            {{ jobHealthGraphiteServer.address }}
+              <span class="detail">
+              {{ jobHealthGraphiteServer.prefix ? jobHealthGraphiteServer.prefix : 'none' }}.job-health.&lt;job_group&gt;.&lt;script&gt;.&lt;location&gt;&lt;jobId&gt;
+            </span>
+          </span>
+            <aside class="right-hand-icon" (click)="remove(jobHealthGraphiteServer)">
+              <i class="fas fa-times"></i>
+            </aside>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="server-detail">
+      <table *ngIf="selectedGraphiteServer">
+        <tr>
+          <td>Graphite Server Address</td>
+          <td>{{selectedGraphiteServer.address}}</td>
+        </tr>
+        <tr>
+          <td>Graphite Server Port</td>
+          <td>{{selectedGraphiteServer.port}}</td>
+        </tr>
+        <tr>
+          <td>Graphite Protocol</td>
+          <td>{{selectedGraphiteServer.protocol}}</td>
+        </tr>
+        <tr>
+          <td>Web App URL</td>
+          <td>{{selectedGraphiteServer.webAppAddress}}</td>
+        </tr>
+        <tr>
+          <td>Path Prefix</td>
+          <td>{{selectedGraphiteServer.prefix ? selectedGraphiteServer.prefix : "no prefix"}}</td>
+        </tr>
+      </table>
+    </section>
+
+  </main>
+  <footer>
+    {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerTop' | translate }}<br>
+    {{ 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerBottom' | translate }}
+  </footer>
+  <hr>
+  <div class="buttons">
+    <a (click)="save()" class="btn btn-primary">{{ 'frontend.default.button.save' | translate }}</a>
+    <a (click)="ngxSmartModalService.close('graphiteIntegrationModal')" class="btn btn-default">{{ 'frontend.default.button.cancel' | translate }}</a>
+  </div>
+</ngx-smart-modal>

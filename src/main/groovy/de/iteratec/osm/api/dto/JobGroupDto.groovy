@@ -21,7 +21,7 @@ class JobGroupDto {
         if(jobGroup.csiConfiguration != null) {
             result.csiConfiguration = CsiConfigurationDto.create(jobGroup.csiConfiguration)
         }
-        result.graphiteServers = GraphiteServerDto.create(jobGroup.graphiteServers)
+        result.graphiteServers = GraphiteServerDto.create(jobGroup.resultGraphiteServers)
 
         return result
     }

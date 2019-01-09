@@ -35,7 +35,8 @@ testDataConfig {
         'de.iteratec.osm.measurement.schedule.JobGroup' {
             def i = 1
             name = {-> "nameIncrementedViaBuildTestDataConfig_${i++}" }
-            graphiteServers = {-> []}
+            resultGraphiteServers = { -> [] }
+            jobHealthGraphiteServers = { -> [] }
         }
         'de.iteratec.osm.report.chart.CsiAggregation' {
             jobGroup = { -> JobGroup.build()}

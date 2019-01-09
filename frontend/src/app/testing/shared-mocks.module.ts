@@ -4,6 +4,7 @@ import {TranslateTestLoader} from './ngx-translate-mocks';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FormsModule} from "@angular/forms";
+import {NgxSmartModalModule} from "ngx-smart-modal";
 
 
 @NgModule({
@@ -17,12 +18,14 @@ import {FormsModule} from "@angular/forms";
     FormsModule,
     HttpClientTestingModule,
     RouterTestingModule,
+    NgxSmartModalModule.forRoot()
   ],
   exports: [
     TranslateModule,
     HttpClientTestingModule,
     RouterTestingModule,
-    FormsModule
+    FormsModule,
+    NgxSmartModalModule
   ]
 })
 export class SharedMocksModule {

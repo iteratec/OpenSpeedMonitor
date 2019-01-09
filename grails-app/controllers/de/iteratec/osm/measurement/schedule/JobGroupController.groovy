@@ -135,7 +135,7 @@ class JobGroupController {
             return
         }
 
-        jobGroup.graphiteServers.clear()
+        clearGraphite()
         if (params.version) {
             def version = params.version.toLong()
             if (jobGroup.version > version) {
@@ -155,11 +155,15 @@ class JobGroupController {
         }
 
 
-        jobGroup.graphiteServers.clear()
-        params.list('graphiteServers').each {
-            jobGroup.graphiteServers.add(GraphiteServer.findById(it))
+        clearGraphite()
+        params.list('resultGraphiteServers').each {
+            jobGroup.resultGraphiteServers.add(GraphiteServer.findById(it))
         }
-        params.remove('graphiteServers')
+        params.list('jobHealthGraphiteServers').each {
+            jobGroup.jobHealthGraphiteServers.add(GraphiteServer.findById(it))
+        }
+        params.remove('resultGraphiteServers')
+        params.remove('jobHealthGraphiteServers')
         def tagParam = params.remove('tags')
         def tags = [tagParam].flatten()
         jobGroup.tags = tags
@@ -171,6 +175,11 @@ class JobGroupController {
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
         redirect(action: "show", id: jobGroup.id)
+    }
+
+    def clearGraphite() {
+        jobGroup.resultGraphiteServers.clear()
+        jobGroup.jobHealthGraphiteServers.clear()
     }
 
     /**
@@ -229,12 +238,12 @@ class JobGroupController {
 
     def createAsync() {
         String name = params['name']
-        List<GraphiteServer> graphiteServers = params["graphiteServers"] != "null" ? GraphiteServer.getAll(params["graphiteServers"].tokenize(',[]\"')*.toLong()) : []
+        List<GraphiteServer> graphiteServers = params["resultGraphiteServers"] != "null" ? GraphiteServer.getAll(params["resultGraphiteServers"].tokenize(',[]\"')*.toLong()) : []
         CsiConfiguration csiConfiguration = params['csiConfiguration'] ? CsiConfiguration.findByLabel(params['csiConfiguration']) : null
         boolean persistDetailData = params['persistDetailData'].toBoolean()
         List<String> tags = params['tags'] != "null" ? params['tags'].tokenize(',[]\"') : []
 
-        JobGroup jobGroup = new JobGroup(name: name, graphiteServers: graphiteServers, csiConfiguration: csiConfiguration, persistDetailData: persistDetailData)
+        JobGroup jobGroup = new JobGroup(name: name, resultGraphiteServers: graphiteServers, csiConfiguration: csiConfiguration, persistDetailData: persistDetailData)
         if (!jobGroup.save(flush: true)) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
         } else {

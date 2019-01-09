@@ -70,6 +70,11 @@ class GraphiteServer {
     GraphiteSocketProvider.Protocol reportProtocol = GraphiteSocketProvider.Protocol.UDP
 
     /**
+     * Prefix for the GraphiteServer.
+     */
+    String prefix
+
+    /**
      * {@link GraphiteEventSourcePath}s, to create Events.
      */
     Collection<GraphiteEventSourcePath> graphiteEventSourcePaths = []
@@ -114,6 +119,7 @@ class GraphiteServer {
         reportProtocol(nullable: false, inList: GraphiteSocketProvider.Protocol.values() as List)
         graphitePathsCsiData(nullable: true)
         graphitePathsRawData(nullable: true)
+        prefix(nullable: true)
     }
 
     @Override

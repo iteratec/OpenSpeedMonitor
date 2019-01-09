@@ -10,7 +10,6 @@ import {Application} from "../../../../models/application.model";
 export class ApplicationJobStatusComponent implements OnChanges {
   @Input() failingJobStatistic: FailingJobStatistic;
   @Input() selectedApplication: Application;
-  @Input() isLoading: boolean;
 
   iconClass: string;
   infoText: string;
@@ -60,5 +59,4 @@ export class ApplicationJobStatusComponent implements OnChanges {
       return 'frontend.de.iteratec.osm.applicationDashboard.jobStatus.multipleFailingJobs';
     }
   }
-
 }
