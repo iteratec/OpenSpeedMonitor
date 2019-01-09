@@ -61,6 +61,13 @@
     </section>
 
     <section class="server-detail">
+      <button *ngIf="!showCreateSection" class="btn btn-primary" (click)="showCreationSection()">
+        {{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.addServer' | translate}}
+      </button>
+      <h2 *ngIf="showCreateSection">
+        {{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.addServerTitle' | translate}}
+      </h2>
+
       <table *ngIf="selectedGraphiteServer">
         <tr>
           <td>Graphite Server Address</td>
@@ -83,6 +90,57 @@
           <td>{{selectedGraphiteServer.prefix ? selectedGraphiteServer.prefix : "no prefix"}}</td>
         </tr>
       </table>
+
+      <form [formGroup]="createServerForm" *ngIf="showCreateSection && !selectedGraphiteServer" class="graphite-form-group">
+        <table>
+          <tr>
+            <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.address' | translate}}</td>
+            <td>
+              <input type="url"  class="btn btn-sm btn-default"
+                     placeholder="{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.address' | translate}}"
+                     formControlName="address">
+            </td>
+          </tr>
+          <tr>
+            <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.port' | translate}}</td>
+            <td>
+              <input type="number" class="btn btn-sm btn-default" placeholder="2003"
+                     formControlName="port">
+            </td>
+          </tr>
+          <tr>
+            <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.protocol' | translate}}</td>
+            <td>
+              <input type="text" class="btn btn-sm btn-default" placeholder="TCP"
+                     formControlName="protocol">
+            </td>
+          </tr>
+          <tr>
+            <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.webAppAddress' | translate}}</td>
+            <td>
+              <input type="url" class="btn btn-sm btn-default"
+                     placeholder="{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.webAppAddress' | translate}}"
+                     formControlName="webAppAddress">
+            </td>
+          </tr>
+          <tr>
+            <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.prefix' | translate}}</td>
+            <td>
+              <input type="text" class="btn btn-sm btn-default" placeholder="jobstatus"
+                     formControlName="prefix">
+            </td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>
+              <div class="creation-buttons">
+                <button type="reset" class="btn btn-default" (click)="cancelCreation()">{{'frontend.default.button.cancel' | translate}}</button>
+                <button type="submit" class="btn btn-primary" (click)="create()">{{'frontend.default.button.save' | translate}}</button>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </form>
     </section>
 
   </main>
