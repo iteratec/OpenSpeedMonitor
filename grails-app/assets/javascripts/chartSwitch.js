@@ -102,10 +102,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
             if (updatedMap["measurand"] == null) updatedMap["measurand"] = "{\"values\":[\"" + measurand + "\"]}";
         }
         var params = $.param(updatedMap, true);
-        var showLinks = false;
-        if (params.length > 0) {
-            showLinks = true;
-        }
+        var showLinks = true;
         updateUrl("#timeSeriesWithDataLink", OpenSpeedMonitor.urls.eventResultDashboardShowAll + "?" + params, showLinks);
         updateUrl("#pageAggregationWithDataLink", OpenSpeedMonitor.urls.pageAggregationShow + "?" + params, showLinks);
         updateUrl("#jobGroupAggregationWithDataLink", OpenSpeedMonitor.urls.jobGroupAggregationShow + "?" + params, showLinks);
