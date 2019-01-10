@@ -13,6 +13,7 @@ import {CsiValueBaseComponent} from "../shared/components/csi-value/csi-value-ba
 import {CsiValueMediumComponent} from "../shared/components/csi-value/csi-value-medium/csi-value-medium.component";
 import {ApplicationJobStatusComponent} from "./components/application-job-status/application-job-status.component";
 import {GraphiteIntegrationComponent} from "./components/application-job-status/graphite-integration/graphite-integration.component";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -21,7 +22,9 @@ describe('ApplicationDashboardComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        SharedMocksModule
+        SharedMocksModule,
+        FormsModule,
+        ReactiveFormsModule
       ],
       declarations: [
         ApplicationDashboardComponent,

@@ -1,5 +1,7 @@
 package de.iteratec.osm.report.external
 
+import de.iteratec.osm.measurement.environment.wptserver.Protocol
+import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.util.ControllerUtils
 import grails.converters.JSON
 import org.springframework.dao.DataIntegrityViolationException
@@ -125,6 +127,25 @@ class GraphiteServerController {
                 table: templateAsPlainText,
                 count: result.totalCount
         ])
+    }
+
+    def createGraphiteServer() {
+        try {
+            GraphiteServer server = new GraphiteServer(
+                    serverAdress: params.address,
+                    port: Integer.parseInt(params.port),
+                    webappPathToRenderingEngine: "render",
+                    webappProtocol: Protocol.HTTPS,
+                    reportProtocol: GraphiteSocketProvider.Protocol.valueOf(params.protocol),
+                    webappUrl: params.webAppAddress,
+                    prefix: params.prefix
+            )
+            server.save(failOnError: true, flush: true)
+            return ControllerUtils.sendObjectAsJSON(response, [success: true, id: server.id])
+        }
+        catch(e) {
+            return ControllerUtils.sendObjectAsJSON(response, [success: false, id: null])
+        }
     }
 
     protected void notFound() {

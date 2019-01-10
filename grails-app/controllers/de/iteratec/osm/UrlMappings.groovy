@@ -34,6 +34,7 @@ class UrlMappings {
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
+        "/graphiteServer/rest/$action"(controller: "graphiteServer")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller

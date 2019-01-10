@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
@@ -9,7 +9,7 @@ import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, 
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
-import {GraphiteServer} from "../modules/application-dashboard/models/graphite-server.model";
+import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";
 import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
 
 @Injectable()
@@ -250,6 +250,18 @@ export class ApplicationService {
   updateAvailableGraphiteServers(application: Application): Observable<GraphiteServer[]> {
     const params = this.createParams(application.id);
     return this.http.get<GraphiteServer[]>('/applicationDashboard/rest/getAvailableGraphiteServers', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+  createGraphiteServer(server: GraphiteServerDTO): Observable<Map<String, any>> {
+    let params = new HttpParams().set("port", server.port.toString());
+    params = params.set("address", server.address.toString());
+    params = params.set("prefix", server.prefix.toString());
+    params = params.set("protocol", server.protocol);
+    params = params.set("webAppAddress", server.webAppAddress.toString());
+    return this.http.post<GraphiteServerDTO>('/graphiteServer/rest/createGraphiteServer', params).pipe(
       handleError(),
       startWith(null)
     )
