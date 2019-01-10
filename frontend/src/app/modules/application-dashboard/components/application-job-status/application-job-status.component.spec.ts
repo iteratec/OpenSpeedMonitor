@@ -7,6 +7,7 @@ import {Application} from "../../../../models/application.model";
 import {FailingJobStatistic} from "../../models/failing-job-statistic.model";
 import {GraphiteIntegrationComponent} from "./graphite-integration/graphite-integration.component";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 describe('ApplicationJobStatusComponent', () => {
   let component: ApplicationJobStatusComponent;
@@ -32,7 +33,9 @@ describe('ApplicationJobStatusComponent', () => {
         GraphiteIntegrationComponent
       ],
       imports: [
-        SharedMocksModule
+        SharedMocksModule,
+        FormsModule,
+        ReactiveFormsModule
       ],
       providers: [
         ApplicationService,

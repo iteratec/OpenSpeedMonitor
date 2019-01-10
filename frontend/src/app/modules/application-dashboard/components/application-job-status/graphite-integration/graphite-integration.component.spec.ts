@@ -8,6 +8,7 @@ import {GlobalOsmNamespace} from "../../../../../models/global-osm-namespace.mod
 import {SharedModule} from "../../../../shared/shared.module";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {By} from "@angular/platform-browser";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 describe('GraphiteIntegrationComponent', () => {
   let component: GraphiteIntegrationComponent;
@@ -20,7 +21,9 @@ describe('GraphiteIntegrationComponent', () => {
       declarations: [ GraphiteIntegrationComponent ],
       imports: [
         SharedMocksModule,
-        SharedModule
+        SharedModule,
+        FormsModule,
+        ReactiveFormsModule
       ],
       providers: [
         ApplicationService,
@@ -59,6 +62,7 @@ describe('GraphiteIntegrationComponent', () => {
     expect(modalContent.innerText).toMatch("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.modalTitle\n" +
       "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select\n" +
       "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select.noneAvailable\n" +
+      "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.addServer\n" +
       "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerTop\n" +
       "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerBottom\n" +
       "frontend.default.button.savefrontend.default.button.cancel");
@@ -231,6 +235,27 @@ describe('GraphiteIntegrationComponent', () => {
     expect(component.jobHealthGraphiteServers[0].id).toBe(1);
   });
 
+  it("should create Server from FormControl", () => {
+    component.createServerForm.get("webAppAddress").setValue("app.iteratec");
+    component.createServerForm.get("address").setValue("test.iteratec");
+    component.createServerForm.get("prefix").setValue("jobstatus");
+    component.createServerForm.get("port").setValue(2003);
+    component.createServerForm.get("protocol").setValue("TCP");
+    spyOn(applicationService, "createGraphiteServer");
+    fixture.detectChanges();
+
+    component.create();
+    fixture.detectChanges();
+
+    expect(applicationService.createGraphiteServer).toHaveBeenCalledWith({
+      address: "test.iteratec",
+      id: null,
+      port : 2003,
+      prefix : "jobstatus",
+      protocol : "TCP",
+      webAppAddress : "app.iteratec"
+    });
+  });
 });
 
 class MockGrailsBridgeService extends GrailsBridgeService {

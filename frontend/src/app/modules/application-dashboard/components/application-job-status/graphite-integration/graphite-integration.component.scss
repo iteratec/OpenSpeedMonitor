@@ -104,4 +104,22 @@ ngx-smart-modal {
       margin: 0 10px;
     }
   }
+  .creation-buttons {
+    display: flex;
+    button {
+      flex-basis: 50%;
+      &:first-child {
+        margin-right: 5px;
+      }
+      &:last-child {
+        margin-left: 5px;
+      }
+    }
+  }
+  .graphite-form-group input {
+    text-align: left;
+  }
+  .required-dot {
+    color: darkred;
+  }
 }
