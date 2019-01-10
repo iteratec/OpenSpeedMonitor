@@ -6,6 +6,7 @@ import {Application} from "../../../../../models/application.model";
 import {GrailsBridgeService} from "../../../../../services/grails-bridge.service";
 import {FormGroup, FormControl} from "@angular/forms";
 import {switchMap} from "rxjs/operators";
+import {Observable} from "rxjs";
 
 @Component({
   selector: 'osm-graphite-integration',
@@ -98,28 +99,34 @@ export class GraphiteIntegrationComponent {
     if(!this.grailsBridgeService.globalOsmNamespace.user.loggedIn) {
       window.location.href = '/login/auth';
     }
-    this.applicationService.createGraphiteServer( {
+    const observable = this.applicationService.createGraphiteServer( {
       address : this.createServerForm.get('address').value,
       id : null,
       port : this.createServerForm.get('port').value,
       prefix : this.createServerForm.get('prefix').value,
       protocol : this.createServerForm.get('protocol').value,
       webAppAddress : this.createServerForm.get('webAppAddress').value
-    }).subscribe(next => {
-        if(next != null && next["success"] && next["id"] != null) {
-          this.resetFormGroup();
-          this.applicationService.selectedApplication$.pipe(
-            switchMap((application: Application) => this.applicationService.updateAvailableGraphiteServers(application))
-          ).subscribe(server => {
-            this.applicationService.availableGraphiteServers$.next(server);
-            this.selectCreatedServer(server, next["id"]);
-          });
-        }
-      }
-    )
+    });
+    if(observable){
+      this.resetFormGroup();
+      this.addNewServer(observable);
+    }
   }
 
-  private selectCreatedServer(server: GraphiteServer[], id: number, ): void {
+  addNewServer( observable: Observable<Map<String, any>> ) : void {
+    observable.subscribe(next => {
+      if (next != null && next["success"] && next["id"] != null) {
+        this.applicationService.selectedApplication$.pipe(
+          switchMap((application: Application) => this.applicationService.updateAvailableGraphiteServers(application))
+        ).subscribe(server => {
+          this.applicationService.availableGraphiteServers$.next(server);
+          this.selectNewServer(server, next["id"]);
+        });
+      }
+    });
+  }
+
+  private selectNewServer(server: GraphiteServer[], id: number, ): void {
     if (server != null) {
       const target = server.find(value => value.id == id);
       this.add(target);
