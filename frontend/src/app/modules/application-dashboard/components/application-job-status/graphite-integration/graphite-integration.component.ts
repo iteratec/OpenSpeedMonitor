@@ -143,4 +143,11 @@ export class GraphiteIntegrationComponent {
       prefix: new FormControl('jobstatus')
     });
   }
+
+  allFormsFilled() : boolean {
+    return this.createServerForm.get('address').value != "" &&
+      this.createServerForm.get('port').value.toString() != "" &&
+      this.createServerForm.get('webAppAddress').value != "" &&
+      this.createServerForm.get('protocol').value != "";
+  }
 }

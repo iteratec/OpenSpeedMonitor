@@ -96,7 +96,7 @@
           <tr>
             <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.address' | translate}}</td>
             <td>
-              <input type="url"  class="btn btn-sm btn-default"
+              <input type="url" class="form-control"
                      placeholder="{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.address' | translate}}"
                      formControlName="address">
             </td>
@@ -104,21 +104,21 @@
           <tr>
             <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.port' | translate}}</td>
             <td>
-              <input type="number" class="btn btn-sm btn-default" placeholder="2003"
+              <input type="number" class="form-control" placeholder="2003"
                      formControlName="port">
             </td>
           </tr>
           <tr>
             <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.protocol' | translate}}</td>
             <td>
-              <input type="text" class="btn btn-sm btn-default" placeholder="TCP"
+              <input type="text" class="form-control" placeholder="TCP"
                      formControlName="protocol">
             </td>
           </tr>
           <tr>
             <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.webAppAddress' | translate}}</td>
             <td>
-              <input type="url" class="btn btn-sm btn-default"
+              <input type="url" class="form-control"
                      placeholder="{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.webAppAddress' | translate}}"
                      formControlName="webAppAddress">
             </td>
@@ -126,7 +126,7 @@
           <tr>
             <td>{{'frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.prefix' | translate}}</td>
             <td>
-              <input type="text" class="btn btn-sm btn-default" placeholder="jobstatus"
+              <input type="text" class="form-control" placeholder="jobstatus"
                      formControlName="prefix">
             </td>
           </tr>
@@ -135,7 +135,8 @@
             <td>
               <div class="creation-buttons">
                 <button type="reset" class="btn btn-default" (click)="cancelCreation()">{{'frontend.default.button.cancel' | translate}}</button>
-                <button type="submit" class="btn btn-primary" (click)="create()">{{'frontend.default.button.save' | translate}}</button>
+                <button type="submit" class="btn btn-primary" (click)="create()"
+                [disabled]="!allFormsFilled()">{{'frontend.default.button.save' | translate}}</button>
               </div>
             </td>
           </tr>
