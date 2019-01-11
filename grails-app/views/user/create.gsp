@@ -17,7 +17,7 @@
                 </g:eachError>
             </ul>
             </g:hasErrors>
-            <g:form action="save" class="form-horizontal">
+            <g:form action="save" class="form-horizontal" useToken="true">
                 <ul class="nav nav-tabs section">
                     <li class="active"><a data-toggle="pill" href="#userMenu">User</a></li>
                     <li><a data-toggle="tab" href="#roleMenu">Role</a></li>
