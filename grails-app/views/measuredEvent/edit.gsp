@@ -2,6 +2,7 @@
 <html>
 <head>
     <g:set var="entityName" value="${message(code: 'measuredEvent.label', default: 'MeasuredEvent')}" scope="request"/>
+    <parameter name="layout_nosecondarymenu" value="${true}"/>
     <meta name="layout" content="layoutOsm"/>
     <title><g:message code="default.edit.label" args="[entityName]"/></title>
 </head>
