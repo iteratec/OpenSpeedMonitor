@@ -261,7 +261,7 @@ export class ApplicationService {
     params = params.set("prefix", server.prefix.toString());
     params = params.set("protocol", server.protocol);
     params = params.set("webAppAddress", server.webAppAddress.toString());
-    return this.http.post<GraphiteServerDTO>('/graphiteServer/rest/createGraphiteServer', params).pipe(
+    return this.http.post<GraphiteServerDTO>('/applicationDashboard/rest/createGraphiteServer', params).pipe(
       handleError(),
       startWith(null)
     )
