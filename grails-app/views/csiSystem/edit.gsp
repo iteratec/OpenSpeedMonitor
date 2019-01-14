@@ -10,7 +10,6 @@
 </head>
 
 <body>
-<g:render template="/_menu/submenubarWithoutDelete"/>
 <section id="edit-csiSystem" class="first">
 
     <div class="alert alert-danger" id="errorDiv" style="display: none" > </div>

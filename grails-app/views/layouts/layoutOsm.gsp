@@ -23,7 +23,6 @@
     </head>
 
     <body>
-
         <!-----------------------------------------------------Github ribbon-->
         %{--from http://tholman.com/github-corners/--}%
         <div id="fork-me">

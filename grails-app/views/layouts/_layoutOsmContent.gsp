@@ -6,7 +6,7 @@
 
         <div class="card">
         <!-- Secondary menu in one row (e.g., actions for current controller) -->
-            <g:if test="${!layout_nosecondarymenu}">
+            <g:if test="${!pageProperty(name: 'page.layout_nosecondarymenu')}">
                 <div class="row">
                     <div class="col-md-12">
                         <g:render template="/_menu/submenubar"/>
