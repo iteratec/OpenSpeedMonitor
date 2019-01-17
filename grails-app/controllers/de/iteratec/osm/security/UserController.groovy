@@ -33,7 +33,7 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
     }
 
     @Transactional
-    private def updateUser(User user, Map params, List roleNames) {
+    private def updateUser(User user, Map params, List<String> roleNames) {
         changeProperties(user, params)
         updatePassword(user, params)
         user.save(failOnError: true, flush: true)
@@ -71,13 +71,14 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
     }
 
     @Transactional
-    private def changedAuthorities(User u, List roleNames) {
+    private def changedAuthorities(User u, List<String> roleNames) {
         List<Role> newRoles = roleNames.collect{ Role.findByAuthority(it) }
         Set<Role> userRoles = u.getAuthorities()
         Set<Role> rolesToDelete = userRoles.findAll{ !(it in newRoles) }
         List<Role> rolesToCreate = newRoles.findAll{ !(it in userRoles)}
         if(!rolesToDelete.empty) {
-            UserRole.where {user == u && (role in rolesToDelete)}.deleteAll()
+            List<UserRole> roles = UserRole.findAllByUserAndRoleInList(u, rolesToDelete.toList())
+            roles.each {it.delete()}
         }
         rolesToCreate.each {
             new UserRole(user: u, role: it).save(failOnError: true, flush: true)
