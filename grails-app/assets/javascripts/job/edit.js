@@ -436,7 +436,8 @@ function getCustomConnNameFromDom() {
 function createJobGroup(createJobGroupUrl) {
     var modalDialog = $("#jobGroupModal");
     var name = modalDialog.find("#name").val();
-    var graphiteServerIds = modalDialog.find("#graphiteServers").val();
+    var resultGraphiteServerIds = modalDialog.find("#resultGraphiteServers").val();
+    var jobHealthGraphiteServerIds = modalDialog.find("#jobHealthGraphiteServers").val();
     var csiConfiguration = modalDialog.find("#csiConfiguration").val();
     var tags = modalDialog.find("#jobGroupTags").tagit("assignedTags");
     var persistDetailData = modalDialog.find("#persistDetailData").attr("checked") ? true : false;
@@ -448,7 +449,8 @@ function createJobGroup(createJobGroupUrl) {
         type: 'POST',
         data: {
             name: name,
-            graphiteServers: JSON.stringify(graphiteServerIds),
+            resultGraphiteServers: JSON.stringify(resultGraphiteServerIds),
+            jobHealthGraphiteServers: JSON.stringify(jobHealthGraphiteServerIds),
             tags: JSON.stringify(tags),
             csiConfiguration: csiConfiguration,
             persistDetailData: persistDetailData
@@ -466,12 +468,4 @@ function createJobGroup(createJobGroupUrl) {
             errorContainer.removeClass("hidden");
         }
     });
-}
-
-
-function selectAllGraphiteServer(select) {
-    var obj = $("#graphiteServers")[0];
-    for (var i = 0; i < obj.options.length; i++) {
-        obj.options[i].selected = select;
-    }
 }

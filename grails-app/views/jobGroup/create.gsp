@@ -34,30 +34,6 @@
             </g:form>
 
         </section>
-        <content tag="include.bottom">
-            <asset:javascript src="node_modules/tag-it/js/tag-it.min.js"/>
-            <asset:script type="text/javascript">
-                $(function() {
-
-                    $("ul[name='jobGroupTags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags')}'});
-                });
-
-                function selectAllResultGraphiteServer(select) {
-                    var obj = $("#resultGraphiteServers")[0];
-                    for (var i=0; i<obj.options.length; i++) {
-                        obj.options[i].selected = select;
-                    }
-                }
-
-                function selectAllJobHealthtGraphiteServer(select) {
-                    var obj = $("#jobHealthGraphiteServers")[0];
-                    for (var i=0; i<obj.options.length; i++) {
-                        obj.options[i].selected = select;
-                    }
-                }
-            </asset:script>
-        </content>
-
     </body>
 
 </html>
