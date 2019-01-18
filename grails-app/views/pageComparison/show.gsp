@@ -6,6 +6,7 @@
     <title><g:message code="de.iteratec.isocsi.pageComparision.title" default="Page Comparison"/></title>
     <asset:stylesheet src="/d3Charts/barChartHorizontal.less"/>
     <asset:stylesheet src="/csiBenchmark/show.less"/>
+    <asset:stylesheet src="/pageAggregation/show.less"/>
 
 </head>
 

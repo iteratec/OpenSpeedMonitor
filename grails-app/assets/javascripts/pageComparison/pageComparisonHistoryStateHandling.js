@@ -40,6 +40,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         state['firstPages'] = [];
         state['secondJobGroups'] = [];
         state['secondPages'] = [];
+        state["selectedPercentile"] = $('input[id=percentageField]').val();
         window.pageComparisonComponent.getComparisons().forEach(function (comparison) {
             state['firstJobGroups'].push(comparison['firstJobGroupId']);
             state['firstPages'].push(comparison['firstPageId']);
@@ -66,6 +67,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         setComparisons(state);
         setMeasurand(state);
         setAggregationValue(state);
+        setPercentile(state);
         loadedState = encodedState;
         if (state['firstJobGroups'] && state['firstPages'] && state['secondJobGroups'] && state['secondPages']) {
             $(window).trigger("historyStateLoaded");
@@ -116,8 +118,19 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageComparison = (function () {
         var isAvg = state["selectedAggregationValue"] === "avg";
         $("#averageButton input").prop("checked", isAvg);
         $("#averageButton").toggleClass("active", isAvg);
-        $("#medianButton input").prop("checked", !isAvg);
-        $("#medianButton").toggleClass("active", !isAvg);
+        $("#percentileButton input").prop("checked", !isAvg);
+        $("#percentileButton").toggleClass("active", !isAvg);
+    };
+
+    var setPercentile = function (state) {
+        if(!state["selectedPercentile"]) {
+            return
+        }
+        var percentile = state["selectedPercentile"];
+        if(percentile.match("\\d{1,3}")) {
+            $("input[id='percentageSlider']").val(percentile);
+            $("input[id='percentageField']").val(percentile);
+        }
     };
 
     var setMeasurand = function (params) {
