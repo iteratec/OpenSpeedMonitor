@@ -38,7 +38,13 @@ class JobGroupController {
     def save() {
         String configurationLabel = params.remove("csiConfiguration")
         def tagParam = params.remove('tags')
-        def jobGroup = new JobGroup(params)
+        String name = params['name']
+        List<GraphiteServer> resultGraphiteServers = params["resultGraphiteServers"] != "null" ? GraphiteServer.getAll(params["resultGraphiteServers"]) : []
+        List<GraphiteServer> jobHealthGraphiteServers = params["jobHealthGraphiteServers"] != "null" ? GraphiteServer.getAll(params["jobHealthGraphiteServers"]) : []
+        CsiConfiguration csiConfiguration = params['csiConfiguration'] ? CsiConfiguration.findByLabel(params['csiConfiguration']) : null
+        boolean persistDetailData = params['persistDetailData'] ? params['persistDetailData'].toBoolean() : false
+
+        JobGroup jobGroup = new JobGroup(name: name, resultGraphiteServers: resultGraphiteServers, jobHealthGraphiteServers: jobHealthGraphiteServers, csiConfiguration: csiConfiguration, persistDetailData: persistDetailData)
 
         CsiConfiguration configuration = CsiConfiguration.findByLabel(configurationLabel)
         if (configuration) {
@@ -135,7 +141,6 @@ class JobGroupController {
             return
         }
 
-        clearGraphite()
         if (params.version) {
             def version = params.version.toLong()
             if (jobGroup.version > version) {
@@ -155,7 +160,8 @@ class JobGroupController {
         }
 
 
-        clearGraphite()
+        jobGroup.resultGraphiteServers.clear()
+        jobGroup.jobHealthGraphiteServers.clear()
         params.list('resultGraphiteServers').each {
             jobGroup.resultGraphiteServers.add(GraphiteServer.findById(it))
         }
@@ -175,11 +181,6 @@ class JobGroupController {
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'jobGroup.label', default: 'JobGroup'), jobGroup.id])
         redirect(action: "show", id: jobGroup.id)
-    }
-
-    def clearGraphite() {
-        jobGroup.resultGraphiteServers.clear()
-        jobGroup.jobHealthGraphiteServers.clear()
     }
 
     /**
@@ -238,12 +239,13 @@ class JobGroupController {
 
     def createAsync() {
         String name = params['name']
-        List<GraphiteServer> graphiteServers = params["resultGraphiteServers"] != "null" ? GraphiteServer.getAll(params["resultGraphiteServers"].tokenize(',[]\"')*.toLong()) : []
+        List<GraphiteServer> resultGraphiteServers = params["resultGraphiteServers"] != "null" ? GraphiteServer.getAll(params["resultGraphiteServers"].tokenize(',[]\"')*.toLong()) : []
+        List<GraphiteServer> jobHealthGraphiteServers = params["jobHealthGraphiteServers"] != "null" ? GraphiteServer.getAll(params["jobHealthGraphiteServers"].tokenize(',[]\"')*.toLong()) : []
         CsiConfiguration csiConfiguration = params['csiConfiguration'] ? CsiConfiguration.findByLabel(params['csiConfiguration']) : null
-        boolean persistDetailData = params['persistDetailData'].toBoolean()
+        boolean persistDetailData = params['persistDetailData'] ? params['persistDetailData'].toBoolean() : false
         List<String> tags = params['tags'] != "null" ? params['tags'].tokenize(',[]\"') : []
 
-        JobGroup jobGroup = new JobGroup(name: name, resultGraphiteServers: graphiteServers, csiConfiguration: csiConfiguration, persistDetailData: persistDetailData)
+        JobGroup jobGroup = new JobGroup(name: name, resultGraphiteServers: resultGraphiteServers, jobHealthGraphiteServers: jobHealthGraphiteServers, csiConfiguration: csiConfiguration, persistDetailData: persistDetailData)
         if (!jobGroup.save(flush: true)) {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, jobGroup.errors.allErrors*.toString().toString())
         } else {
