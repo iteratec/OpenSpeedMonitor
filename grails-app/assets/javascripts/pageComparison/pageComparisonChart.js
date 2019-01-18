@@ -176,10 +176,15 @@ OpenSpeedMonitor.ChartModules.PageComparisonChart = (function (chartIdentifier) 
             .attr("transform", "translate(0, " + posY + ")");
     };
 
+    var isDataAvailable = function () {
+        return data.isDataAvailable();
+    };
+
     return {
         setData: setData,
         resetData: resetData,
-        render: render
+        render: render,
+        isDataAvailable: isDataAvailable
     };
 
 });
