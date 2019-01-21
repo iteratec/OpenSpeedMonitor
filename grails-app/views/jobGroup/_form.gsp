@@ -19,13 +19,13 @@
     <div class="col-md-6">
         <g:select id="resultGraphiteServers" name="resultGraphiteServers"
                   from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
-                  keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.id}"
+                  keys="${de.iteratec.osm.report.external.GraphiteServer?.list()*.id}"
                   multiple="true" optionKey="id" size="5" value="${jobGroup?.resultGraphiteServers*.id}"
                   class="many-to-many form-control"/>
     </div>
 
     <div class="col-md-3">
-        <a href="#" id="deselectAllResultGraphiteServer" onclick="selectAllResultGraphiteServer(false)">
+        <a href="#" id="deselectAllResultGraphiteServer" onclick="deselectGraphiteServers('resultGraphiteServers')">
             <i class="fas fa-undo" aria-hidden="true"></i>
             <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all"/>
         </a>
@@ -41,13 +41,13 @@
     <div class="col-md-6">
         <g:select id="jobHealthGraphiteServers" name="jobHealthGraphiteServers"
                   from="${de.iteratec.osm.report.external.GraphiteServer.list()*.serverAdress}"
-                  keys="${de.iteratec.osm.csi.CsiConfiguration?.list()*.id}"
+                  keys="${de.iteratec.osm.report.external.GraphiteServer?.list()*.id}"
                   multiple="true" optionKey="id" size="5" value="${jobGroup?.jobHealthGraphiteServers*.id}"
                   class="many-to-many form-control"/>
     </div>
 
     <div class="col-md-3">
-        <a href="#" id="deselectAllJobHealthGraphiteServer" onclick="selectAllJobHealthGraphiteServer(false)">
+        <a href="#" id="deselectAllJobHealthGraphiteServer" onclick="deselectGraphiteServers('jobHealthGraphiteServers')">
             <i class="fas fa-undo" aria-hidden="true"></i>
             <g:message message="de.iteratec.isocsi.jobGroup.deselect.all.graphiteServer" default="Deselect all"/>
         </a>
@@ -93,3 +93,19 @@
         </div>
     </div>
 </g:if>
+
+<content tag="include.bottom">
+    <asset:javascript src="node_modules/tag-it/js/tag-it.min.js"/>
+    <asset:script type="text/javascript">
+        $(function() {
+            $("ul[name='jobGroupTags']").tagit({select:true, tagSource: '${g.createLink(action: 'tags')}'});
+        });
+
+        function deselectGraphiteServers(selectElementId) {
+            var obj = $("select#" + selectElementId + " option");
+            for (var i = 0; i < obj.length; i++) {
+                obj[i].selected = false;
+            }
+        }
+    </asset:script>
+</content>
