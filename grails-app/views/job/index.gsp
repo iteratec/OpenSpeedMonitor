@@ -7,7 +7,7 @@
     <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isj.jobs"/></title>
 
-    <g:set var="entityName" value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" scope="request"/>
+    <g:set var="jobLabel" value="${message(code: 'de.iteratec.isj.job', default: 'Job')}" scope="request"/>
 
     <asset:stylesheet src="job/list"/>
 
@@ -211,7 +211,7 @@
 
             <div id="createJobContainer">
                 <a href="<g:createLink action="create"/>" class="btn btn-primary pull-right">
-                    <i class="fas fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
+                    <i class="fas fa-plus"></i> <g:message code="default.create.label" args="[jobLabel]"/>
                 </a>
             </div>
         </div>
