@@ -256,6 +256,7 @@ grails:
               alwaysUseDefault: true
               defaultTargetUrl: '/'
             interceptUrlMap: [
+                            {pattern: '/role/**',                                       access: ['denyAll']},
                             {pattern: "/static/console/**",                             access: ['ROLE_SUPER_ADMIN']},
                             {pattern: '/static/**',                                     access: ["permitAll"]},
                             {pattern: '/static/*',                                      access: ["permitAll"]},
