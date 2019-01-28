@@ -3,7 +3,7 @@
 <html>
     <head>
         <meta name="layout" content="layoutOsm" />
-        <g:set var="entityName" value="${message(code: 'connectivityProfile.label', default: 'Connection')}" scope="request"/>
+        <g:set var="connectivityLabel" value="${message(code: 'connectivityProfile.label', default: 'Connection')}" scope="request"/>
         <title><g:message code="connectivityProfile.label.plural" /></title>
     </head>
 
@@ -12,7 +12,7 @@
         <div class="card">
             <div class="table-filter">
                 <a href="<g:createLink action="create" />" class="btn btn-primary pull-right">
-                    <i class="fas fa-plus"></i> <g:message code="default.create.label" args="[entityName]"/>
+                    <i class="fas fa-plus"></i> <g:message code="default.create.label" args="[connectivityLabel]"/>
                 </a>
             </div>
             <section id="list-connectivityProfile" class="first">
