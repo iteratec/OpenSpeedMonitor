@@ -20,6 +20,18 @@ class UserController extends grails.plugin.springsecurity.ui.UserController {
     def show(User user) {
         respond user
     }
+
+    def edit() {
+        Map model = super.edit()
+        if (!model['roleMap']) {
+            List<Role> allRoles = Role.list()
+            allRoles.each { role ->
+                model['roleMap'].put(role, false)
+            }
+        }
+        return model
+    }
+
     def search(){
         params.action = "index"
         redirect(params)
