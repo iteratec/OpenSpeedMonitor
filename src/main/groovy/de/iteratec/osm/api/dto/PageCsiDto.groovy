@@ -7,5 +7,4 @@ class PageCsiDto {
     Long pageId
     String date
     double csiDocComplete
-    double csiVisComplete
 }
