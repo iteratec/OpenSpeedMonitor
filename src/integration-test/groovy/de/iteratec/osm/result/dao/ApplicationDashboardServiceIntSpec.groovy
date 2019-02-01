@@ -91,7 +91,6 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         applicationCsiDtos[jobGroup1.id].csiValues.length == 1
         applicationCsiDtos[jobGroup1.id].csiValues[0].date == today.format("yyyy-MM-dd")
         applicationCsiDtos[jobGroup1.id].csiValues[0].csiDocComplete == 50.0d
-        applicationCsiDtos[jobGroup1.id].csiValues[0].csiVisComplete == 60.0d
 
         applicationCsiDtos[jobGroup2.id].hasCsiConfiguration == true
         applicationCsiDtos[jobGroup2.id].hasJobResults == true
@@ -99,7 +98,6 @@ class ApplicationDashboardServiceIntSpec extends NonTransactionalIntegrationSpec
         applicationCsiDtos[jobGroup2.id].csiValues.length == 1
         applicationCsiDtos[jobGroup2.id].csiValues[0].date == today.format("yyyy-MM-dd")
         applicationCsiDtos[jobGroup2.id].csiValues[0].csiDocComplete == 70.0d
-        applicationCsiDtos[jobGroup2.id].csiValues[0].csiVisComplete == 80.0d
 
     }
 

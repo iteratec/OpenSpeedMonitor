@@ -61,11 +61,10 @@ class ApplicationDashboardService {
         pageCsiAggregationService.getOrCalculatePageCsiAggregations(from.toDate(), to.toDate(), dailyInterval,
                 csiGroup, pages).each {
             PageCsiDto pageCsiDto = new PageCsiDto()
-            if (it.csByWptDocCompleteInPercent && it.csByWptVisuallyCompleteInPercent) {
+            if (it.csByWptDocCompleteInPercent) {
                 pageCsiDto.pageId = it.page.id
                 pageCsiDto.date = it.started.format("yyy-MM-dd")
                 pageCsiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                pageCsiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
                 pageCsiDtos << pageCsiDto
             }
         }
@@ -180,7 +179,6 @@ class ApplicationDashboardService {
                 CsiDto csiDto = new CsiDto()
                 csiDto.date = it.started.format("yyyy-MM-dd")
                 csiDto.csiDocComplete = it.csByWptDocCompleteInPercent
-                csiDto.csiVisComplete = it.csByWptVisuallyCompleteInPercent
                 csiDtos << csiDto
             }
         }
