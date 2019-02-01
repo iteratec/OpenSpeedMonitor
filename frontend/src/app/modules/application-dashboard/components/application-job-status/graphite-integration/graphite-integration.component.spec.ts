@@ -59,13 +59,15 @@ describe('GraphiteIntegrationComponent', () => {
 
     let modalContent = fixture.nativeElement.querySelector('.nsm-content');
     expect(modalContent).toBeTruthy();
-    expect(modalContent.innerText).toMatch("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.modalTitle\n" +
-      "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select\n" +
-      "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select.noneAvailable\n" +
-      "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.addServer\n" +
-      "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerTop\n" +
-      "frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerBottom\n" +
-      "frontend.default.button.savefrontend.default.button.cancel");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.modalTitle");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.select.noneAvailable");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.addServer");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.modalTitle");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerTop");
+    expect(modalContent.innerText).toContain("frontend.de.iteratec.osm.applicationDashboard.jobStatus.graphiteIntegration.footerBottom");
+    expect(modalContent.innerText).toContain("frontend.default.button.save");
+    expect(modalContent.innerText).toContain("frontend.default.button.cancel");
     let openedModals = ngxSmartModalService.getOpenedModals();
     expect(openedModals.length).toEqual(1);
 
