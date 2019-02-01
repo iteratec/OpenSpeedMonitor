@@ -331,7 +331,7 @@ class EventResultPersisterService implements iResultListener {
             viewtag.parent().breakdown.children().forEach { measurand ->
                 Measurand thisMeasurand = Measurand.byResultXmlTag(measurand.name())
                 if(thisMeasurand) {
-                    result.setProperty(thisMeasurand.getEventResultField(), measurand.toInteger())
+                    result.setProperty(thisMeasurand.getEventResultField(), measurand.bytes.toInteger())
                 }
             }
         }

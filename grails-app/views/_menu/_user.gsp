@@ -59,11 +59,6 @@
 					</li>
 
 					<li class="controller">
-						<g:link controller="role" action="index"><i class="fas fa-trophy"
-																	aria-hidden="true"></i> <g:message
-								code="role.label" default="Role"/></g:link>
-					</li>
-					<li class="controller">
 						<g:link controller="registrationCode" action="index"><i class="fas fa-key"
 																				aria-hidden="true"></i> <g:message
 								code="registrationCode.label" default="RegistrationCode"/></g:link>
