@@ -427,7 +427,6 @@ class TabularResultPresentationController {
         result << 'ConnectivityBandwithUp'
         result << 'ConnectivityLatency'
         result << 'ConnectivityPacketLoss'
-        result << 'WPTResultUrl'
         return result
     }
 }
