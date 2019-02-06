@@ -1,5 +1,7 @@
 package de.iteratec.osm.report.external
 
+import grails.util.Environment
+
 class JobHealthReportJob {
 
     JobHealthReportService jobHealthReportService
@@ -10,7 +12,9 @@ class JobHealthReportJob {
     }
 
     def execute() {
-        Date date = new Date()
-        jobHealthReportService.reportJobHealthStatusToGraphite(date)
+        if (Environment.getCurrent() == Environment.PRODUCTION) {
+            Date date = new Date()
+            jobHealthReportService.reportJobHealthStatusToGraphite(date)
+        }
     }
 }
