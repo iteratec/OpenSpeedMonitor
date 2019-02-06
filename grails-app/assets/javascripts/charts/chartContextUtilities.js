@@ -92,6 +92,10 @@ $.contextMenu({
             name: chartContextMenuI18N.filmstrip,
             icon: "fas fa-film"
         },
+        "filmstripTool": {
+            name: chartContextMenuI18N.filmstripTool,
+            icon: "fas fa-money-check"
+        },
         "compare": {
             name: chartContextMenuI18N.compareFilmstrips,
             icon: "fas fa-columns",
@@ -109,7 +113,7 @@ $.contextMenu({
             callback: function (itemKey) {
                 // if current point is not selected yet, do it and then open the comparison view
                 if (OpenSpeedMonitor.chartContextUtil.isNotSelected(rickshawGraphBuilder.graph.nearestPoint)) {
-                  OpenSpeedMonitor.chartContextUtil.selectPoint(rickshawGraphBuilder.graph.nearestPoint);
+                    OpenSpeedMonitor.chartContextUtil.selectPoint(rickshawGraphBuilder.graph.nearestPoint);
                 }
                 window.open(OpenSpeedMonitor.chartContextUtil.buildWptUrl(itemKey, rickshawGraphBuilder.graph.nearestPoint));
             }
@@ -123,7 +127,7 @@ $.contextMenu({
                 return OpenSpeedMonitor.chartContextUtil.isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
             },
             callback: function () {
-              OpenSpeedMonitor.chartContextUtil.selectPoint(rickshawGraphBuilder.graph.nearestPoint);
+                OpenSpeedMonitor.chartContextUtil.selectPoint(rickshawGraphBuilder.graph.nearestPoint);
             }
         },
         "deselectPoint": {
@@ -134,7 +138,7 @@ $.contextMenu({
                 return !OpenSpeedMonitor.chartContextUtil.isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
             },
             callback: function () {
-              OpenSpeedMonitor.chartContextUtil.deselectPoint(rickshawGraphBuilder.graph.nearestPoint);
+                OpenSpeedMonitor.chartContextUtil.deselectPoint(rickshawGraphBuilder.graph.nearestPoint);
             }
         }
     }
@@ -167,7 +171,7 @@ $.contextMenu({
                 return rickshawGraphBuilder.graph.selectedPoints.length > 0;
             },
             callback: function () {
-              OpenSpeedMonitor.chartContextUtil.deselectAllPoints();
+                OpenSpeedMonitor.chartContextUtil.deselectAllPoints();
             }
         }
     }
@@ -180,9 +184,9 @@ $('#rickshaw_main').on('click', '.chart-context-menu', function (event) {
         var nearestPoint = rickshawGraphBuilder.graph.nearestPoint;
 
         if (OpenSpeedMonitor.chartContextUtil.isNotSelected(nearestPoint)) {
-          OpenSpeedMonitor.chartContextUtil.selectPoint(nearestPoint);
+            OpenSpeedMonitor.chartContextUtil.selectPoint(nearestPoint);
         } else {
-          OpenSpeedMonitor.chartContextUtil.deselectPoint(nearestPoint)
+            OpenSpeedMonitor.chartContextUtil.deselectPoint(nearestPoint)
         }
 
         event.preventDefault();
@@ -194,182 +198,187 @@ $('#rickshaw_main').on('click', '.chart-context-menu', function (event) {
 /**
  * This module provides utilities used for construction and functionality of chart context menus.
  */
-OpenSpeedMonitor.chartContextUtil = (function(){
+OpenSpeedMonitor.chartContextUtil = (function () {
 
-  function buildWptUrl(wptView, nearestPoint) {
-    var url = null;
-    var defaultVideoParameter = '&ival=100&end=full';
-    if (typeof nearestPoint == 'undefined' || typeof wptView == 'undefined') {
-      // build url for the comparison view launched from the chart context menu
-      url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl +
-        "video/compare.php?tests=" + comparingPartOfFilmstripsURL()+defaultVideoParameter;
-    } else {
-      // build url for the comparison view launched from a a specific point
+    function buildWptUrl(wptView, nearestPoint) {
+        var url = null;
+        var defaultVideoParameter = '&ival=100&end=full';
+        if (typeof nearestPoint == 'undefined' || typeof wptView == 'undefined') {
+            // build url for the comparison view launched from the chart context menu
+            url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl +
+                "video/compare.php?tests=" + comparingPartOfFilmstripsURL() + defaultVideoParameter;
+        } else {
+            // build url for the comparison view launched from a a specific point
 
-      // get the wpt infos of the corresponding data point
-      var wptServerBaseurl = nearestPoint.value.wptResultInfo.wptServerBaseurl;
-      var testId = nearestPoint.value.wptResultInfo.testId;
-      var numberOfWptRun = nearestPoint.value.wptResultInfo.numberOfWptRun;
-      var cachedView = nearestPoint.value.wptResultInfo.cachedView;
-      var cached = null;
-      var oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney;
+            // get the wpt infos of the corresponding data point
+            var wptServerBaseurl = nearestPoint.value.wptResultInfo.wptServerBaseurl;
+            var testId = nearestPoint.value.wptResultInfo.testId;
+            var numberOfWptRun = nearestPoint.value.wptResultInfo.numberOfWptRun;
+            var cachedView = nearestPoint.value.wptResultInfo.cachedView;
+            var cached = null;
+            var oneBaseStepIndexInJourney = nearestPoint.value.wptResultInfo.oneBaseStepIndexInJourney;
 
-      // build the url
-      if (wptView == "compare") {
-        url = wptServerBaseurl + "video/compare.php?tests=" + comparingPartOfFilmstripsURL() + defaultVideoParameter;
-      } else if (wptView == "filmstrip") {
-        cached = cachedView ? "1" : "0";
+            // build the url
+            if (wptView == "compare") {
+                url = wptServerBaseurl + "video/compare.php?tests=" + comparingPartOfFilmstripsURL() + defaultVideoParameter;
+            } else if (wptView == "filmstrip") {
+                cached = cachedView ? "1" : "0";
 
-        url = wptServerBaseurl + "video/compare.php?tests=" +
-          testId +
-          "-r:" + numberOfWptRun +
-          "-c:" + cached +
-          "-s:" + oneBaseStepIndexInJourney +
-          defaultVideoParameter;
-      } else {
-        cached = cachedView ? "cached/" : "";
+                url = wptServerBaseurl + "video/compare.php?tests=" +
+                    testId +
+                    "-r:" + numberOfWptRun +
+                    "-c:" + cached +
+                    "-s:" + oneBaseStepIndexInJourney +
+                    defaultVideoParameter;
+            } else if (wptView == "filmstripTool") {
+                url = "https://iteratec.github.io/wpt-filmstrip/#wptUrl=" + wptServerBaseurl +
+                    "&testId=" + testId +
+                    "&view=filmstrip" +
+                    "&step=" + oneBaseStepIndexInJourney;
+            } else {
+                cached = cachedView ? "cached/" : "";
 
-        url = wptServerBaseurl + "result/" + testId + "/" + cached;
+                url = wptServerBaseurl + "result/" + testId + "/" + cached;
 
-        if (wptView == "summary") url += "#run";
+                if (wptView == "summary") url += "#run";
 
-        url += numberOfWptRun;
+                url += numberOfWptRun;
 
-        switch (wptView) {
-          case "summary":
-            url += "_step";
-            break;
-          case "waterfallView":
-            url += "/details/#waterfall_view_step";
-            break;
-          case "performanceReview":
-            url += "/performance_optimization/#review_step";
-            break;
-          case "contentBreakdown":
-            url += "/breakdown/#breakdown_fv_step";
-            break;
-          case "domains":
-            url += "/domains/#breakdown_fv_step";
-            break;
-          case "screenshot":
-            url += "/screen_shot/#step_";
-            break;
-          default:
-            alert("URL could not be configured. Please try again.");
-            return;
+                switch (wptView) {
+                    case "summary":
+                        url += "_step";
+                        break;
+                    case "waterfallView":
+                        url += "/details/#waterfall_view_step";
+                        break;
+                    case "performanceReview":
+                        url += "/performance_optimization/#review_step";
+                        break;
+                    case "contentBreakdown":
+                        url += "/breakdown/#breakdown_fv_step";
+                        break;
+                    case "domains":
+                        url += "/domains/#breakdown_fv_step";
+                        break;
+                    case "screenshot":
+                        url += "/screen_shot/#step_";
+                        break;
+                    default:
+                        alert("URL could not be configured. Please try again.");
+                        return;
+                }
+
+                url += oneBaseStepIndexInJourney;
+            }
         }
 
-        url += oneBaseStepIndexInJourney;
-      }
+        return url;
     }
 
-    return url;
-  }
+    function comparingPartOfFilmstripsURL() {
+        var urlPart = "";
+        rickshawGraphBuilder.graph.selectedPoints.forEach(function (point) {
+            var testId = point.value.wptResultInfo.testId;
+            var numberOfWptRun = point.value.wptResultInfo.numberOfWptRun;
+            var cached = point.value.wptResultInfo.cachedView ? "1" : "0";
+            var oneBaseStepIndexInJourney = point.value.wptResultInfo.oneBaseStepIndexInJourney;
 
-  function comparingPartOfFilmstripsURL() {
-    var urlPart = "";
-    rickshawGraphBuilder.graph.selectedPoints.forEach(function (point) {
-      var testId = point.value.wptResultInfo.testId;
-      var numberOfWptRun = point.value.wptResultInfo.numberOfWptRun;
-      var cached = point.value.wptResultInfo.cachedView ? "1" : "0";
-      var oneBaseStepIndexInJourney = point.value.wptResultInfo.oneBaseStepIndexInJourney;
+            urlPart += testId +
+                "-r:" + numberOfWptRun +
+                "-c:" + cached +
+                "-s:" + oneBaseStepIndexInJourney + ",";
+        });
 
-      urlPart += testId +
-        "-r:" + numberOfWptRun +
-        "-c:" + cached +
-        "-s:" + oneBaseStepIndexInJourney + ",";
-    });
-
-    // return this part of the url, but delete the last unnecessary comma
-    return urlPart.slice(0, -1);
-  }
-
-
-  function selectPoint(nearestPoint) {
-    // selection is only possible if same server was used
-    if (rickshawGraphBuilder.graph.selectedPoints.length > 0) {
-      var server = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl;
-
-      if (server !== nearestPoint.value.wptResultInfo.wptServerBaseurl) {
-        $("#ContextMenuErrorModal").modal();
-        return;
-      }
+        // return this part of the url, but delete the last unnecessary comma
+        return urlPart.slice(0, -1);
     }
 
-    // create and save the html id for the dot in the 'rickshawGraphBuilder.graph.selectedPoints' datastructure
-    var html_id = nearestPoint.html_id = "selected_dot_" + (rickshawGraphBuilder.graph.selectedPoints.length + 1).toString();
-    // add the point to the datastructure
-    rickshawGraphBuilder.graph.selectedPoints.push(nearestPoint);
 
-    // create the html:
-    // get the current dot and mark it as saved
-    var activeDot = $('.dot.active')[0];
-    $(activeDot).addClass('saved');
-    // set an id for the ability to delete it individually
-    $(activeDot).attr('id', html_id);
+    function selectPoint(nearestPoint) {
+        // selection is only possible if same server was used
+        if (rickshawGraphBuilder.graph.selectedPoints.length > 0) {
+            var server = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl;
 
-    // create the new dot and copy the styles of the active dot but without the active context menu class property
-    var newSavedDot = $(activeDot).clone();
-    newSavedDot.removeClass('context-menu-active');
-    // get the distance to the left side
-    var detailElement = $('.detail')[0];
-    var left = $(detailElement).css("left");
-    $(newSavedDot).css("left", left);
+            if (server !== nearestPoint.value.wptResultInfo.wptServerBaseurl) {
+                $("#ContextMenuErrorModal").modal();
+                return;
+            }
+        }
 
-    // display the new saved dot in the chart
-    var chart = $('#rickshaw_chart');
-    $(chart).append(newSavedDot);
-  }
+        // create and save the html id for the dot in the 'rickshawGraphBuilder.graph.selectedPoints' datastructure
+        var html_id = nearestPoint.html_id = "selected_dot_" + (rickshawGraphBuilder.graph.selectedPoints.length + 1).toString();
+        // add the point to the datastructure
+        rickshawGraphBuilder.graph.selectedPoints.push(nearestPoint);
 
+        // create the html:
+        // get the current dot and mark it as saved
+        var activeDot = $('.dot.active')[0];
+        $(activeDot).addClass('saved');
+        // set an id for the ability to delete it individually
+        $(activeDot).attr('id', html_id);
 
-  function isNotSelected(point) {
-    var isNotSaved = true;
-    rickshawGraphBuilder.graph.selectedPoints.forEach(function (savedPoint) {
-      if (point.formattedXValue == savedPoint.formattedXValue &&
-        point.formattedYValue == savedPoint.formattedYValue &&
-        point.name == savedPoint.name) {
-        isNotSaved = false;
-      }
-    });
+        // create the new dot and copy the styles of the active dot but without the active context menu class property
+        var newSavedDot = $(activeDot).clone();
+        newSavedDot.removeClass('context-menu-active');
+        // get the distance to the left side
+        var detailElement = $('.detail')[0];
+        var left = $(detailElement).css("left");
+        $(newSavedDot).css("left", left);
 
-    return isNotSaved;
-  }
-
-
-  function deselectPoint(point) {
-    var itemToRemove = null;
-    // get the current item in the datastructure
-    rickshawGraphBuilder.graph.selectedPoints.forEach(function (savedPoint) {
-      if (point.formattedXValue == savedPoint.formattedXValue &&
-        point.formattedYValue == savedPoint.formattedYValue &&
-        point.name == savedPoint.name) {
-        itemToRemove = savedPoint;
-      }
-    });
-    // delete the element from the datastructure
-    rickshawGraphBuilder.graph.selectedPoints.splice(itemToRemove, 1);
-
-    // remove the dot from the DOM
-    $('#' + itemToRemove.html_id)[0].remove();
-  }
-
-
-  function deselectAllPoints() {
-    // reset the point datastructure
-    rickshawGraphBuilder.graph.selectedPoints = [];
-    // delete the DOM elements
-    var savedDots = document.getElementsByClassName('saved');
-    while (savedDots[0]) {
-      savedDots[0].parentNode.removeChild(savedDots[0]);
+        // display the new saved dot in the chart
+        var chart = $('#rickshaw_chart');
+        $(chart).append(newSavedDot);
     }
-  }
 
-  return {
-    buildWptUrl: buildWptUrl,
-    selectPoint: selectPoint,
-    isNotSelected: isNotSelected,
-    deselectPoint: deselectPoint,
-    deselectAllPoints: deselectAllPoints
-  }
+
+    function isNotSelected(point) {
+        var isNotSaved = true;
+        rickshawGraphBuilder.graph.selectedPoints.forEach(function (savedPoint) {
+            if (point.formattedXValue == savedPoint.formattedXValue &&
+                point.formattedYValue == savedPoint.formattedYValue &&
+                point.name == savedPoint.name) {
+                isNotSaved = false;
+            }
+        });
+
+        return isNotSaved;
+    }
+
+
+    function deselectPoint(point) {
+        var itemToRemove = null;
+        // get the current item in the datastructure
+        rickshawGraphBuilder.graph.selectedPoints.forEach(function (savedPoint) {
+            if (point.formattedXValue == savedPoint.formattedXValue &&
+                point.formattedYValue == savedPoint.formattedYValue &&
+                point.name == savedPoint.name) {
+                itemToRemove = savedPoint;
+            }
+        });
+        // delete the element from the datastructure
+        rickshawGraphBuilder.graph.selectedPoints.splice(itemToRemove, 1);
+
+        // remove the dot from the DOM
+        $('#' + itemToRemove.html_id)[0].remove();
+    }
+
+
+    function deselectAllPoints() {
+        // reset the point datastructure
+        rickshawGraphBuilder.graph.selectedPoints = [];
+        // delete the DOM elements
+        var savedDots = document.getElementsByClassName('saved');
+        while (savedDots[0]) {
+            savedDots[0].parentNode.removeChild(savedDots[0]);
+        }
+    }
+
+    return {
+        buildWptUrl: buildWptUrl,
+        selectPoint: selectPoint,
+        isNotSelected: isNotSelected,
+        deselectPoint: deselectPoint,
+        deselectAllPoints: deselectAllPoints
+    }
 
 })();
