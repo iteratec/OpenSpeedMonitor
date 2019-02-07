@@ -64,9 +64,8 @@ jobs:
       deploy:
         provider: script
         script:
-          [ "${TRAVIS_PULL_REQUEST}" = "false" ] &&
-          groovy scripts/ci/building/set_new_versionnumber_travis_dev &&
-          ./gradlew assemble &&
+          if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then groovy scripts/ci/building/set_new_versionnumber_travis_dev fi &&
+          if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; ./gradlew assemble fi &&
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
           docker build -t iteratec/openspeedmonitor:develop . &&
           docker push iteratec/openspeedmonitor:develop &&
