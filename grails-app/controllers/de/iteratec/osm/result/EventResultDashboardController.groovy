@@ -57,7 +57,6 @@ class EventResultDashboardController {
     LinkGenerator grailsLinkGenerator
 
 
-
     public static final String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy'
 
     public static final List<Long> AGGREGATION_INTERVALS = [CsiAggregationInterval.RAW, CsiAggregationInterval.HOURLY, CsiAggregationInterval.DAILY, CsiAggregationInterval.WEEKLY]
@@ -282,11 +281,11 @@ class EventResultDashboardController {
         List<SelectedMeasurand> allMeasurands = modelToRender.get('selectedAggrGroupValues')
 
         List<OsmChartAxis> labelToDataMap = allMeasurands.collect {
-                new OsmChartAxis(
+            new OsmChartAxis(
                     it.getMeasurandGroup(),
                     i18nService.msg("de.iteratec.isr.measurand.group.${it.getMeasurandGroup()}", it.getMeasurandGroup().toString())
-                    + " [" + it.getMeasurandGroup().getUnit().getLabel() + "]",
-                            getAxisSide(it.getMeasurandGroup()) )
+                            + " [" + it.getMeasurandGroup().getUnit().getLabel() + "]",
+                    getAxisSide(it.getMeasurandGroup()))
         }
 
         ErQueryParams queryParams = cmd.createErQueryParams();
@@ -307,10 +306,10 @@ class EventResultDashboardController {
         fillWithAnnotations(modelToRender, timeFrame, cmd.selectedFolder)
     }
 
-    private int getAxisSide(MeasurandGroup measurandGroup){
-        if(measurandGroup == MeasurandGroup.LOAD_TIMES){
+    private int getAxisSide(MeasurandGroup measurandGroup) {
+        if (measurandGroup == MeasurandGroup.LOAD_TIMES) {
             return OsmChartAxis.LEFT_CHART_SIDE
-        }else{
+        } else {
             return OsmChartAxis.RIGHT_CHART_SIDE
         }
     }
@@ -346,6 +345,7 @@ class EventResultDashboardController {
         i18n.put("domains", message(code: 'de.iteratec.chart.contextMenu.domains', default: 'Domains'))
         i18n.put("screenshot", message(code: 'de.iteratec.chart.contextMenu.screenshot', default: 'Screenshot'))
         i18n.put("filmstrip", message(code: 'de.iteratec.chart.contextMenu.filmstrip', default: 'Filmstrip'))
+        i18n.put("filmstripTool", message(code: 'de.iteratec.chart.contextMenu.filmstripTool', default: 'Filmstrip Overview'))
         i18n.put("compareFilmstrips", message(code: 'de.iteratec.chart.contextMenu.compareFilmstrips', default: 'Compare Filmstrips'))
         i18n.put("selectPoint", message(code: 'de.iteratec.chart.contextMenu.selectPoint', default: 'Select Point'))
         i18n.put("deselectPoint", message(code: 'de.iteratec.chart.contextMenu.deselectPoint', default: 'Deselect Point'))
