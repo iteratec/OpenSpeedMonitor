@@ -64,6 +64,7 @@ jobs:
       deploy:
         provider: script
         script:
+          if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then
           groovy scripts/ci/building/set_new_versionnumber_travis_dev &&
           ./gradlew assemble &&
           echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
