@@ -2,14 +2,14 @@ before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
-  npm
-  directories:
-    - node_modules
-    - frontend/node_modules
-    - build/npm
-    - $HOME/.npm
-    - $HOME/.gradle/caches/
-    - $HOME/.gradle/wrapper/
+  - directories:
+      - node_modules
+      - frontend/node_modules
+      - build/npm
+      - $HOME/.npm
+      - $HOME/.gradle/caches/
+      - $HOME/.gradle/wrapper/
+  - npm
 language: groovy
 jdk:
   - openjdk8
