@@ -2,6 +2,7 @@ before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
+  npm
   directories:
     - node_modules
     - frontend/node_modules
@@ -28,6 +29,7 @@ addons:
 
 # Install ChromeDriver
 install:
+  - npm i -g npm@6.7.0
   - npm ci
   - wget -N https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -P ~/
   - unzip ~/chromedriver_linux64.zip -d ~/
