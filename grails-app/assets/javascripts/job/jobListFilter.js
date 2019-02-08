@@ -108,9 +108,9 @@ OpenSpeedMonitor.jobListFilter = (function () {
 
     var initFilterInput = function () {
         var filterText;
-        var urlParam = getUrlParam()[1];
+        var urlParam = getUrlParam();
         if (urlParam) {
-            filterText = urlParam;
+            filterText = urlParam[1];
         } else {
             filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
         }
@@ -120,28 +120,34 @@ OpenSpeedMonitor.jobListFilter = (function () {
     };
 
     var initFilterCheckboxes = function () {
-        var urlParam = getUrlParam()[0];
+        var urlParam = getUrlParam();
         if (urlParam) {
-            if (urlParam === 'name') {
+            if (urlParam[0] === 'name') {
                 assignCheckboxValue(allFilterCheckboxes.byName, true);
-            } else if (urlParam === 'script') {
+                allFilterCheckboxes.byName.element.on('change', filter);
+            } else if (urlParam[0] === 'script') {
                 assignCheckboxValue(allFilterCheckboxes.byScript, true);
-            } else if (urlParam === 'jobGroup') {
+                allFilterCheckboxes.byScript.element.on('change', filter);
+            } else if (urlParam[0] === 'jobGroup') {
                 assignCheckboxValue(allFilterCheckboxes.byJobGroup, true);
-            } else if (urlParam === 'location') {
+                allFilterCheckboxes.byJobGroup.element.on('change', filter);
+            } else if (urlParam[0] === 'location') {
                 assignCheckboxValue(allFilterCheckboxes.byLocation, true);
-            } else if (urlParam === 'browser') {
+                allFilterCheckboxes.byLocation.element.on('change', filter);
+            } else if (urlParam[0] === 'browser') {
                 assignCheckboxValue(allFilterCheckboxes.byBrowser, true);
-            } else if (urlParam === 'tags') {
+                allFilterCheckboxes.byBrowser.element.on('change', filter);
+            } else if (urlParam[0] === 'tags') {
                 assignCheckboxValue(allFilterCheckboxes.byTags, true);
+                allFilterCheckboxes.byTags.element.on('change', filter);
             }
-            allFilterCheckboxes.byJobGroup.element.on('change', filter);
         } else {
             $.each(allFilterCheckboxes, function (name, checkbox) {
                 var localStorageValue = storageUtils.getFromLocalStorage(checkbox.localStorage);
                 if (localStorageValue !== null) {
                     assignCheckboxValue(checkbox, OpenSpeedMonitor.stringUtils.stringToBoolean(localStorageValue));
                 }
+                console.log(checkbox.element);
                 checkbox.element.on('change', filter);
             });
         }
