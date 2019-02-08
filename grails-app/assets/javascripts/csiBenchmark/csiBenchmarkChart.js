@@ -1,5 +1,4 @@
 //= require /node_modules/d3/d3.min.js
-//= require /charts/commonChartFunctions.js
 
 "use strict";
 
