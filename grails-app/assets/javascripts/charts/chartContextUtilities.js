@@ -154,7 +154,7 @@ $.contextMenu({
     items: {
         "comparePoints": {
             name: chartContextMenuI18N.compareFilmstrips,
-            icon: "fa-columns",
+            icon: "fas fa-columns",
             // show only if at least one point is already saved
             visible: function () {
                 return rickshawGraphBuilder.graph.selectedPoints.length > 1;
