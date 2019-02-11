@@ -147,7 +147,6 @@ OpenSpeedMonitor.jobListFilter = (function () {
                 if (localStorageValue !== null) {
                     assignCheckboxValue(checkbox, OpenSpeedMonitor.stringUtils.stringToBoolean(localStorageValue));
                 }
-                console.log(checkbox.element);
                 checkbox.element.on('change', filter);
             });
         }
