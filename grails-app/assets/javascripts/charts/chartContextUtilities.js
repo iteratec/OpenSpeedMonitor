@@ -132,7 +132,7 @@ $.contextMenu({
         },
         "deselectPoint": {
             name: chartContextMenuI18N.deselectPoint,
-            icon: "fas fa-trash",
+            icon: "fas fa-trash-alt",
             // show only if point is already selected
             visible: function () {
                 return !OpenSpeedMonitor.chartContextUtil.isNotSelected(rickshawGraphBuilder.graph.nearestPoint);
@@ -165,7 +165,7 @@ $.contextMenu({
         },
         "deselectAllPoints": {
             name: chartContextMenuI18N.deselectAllPoints,
-            icon: "fa-trash-o",
+            icon: "fas fa-trash-alt",
             // show only if at least one point is already saved
             visible: function () {
                 return rickshawGraphBuilder.graph.selectedPoints.length > 0;
