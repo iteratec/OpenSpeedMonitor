@@ -41,6 +41,21 @@
     </div>
 </div>
 
+<div class="form-group" ${hasErrors(bean: job, field: 'maxDownloadTimeInMinutes', 'has-error')}>
+    <label class="col-md-4 control-label" for="maxDownloadTimeInMinutes">
+        <abbr title="${message(code: "job.maxDownloadTimeInMinutes.description", default: 'After maximum run time has passed without a result the job run is cancelled and marked as failed (timeout).')}"
+              data-placement="bottom" rel="tooltip">
+            <g:message code="job.maxDownloadTimeInMinutes.label" default="Maximum Run Time"></g:message>
+            (<g:message code="job.maxDownloadTimeInMinutes.label.unit" default="Minutes"></g:message>)
+        </abbr>
+    </label>
+
+    <div class="col-md-2">
+        <input style="max-width: 100px;" id="maxDownloadTimeInMinutes" class="text short form-control" min="10" max="240" name="maxDownloadTimeInMinutes"
+               value="${job?.maxDownloadTimeInMinutes}" type="number"/>
+    </div>
+</div>
+
 <div class="form-group ${hasErrors(bean: job, field: 'runs', 'has-error')} required">
     <label class="col-md-4 control-label" for="runs">
         <g:message code="job.runs.label" default="Runs*" />
