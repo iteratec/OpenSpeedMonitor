@@ -94,6 +94,7 @@ OpenSpeedMonitor.jobListFilter = (function () {
         initFilterCheckboxes();
         initClearFilterButton();
         filter();
+        LL
     };
 
     var getUrlParam = function () {
@@ -110,7 +111,7 @@ OpenSpeedMonitor.jobListFilter = (function () {
         var filterText;
         var urlParam = getUrlParam();
         if (urlParam) {
-            filterText = urlParam[1];
+            filterText = decodeURIComponent(urlParam[1]);
         } else {
             filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
         }
