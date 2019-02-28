@@ -270,6 +270,8 @@ task nodeSyncJavascript(type: Sync) {
     include "air-datepicker/dist/js/i18n/datepicker.en.js"
     include "air-datepicker/dist/js/i18n/datepicker.de.js"
     include "bootstrap-validator/js/validator.js"
+    include "elastic-apm-js-base/dist/bundles/elastic-apm-js-base.umd.min.js"
+    include "tti-polyfill/tti-polyfill.js"
     dependsOn npmInstall
 }
 

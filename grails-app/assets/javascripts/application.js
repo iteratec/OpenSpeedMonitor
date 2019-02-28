@@ -23,6 +23,7 @@
 //= require kickstart/checkboxes
 //= require spinner
 //= require node_modules/bootstrap-validator/js/validator
+//= require rum/rum.js
 //= require_self
 
 delete $.fn.datepicker; // so it can be replaced by air-datepicker

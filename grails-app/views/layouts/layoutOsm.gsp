@@ -18,6 +18,12 @@
         <link rel="apple-touch-icon" href="assets/ico/apple-touch-icon-72x72.png" sizes="72x72">
         <link rel="apple-touch-icon" href="assets/ico/apple-touch-icon-114x114.png" sizes="114x114">
 
+        <script>
+          !function(){if('PerformanceLongTaskTiming' in window){var g=window.__tti={e:[]};
+            g.o=new PerformanceObserver(function(l){g.e=g.e.concat(l.getEntries())});
+            g.o.observe({entryTypes:['longtask']})}}();
+        </script>
+
         <g:layoutHead/>
 
     </head>

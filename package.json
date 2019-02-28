@@ -34,6 +34,7 @@
     "codemirror": "5.19.0",
     "crossfilter2": "1.3.14",
     "d3": "3.5.17",
+    "elastic-apm-js-base": "^3.0.0",
     "eonasdan-bootstrap-datetimepicker": "4.17.47",
     "file-saver": "1.3.3",
     "jasmine-core": "2.4.1",
@@ -54,6 +55,7 @@
     "save-svg-as-png": "1.1.0",
     "spin.js": "^2.0.1",
     "sticky-table-headers": "0.1.24",
-    "tag-it": "HirokiDaido/tag-it"
+    "tag-it": "HirokiDaido/tag-it",
+    "tti-polyfill": "^0.2.2"
   }
 }
