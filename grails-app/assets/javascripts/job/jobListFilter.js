@@ -94,7 +94,6 @@ OpenSpeedMonitor.jobListFilter = (function () {
         initFilterCheckboxes();
         initClearFilterButton();
         filter();
-        LL
     };
 
     var getUrlParam = function () {
