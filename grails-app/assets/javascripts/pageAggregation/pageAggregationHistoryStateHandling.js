@@ -36,6 +36,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
         state["selectedFolder"] = $("#folderSelectHtmlId").val();
         state["selectedPages"] = $("#pageSelectHtmlId").val();
+        state["selectedBrowsers"] = $("#selectedBrowsersHtmlId").val();
         state['selectedAggrGroupValuesUnCached'] = [];
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
         state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
@@ -76,6 +77,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setTimeFrame(state);
         setJobGroups(state);
         setPages(state);
+        setBrowsers(state);
         setMeasurands(state);
         setSelectedFilter(state);
         setStackBars(state);
@@ -104,6 +106,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     var setPages = function (params) {
         if (params['selectedPages']) {
             setMultiSelect("pageSelectHtmlId", params['selectedPages']);
+        }
+    };
+
+    var setBrowsers = function (params) {
+        if (params['selectedBrowsers']) {
+            setMultiSelect("selectedBrowsersHtmlId", params['selectedBrowsers']);
         }
     };
 
