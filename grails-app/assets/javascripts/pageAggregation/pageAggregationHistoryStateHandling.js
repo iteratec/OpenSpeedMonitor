@@ -110,6 +110,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var setBrowsers = function (params) {
+        console.log(params);
         if (params['selectedBrowsers']) {
             setMultiSelect("selectedBrowsersHtmlId", params['selectedBrowsers']);
         }

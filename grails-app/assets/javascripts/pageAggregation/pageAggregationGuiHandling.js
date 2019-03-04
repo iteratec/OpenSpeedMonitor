@@ -271,6 +271,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
                 return $(e).text()
             })),
+            selectedBrowsers: JSON.stringify($.map($("#selectedBrowsersHtmlId option:selected"), function (e) {
+                return $(e).val()
+            })),
             selectedSeries: JSON.stringify(selectedSeries)
         };
 
@@ -301,6 +304,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             url: OpenSpeedMonitor.urls.pageAggregationGetData,
             dataType: "json",
             success: function (data) {
+                console.log(data);
                 if (aggregationValue === "avg") {
                     avgLoaded = true;
                     handleNewData(data, isStateChange, false);

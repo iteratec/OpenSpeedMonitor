@@ -103,6 +103,7 @@ class EventResultDashboardController {
      * {@linkplain Map#isEmpty() empty}.
      */
     Map<String, Object> showAll(EventResultDashboardShowAllCommand cmd) {
+        println cmd
 
 
         Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();

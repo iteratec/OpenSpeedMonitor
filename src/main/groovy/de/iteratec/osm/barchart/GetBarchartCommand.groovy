@@ -27,5 +27,10 @@ class GetBarchartCommand implements Validateable {
     })
     List selectedSeries
 
+    @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['selectedBrowsers'])
+    })
+    List<Long> selectedBrowsers
+
     String selectedAggregationValue
 }

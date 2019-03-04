@@ -184,6 +184,7 @@ public class EventResultDashboardService {
                         .withMeasuredEventIdsIn(queryParams.measuredEventIds as List)
                         .withSelectedMeasurands(selectedMeasurands)
             }
+            println queryBuilder
 
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append connectivities', 2) {
                 appendConnectivity(queryBuilder, queryParams)

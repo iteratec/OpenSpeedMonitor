@@ -21,14 +21,16 @@ A card to select page & measured step, browser & location, and the connectivity
         </li>
         <li id="filter-navtab-browser-and-location">
             <a href="#browser-tab" data-toggle="tab">
-                <g:message code="browser.label" default="Browser"/>&nbsp;|&nbsp;<g:message code="job.location.label" default="Location"/>
+                <g:message code="browser.label" default="Browser"/><g:if test="${showLocationInBrowserTab}">&nbsp;|&nbsp;<g:message code="job.location.label" default="Location"/></g:if>
             </a>
         </li>
-        <li id="filter-navtab-connectivityprofile">
-            <a href="#connectivity-tab" data-toggle="tab">
-                <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
-            </a>
-        </li>
+        <g:if test="${showConnectivityTab}">
+            <li id="filter-navtab-connectivityprofile">
+                <a href="#connectivity-tab" data-toggle="tab">
+                    <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
+                </a>
+            </li>
+        </g:if>
     </ul>
     </g:else>
 
@@ -60,42 +62,46 @@ A card to select page & measured step, browser & location, and the connectivity
                     </label>
 
                     <br>
-                    <label for="selectedLocationsHtmlId">
-                        <strong>
-                            <g:message code="de.iteratec.isr.wptrd.labels.filterLocation"
-                                       default="Location:"/>
-                        </strong>
-                    </label>
-                    <g:select id="selectedLocationsHtmlId"
-                              class="chosen"
-                              data-parent-child-mapping='${locationsOfBrowsers as grails.converters.JSON}'
-                              data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Bitte ausw&auml;hlen')}"
-                              name="selectedLocations" from="${locations}" optionKey="id"
-                              optionValue="${it}"
-                              multiple="true" value="${selectedLocations}"/>
-                    <br>
-                    <label class="checkbox-inline">
-                        <input type="checkbox" id="selectedAllLocations" ${selectedLocations ? '' : 'checked'} />
-                        <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllLocations.label"
-                                   default="Select all locations"/>
-                    </label>
+                    <g:if test="${showLocationInBrowserTab}">
+                        <label for="selectedLocationsHtmlId">
+                            <strong>
+                                <g:message code="de.iteratec.isr.wptrd.labels.filterLocation"
+                                           default="Location:"/>
+                            </strong>
+                        </label>
+                        <g:select id="selectedLocationsHtmlId"
+                                  class="chosen"
+                                  data-parent-child-mapping='${locationsOfBrowsers as grails.converters.JSON}'
+                                  data-placeholder="${g.message(code: 'web.gui.jquery.chosen.multiselect.placeholdermessage', 'default': 'Bitte ausw&auml;hlen')}"
+                                  name="selectedLocations" from="${locations}" optionKey="id"
+                                  optionValue="${it}"
+                                  multiple="true" value="${selectedLocations}"/>
+                        <br>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="selectedAllLocations" ${selectedLocations ? '' : 'checked'} />
+                            <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllLocations.label"
+                                       default="Select all locations"/>
+                        </label>
+                    </g:if>
                 </div>
             </div>
-            <div class="tab-pane" id="connectivity-tab">
-                <div id="filter-connectivityprofile">
-                    <g:select id="selectedConnectivityProfilesHtmlId"
-                              class="form-control"
-                              name="selectedConnectivities" from="${avaiableConnectivities}" optionKey="id" optionValue="name"
-                              multiple="true"
-                              value="${avaiableConnectivities.findAll {selectedConnectivities*.toString().contains(it.id.toString())}}"
-                              title="${message(code:'de.iteratec.isr.wptrd.labels.filterConnectivityProfile')}" />
-                    <label class="checkbox-inline">
-                        <input type="checkbox" id="selectedAllConnectivityProfiles" ${selectedConnectivities ? '' : 'checked'} />
-                        <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
-                                   default="Select all Connectivity Profiles"/>
-                    </label>
+            <g:if test="${showConnectivityTab}">
+                <div class="tab-pane" id="connectivity-tab">
+                    <div id="filter-connectivityprofile">
+                        <g:select id="selectedConnectivityProfilesHtmlId"
+                                  class="form-control"
+                                  name="selectedConnectivities" from="${avaiableConnectivities}" optionKey="id" optionValue="name"
+                                  multiple="true"
+                                  value="${avaiableConnectivities.findAll {selectedConnectivities*.toString().contains(it.id.toString())}}"
+                                  title="${message(code:'de.iteratec.isr.wptrd.labels.filterConnectivityProfile')}" />
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="selectedAllConnectivityProfiles" ${selectedConnectivities ? '' : 'checked'} />
+                            <g:message code="de.iteratec.isr.csi.eventResultDashboard.selectedAllConnectivityProfiles.label"
+                                       default="Select all Connectivity Profiles"/>
+                        </label>
+                    </div>
                 </div>
-            </div>
+            </g:if>
         </g:if>
     </div>
 </div>

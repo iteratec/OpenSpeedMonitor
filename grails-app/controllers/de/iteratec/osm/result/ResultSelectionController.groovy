@@ -71,6 +71,7 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     @RestAction
     def getJobGroups(ResultSelectionCommand command) {
+        println command
         if (command.hasErrors()) {
             sendError(command)
             return
