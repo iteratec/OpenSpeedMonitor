@@ -32,7 +32,8 @@
             "scripts": [],
             "lazyModules": [
               "src/app/modules/page-comparison/page-comparison.module",
-              "src/app/modules/job-threshold/job-threshold.module"
+              "src/app/modules/job-threshold/job-threshold.module",
+              "src/app/modules/result-selection/result-selection.module"
             ],
             "vendorChunk": false,
             "extractCss": true
