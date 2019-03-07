@@ -247,6 +247,7 @@ task nodeSyncJavascript(type: Sync) {
     description "Copy 3rd party js libs to grails asset folder."
     from 'node_modules'
     into "grails-app/assets/javascripts/node_modules"
+    include 'elastic-apm-js-base/dist/bundles/elastic-apm-opentracing.umd.js'
     include 'jquery/dist/jquery.min.js'
     include 'jquery-ui-dist/jquery-ui.min.js'
     include 'bootstrap/dist/js/bootstrap.min.js'

@@ -1,4 +1,4 @@
-import {NgZone} from "@angular/core";
+ import {NgZone} from "@angular/core";
 import {PageComparisonSelectionDto} from "./models/page-comparison-selection.model";
 import {PageComparisonComponent} from "./page-comparison.component";
 

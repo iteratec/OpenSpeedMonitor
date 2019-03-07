@@ -2,19 +2,19 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <html>
 <head>
-    <meta name="layout" content="layoutOsm"/>
+    <meta name="layout" content="layoutPlain"/>
     <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
     <asset:stylesheet src="/pageAggregation/show.less"/>
 </head>
 
 <body>
-<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageAggregation']"/>
-<p>
-    <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
-               default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
-</p>
+%{--<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageAggregation']"/>--}%
+%{--<p>--}%
+    %{--<g:message code="de.iteratec.isocsi.pageAggregation.description.short"--}%
+               %{--default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>--}%
+%{--</p>--}%
 
-<div class="card hidden" id="chart-card">
+<div class="hidden" style="background-color: white; padding: 0px" id="chart-card">
     <div id="error-div" class="hidden">
         <div class="alert alert-danger">
             <div id="error-message"></div>
@@ -23,7 +23,7 @@
     <g:render template="barChart"/>
 </div>
 
-<div class="row">
+<div class="row hidden">
     <div class="col-md-12">
         <form id="dashBoardParamsForm">
             <!-- show button -->
