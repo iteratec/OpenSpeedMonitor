@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {SelectableApplication} from "../models/selectable-application.model";
@@ -9,10 +9,13 @@ import {SelectableLocation} from "../models/selectable-location.model";
 import {SelectableConnectivity} from "../models/selectable-connectivity.model";
 import {SelectableHeroTiming} from "../models/selectable-hero-timing.model";
 import {SelectableUserTiming} from "../models/selectable-user-timing.model";
+import {Chart} from "../models/result-selection-chart.model";
+import {SelectableApplicationWithPages} from "../models/selectable-application-with-pages.model";
 
 @Injectable()
 export class ResultSelectionService {
   selectableApplications$: ReplaySubject<SelectableApplication[]> = new ReplaySubject<SelectableApplication[]>(1);
+  selectableApplicationsAndPages$: ReplaySubject<SelectableApplicationWithPages[]> = new ReplaySubject<SelectableApplicationWithPages[]>(1);
   selectableEventsAndPages$: ReplaySubject<SelectableMeasuredEvent[]> = new ReplaySubject<SelectableMeasuredEvent[]>(1);
   selectableLocationsAndBrowsers$: ReplaySubject<SelectableLocation[]> = new ReplaySubject<SelectableLocation[]>(1);
   selectableConnectivities$: ReplaySubject<SelectableConnectivity[]> = new ReplaySubject<SelectableConnectivity[]>(1);
@@ -24,18 +27,35 @@ export class ResultSelectionService {
   constructor(private http: HttpClient) {
   }
 
-  loadAllSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
-    this.loadSelectableApplications(resultSelectionCommand);
-    this.loadSelectableEventsAndPages(resultSelectionCommand);
-    this.loadSelectableLocationsAndBrowsers(resultSelectionCommand);
-    this.loadSelectableConnectivities(resultSelectionCommand);
+  loadSelectableData(resultSelectionCommand: ResultSelectionCommand, chart: Chart): void {
+
+    this.loadResultCount(resultSelectionCommand);
     this.loadSelectableUserTimings(resultSelectionCommand);
     this.loadSelectableHeroTimings(resultSelectionCommand);
-    this.loadResultCount(resultSelectionCommand);
+
+    if(chart !== Chart.PageComparison) {
+      this.loadSelectableApplications(resultSelectionCommand);
+    } else {
+      this.loadSelectableApplicationsAndPages(resultSelectionCommand);
+    }
+
+    if (chart === Chart.TimeSeries) {
+      this.loadSelectableLocationsAndBrowsers(resultSelectionCommand);
+      this.loadSelectableConnectivities(resultSelectionCommand);
+    }
+
+    if(chart === Chart.TimeSeries || chart === Chart.PageAggregation || chart === Chart.Distribution) {
+      this.loadSelectableEventsAndPages(resultSelectionCommand);
+    }
+
   }
 
   loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
     this.updateSelectableApplications(resultSelectionCommand).subscribe(next => this.selectableApplications$.next(next));
+  }
+
+  loadSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
+    this.updateSelectableApplicationsAndPages(resultSelectionCommand).subscribe(next => this.selectableApplicationsAndPages$.next(next));
   }
 
   loadSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
@@ -64,7 +84,16 @@ export class ResultSelectionService {
 
   updateSelectableApplications(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplication[]> {
     const params = this.createParams(resultSelectionCommand);
+    console.log(params);
     return this.http.get<SelectableApplication[]>('/resultSelection/getJobGroups', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+  updateSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplicationWithPages[]> {
+    const params = this.createParams(resultSelectionCommand);
+    return this.http.get<SelectableApplicationWithPages[]>('/jobGroup/getJobGroupsWithPages', {params: params}).pipe(
       handleError(),
       startWith(null)
     )
@@ -123,16 +152,15 @@ export class ResultSelectionService {
       from: resultSelectionCommand.from.toISOString(),
       to: resultSelectionCommand.to.toISOString(),
       caller: Caller[resultSelectionCommand.caller],
-      jobGroupIds: resultSelectionCommand.jobGroupIds ? resultSelectionCommand.jobGroupIds.toString() : undefined,
-      pageIds: resultSelectionCommand.pageIds ? resultSelectionCommand.pageIds.toString() : undefined,
-      measuredEventIds: resultSelectionCommand.measuredEventIds ? resultSelectionCommand.measuredEventIds.toString() : undefined,
-      browserIds: resultSelectionCommand.browserIds ? resultSelectionCommand.browserIds.toString() : undefined,
-      locationIds: resultSelectionCommand.locationIds ? resultSelectionCommand.locationIds.toString(): undefined,
-      selectedConnectivities: resultSelectionCommand.selectedConnectivities ? resultSelectionCommand.selectedConnectivities.toString(): undefined
+      ...(resultSelectionCommand.jobGroupIds.length && { jobGroupIds: resultSelectionCommand.jobGroupIds.toString() }),
+      ...(resultSelectionCommand.pageIds.length && { pageIds: resultSelectionCommand.pageIds.toString() }),
+      ...(resultSelectionCommand.measuredEventIds.length && { measuredEventIds: resultSelectionCommand.measuredEventIds.toString() }),
+      ...(resultSelectionCommand.browserIds.length && { browserIds: resultSelectionCommand.browserIds.toString() }),
+      ...(resultSelectionCommand.locationIds.length && { locationIds: resultSelectionCommand.locationIds.toString() }),
+      ...(resultSelectionCommand.selectedConnectivities.length && { selectedConnectivities: resultSelectionCommand.selectedConnectivities })
     }
   }
 }
-
 
 function handleError(): OperatorFunction<any, any> {
   return catchError((error) => {

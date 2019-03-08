@@ -1,0 +1,4 @@
+<ng-container *ngIf="currentChart === 'TimeSeries' || 'PageAggregation'">
+  <osm-result-selection-application></osm-result-selection-application>
+  <osm-result-selection-time-frame [currentChart]="currentChart" ></osm-result-selection-time-frame>
+</ng-container>
