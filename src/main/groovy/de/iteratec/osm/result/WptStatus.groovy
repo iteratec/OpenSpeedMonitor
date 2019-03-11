@@ -9,6 +9,7 @@ enum WptStatus {
     TESTED_APPLICATION_CLIENTERROR(400, 499),
     TESTED_APPLICATION_INTERNALSERVERERROR(500, 599),
     TEST_DID_NOT_START(701),
+    TEST_HAS_A_UNDEFINED_PROBLEM(12999),
     TEST_FAILED_WAITING_FOR_DOM_ELEMENT(99996),
     TEST_TIMED_OUT(99997),
     TEST_TIMED_OUT_CONTENT_ERRORS(99998),
@@ -40,11 +41,11 @@ enum WptStatus {
     }
 
     boolean isFailed() {
-        return wptStatusCode > COMPLETED.wptStatusCode && wptStatusCode < TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.wptStatusCode
+        return wptStatusCode > COMPLETED.wptStatusCode && wptStatusCode < TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.wptStatusCode && wptStatusCode != TEST_HAS_A_UNDEFINED_PROBLEM.wptStatusCode
     }
 
     boolean isSuccess() {
-        return wptStatusCode in [COMPLETED.wptStatusCode, SUCCESSFUL.wptStatusCode, TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.wptStatusCode]
+        return wptStatusCode in [COMPLETED.wptStatusCode, SUCCESSFUL.wptStatusCode, TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED.wptStatusCode, TEST_HAS_A_UNDEFINED_PROBLEM.wptStatusCode]
     }
 
     boolean isFinished() {
