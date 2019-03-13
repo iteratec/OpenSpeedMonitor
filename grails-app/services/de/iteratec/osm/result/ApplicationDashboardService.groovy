@@ -1,5 +1,6 @@
 package de.iteratec.osm.result
 
+import grails.converters.JSON
 import org.hibernate.criterion.CriteriaSpecification
 import com.codahale.metrics.graphite.Graphite
 import de.iteratec.osm.ConfigService
@@ -105,6 +106,18 @@ class ApplicationDashboardService {
         }
 
         return recentMetrics
+    }
+
+    List<Map> getPerformanceAspectsForJobGroup(Long jobGroupId) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+        return PerformanceAspect.createCriteria().list {
+            eq 'jobGroup', jobGroup
+            projections {
+                property 'page', 'page'
+                property 'metricIdentifier', 'metricIdentifier'
+                property 'performanceAspectType', 'performanceAspectType'
+            }
+        }
     }
 
     def createOrReturnCsiConfiguration(Long jobGroupId) {

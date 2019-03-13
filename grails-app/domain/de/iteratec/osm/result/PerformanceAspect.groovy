@@ -18,12 +18,13 @@ class PerformanceAspect {
         performanceAspectType(unique: ['jobGroup', 'page'])
     }
 
-    def beforeInsert(){
-        this.metricIdentifier = metric.optionValue
-        this.cachedView = metric.cachedView
-    }
-
     def onLoad(){
         this.metric = new SelectedMeasurand(this.metricIdentifier, this.cachedView)
+    }
+
+    void setMetric(SelectedMeasurand metric){
+        this.metric = metric
+        this.metricIdentifier = metric.optionValue
+        this.cachedView = metric.cachedView
     }
 }
