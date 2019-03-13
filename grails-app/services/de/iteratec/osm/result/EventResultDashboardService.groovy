@@ -175,7 +175,7 @@ public class EventResultDashboardService {
 
             EventResultQueryBuilder queryBuilder
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - create query builder', 2) {
-                queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                queryBuilder = new EventResultQueryBuilder()
                         .withJobResultDateBetween(startDate, endDate)
                         .withJobGroupIdsIn(queryParams.jobGroupIds as List)
                         .withPageIdsIn(queryParams.pageIds as List)

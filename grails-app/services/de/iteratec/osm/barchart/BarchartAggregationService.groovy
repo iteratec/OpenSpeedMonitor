@@ -56,7 +56,7 @@ class BarchartAggregationService {
         }
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
-        EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder()
                 .withJobResultDateBetween(from, to)
                 .withSelectedMeasurands(selectedMeasurands)
                 .withJobGroupIn(jobGroups)
