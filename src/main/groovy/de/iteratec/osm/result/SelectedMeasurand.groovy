@@ -9,9 +9,11 @@ class SelectedMeasurand {
     String name
     CachedView cachedView
     SelectedMeasurandType selectedType
+    String optionValue
 
     SelectedMeasurand(String optionValue, CachedView cachedView) {
         this.cachedView = cachedView
+        this.optionValue = optionValue
 
         if (!isValid(optionValue)) {
             throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")

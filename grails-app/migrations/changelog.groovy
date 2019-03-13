@@ -74,4 +74,5 @@ databaseChangeLog = {
     include file: '2018-11-30-v500-remove-waterfall-url.groovy'
     include file: '2018-11-19-v500-job-group-graphite-servers.groovy'
     include file: '2018-12-12-v500-nullable-job-result-label.groovy'
+    include file: '2019-03-13-v511-add-performance-aspect.groovy'
 }
