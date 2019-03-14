@@ -197,7 +197,7 @@ OpenSpeedMonitor.jobListFilter = (function () {
     };
 
     var showOnlyFiltersMatchRow = function (row) {
-        var isMatch = !showOnlyCheckboxes.showOnlyActive.isChecked || row.find(".job_active").val() == "true";
+        var isMatch = !showOnlyCheckboxes.showOnlyActive.isChecked || !(row.find(".job_active").val() === "false");
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyHighlighted.isChecked || row.hasClass("highlight"));
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyChecked.isChecked || row.find(".jobCheckbox").prop("checked"));
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyRunning.isChecked || row.find(".running").length > 0);
