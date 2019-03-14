@@ -1,0 +1,41 @@
+<div class="card form-horizontal">
+  <h2>{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}</h2>
+
+  <div class="row form-group">
+
+    <label class="control-label col-md-4">
+      {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}
+    </label>
+    <div class="col-md-8">
+      <select class="form-control" [(ngModel)]="timeFrameInSeconds" (ngModelChange)="selectTimeFrame()">
+        <option *ngFor="let seconds of selectableTimeFramesInSeconds" [value]="seconds">
+          {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.seconds.' + seconds | translate }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <div class="col-md-8 col-md-offset-4">
+      <div class="input-group" [formGroup]="timeSelectionForm">
+        <ng2-flatpickr formControlName="timeFrame" #resultSelectionFlatpickr id="resultSelectionFlatpickr" [config]="resultSelectionFlatpickrOptions" [addClass]="'form-control'"></ng2-flatpickr>
+        <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
+        <input type="text" #resultSelectionFlatpickrSecondField  id="resultSelectionFlatpickrSecondField" class="form-control">
+      </div>
+    </div>
+  </div>
+
+
+  <div class="row form-group">
+    <div class="col-md-8 col-md-offset-4">
+      <button type="button" class="btn btn-default btn-block">
+        <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<p>
+  <button (click)="updateName()">Update Name</button>
+</p>
