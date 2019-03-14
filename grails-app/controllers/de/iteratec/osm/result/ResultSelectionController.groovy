@@ -163,6 +163,15 @@ class ResultSelectionController extends ExceptionHandlerController {
     }
 
     @RestAction
+    def getMeasurands(){
+        def dtos = Measurand.collect {Measurand measurand -> [
+                name: measurand.eventResultField,
+                id: measurand.eventResultField
+        ]}
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
     def getUserTimings(ResultSelectionCommand command) {
         getUserOrHeroTiming(command, [UserTimingType.MARK, UserTimingType.MEASURE])
     }

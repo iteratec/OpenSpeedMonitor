@@ -11,6 +11,7 @@ import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";
 import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
+import {ResultSelectionService} from "./result-selection.service";
 
 @Injectable()
 export class ApplicationService {
@@ -25,7 +26,7 @@ export class ApplicationService {
 
   selectedApplication$ = new ReplaySubject<Application>(1);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private measurandsService: ResultSelectionService) {
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
     ).subscribe(this.metrics$);
@@ -106,6 +107,7 @@ export class ApplicationService {
   }
 
   updateSelectedApplication(application: Application) {
+    this.measurandsService.updateApplications([application]);
     this.selectedApplication$.next(application);
   }
 

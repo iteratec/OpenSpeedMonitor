@@ -10,4 +10,5 @@
     <osm-page-metric [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))"
                      [metric]="metrics.BYTES_FULLY_LOADED"></osm-page-metric>
   </div>
+  <button (click)="getMeasurands()"></button>
 </div>

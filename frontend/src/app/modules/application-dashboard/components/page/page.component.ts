@@ -2,11 +2,14 @@ import {Component, Input} from '@angular/core';
 import {Observable} from "rxjs/internal/Observable";
 import {PageMetricsDto} from "../../models/page-metrics.model";
 import {ApplicationService} from "../../../../services/application.service";
-import {map} from "rxjs/operators";
+import {map, take} from "rxjs/operators";
 import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {Metrics} from "../../../../enums/metric.enum";
+import {ResultSelectionService} from "../../../../services/result-selection.service";
+import {ReplaySubject} from "rxjs";
+import {SelectableMeasurand} from "../../../../models/measurand.model";
 
 @Component({
   selector: 'osm-page',
@@ -22,7 +25,7 @@ export class PageComponent {
   metrics = Metrics;
 
 
-  constructor(private applicationDashboardService: ApplicationService) {
+  constructor(private applicationDashboardService: ApplicationService, private measurandsService: ResultSelectionService) {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
         this.isLoading = next.isLoading;
@@ -42,6 +45,11 @@ export class PageComponent {
     );
   }
 
+
+  getMeasurands(){
+    this.measurandsService.updatePages([{id: this.metricsForPage.pageId, name: "wtf"}])
+    this.measurandsService.userTimings$.pipe(take(3)).subscribe(resp => console.log(resp.data))
+  }
 
   transform(value: number): string {
     if (value) {
