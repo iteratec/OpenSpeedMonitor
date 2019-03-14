@@ -12,16 +12,16 @@ class WptResultValidationSpec extends Specification {
     void "WPT Result validation"() {
         setup: "given a result node from wpt"
         GPathResult xmlResult = new XmlSlurper().parseText("""
-<firstView>
-    <result>${wptStatus}</result>
-    <TTFB>${ttfb}</TTFB>
-    <render>${startRender}</render>
-    <visualComplete>${visComplete}</visualComplete>
-    <SpeedIndex>${speedIndex}</SpeedIndex>
-    <docTime>${docComplete}</docTime>
-    <fullyLoaded>${fullyLoadedTime}</fullyLoaded>
-</firstView>
-""")
+            <firstView>
+                <result>${wptStatus}</result>
+                <TTFB>${ttfb}</TTFB>
+                <render>${startRender}</render>
+                <visualComplete>${visComplete}</visualComplete>
+                <SpeedIndex>${speedIndex}</SpeedIndex>
+                <docTime>${docComplete}</docTime>
+                <fullyLoaded>${fullyLoadedTime}</fullyLoaded>
+            </firstView>
+            """)
         WptResultXml resultXml = new WptResultXml(xmlResult, 10, 60000)
 
         expect: "it gets validated to #valid"
