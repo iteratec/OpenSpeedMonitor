@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {BehaviorSubject, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
+import {HttpClient} from "@angular/common/http";
+import {EMPTY, Observable, OperatorFunction, ReplaySubject, combineLatest} from "rxjs";
 import { SelectableMeasurand} from "../models/measurand.model";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
-import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, combineLatest} from "rxjs/operators";
+import {catchError, switchMap, map} from "rxjs/operators";
 import {Application} from "../models/application.model";
 import {Page} from "../models/page.model";
 
@@ -20,15 +20,14 @@ export class ResultSelectionService {
 
   constructor(private http: HttpClient) {
     this.getMeasurands();
-    this.selectedApplication$.pipe(
-      combineLatest(this.selectedPage$, (applications: Application[], pages: Page[]) => this.generateParams(applications, pages)),
+
+    combineLatest(this.selectedApplication$, this.selectedPage$,  (applications: Application[], pages:Page[]) =>this.generateParams(applications, pages)).pipe(
       switchMap(params => this.getUserTimings(params))
     ).subscribe(this.userTimings$);
 
-    this.selectedApplication$.pipe(
-      combineLatest(this.selectedPage$, (applications: Application[], pages: Page[]) => this.generateParams(applications, pages)),
+    combineLatest(this.selectedApplication$, this.selectedPage$, (applications: Application[], pages:Page[]) =>this.generateParams(applications, pages)).pipe(
       switchMap(params => this.getHeroTimings(params))
-    ).subscribe(this.heroTimings$);
+    ).subscribe(this.heroTimings$)
   }
 
   updateApplications(applications: Application[]){
