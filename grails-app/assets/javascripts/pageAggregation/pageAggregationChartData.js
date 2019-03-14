@@ -216,6 +216,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         return filter.map(function (datum) {
             return {
                 page: datum.page,
+                browser: datum.browser,
                 jobGroup: datum.jobGroup,
                 id: createSeriesValueId(datum)
             };
