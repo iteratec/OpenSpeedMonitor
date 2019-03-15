@@ -7,7 +7,7 @@ import {CsiValueMediumComponent} from "./components/csi-value/csi-value-medium/c
 import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi-value-small.component";
 import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 import {NgxSmartModalModule} from "ngx-smart-modal";
-import { MetricSelectComponent } from './components/metric-select/metric-select.component';
+import { MeasurandSelectComponent } from './components/result-selection/measurand-select/measurand-select.component';
 
 @NgModule({
   imports: [
@@ -21,7 +21,7 @@ import { MetricSelectComponent } from './components/metric-select/metric-select.
     CsiValueMediumComponent,
     CsiValueSmallComponent,
     EmptyStateComponent,
-    MetricSelectComponent
+    MeasurandSelectComponent,
   ],
   exports: [
     CommonModule,

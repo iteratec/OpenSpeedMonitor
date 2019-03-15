@@ -1,4 +1,5 @@
 <h2>{{metricsForPage?.pageName}}</h2>
+<osm-performance-aspect-management [pageId]="metricsForPage?.pageId"></osm-performance-aspect-management>
 <div class="page-metrics">
   <osm-csi-value-medium [csiValue]="pageCsi$ | async" [csiDate]="pageCsiDate$ | async"
                         [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value-medium>
@@ -10,5 +11,4 @@
     <osm-page-metric [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))"
                      [metric]="metrics.BYTES_FULLY_LOADED"></osm-page-metric>
   </div>
-  <button (click)="getMeasurands()"></button>
 </div>

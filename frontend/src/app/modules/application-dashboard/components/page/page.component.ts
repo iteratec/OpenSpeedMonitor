@@ -25,7 +25,7 @@ export class PageComponent {
   metrics = Metrics;
 
 
-  constructor(private applicationDashboardService: ApplicationService, private measurandsService: ResultSelectionService) {
+  constructor(private applicationDashboardService: ApplicationService) {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
         this.isLoading = next.isLoading;
@@ -45,11 +45,6 @@ export class PageComponent {
     );
   }
 
-
-  getMeasurands(){
-    this.measurandsService.updatePages([{id: this.metricsForPage.pageId, name: "wtf"}])
-    this.measurandsService.userTimings$.pipe(take(3)).subscribe(resp => console.log(resp.data))
-  }
 
   transform(value: number): string {
     if (value) {

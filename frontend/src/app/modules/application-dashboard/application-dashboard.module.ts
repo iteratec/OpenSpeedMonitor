@@ -11,6 +11,7 @@ import {HttpClientModule} from "@angular/common/http";
 import { ApplicationJobStatusComponent } from './components/application-job-status/application-job-status.component';
 import {GraphiteIntegrationComponent} from "./components/application-job-status/graphite-integration/graphite-integration.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import { PerformanceAspectManagementComponent } from './components/performance-aspect-management/performance-aspect-management.component';
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -33,7 +34,8 @@ const DashboardRoutes: Routes = [
     CsiInfoComponent,
     PageMetricComponent,
     ApplicationJobStatusComponent,
-    GraphiteIntegrationComponent
+    GraphiteIntegrationComponent,
+    PerformanceAspectManagementComponent,
   ],
   exports: [
     RouterModule

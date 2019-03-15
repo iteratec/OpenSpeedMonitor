@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MetricSelectComponent } from './metric-select.component';
+import { MeasurandSelectComponent } from './measurand-select.component';
 
-describe('MetricSelectComponent', () => {
-  let component: MetricSelectComponent;
-  let fixture: ComponentFixture<MetricSelectComponent>;
+describe('MeasurandSelectComponent', () => {
+  let component: MeasurandSelectComponent;
+  let fixture: ComponentFixture<MeasurandSelectComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MetricSelectComponent ]
+      declarations: [ MeasurandSelectComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MetricSelectComponent);
+    fixture = TestBed.createComponent(MeasurandSelectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
