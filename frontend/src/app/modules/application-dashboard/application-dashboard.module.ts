@@ -12,6 +12,7 @@ import { ApplicationJobStatusComponent } from './components/application-job-stat
 import {GraphiteIntegrationComponent} from "./components/application-job-status/graphite-integration/graphite-integration.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { PerformanceAspectManagementComponent } from './components/performance-aspect-management/performance-aspect-management.component';
+import {ResultSelectionModule} from "../result-selection/result-selection.module";
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -24,7 +25,8 @@ const DashboardRoutes: Routes = [
     SharedModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    ResultSelectionModule
   ],
   declarations: [
     ApplicationDashboardComponent,

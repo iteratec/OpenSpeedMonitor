@@ -7,7 +7,7 @@ import {CsiValueMediumComponent} from "./components/csi-value/csi-value-medium/c
 import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi-value-small.component";
 import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 import {NgxSmartModalModule} from "ngx-smart-modal";
-import { MeasurandSelectComponent } from './components/result-selection/measurand-select/measurand-select.component';
+
 
 @NgModule({
   imports: [
@@ -21,7 +21,6 @@ import { MeasurandSelectComponent } from './components/result-selection/measuran
     CsiValueMediumComponent,
     CsiValueSmallComponent,
     EmptyStateComponent,
-    MeasurandSelectComponent,
   ],
   exports: [
     CommonModule,
@@ -30,7 +29,7 @@ import { MeasurandSelectComponent } from './components/result-selection/measuran
     CsiValueMediumComponent,
     CsiValueSmallComponent,
     EmptyStateComponent,
-    NgxSmartModalModule
+    NgxSmartModalModule,
   ]
 })
 export class SharedModule {

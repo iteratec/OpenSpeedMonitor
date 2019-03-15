@@ -1,5 +1,4 @@
-<h2>{{metricsForPage?.pageName}}</h2>
-<osm-performance-aspect-management [pageId]="metricsForPage?.pageId"></osm-performance-aspect-management>
+<h2>{{metricsForPage?.pageName}} <osm-performance-aspect-management [pageId]="metricsForPage?.pageId"></osm-performance-aspect-management></h2>
 <div class="page-metrics">
   <osm-csi-value-medium [csiValue]="pageCsi$ | async" [csiDate]="pageCsiDate$ | async"
                         [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value-medium>

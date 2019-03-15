@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
+import {NgxSmartModalService} from "ngx-smart-modal";
 
 @Component({
   selector: 'osm-performance-aspect-management',
@@ -9,10 +10,19 @@ import {ResultSelectionService} from "../../../../services/result-selection.serv
 export class PerformanceAspectManagementComponent implements OnInit {
   @Input() pageId: number;
 
-  constructor( private measurandsService: ResultSelectionService) { }
+  constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService) { }
 
   ngOnInit() {
-    this.measurandsService.updatePages([{id: this.pageId, name: "does-not-matter"}])
+
+  }
+
+  initDialog(){
+    this.measurandsService.updatePages([{id: this.pageId, name: "does-not-matter"}]);
+    this.ngxSmartModalService.open('preformanceAspectMgmtModal');
+  }
+
+  cancel(){
+
   }
 
 }
