@@ -15,26 +15,45 @@ export class ResultSelectionService {
   userTimings$: ReplaySubject<ResponseWithLoadingState<SelectableMeasurand[]>> = new ReplaySubject(1);
   heroTimings$: ReplaySubject<ResponseWithLoadingState<SelectableMeasurand[]>> = new ReplaySubject(1);
 
-  selectedApplication$: ReplaySubject<Application[]> = new ReplaySubject<Application[]>(1);
-  selectedPage$: ReplaySubject<Page[]> = new ReplaySubject<Page[]>(1);
+  selectedApplications$: ReplaySubject<Application[]> = new ReplaySubject<Application[]>(1);
+  selectedPages$: ReplaySubject<Page[]> = new ReplaySubject<Page[]>(1);
 
   constructor(private http: HttpClient) {
     this.getMeasurands();
 
-    combineLatest(this.selectedApplication$, this.selectedPage$,  (applications: Application[], pages:Page[]) =>this.generateParams(applications, pages)).pipe(
+    this.combinedParams().pipe(
       switchMap(params => this.getUserTimings(params))
     ).subscribe(this.userTimings$);
 
-    combineLatest(this.selectedApplication$, this.selectedPage$, (applications: Application[], pages:Page[]) =>this.generateParams(applications, pages)).pipe(
+    this.combinedParams().pipe(
       switchMap(params => this.getHeroTimings(params))
     ).subscribe(this.heroTimings$)
   }
 
   updateApplications(applications: Application[]){
-    this.selectedApplication$.next(applications)
+    this.selectedApplications$.next(applications);
+    this.updatePages([]);
   }
   updatePages(pages: Page[]){
-    this.selectedPage$.next(pages);
+    this.selectedPages$.next(pages);
+  }
+
+  private combinedParams():Observable<any>{
+    return combineLatest(
+      this.selectedApplications$,
+      this.selectedPages$,
+      (applications: Application[], pages:Page[]) => this.generateParams(applications, pages));
+  }
+  private generateParams(applications: Application[], pages: Page[]){
+    let now: Date = new Date();
+    let threeDaysAgo: Date = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    return {
+      jobGroupIds: applications.map(app => app.id),
+      pageIds: pages.map(page => page.id),
+      from: threeDaysAgo.toISOString(),
+      to: now.toISOString()
+    }
   }
 
   private getUserTimings(params): Observable<ResponseWithLoadingState<SelectableMeasurand[]>>{
@@ -57,18 +76,6 @@ export class ResultSelectionService {
       handleError(),
       map(dtos => ({isLoading: false, data: dtos})),
     )
-  }
-
-  private generateParams(applications: Application[], pages: Page[]){
-    let now: Date = new Date();
-    let threeDaysAgo: Date = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    return {
-      jobGroupIds: applications.map(app => app.id),
-      pageIds: pages.map(page => page.id),
-      from: threeDaysAgo.toISOString(),
-      to: now.toISOString()
-    }
   }
 }
 
