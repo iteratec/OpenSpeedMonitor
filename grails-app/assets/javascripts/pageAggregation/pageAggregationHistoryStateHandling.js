@@ -77,16 +77,21 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setTimeFrame(state);
         setJobGroups(state);
         setPages(state);
-        setBrowsers(state);
         setMeasurands(state);
         setSelectedFilter(state);
         setStackBars(state);
         setAggregationValue(state);
         setPercentile(state);
-        loadedState = encodedState;
-        if (state.selectedFolder && state.selectedPages) {
-            $(window).trigger("historyStateLoaded");
-        }
+
+        window.setTimeout(function () {
+            setBrowsers(state);
+            loadedState = encodedState;
+            if (state.selectedFolder && state.selectedPages) {
+                $(window).trigger("historyStateLoaded");
+            }
+        }, 1000);
+
+
     };
 
     var setTimeFrame = function (state) {
