@@ -1,15 +1,15 @@
 <li *ngIf="(measurandGroup$ | async)?.data">
-  <p>{{(measurandGroup$ | async)?.data?.name}}</p>
+  <p class="dropdown-group">{{(measurandGroup$ | async)?.data?.name | translate}}</p>
 </li>
 <li *ngIf="(measurandGroup$ | async)?.data?.values?.length; else noMeasurands">
   <a class="dropdown-item" *ngFor="let selectableMeasurand of (measurandGroup$ | async)?.data?.values" (click)="selectMeasurand(selectableMeasurand)">
-    {{selectableMeasurand.name}}
+    {{selectableMeasurand.name | translate}}
   </a>
 </li>
 <ng-template #noMeasurands>
   <li>
     <a class="dropdown-item">
-      {{(measurandGroup$ | async)?.isLoading? "Loading": "Nothing available"}}
+      {{(measurandGroup$ | async)?.isLoading? "frontend.de.iteratec.osm.queueDashboard.load-information.label": "frontend.de.iteratec.osm.no-info.label" | translate}}
     </a>
   </li>
 </ng-template>

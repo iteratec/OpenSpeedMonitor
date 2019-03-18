@@ -1,0 +1,26 @@
+@import "../../../../../../styles/colors";
+
+.dropdown-item {
+  min-width: 30em;
+  padding: 0.5em 1em;
+  color: $color-text-medium;
+  display: flex;
+  align-items: center;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
+
+  .title, .detail {
+    display: block;
+  }
+
+  .detail {
+    color: $color-text-light;
+  }
+}
+
+.dropdown-group {
+  min-width: 30em;
+  padding: 0.5em;
+}

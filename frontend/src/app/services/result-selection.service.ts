@@ -83,7 +83,7 @@ export class ResultSelectionService {
       handleError()
     ).subscribe((groups: MeasurandGroup[]) => {
       groups.forEach((group: MeasurandGroup)=>{
-        let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {isLoading: false, data: group};
+        let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {isLoading: false, data: {name: "frontend.de.iteratec.isr.measurand.group."+group.name, values: group.values.map(measurand => ({name: "frontend.de.iteratec.isr.measurand."+measurand.name, id: measurand.id }))}};
         let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
         if(concerningSubject$){
           concerningSubject$.next(responseWithLoadingState);
@@ -118,7 +118,7 @@ export class ResultSelectionService {
   private getSelectableMeasurands(url: string, params: any,groupName: string): Observable<ResponseWithLoadingState<MeasurandGroup>>{
     return this.http.get<SelectableMeasurand[]>(url, {params}).pipe(
       handleError(),
-      map(dtos => ({isLoading: false, data: {name: groupName, values: dtos}})),
+      map(dtos => ({isLoading: false, data: {name: "frontend.de.iteratec.isr.measurand.group."+groupName, values: dtos}})),
     )
   }
 }
