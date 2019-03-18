@@ -6,6 +6,7 @@ import {ResponseWithLoadingState} from "../models/response-with-loading-state.mo
 import {catchError, switchMap, map} from "rxjs/operators";
 import {Application} from "../models/application.model";
 import {Page} from "../models/page.model";
+import {group} from "@angular/animations";
 
 @Injectable({
   providedIn: 'root'
@@ -73,26 +74,41 @@ export class ResultSelectionService {
   }
 
   private getMeasurands(){
-    const defaultMeasurands$: Observable<MeasurandGroup[]> = this.getDefaultMeasurands();
-    this.manageDefaultMeasurandGroup("LOAD_TIMES", this.loadTimes$, defaultMeasurands$);
-    this.manageDefaultMeasurandGroup("REQUEST_COUNTS", this.requestCounts$, defaultMeasurands$);
-    this.manageDefaultMeasurandGroup("REQUEST_SIZES", this.requestSizes$, defaultMeasurands$);
-    this.manageDefaultMeasurandGroup("PERCENTAGES", this.percentages$, defaultMeasurands$);
-  }
-
-  private manageDefaultMeasurandGroup(groupName: string, receiver$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>, origin$: Observable<MeasurandGroup[]>){
-    this.setToLoading(receiver$, groupName);
-    origin$.pipe(map((values: MeasurandGroup[]) =>{
-      let group: MeasurandGroup =  values.find((group: MeasurandGroup) => { return group.name == groupName});
-      return {isLoading: false, data: group};
-    })).subscribe(receiver$);
-  }
-
-  private getDefaultMeasurands(): Observable<MeasurandGroup[]>{
+    this.setToLoading( this.loadTimes$, "LOAD_TIMES");
+    this.setToLoading(this.requestCounts$,"REQUEST_COUNTS");
+    this.setToLoading( this.requestSizes$, "REQUEST_SIZES");
+    this.setToLoading( this.percentages$, "PERCENTAGES");
     const url: string = '/resultSelection/getMeasurands';
     return this.http.get<MeasurandGroup[]>(url).pipe(
       handleError()
-    )
+    ).subscribe((groups: MeasurandGroup[]) => {
+      groups.forEach((group: MeasurandGroup)=>{
+        let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {isLoading: false, data: group};
+        let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
+        if(concerningSubject$){
+          concerningSubject$.next(responseWithLoadingState);
+        }
+      });
+    })
+  }
+
+  private getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>|undefined{
+    let subject$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>;
+    switch (name) {
+      case "LOAD_TIMES":
+        subject$ = this.loadTimes$;
+        break;
+      case "REQUEST_COUNTS":
+        subject$ = this.requestCounts$;
+        break;
+      case "REQUEST_SIZES":
+        subject$ = this.requestSizes$;
+        break;
+      case "PERCENTAGES":
+        subject$ = this.percentages$;
+        break;
+    }
+    return subject$;
   }
 
   private setToLoading(subject$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>, groupName: string){
