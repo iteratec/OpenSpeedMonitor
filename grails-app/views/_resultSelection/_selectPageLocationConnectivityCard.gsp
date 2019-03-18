@@ -14,7 +14,7 @@ A card to select page & measured step, browser & location, and the connectivity
 </g:if>
 <g:if test="${showOnlyBrowser}">
     <h2>
-        <g:message code="de.iteratec.isr.wptrd.labels.filterBrowser" default="Browser"/>
+        <g:message code="de.iteratec.osm.result.browser.label" default="Browser"/>
     </h2>
 </g:if>
 <g:else>
