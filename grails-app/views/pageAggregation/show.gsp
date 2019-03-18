@@ -43,9 +43,9 @@
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                               model="${[
-                                'selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'to': to,
-                                'showIncludeInterval': false,
-                                'showComparisonInterval': true
+                                      'selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'to': to,
+                                      'showIncludeInterval'      : false,
+                                      'showComparisonInterval'   : true
                               ]}"/>
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
@@ -72,8 +72,7 @@
                                       'browsers'             : browsers,
                                       'selectedBrowsers'     : selectedBrowsers,
                                       'selectedAllBrowsers'  : selectedAllBrowsers
-                              ]"
-                    />
+                              ]"/>
                 </div>
 
                 <div class="row">
