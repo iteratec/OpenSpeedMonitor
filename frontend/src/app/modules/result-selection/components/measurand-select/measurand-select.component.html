@@ -2,7 +2,7 @@
   <button class=" dropdown-toggle" type="button"
           data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
-    {{initialValue?.name || "select measurand"}}
+    {{(initialValue?.name || "select measurand")| translate}}
     <i class="fas fa-caret-down select-application-header-triangle"></i>
   </button>
   <ul class="dropdown-menu" aria-labelledby="selectApplicationHeaderId">
