@@ -164,10 +164,10 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     @RestAction
     def getMeasurands(){
-        def dtos = Measurand.collect {Measurand measurand -> [
-                name: measurand.eventResultField,
-                id: measurand.eventResultField
-        ]}
+        List dtos = []
+        MeasurandGroup.values().each { measurandGroup ->
+            dtos.add([name: measurandGroup.toString(), values: Measurand.values().findAll { it.measurandGroup == measurandGroup }.collect {[name: it.toString(), id: it.toString()]}])
+        }
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }
 

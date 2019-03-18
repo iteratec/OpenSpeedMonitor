@@ -5,43 +5,7 @@
     {{initialValue?.name || "select measurand"}}
     <i class="fas fa-caret-down select-application-header-triangle"></i>
   </button>
-  <ul *ngIf="(measurands$ | async)?.data" class="dropdown-menu" aria-labelledby="selectApplicationHeaderId">
-    <li>
-      <p>Measurands</p>
-      <a class="dropdown-item" *ngFor="let measurand of (measurands$ | async)?.data" (click)="selectMeasurand(measurand)">
-        {{measurand.name}}
-      </a>
-    </li>
-    <li>
-      <p>User Timings</p>
-    </li>
-    <li *ngIf="(userTimings$ | async)?.data; else noUserTimings">
-      <a class="dropdown-item" *ngFor="let userTiming of (userTimings$ | async)?.data" (click)="selectMeasurand(userTiming)">
-        {{userTiming.name}}
-      </a>
-    </li>
-    <li>
-      <p>Hero Timings </p>
-    </li>
-    <li *ngIf="(heroTimings$ | async)?.data; else noHeroTimings">
-      <a class="dropdown-item" *ngFor="let heroTiming of (heroTimings$ | async)?.data" (click)="selectMeasurand(heroTiming)">
-        {{heroTiming.name}}
-      </a>
-    </li>
+  <ul class="dropdown-menu" aria-labelledby="selectApplicationHeaderId">
+    <osm-measurand-group *ngFor="let group$ of selectableMeasurandGroups" [measurandGroup$]="group$" (onSelectMeasurand)="selectMeasurand($event)"></osm-measurand-group>
   </ul>
 </div>
-
-<ng-template #noUserTimings>
-  <li>
-    <a>
-      {{(userTimings$ | ansync)?.isLoading? "Loading": "no User Timings available"}}
-    </a>
-  </li>
-</ng-template>
-<ng-template #noHeroTimings>
-  <li>
-    <a>
-      {{(heroTimings$ | ansync)?.isLoading? "Loading": "no Hero Timings available"}}
-    </a>
-  </li>
-</ng-template>

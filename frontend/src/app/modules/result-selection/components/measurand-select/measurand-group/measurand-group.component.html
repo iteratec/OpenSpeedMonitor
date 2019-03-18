@@ -1,0 +1,15 @@
+<li *ngIf="(measurandGroup$ | async)?.data">
+  <p>{{(measurandGroup$ | async)?.data?.name}}</p>
+</li>
+<li *ngIf="(measurandGroup$ | async)?.data?.values?.length; else noMeasurands">
+  <a class="dropdown-item" *ngFor="let selectableMeasurand of (measurandGroup$ | async)?.data?.values" (click)="selectMeasurand(selectableMeasurand)">
+    {{selectableMeasurand.name}}
+  </a>
+</li>
+<ng-template #noMeasurands>
+  <li>
+    <a class="dropdown-item">
+      {{(measurandGroup$ | async)?.isLoading? "Loading": "Nothing available"}}
+    </a>
+  </li>
+</ng-template>

@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
 import {ReplaySubject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {SelectableMeasurand} from "../../../../models/measurand.model";
+import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 
 @Component({
   selector: 'osm-measurand-select',
@@ -13,14 +13,14 @@ export class MeasurandSelectComponent implements OnInit {
   @Input() initialValue: SelectableMeasurand;
   @Output() onSelect: EventEmitter<SelectableMeasurand> = new EventEmitter<SelectableMeasurand>();
 
-  measurands$: ReplaySubject<ResponseWithLoadingState<SelectableMeasurand[]>>;
-  userTimings$: ReplaySubject<ResponseWithLoadingState<SelectableMeasurand[]>>;
-  heroTimings$: ReplaySubject<ResponseWithLoadingState<SelectableMeasurand[]>>;
+  selectableMeasurandGroups: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>[];
 
   constructor(private resultSelectionService: ResultSelectionService) {
-    this.measurands$ = this.resultSelectionService.measurands$;
-    this.userTimings$ = this.resultSelectionService.userTimings$;
-    this.heroTimings$ = this.resultSelectionService.heroTimings$;
+    this.selectableMeasurandGroups = [
+      this.resultSelectionService.loadTimes$,
+      this.resultSelectionService.heroTimings$,
+      this.resultSelectionService.userTimings$
+    ]
   }
 
   ngOnInit() {
