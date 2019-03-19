@@ -1,26 +1,30 @@
 @import "../../../../../../styles/colors";
 
 .dropdown-item {
-  min-width: 30em;
-  padding: 0.5em 1em;
+  padding: 0 1em;
   color: $color-text-medium;
   display: flex;
   align-items: center;
+  font-weight: normal;
+  white-space: pre;
+  min-height: 1.2em;
 
   &:hover, &:focus {
     text-decoration: none;
   }
+}
 
-  .title, .detail {
-    display: block;
-  }
-
-  .detail {
-    color: $color-text-light;
+.selectable {
+  &:hover, &:focus {
+    cursor: pointer;
+    background-color: $color-primary;
+    color: $color-card-background;
   }
 }
+
 
 .dropdown-group {
-  min-width: 30em;
-  padding: 0.5em;
+  padding: 0 0.5em;
+  margin: 10px 0;
 }
+

@@ -2,7 +2,7 @@
   <p class="dropdown-group">{{(measurandGroup$ | async)?.data?.name | translate}}</p>
 </li>
 <li *ngIf="(measurandGroup$ | async)?.data?.values?.length; else noMeasurands">
-  <a class="dropdown-item" *ngFor="let selectableMeasurand of (measurandGroup$ | async)?.data?.values" (click)="selectMeasurand(selectableMeasurand)">
+  <a class="dropdown-item selectable" *ngFor="let selectableMeasurand of (measurandGroup$ | async)?.data?.values" (click)="selectMeasurand(selectableMeasurand)">
     {{selectableMeasurand.name | translate}}
   </a>
 </li>
