@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
-import {ReplaySubject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 
@@ -10,7 +10,7 @@ import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.
   styleUrls: ['./measurand-select.component.scss']
 })
 export class MeasurandSelectComponent implements OnInit {
-  @Input() initialValue: SelectableMeasurand;
+  @Input() initialValue: string;
   @Output() onSelect: EventEmitter<SelectableMeasurand> = new EventEmitter<SelectableMeasurand>();
 
   selectableMeasurandGroups: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>[];
@@ -27,7 +27,7 @@ export class MeasurandSelectComponent implements OnInit {
   }
 
   selectMeasurand(measurand: SelectableMeasurand){
-    this.initialValue = measurand;
+    this.initialValue = measurand.name;
     this.onSelect.emit(measurand);
   }
 

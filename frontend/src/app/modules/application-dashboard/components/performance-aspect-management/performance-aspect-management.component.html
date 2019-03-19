@@ -2,9 +2,11 @@
 
 <ngx-smart-modal id="preformanceAspectMgmtModal" identifier="preformanceAspectMgmtModal" [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="cancel()">
   <h2>{{"frontend.de.iteratec.osm.performance-aspect.mgmt" | translate}}</h2>
+  <hr>
   <div *ngIf="(performanceAspects$ | async)?.isLoading == false; else isLoading" class="aspect-management-box">
     <osm-performance-aspect-inspect *ngFor="let performanceAspect of (performanceAspects$ | async)?.data" [performanceAspect]="performanceAspect" class="aspect-inspect"></osm-performance-aspect-inspect>
   </div>
+  <hr>
 </ngx-smart-modal>
 
 <ng-template #isLoading>

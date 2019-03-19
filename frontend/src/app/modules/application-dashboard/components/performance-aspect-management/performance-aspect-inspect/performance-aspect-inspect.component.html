@@ -1,9 +1,30 @@
 <div class="edit-container">
-  <p class="container-item aspect-type">{{performanceAspect.performanceAspectType}}</p>
-  <p class="container-item measurand">{{performanceAspect.metricIdentifier}}</p>
-  <button class="container-item edit-button">
-    Edit
-    <i class="fas fa-pen" ></i>
-  </button>
+  <div class="aspect-type">
+    <div class="aspect-label">{{"frontend.de.iteratec.osm.performance-aspect."+performanceAspect.performanceAspectType| translate}}</div>
+  </div>
+  <div class="measurand">
+    <div *ngIf="!editMode; else measurandSelect">
+      <div class="form-control">{{(selectedMetric$ | async)|translate}}</div>
+    </div>
+  </div>
+  <div class="buttons">
+    <div *ngIf="!editMode; else saveOrCancel">
+      <button class="btn btn-primary edit-button" (click)="edit()">
+        Edit
+      </button>
+    </div>
 
+  </div>
 </div>
+
+<ng-template #measurandSelect>
+  <osm-measurand-select [initialValue]="selectedMetric$ | async"></osm-measurand-select>
+</ng-template>
+<ng-template #saveOrCancel>
+  <button class="btn btn-warning" (click)="cancel()">
+    Cancel
+  </button>
+  <button class="btn btn-success" (click)="save()">
+    Save
+  </button>
+</ng-template>

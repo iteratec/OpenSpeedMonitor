@@ -2,7 +2,7 @@
   <button class=" dropdown-toggle form-control measurand-select" type="button"
           data-toggle="dropdown"
           aria-haspopup="true" aria-expanded="false">
-    {{(initialValue?.name || "select measurand")| translate}}
+    {{(initialValue || "select measurand")| translate}}
     <i class="fas fa-caret-down select-measurand-triangle"></i>
   </button>
   <ul class="dropdown-menu scrollable-menu">
