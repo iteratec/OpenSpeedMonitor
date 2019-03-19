@@ -108,16 +108,30 @@ class ApplicationDashboardService {
         return recentMetrics
     }
 
-    List<Map> getPerformanceAspectsForJobGroup(Long jobGroupId) {
+    List<Map> getPerformanceAspectsForJobGroup(Long jobGroupId, Long pageId) {
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
-        return PerformanceAspect.createCriteria().list {
+        Page page = Page.findById(pageId)
+        List<Map> performanceAspects = PerformanceAspect.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq 'jobGroup', jobGroup
+            eq 'page', page
             projections {
-                property 'page', 'page'
+                property 'id', 'id'
+                property 'page.id', 'pageId'
+                property 'jobGroup.id', 'jobGroupId'
                 property 'metricIdentifier', 'metricIdentifier'
                 property 'performanceAspectType', 'performanceAspectType'
             }
         }
+        PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
+            if(!performanceAspects.collect{it.performanceAspectType}.contains(performanceAspectType)){
+                performanceAspects.add([id: null, pageId: page.id, jobGroupId: jobGroup.id, performanceAspectType: performanceAspectType, metricIdentifier: performanceAspectType.defaultMetric.toString()])
+            }
+        }
+        performanceAspects.each { it.performanceAspectType = it.performanceAspectType.toString()};
+
+        return performanceAspects
+
     }
 
     def createOrReturnCsiConfiguration(Long jobGroupId) {

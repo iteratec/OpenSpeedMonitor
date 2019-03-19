@@ -1,6 +1,6 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.annotations.RestAction
+
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.Page
@@ -11,7 +11,6 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
-import grails.converters.JSON
 import org.springframework.http.HttpStatus
 
 class ApplicationDashboardController {
@@ -50,14 +49,15 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
     }
 
-    def getPerformanceAspectsForApplication(DefaultApplicationCommand command) {
+    def getPerformanceAspectsForApplication(PerformanceAspectManagementRequestCommand command) {
         Long jobGroupId = command.applicationId
-        List<Map> performanceAspects = applicationDashboardService.getPerformanceAspectsForJobGroup(jobGroupId)
+        Long pageId = command.pageId
+        List<Map> performanceAspects = applicationDashboardService.getPerformanceAspectsForJobGroup(jobGroupId, pageId)
 
         return ControllerUtils.sendObjectAsJSON(response, performanceAspects)
     }
 
-    def createOrUpdatePerformanceAspect(PerformanceAspectCommand command){
+    def createOrUpdatePerformanceAspect(PerformanceAspectCreationCommand command){
         PerformanceAspectType performanceAspectType = PerformanceAspectType.valueOf(command.performanceAspectType)
         SelectedMeasurand metric = new SelectedMeasurand(command.metricIdentifier, CachedView.UNCACHED)
         Page page = Page.findById(command.pageId)
@@ -186,7 +186,7 @@ class DefaultApplicationCommand implements Validateable {
     }
 }
 
-class PerformanceAspectCommand implements Validateable {
+class PerformanceAspectCreationCommand implements Validateable {
     Long performanceAspectId
     Long applicationId
     Long pageId
@@ -199,5 +199,15 @@ class PerformanceAspectCommand implements Validateable {
         pageId(nullable: false)
         metricIdentifier(nullable: false)
         performanceAspectType(nullable: false)
+    }
+}
+
+class PerformanceAspectManagementRequestCommand implements Validateable {
+    Long applicationId
+    Long pageId
+
+    static constraints = {
+        applicationId(nullable: false)
+        pageId(nullable: false)
     }
 }
