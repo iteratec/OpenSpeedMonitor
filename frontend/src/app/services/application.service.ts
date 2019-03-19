@@ -12,6 +12,8 @@ import {FailingJobStatistic} from "../modules/application-dashboard/models/faili
 import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";
 import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
 import {ResultSelectionService} from "./result-selection.service";
+import {PerformanceAspect} from "../models/perfomance-aspect.model";
+import {Page} from "../models/page.model";
 
 @Injectable()
 export class ApplicationService {
@@ -23,10 +25,16 @@ export class ApplicationService {
   failingJobs$: ReplaySubject<{}> = new ReplaySubject<{}>(1);
   jobHealthGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
   availableGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
+  performanceAspectForPage$: ReplaySubject<ResponseWithLoadingState<PerformanceAspect[]>> = new ReplaySubject<ResponseWithLoadingState<PerformanceAspect[]>>(1);
 
+  selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
   selectedApplication$ = new ReplaySubject<Application>(1);
 
   constructor(private http: HttpClient, private measurandsService: ResultSelectionService) {
+    this.combinedParams().pipe(
+      switchMap(params => this.getPerformanceAspects(params))
+    ).subscribe(this.performanceAspectForPage$);
+
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
     ).subscribe(this.metrics$);
@@ -111,10 +119,36 @@ export class ApplicationService {
     this.selectedApplication$.next(application);
   }
 
+  updatePage(page: Page) {
+    this.selectedPage$.next(page);
+  }
+
+  private combinedParams(): Observable<any> {
+    return combineLatest(
+      this.selectedApplication$,
+      this.selectedPage$,
+      (application: Application, page: Page) => this.generateParams(application, page));
+  }
+
+  private generateParams(application: Application, page: Page) {
+    return {
+      applicationId: application.id,
+      pageId: page.id
+    }
+  }
+
   selectSelectedApplicationCsi(): Observable<ApplicationCsi> {
     return combineLatest(this.selectedApplication$, this.applicationCsiById$).pipe(
       map(([application, csiById]) => csiById[application.id]),
       filter(applicationCsi => !!applicationCsi)
+    );
+  }
+
+  private getPerformanceAspects(params): Observable<ResponseWithLoadingState<PerformanceAspect[]>>{
+    this.performanceAspectForPage$.next({data: [], isLoading: true});
+    return this.http.get<Performance[]>('/applicationDashboard/rest/getPerformanceAspectsForApplication', {params}).pipe(
+      handleError(),
+      map(dtos => ({isLoading: false, data: dtos}))
     );
   }
 

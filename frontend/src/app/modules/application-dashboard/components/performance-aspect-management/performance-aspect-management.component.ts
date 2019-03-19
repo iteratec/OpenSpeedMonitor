@@ -1,6 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
 import {NgxSmartModalService} from "ngx-smart-modal";
+import {ApplicationService} from "../../../../services/application.service";
+import {ReplaySubject} from "rxjs";
+import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 
 @Component({
   selector: 'osm-performance-aspect-management',
@@ -9,8 +13,11 @@ import {NgxSmartModalService} from "ngx-smart-modal";
 })
 export class PerformanceAspectManagementComponent implements OnInit {
   @Input() pageId: number;
+  performanceAspects$: ReplaySubject<ResponseWithLoadingState<PerformanceAspect[]>>
 
-  constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService) { }
+  constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
+    this.performanceAspects$ = this.applicationService.performanceAspectForPage$
+  }
 
   ngOnInit() {
 
@@ -18,6 +25,7 @@ export class PerformanceAspectManagementComponent implements OnInit {
 
   initDialog(){
     this.measurandsService.updatePages([{id: this.pageId, name: "does-not-matter"}]);
+    this.applicationService.updatePage({id: this.pageId, name: "does-not-matter"});
     this.ngxSmartModalService.open('preformanceAspectMgmtModal');
   }
 
