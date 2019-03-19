@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {ApplicationService} from "../../../../services/application.service";
@@ -9,7 +9,8 @@ import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 @Component({
   selector: 'osm-performance-aspect-management',
   templateUrl: './performance-aspect-management.component.html',
-  styleUrls: ['./performance-aspect-management.component.scss']
+  styleUrls: ['./performance-aspect-management.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class PerformanceAspectManagementComponent implements OnInit {
   @Input() pageId: number;

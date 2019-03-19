@@ -1,6 +1,14 @@
 <i class="fas fa-pen" (click)="initDialog()"></i>
 
-<ngx-smart-modal id="preformanceAspectMgmtModal" identifier="preformanceAspectMgmtModal" (onAnyCloseEvent)="cancel()">
+<ngx-smart-modal id="preformanceAspectMgmtModal" identifier="preformanceAspectMgmtModal" [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="cancel()">
   <h2>{{"frontend.de.iteratec.osm.performance-aspect.mgmt" | translate}}</h2>
-  <osm-measurand-select></osm-measurand-select>
+  <div *ngIf="(performanceAspects$ | async)?.isLoading == false; else isLoading" class="aspect-management-box">
+    <osm-performance-aspect-inspect *ngFor="let performanceAspect of (performanceAspects$ | async)?.data" [performanceAspect]="performanceAspect" class="aspect-inspect"></osm-performance-aspect-inspect>
+  </div>
 </ngx-smart-modal>
+
+<ng-template #isLoading>
+  <div>
+    <p>{{"frontend.de.iteratec.osm.queueDashboard.load-information.label" | translate}}</p>
+  </div>
+</ng-template>

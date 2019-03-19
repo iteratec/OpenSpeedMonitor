@@ -1,0 +1,26 @@
+.edit-container{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-auto-columns: max-content;
+  grid-template-rows: 1fr;
+  //display: flex;
+  //justify-content: space-between;
+}
+
+.container-item{
+  margin: 0.5em;
+}
+
+.aspect-type{
+  grid-column-start: 1;
+  grid-column-end: span 2;
+}
+
+.measurand{
+  grid-column-start: 3;
+  grid-column-end: span 2;
+}
+
+.edit-button{
+  grid-column-start: 6;
+}

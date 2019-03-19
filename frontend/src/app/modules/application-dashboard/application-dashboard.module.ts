@@ -13,6 +13,7 @@ import {GraphiteIntegrationComponent} from "./components/application-job-status/
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import { PerformanceAspectManagementComponent } from './components/performance-aspect-management/performance-aspect-management.component';
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
+import { PerformanceAspectInspectComponent } from './components/performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component';
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -38,6 +39,7 @@ const DashboardRoutes: Routes = [
     ApplicationJobStatusComponent,
     GraphiteIntegrationComponent,
     PerformanceAspectManagementComponent,
+    PerformanceAspectInspectComponent,
   ],
   exports: [
     RouterModule

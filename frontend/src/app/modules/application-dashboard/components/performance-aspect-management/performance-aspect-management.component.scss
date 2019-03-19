@@ -1,0 +1,16 @@
+.aspect-management-modal{
+  max-width: 1200px;
+}
+
+.aspect-management-box{
+  display: grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
+  //grid-gap: 8px;
+}
+
+.aspect-inspect{
+  grid-column-start: 1;
+  grid-column-end: span 3;
+}
+
