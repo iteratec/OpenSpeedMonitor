@@ -5,7 +5,7 @@
     {{(initialValue?.name || "select measurand")| translate}}
     <i class="fas fa-caret-down select-measurand-triangle"></i>
   </button>
-  <ul class="dropdown-menu">
+  <ul class="dropdown-menu scrollable-menu">
     <osm-measurand-group *ngFor="let group$ of selectableMeasurandGroups" [measurandGroup$]="group$" (onSelectMeasurand)="selectMeasurand($event)"></osm-measurand-group>
   </ul>
 </div>
