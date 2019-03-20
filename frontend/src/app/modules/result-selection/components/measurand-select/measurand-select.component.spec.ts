@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MeasurandSelectComponent } from './measurand-select.component';
+import {MeasurandGroupComponent} from "./measurand-group/measurand-group.component";
+import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 
 describe('MeasurandSelectComponent', () => {
   let component: MeasurandSelectComponent;
@@ -8,7 +10,8 @@ describe('MeasurandSelectComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ MeasurandSelectComponent ]
+      declarations: [ MeasurandSelectComponent, MeasurandGroupComponent ],
+      imports: [SharedMocksModule]
     })
     .compileComponents();
   }));
