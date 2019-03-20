@@ -1,38 +1,64 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import {PerformanceAspect} from "../../../../../models/perfomance-aspect.model";
 import {TranslateService} from "@ngx-translate/core";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
-import {log} from "util";
+import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
+import {SelectableMeasurand} from "../../../../../models/measurand.model";
+import {ApplicationService} from "../../../../../services/application.service";
 
 @Component({
   selector: 'osm-performance-aspect-inspect',
   templateUrl: './performance-aspect-inspect.component.html',
   styleUrls: ['./performance-aspect-inspect.component.scss']
 })
-export class PerformanceAspectInspectComponent implements OnInit {
-  @Input() performanceAspect: PerformanceAspect;
+export class PerformanceAspectInspectComponent implements OnInit, OnChanges {
+  @Input() performanceAspectWrapped: ResponseWithLoadingState<PerformanceAspect>;
   selectedMetric$: Observable<string>;
   editMode: boolean = false;
+  performanceAspectInEditing: PerformanceAspect;
 
-  constructor(private translateService: TranslateService) { }
+  constructor(private translateService: TranslateService, private applicationService: ApplicationService) {
+  }
 
   ngOnInit() {
-    const key: string = `frontend.de.iteratec.isr.measurand.${this.performanceAspect.metricIdentifier}`;
+    this.setAspectInEditing();
+    this.updateSelectedMetric();
+  }
+
+  ngOnChanges(){
+    this.setAspectInEditing();
+    this.updateSelectedMetric();
+  }
+
+  private updateSelectedMetric() {
+    const measurandName = this.performanceAspectWrapped.data.measurand.name;
+    const key: string = `frontend.de.iteratec.isr.measurand.${measurandName}`;
     this.selectedMetric$ = this.translateService.get(key).pipe(
-      map((translation: string) => translation === key ? this.performanceAspect.metricIdentifier : key)
+      map((translation: string) => translation === key ? measurandName : key)
     )
   }
 
-  edit(){
+  private setAspectInEditing() {
+    this.performanceAspectInEditing = Object.assign({}, this.performanceAspectWrapped.data);
+  }
+
+  edit() {
+    this.setAspectInEditing();
     this.editMode = true;
   }
 
-  cancel(){
+  cancel() {
+    this.setAspectInEditing();
     this.editMode = false;
   }
 
-  save(){
+  save() {
+    this.applicationService.createOrUpdatePerformanceAspect(this.performanceAspectInEditing);
     this.editMode = false;
+  }
+
+  selectMeasurandForAspect(measurand: SelectableMeasurand) {
+    this.performanceAspectInEditing.measurand = measurand;
   }
 }

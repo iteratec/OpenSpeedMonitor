@@ -122,6 +122,10 @@ class ApplicationDashboardService {
                 property 'metricIdentifier', 'metricIdentifier'
                 property 'performanceAspectType', 'performanceAspectType'
             }
+        }.each {
+            SelectedMeasurand selectedMetric = new SelectedMeasurand(it.metricIdentifier, CachedView.UNCACHED)
+            it.remove('metricIdentifier')
+            it.measurand = [name: selectedMetric.name, id: selectedMetric.optionValue]
         }
         PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
             if(!performanceAspects.collect{it.performanceAspectType}.contains(performanceAspectType)){

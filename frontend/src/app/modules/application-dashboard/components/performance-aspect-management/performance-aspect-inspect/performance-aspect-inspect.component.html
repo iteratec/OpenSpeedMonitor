@@ -1,6 +1,6 @@
 <div class="edit-container">
   <div class="aspect-type">
-    <div class="aspect-label">{{"frontend.de.iteratec.osm.performance-aspect."+performanceAspect.performanceAspectType| translate}}</div>
+    <div class="aspect-label">{{"frontend.de.iteratec.osm.performance-aspect."+performanceAspectWrapped.data.performanceAspectType| translate}}</div>
   </div>
   <div class="measurand">
     <div *ngIf="!editMode; else measurandSelect">
@@ -8,18 +8,22 @@
     </div>
   </div>
   <div class="buttons">
-    <div *ngIf="!editMode; else saveOrCancel">
-      <button class="btn btn-primary edit-button" (click)="edit()">
-        Edit
-      </button>
+      <div *ngIf="!performanceAspectWrapped.isLoading">
+        <div *ngIf="!editMode; else saveOrCancel">
+        <button class="btn btn-primary edit-button" (click)="edit()">
+          Edit
+        </button>
+      </div>
+
     </div>
 
   </div>
 </div>
 
 <ng-template #measurandSelect>
-  <osm-measurand-select [initialValue]="selectedMetric$ | async"></osm-measurand-select>
+  <osm-measurand-select [initialValue]="selectedMetric$ | async" (onSelect)="selectMeasurandForAspect($event)"></osm-measurand-select>
 </ng-template>
+
 <ng-template #saveOrCancel>
   <button class="btn btn-warning" (click)="cancel()">
     Cancel
@@ -28,3 +32,4 @@
     Save
   </button>
 </ng-template>
+

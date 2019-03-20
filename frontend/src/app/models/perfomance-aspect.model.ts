@@ -1,7 +1,10 @@
+import {SelectableMeasurand} from "./measurand.model";
+
+
 export interface PerformanceAspect {
   id: number
   pageId: number
   jobGroupId: number
-  metricIdentifier: string
+  measurand: SelectableMeasurand
   performanceAspectType: string
 }

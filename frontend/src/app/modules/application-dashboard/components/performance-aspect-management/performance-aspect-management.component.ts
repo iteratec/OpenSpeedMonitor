@@ -2,7 +2,7 @@ import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {ApplicationService} from "../../../../services/application.service";
-import {ReplaySubject} from "rxjs";
+import {ReplaySubject, Subject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 
@@ -14,7 +14,7 @@ import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 })
 export class PerformanceAspectManagementComponent implements OnInit {
   @Input() pageId: number;
-  performanceAspects$: ReplaySubject<ResponseWithLoadingState<PerformanceAspect[]>>
+  performanceAspects$: Subject<ResponseWithLoadingState<PerformanceAspect>[]>;
 
   constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
     this.performanceAspects$ = this.applicationService.performanceAspectForPage$

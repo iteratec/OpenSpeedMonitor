@@ -8,7 +8,6 @@ class PerformanceAspect {
     Page page
     PerformanceAspectType performanceAspectType
 
-    SelectedMeasurand metric
     String metricIdentifier
     CachedView cachedView
 
@@ -18,13 +17,14 @@ class PerformanceAspect {
         performanceAspectType(unique: ['jobGroup', 'page'])
     }
 
-    def onLoad(){
-        this.metric = new SelectedMeasurand(this.metricIdentifier, this.cachedView)
-    }
+
 
     void setMetric(SelectedMeasurand metric){
-        this.metric = metric
         this.metricIdentifier = metric.optionValue
         this.cachedView = metric.cachedView
+    }
+
+    SelectedMeasurand getMetric(){
+        return new SelectedMeasurand(this.metricIdentifier, this.cachedView)
     }
 }

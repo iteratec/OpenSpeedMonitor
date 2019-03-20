@@ -75,9 +75,10 @@ class ApplicationDashboardController {
             performanceAspect = performanceAspect.save(flush: true, failOnError: true)
             Map performanceAspectDto = [:]
             performanceAspectDto.id = performanceAspect.id
-            performanceAspectDto.metric = performanceAspect.metricIdentifier
-            performanceAspectDto.type = performanceAspect.performanceAspectType.toString()
+            performanceAspectDto.measurand = [name: performanceAspect.metric.name, id: performanceAspect.metric.optionValue]
+            performanceAspectDto.performanceAspectType = performanceAspect.performanceAspectType.toString()
             performanceAspectDto.pageId = performanceAspect.page.id
+            performanceAspectDto.jobGroupId = performanceAspect.jobGroup.id
             return ControllerUtils.sendObjectAsJSON(response, performanceAspectDto)
         } catch (Exception e) {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, e.toString())
