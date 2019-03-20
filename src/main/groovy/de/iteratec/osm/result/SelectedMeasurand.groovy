@@ -2,8 +2,10 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.Constants
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.InheritConstructors
 
+@EqualsAndHashCode
 @InheritConstructors
 class SelectedMeasurand {
     String name
