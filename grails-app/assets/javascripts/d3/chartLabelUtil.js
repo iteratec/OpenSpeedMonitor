@@ -16,6 +16,7 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
     var uniquePages = [];
     var uniqueJobGroups = [];
     var uniqueMeasurands = [];
+    var uniqueBrowsers = [];
 
     var init = function () {
         seriesData = series;
@@ -25,10 +26,11 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
 
     var deduceUniqueEntries = function () {
         seriesData.forEach(function (series) {
-            if (series.grouping && !series.page && !series.jobGroup) {
+            if (series.grouping && !series.page && !series.jobGroup && !series.browser) {
                 var splittedIdentifier = series.grouping.split(groupingDelimiter);
                 series.page = splittedIdentifier[0];
                 series.jobGroup = splittedIdentifier[1];
+                series.browser = splittedIdentifier[2];
             }
 
             if (series.page && uniquePages.indexOf(series.page) === -1) {
@@ -40,7 +42,9 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
             if (series.measurand && uniqueMeasurands.indexOf(series.measurand) === -1) {
                 uniqueMeasurands.push(series.measurand);
             }
-
+            if (series.browser && uniqueBrowsers.indexOf(series.browser) === -1) {
+                uniqueBrowsers.push(series.browser);
+            }
         });
 
     };
@@ -56,6 +60,9 @@ OpenSpeedMonitor.ChartModules.ChartLabelUtil = function (series, i18nMap) {
             }
             if (!omitMeasurands && uniqueMeasurands.length > 1) {
                 labelParts.push(series.measurand);
+            }
+            if (uniqueBrowsers.length > 1) {
+                labelParts.push(series.browser);
             }
             series.label = labelParts.join(delimiter);
         });

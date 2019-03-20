@@ -31,19 +31,20 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
             orderedSeries.groupData.forEach(function (element) {
                 labelList.push({
                     jobGroup: element.jobGroup,
+                    browser: element.browser,
                     measurand: rawSeries.measurand
                 });
             });
         }
         var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(labelList, data.i18nMap);
         headerText = chartLabelUtils.getCommonLabelParts(false);
-        headerText += headerText ? ' - '+getAggregationValueLabel() : getAggregationValueLabel();
+        headerText += headerText ? ' - ' + getAggregationValueLabel() : getAggregationValueLabel();
         sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
             return s.label;
         });
         fullWidth = getActualSvgWidth();
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
-        chartBarsWidth = fullWidth - 2*OpenSpeedMonitor.ChartComponents.common.ComponentMargin - chartSideLabelsWidth;
+        chartBarsWidth = fullWidth - 2 * OpenSpeedMonitor.ChartComponents.common.ComponentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailable = rawSeries.groupData ? true : dataAvailable;
     };
@@ -59,30 +60,32 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         };
     };
 
-    var addAggregationToSeriesEntry = function(jobGroup, aggregationValue, value, valueComparative) {
+    var addAggregationToSeriesEntry = function (jobGroup, aggregationValue, value, valueComparative) {
         rawSeries.groupData.forEach(function (it) {
-            if(it.jobGroup === jobGroup) {
+            if (it.jobGroup === jobGroup) {
                 it[aggregationValue] = value;
-                if (valueComparative) {it[aggregationValue+'Comparative'] = valueComparative}
+                if (valueComparative) {
+                    it[aggregationValue + 'Comparative'] = valueComparative
+                }
             }
         })
     };
 
-    var transformAndMergeData = function(data) {
-        if(data.groupData && !rawSeries.groupData) {
+    var transformAndMergeData = function (data) {
+        if (data.groupData && !rawSeries.groupData) {
             rawSeries = data || rawSeries;
-            rawSeries.groupData.forEach(function(it){
+            rawSeries.groupData.forEach(function (it) {
                 it[data.groupData[0].aggregationValue] = it.value;
                 delete it.value;
-                if(data.hasComparativeData) {
-                    it[data.groupData[0].aggregationValue+'Comparative'] = it.valueComparative;
+                if (data.hasComparativeData) {
+                    it[data.groupData[0].aggregationValue + 'Comparative'] = it.valueComparative;
                     delete it.valueComparative;
                 }
             })
         }
-        if(data.groupData && rawSeries && !rawSeries.groupData[0].hasOwnProperty(data.groupData[0].aggregationValue)) {
-            data.groupData.forEach(function(it){
-                if(data.hasComparativeData) {
+        if (data.groupData && rawSeries && !rawSeries.groupData[0].hasOwnProperty(data.groupData[0].aggregationValue)) {
+            data.groupData.forEach(function (it) {
+                if (data.hasComparativeData) {
                     addAggregationToSeriesEntry(it.jobGroup, data.groupData[0].aggregationValue, it.value, it.valueComparative);
                 } else {
                     addAggregationToSeriesEntry(it.jobGroup, data.groupData[0].aggregationValue, it.value);
@@ -94,8 +97,7 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
     var getAggregationValueLabel = function () {
         if (aggregationValue === 'avg') {
             return 'Average'
-        }
-        else {
+        } else {
             return "Percentile: " + aggregationValue + "%"
         }
     };
@@ -153,9 +155,10 @@ OpenSpeedMonitor.ChartModules.JobGroupAggregationData = (function (svgSelection)
         var mappedValues = [];
         rawValues.groupData.forEach(function (series) {
             var mappedSeries = {};
-            mappedSeries.id = series.jobGroup;
+            mappedSeries.id = series.jobGroup + series.browser;
             mappedSeries.value = series[aggregationValue];
             mappedSeries.unit = rawValues.unit;
+            mappedSeries.browser = series.browser;
             mappedValues.push(mappedSeries);
         });
         return mappedValues;

@@ -32,7 +32,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         individualColors = componentData.individualColors || individualColors;
         forceSignInLabel = (componentData.forceSignInLabel !== undefined) ? componentData.forceSignInLabel : forceSignInLabel;
         isRestrained = (componentData.isRestrained !== undefined) ? componentData.isRestrained : isRestrained;
-        highlightId = highlightId!==componentData.highLightId ? componentData.highLightId || highlightId : undefined;
+        highlightId = highlightId !== componentData.highLightId ? componentData.highLightId || highlightId : undefined;
     };
 
     var render = function (selection, isAggregationValueChange) {
@@ -40,7 +40,9 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         var yScale = d3.scale.ordinal().rangeBands([0, height]);
 
         xScale.domain([minValue, maxValue]);
-        yScale.domain(data.map(function(d) { return d.id; }));
+        yScale.domain(data.map(function (d) {
+            return d.id;
+        }));
         var bars = selection.selectAll(".bar").data(data, function (d) {
             return d.id;
         });
@@ -58,7 +60,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .attr("y", 0)
             .attr("height", barBand)
             .each(function (d) {
-                var color = individualColors?d.color: barColor;
+                var color = individualColors ? d.color : barColor;
                 d3.select(this).attr("fill", color);
             });
         bars.append("text")
@@ -71,12 +73,18 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
     var renderUpdate = function (updateSelection, xScale, yScale, isAggregationValueChange) {
         var valueLabelOffset = 10;
         updateSelection
-            .on("mouseover", function(data) { callEventHandler("mouseover", data) })
-            .on("mouseout", function(data) { callEventHandler("mouseout", data) })
-            .on("click", function(data) { callEventHandler("click", data) });
+            .on("mouseover", function (data) {
+                callEventHandler("mouseover", data)
+            })
+            .on("mouseout", function (data) {
+                callEventHandler("mouseout", data)
+            })
+            .on("click", function (data) {
+                callEventHandler("click", data)
+            });
 
         updateSelection.select(".bar-value").text(function (d) {
-          if (d.value !== null) {
+            if (d.value !== null) {
                 var prefix = d.showLabelOnTop ? d.label + ": " : "";
                 prefix = prefix + (d.value > 0 && forceSignInLabel ? "+" : "");
                 return prefix + formatValue(d.value) + " " + d.unit;
@@ -112,13 +120,13 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         transition.style("opacity", getOpacity);
         transition.select(".bar-rect")
             .style("opacity", function (d) {
-                return !(d.id===highlightId || !highlightId) ? 0.2 : 1;
+                return !(d.id === highlightId || !highlightId) ? 0.2 : 1;
             })
             .attr("y", function (d) {
                 return yScale(d.id)
             })
             .each(function (d) {
-                var color = individualColors?d.color: barColor;
+                var color = individualColors ? d.color : barColor;
                 d3.select(this).attr("fill", color);
             });
         transition.select(".bar-value")
@@ -128,12 +136,12 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
             .attr("text-anchor", function (d) {
                 return (d.value < 0) ? "start" : "end";
             })
-            .style("opacity", function(d) {
+            .style("opacity", function (d) {
                 return ((this.getComputedTextLength() + 2 * valueLabelOffset) > barWidth(xScale, d.value)) ? 0 : 1;
             });
     };
 
-    var barEnd = function(xScale, value) {
+    var barEnd = function (xScale, value) {
         return (value < 0) ? xScale(0) : xScale(value);
     };
 
@@ -141,7 +149,7 @@ OpenSpeedMonitor.ChartComponents.ChartBars = (function () {
         return (value < 0) ? xScale(value) : xScale(0);
     };
 
-    var barWidth = function(xScale, value) {
+    var barWidth = function (xScale, value) {
         return value === null ? 0 : (barEnd(xScale, value) - barStart(xScale, value));
     };
 

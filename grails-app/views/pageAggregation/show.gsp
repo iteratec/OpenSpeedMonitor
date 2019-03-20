@@ -43,9 +43,9 @@
                 <div class="col-md-4">
                     <g:render template="/_resultSelection/selectIntervalTimeframeCard"
                               model="${[
-                                'selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'to': to,
-                                'showIncludeInterval': false,
-                                'showComparisonInterval': true
+                                      'selectedTimeFrameInterval': selectedTimeFrameInterval, 'from': from, 'to': to,
+                                      'showIncludeInterval'      : false,
+                                      'showComparisonInterval'   : true
                               ]}"/>
 
                     <g:render template="/_resultSelection/selectBarchartMeasurings" model="[
@@ -64,12 +64,15 @@
                 </div>
                 %{--the rest----------------------------------------------------------------------------------------------}%
                 <div id="filter-complete-tabbable" class="col-md-5">
-                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard" model="[
-                            'showOnlyPage'         : true,
-                            'hideMeasuredEventForm': true,
-                            'pages'                : pages,
-                            'selectedPages'        : selectedPages
-                    ]"/>
+                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
+                              model="[
+                                      'hideMeasuredEventForm': true,
+                                      'pages'                : pages,
+                                      'selectedPages'        : selectedPages,
+                                      'browsers'             : browsers,
+                                      'selectedBrowsers'     : selectedBrowsers,
+                                      'selectedAllBrowsers'  : selectedAllBrowsers
+                              ]"/>
                 </div>
 
                 <div class="row">
