@@ -41,6 +41,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var aggregationsWithoutPageNeed = ["weekly_shop", "daily_shop", "daily_system", "weekly_system"];
     var needsNoPageSelectionDueToCsiAggregation = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && aggregationsWithoutPageNeed.indexOf($("input[name='aggrGroupAndInterval']:checked").val()) >= 0;
+    var hasNoPageSelectionTab = $("#page-tab").length === 0;
     var csiSystemSelected = $("#dashBoardParamsForm").data("caller") == "CsiAggregation" && ($("input[name='aggrGroupAndInterval']:checked").val() == "daily_system" || $("input[name='aggrGroupAndInterval']:checked").val() == "weekly_system");
     var lastResultCount = 1;
 
@@ -96,8 +97,8 @@ OpenSpeedMonitor.resultSelection = (function () {
         selectPageLocationConnectivityCard.on("connectivitySelectionChanged", setQueryArgsFromConnectivitySelection);
     };
 
-    var setTimeFrameFromEvent = function(event){
-       setQueryArgsFromTimeFrame(event.detail)
+    var setTimeFrameFromEvent = function (event) {
+        setQueryArgsFromTimeFrame(event.detail)
     };
 
     var setQueryArgsFromTimeFrame = function (time) {
@@ -176,7 +177,7 @@ OpenSpeedMonitor.resultSelection = (function () {
             }
 
         }
-        if(OpenSpeedMonitor.selectUserTimings){
+        if (OpenSpeedMonitor.selectUserTimings) {
             updateCard(resultSelectionUrls["userTimings"], OpenSpeedMonitor.selectUserTimings.updateUserTimings, spinner);
             updateCard(resultSelectionUrls["heroTimings"], OpenSpeedMonitor.selectUserTimings.updateHeroTimings, spinner);
             updateStarted = true;
@@ -193,11 +194,11 @@ OpenSpeedMonitor.resultSelection = (function () {
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
         warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
 
-        if(pageSelectionAvailable){
+        if (pageSelectionAvailable) {
             warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         }
 
-        var doDisable = lastResultCount === 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
+        var doDisable = lastResultCount === 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasNoPageSelectionTab || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
 
         showButtons.prop("disabled", doDisable);
         showButtons.toggleClass("disabled", doDisable)
