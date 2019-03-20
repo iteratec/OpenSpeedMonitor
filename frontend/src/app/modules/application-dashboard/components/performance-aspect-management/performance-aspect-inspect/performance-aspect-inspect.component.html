@@ -1,6 +1,6 @@
 <div class="edit-container">
   <div class="aspect-type">
-    <div class="aspect-label">{{"frontend.de.iteratec.osm.performance-aspect."+performanceAspectWrapped.data.performanceAspectType| translate}}</div>
+    <div class="aspect-label">{{"frontend.de.iteratec.osm.performance-aspect."+performanceAspectWrapped?.data?.performanceAspectType| translate}}</div>
   </div>
   <div class="measurand">
     <div *ngIf="!editMode; else measurandSelect">
@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="buttons">
-      <div *ngIf="!performanceAspectWrapped.isLoading">
+      <div *ngIf="!performanceAspectWrapped?.isLoading">
         <div *ngIf="!editMode; else saveOrCancel">
         <button class="btn btn-primary edit-button" (click)="edit()">
           Edit

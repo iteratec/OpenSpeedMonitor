@@ -22,13 +22,17 @@ export class PerformanceAspectInspectComponent implements OnInit, OnChanges {
   }
 
   ngOnInit() {
-    this.setAspectInEditing();
-    this.updateSelectedMetric();
+    if(this.performanceAspectWrapped){
+      this.setAspectInEditing();
+      this.updateSelectedMetric();
+    }
   }
 
   ngOnChanges(){
-    this.setAspectInEditing();
-    this.updateSelectedMetric();
+    if(this.performanceAspectWrapped){
+      this.setAspectInEditing();
+      this.updateSelectedMetric();
+    }
   }
 
   private updateSelectedMetric() {
