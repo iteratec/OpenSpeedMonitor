@@ -16,7 +16,6 @@ import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";
 import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
-import {ResultSelectionService} from "./result-selection.service";
 import {PerformanceAspect} from "../models/perfomance-aspect.model";
 import {Page} from "../models/page.model";
 
@@ -35,7 +34,7 @@ export class ApplicationService {
   selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
   selectedApplication$ = new ReplaySubject<Application>(1);
 
-  constructor(private http: HttpClient, private measurandsService: ResultSelectionService) {
+  constructor(private http: HttpClient) {
     this.combinedParams().pipe(
       switchMap(params => this.getPerformanceAspects(params))
     ).subscribe(this.performanceAspectForPage$);
@@ -120,7 +119,6 @@ export class ApplicationService {
   }
 
   updateSelectedApplication(application: Application) {
-    this.measurandsService.updateApplications([application]);
     this.selectedApplication$.next(application);
   }
 

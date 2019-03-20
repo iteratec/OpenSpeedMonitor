@@ -8,6 +8,7 @@ import {PageMetricsDto} from "./models/page-metrics.model";
 import {ApplicationCsi, ApplicationCsiById} from "../../models/application-csi.model";
 import {Csi} from "../../models/csi.model";
 import {FailingJobStatistic} from "./models/failing-job-statistic.model";
+import {ResultSelectionService} from "../../services/result-selection.service";
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -28,7 +29,8 @@ export class ApplicationDashboardComponent implements OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private applicationService: ApplicationService
+    private applicationService: ApplicationService,
+    private resultSelectionService: ResultSelectionService
   ) {
     this.pages$ = this.applicationService.metrics$;
     this.applications$ = applicationService.applications$.pipe(
@@ -57,6 +59,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     this.selectedApplication = this.findApplicationById(applications, applicationId);
     if (this.selectedApplication) {
       this.applicationService.updateSelectedApplication(this.selectedApplication);
+      this.resultSelectionService.updateApplications([this.selectedApplication]);
     }
   }
 
