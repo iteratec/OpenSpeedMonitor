@@ -26,7 +26,13 @@ export class LandingComponent {
     );
     this.applications$ = combineLatest(this.applicationService.applications$, this.applicationService.applicationCsiById$).pipe(
       filter(([applications]) => !applications.isLoading && !!applications.data),
-      map(([applications, csiById]) => applications.data.map(app => new ApplicationWithCsi(app, csiById[app.id], csiById.isLoading)))
+      map(([applications, csiById]) => applications.data.map(app => new ApplicationWithCsi(app, csiById[app.id], csiById.isLoading)).sort((a, b) => {
+        if (!b.recentCsi.csiDocComplete) {
+          return -1;
+        } else {
+          return b.recentCsi.csiDocComplete - a.recentCsi.csiDocComplete;
+        }
+      }))
     );
     this.applicationService.loadApplications();
     this.applicationService.loadRecentCsiForApplications();
