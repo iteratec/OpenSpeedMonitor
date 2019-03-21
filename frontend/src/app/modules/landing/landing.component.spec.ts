@@ -105,14 +105,14 @@ describe('LandingComponent', () => {
     expect(fixture.debugElement.query(By.css(".clickable-list"))).toBeTruthy();
     const links = fixture.debugElement.queryAll(By.css(".clickable-list a"));
     expect(links.length).toBe(2);
-    expect(links[0].nativeElement.href).toMatch(".*/applicationDashboard/1");
-    expect(links[0].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestOne");
+    expect(links[0].nativeElement.href).toMatch(".*/applicationDashboard/2");
+    expect(links[0].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestTwo");
     expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
-    expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(60);
-    expect(links[1].nativeElement.href).toMatch(".*/applicationDashboard/2");
-    expect(links[1].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestTwo");
+    expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(70);
+    expect(links[1].nativeElement.href).toMatch(".*/applicationDashboard/1");
+    expect(links[1].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestOne");
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
-    expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(70);
+    expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(60);
   });
 
   it('should show a button to view all jobs', () => {
