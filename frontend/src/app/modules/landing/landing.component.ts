@@ -29,6 +29,8 @@ export class LandingComponent {
       map(([applications, csiById]) => applications.data.map(app => new ApplicationWithCsi(app, csiById[app.id], csiById.isLoading)).sort((a, b) => {
         if (!b.recentCsi.csiDocComplete) {
           return -1;
+        } else if (!a.recentCsi.csiDocComplete && !b.recentCsi.csiDocComplete) {
+          return 0;
         } else {
           return b.recentCsi.csiDocComplete - a.recentCsi.csiDocComplete;
         }
