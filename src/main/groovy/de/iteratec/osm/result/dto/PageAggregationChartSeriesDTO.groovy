@@ -12,5 +12,6 @@ class PageAggregationChartSeriesDTO {
     String page = ""
     String jobGroup = ""
     String unit = ""
+    String browser = ""
     String aggregationValue = ""
 }

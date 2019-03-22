@@ -100,7 +100,7 @@ OpenSpeedMonitor.jobListFilter = (function () {
         var href = window.location.href;
         if (href.includes('#')) {
             href = href.split('#/')[1];
-            return href.split('=')[1];
+            return href.split('=');
         } else {
             return null;
         }
@@ -110,7 +110,7 @@ OpenSpeedMonitor.jobListFilter = (function () {
         var filterText;
         var urlParam = getUrlParam();
         if (urlParam) {
-            filterText = urlParam;
+            filterText = decodeURIComponent(urlParam[1]);
         } else {
             filterText = storageUtils.getFromLocalStorage(filterTextLocalStorage);
         }
@@ -122,8 +122,25 @@ OpenSpeedMonitor.jobListFilter = (function () {
     var initFilterCheckboxes = function () {
         var urlParam = getUrlParam();
         if (urlParam) {
-            assignCheckboxValue(allFilterCheckboxes.byJobGroup, true);
-            allFilterCheckboxes.byJobGroup.element.on('change', filter);
+            if (urlParam[0] === 'name') {
+                assignCheckboxValue(allFilterCheckboxes.byName, true);
+                allFilterCheckboxes.byName.element.on('change', filter);
+            } else if (urlParam[0] === 'script') {
+                assignCheckboxValue(allFilterCheckboxes.byScript, true);
+                allFilterCheckboxes.byScript.element.on('change', filter);
+            } else if (urlParam[0] === 'jobGroup') {
+                assignCheckboxValue(allFilterCheckboxes.byJobGroup, true);
+                allFilterCheckboxes.byJobGroup.element.on('change', filter);
+            } else if (urlParam[0] === 'location') {
+                assignCheckboxValue(allFilterCheckboxes.byLocation, true);
+                allFilterCheckboxes.byLocation.element.on('change', filter);
+            } else if (urlParam[0] === 'browser') {
+                assignCheckboxValue(allFilterCheckboxes.byBrowser, true);
+                allFilterCheckboxes.byBrowser.element.on('change', filter);
+            } else if (urlParam[0] === 'tags') {
+                assignCheckboxValue(allFilterCheckboxes.byTags, true);
+                allFilterCheckboxes.byTags.element.on('change', filter);
+            }
         } else {
             $.each(allFilterCheckboxes, function (name, checkbox) {
                 var localStorageValue = storageUtils.getFromLocalStorage(checkbox.localStorage);
@@ -180,7 +197,7 @@ OpenSpeedMonitor.jobListFilter = (function () {
     };
 
     var showOnlyFiltersMatchRow = function (row) {
-        var isMatch = !showOnlyCheckboxes.showOnlyActive.isChecked || row.find(".job_active").val() == "true";
+        var isMatch = !showOnlyCheckboxes.showOnlyActive.isChecked || row.find(".job_active").val() === "true";
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyHighlighted.isChecked || row.hasClass("highlight"));
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyChecked.isChecked || row.find(".jobCheckbox").prop("checked"));
         isMatch = isMatch && (!showOnlyCheckboxes.showOnlyRunning.isChecked || row.find(".running").length > 0);

@@ -36,6 +36,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         state["selectedTimeFrameInterval"] = $("#timeframeSelect").val();
         state["selectedFolder"] = $("#folderSelectHtmlId").val();
         state["selectedPages"] = $("#pageSelectHtmlId").val();
+        state["selectedBrowsers"] = $("#selectedBrowsersHtmlId").val();
         state['selectedAggrGroupValuesUnCached'] = [];
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
         state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
@@ -81,10 +82,16 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         setStackBars(state);
         setAggregationValue(state);
         setPercentile(state);
-        loadedState = encodedState;
-        if(state.selectedFolder && state.selectedPages){
-            $(window).trigger("historyStateLoaded");
-        }
+
+        window.setTimeout(function () {
+            setBrowsers(state);
+            loadedState = encodedState;
+            if (state.selectedFolder && state.selectedPages) {
+                $(window).trigger("historyStateLoaded");
+            }
+        }, 1000);
+
+
     };
 
     var setTimeFrame = function (state) {
@@ -107,6 +114,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         }
     };
 
+    var setBrowsers = function (params) {
+        if (params['selectedBrowsers']) {
+            setMultiSelect("selectedBrowsersHtmlId", params['selectedBrowsers']);
+        }
+    };
+
     var setMeasurands = function (params) {
         var measurands = params['selectedAggrGroupValuesUnCached'];
         if (!measurands) {
@@ -117,18 +130,21 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         }
         $(".measurandSeries-clone").remove();
         var currentAddButton = $("#addMeasurandButton");
-        for (var i = 0; i < measurands.length -1; i++) {
+        for (var i = 0; i < measurands.length - 1; i++) {
             currentAddButton.trigger('click');
         }
         var selects = $(".measurand-select");
 
         measurands.forEach(function (measurand, i) {
-            if(measurand.startsWith("_UTM")) {
+            if (measurand.startsWith("_UTM")) {
 
                 var optGroupUserTimings = $(selects[i]).find('.measurand-opt-group-USER_TIMINGS');
                 var alreadyThere = optGroupUserTimings.length > 1;
-                if(!alreadyThere){
-                    OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{id: measurand, name: measurand}])
+                if (!alreadyThere) {
+                    OpenSpeedMonitor.domUtils.updateSelectOptions(optGroupUserTimings, [{
+                        id: measurand,
+                        name: measurand
+                    }])
                 }
             }
             $(selects[i]).val(measurand);
@@ -139,7 +155,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         if (!state["selectedFilter"]) {
             return;
         }
-        $(".chart-filter").each(function() {
+        $(".chart-filter").each(function () {
             var $this = $(this);
             $this.toggleClass("selected", $this.data("filter") === state["selectedFilter"]);
         });
@@ -168,11 +184,11 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     var setPercentile = function (state) {
-        if(!state["selectedPercentile"]) {
+        if (!state["selectedPercentile"]) {
             return
         }
         var percentile = state["selectedPercentile"];
-        if(percentile.match("\\d{1,3}")) {
+        if (percentile.match("\\d{1,3}")) {
             $("input[id='percentageSlider']").val(percentile);
             $("input[id='percentageField']").val(percentile);
         }
@@ -184,6 +200,5 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
     };
 
     initWaitForPostload();
-    return {
-    };
+    return {};
 })();

@@ -103,8 +103,8 @@ class PageAggregationControllerSpec extends Specification implements BuildDomain
                         aggregationValue: "bar"
                 )
         ]
-        controllerUnderTest.i18nService = Stub(I18nService){
-            msg(_ as String, _ as String) >> {String key, String defaultValue -> key+";"+defaultValue}
+        controllerUnderTest.i18nService = Stub(I18nService) {
+            msg(_ as String, _ as String) >> { String key, String defaultValue -> key + ";" + defaultValue }
         }
 
         when: "being converted to DTO"
@@ -120,6 +120,7 @@ class PageAggregationControllerSpec extends Specification implements BuildDomain
                         valueComparative: 2.4,
                         page: "page one",
                         jobGroup: "job group 1",
+                        browser: null,
                         unit: "ms",
                         aggregationValue: "foo"),
                 new PageAggregationChartSeriesDTO(
@@ -130,6 +131,7 @@ class PageAggregationControllerSpec extends Specification implements BuildDomain
                         valueComparative: null,
                         page: "page two",
                         jobGroup: "job group 2",
+                        browser: null,
                         unit: "ms",
                         aggregationValue: "bar")
         ]

@@ -39,6 +39,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         state["selectedFilter"] = $(".chart-filter.selected").data("filter");
         state["selectedAggregationValue"] = $('input[name=aggregationValue]:checked').val();
         state["selectedPercentile"] = $('input[id=percentageField]').val();
+        state["selectedBrowsers"] = $("#selectedBrowsersHtmlId").val();
         var measurandSelects = $(".measurand-select");
         // leave out last select as it's the "hidden clone"
         for (var i = 0; i < measurandSelects.length - 1; i++) {
@@ -74,10 +75,14 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
         setSelectedFilter(state);
         setAggregationValue(state);
         setPercentile(state);
-        loadedState = encodedState;
-        if (state.selectedFolder) {
-            $(window).trigger("historyStateLoaded");
-        }
+
+        window.setTimeout(function () {
+            setBrowsers(state);
+            loadedState = encodedState;
+            if (state.selectedFolder) {
+                $(window).trigger("historyStateLoaded");
+            }
+        }, 1000);
     };
 
     var setTimeFrame = function (state) {
@@ -88,6 +93,12 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
     var setJobGroups = function (params) {
         if (params['selectedFolder']) {
             setMultiSelect("folderSelectHtmlId", params['selectedFolder']);
+        }
+    };
+
+    var setBrowsers = function (params) {
+        if (params['selectedBrowsers']) {
+            setMultiSelect("selectedBrowsersHtmlId", params['selectedBrowsers']);
         }
     };
 
@@ -145,11 +156,11 @@ OpenSpeedMonitor.ChartModules.UrlHandling.JobGroupAggregation = (function () {
     };
 
     var setPercentile = function (state) {
-        if(!state["selectedPercentile"]) {
+        if (!state["selectedPercentile"]) {
             return
         }
         var percentile = state["selectedPercentile"];
-        if(percentile.match("\\d{1,3}")) {
+        if (percentile.match("\\d{1,3}")) {
             $("input[id='percentageSlider']").val(percentile);
             $("input[id='percentageField']").val(percentile);
         }
