@@ -5,14 +5,15 @@ import {SharedModule} from "../shared/shared.module";
 import { ResultSelectionTimeFrameComponent } from './components/result-selection-time-frame/result-selection-time-frame.component';
 import { ResultSelectionApplicationComponent } from './components/result-selection-application/result-selection-application.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {Ng2FlatpickrModule} from "ng2-flatpickr";
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
 @NgModule({
   imports: [
     SharedModule,
     ReactiveFormsModule,
     FormsModule,
-    Ng2FlatpickrModule
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule
   ],
   declarations: [
     ResultSelectionComponent,

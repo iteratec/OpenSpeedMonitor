@@ -17,10 +17,14 @@
 
   <div class="row form-group">
     <div class="col-md-8 col-md-offset-4">
-      <div class="input-group" [formGroup]="timeSelectionForm">
-        <ng2-flatpickr formControlName="timeFrame" #resultSelectionFlatpickr id="resultSelectionFlatpickr" [config]="resultSelectionFlatpickrOptions" [addClass]="'form-control'"></ng2-flatpickr>
+      <div class="input-group">
+        <input class="form-control" [owlDateTimeTrigger]="dateTimeFrom" [owlDateTime]="dateTimeFrom" [(ngModel)]="selectedMoments"
+               [selectMode]="'rangeFrom'" (dateTimeChange)="updateTimeFrame()" (blur)="dateTimeFrom.valueOf()">
+        <owl-date-time #dateTimeFrom firstDayOfWeek="1"></owl-date-time>
         <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
-        <input type="text" #resultSelectionFlatpickrSecondField  id="resultSelectionFlatpickrSecondField" class="form-control">
+        <input class="form-control" [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [(ngModel)]="selectedMoments"
+               [selectMode]="'rangeTo'" (dateTimeChange)="updateTimeFrame()">
+        <owl-date-time #dateTimeTo firstDayOfWeek="1"></owl-date-time>
       </div>
     </div>
   </div>

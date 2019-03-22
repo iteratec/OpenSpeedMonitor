@@ -1,13 +1,10 @@
-import {Component, ElementRef, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {formatDate} from "@angular/common";
+import {Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {Caller, ResultSelectionCommand} from "../../models/result-selection-command.model";
 import {Chart} from "../../models/result-selection-chart.model";
 import {ResultSelectionService} from "../../services/result-selection.service";
-import {FlatpickrOptions, Ng2FlatpickrComponent} from "ng2-flatpickr";
-import rangePlugin from 'flatpickr/dist/plugins/rangePlugin'
-import German from 'flatpickr/dist/l10n/de'
 import {OsmLangService} from "../../../../services/osm-lang.service";
 import {FormControl, FormGroup} from "@angular/forms";
+import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
 
 @Component({
   selector: 'osm-result-selection-time-frame',
@@ -18,11 +15,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 export class ResultSelectionTimeFrameComponent implements OnInit {
 
   @Input() currentChart: string;
-  @ViewChild("resultSelectionFlatpickr") resultSelectionFlatpickr: Ng2FlatpickrComponent;
-  @ViewChild("resultSelectionFlatpickrSecondField") resultSelectionFlatpickrSecondField: ElementRef;
-
-  from: Date;
-  to: Date;
+  // @ViewChild("dateTimeTo") dateTimeTo: OwlDateTimeComponent<any>;
 
   timeSelectionForm = new FormGroup({
     timeFrame: new FormControl(),
@@ -31,17 +24,24 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
   selectableTimeFramesInSeconds: number[] = [0, 3600, 43200, 86400, 259200, 604800, 1209600, 2419200];
   timeFrameInSeconds: number = 0;
 
-  resultSelectionFlatpickrOptions: FlatpickrOptions;
+  selectedMoments: Date[];
 
-  constructor(private resultSelectionService: ResultSelectionService, private osmLangService: OsmLangService) {
+  constructor(private resultSelectionService: ResultSelectionService, private osmLangService: OsmLangService, dateTimeAdapter: DateTimeAdapter<any>) {
+    dateTimeAdapter.setLocale(this.osmLangService.getOsmLang() + "-DE");
   }
 
   ngOnInit() {
+
     let defaultFrom = new Date();
     let defaultTo = new Date();
     defaultTo.setHours(23, 59, 59, 999);
     defaultFrom.setDate(defaultTo.getDate() - 28);
     defaultFrom.setHours(0, 0, 0, 0);
+
+    this.selectedMoments = [
+      defaultFrom,
+      defaultTo
+    ];
 
     let defaultResultSelectionCommand = new ResultSelectionCommand({
       from: defaultFrom,
@@ -56,42 +56,33 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     });
 
     this.resultSelectionService.loadSelectableData(defaultResultSelectionCommand, Chart[this.currentChart]);
-
-    this.from = defaultFrom;
-    this.to = defaultTo;
-
-    this.updateFlatpickrConfig();
     this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[7];
-    this.timeSelectionForm.setValue({'timeFrame': [this.from, this.to]});
-    this.resultSelectionFlatpickrSecondField.nativeElement.value = formatDate(this.to, 'dd.LL.yyyy HH:mm', 'en');
-  }
-
-  private updateFlatpickrConfig(): void {
-    this.resultSelectionFlatpickrOptions = {
-      dateFormat: 'd.m.Y H:i',
-      enableTime: true,
-      time_24hr: true,
-      defaultDate: this.from,
-      ...(this.osmLangService.getOsmLang() === 'de' && { locale: German.de }),
-      plugins: [rangePlugin({ input: "#resultSelectionFlatpickrSecondField" })],
-    };
   }
 
   selectTimeFrame(): void {
-    this.from = new Date();
-    this.to = new Date();
-    this.from.setSeconds(this.to.getSeconds() - this.timeFrameInSeconds);
-    if (this.timeFrameInSeconds >= 259200) {
-      this.to.setHours(23, 59, 59, 999);
-      this.from.setHours(0, 0, 0, 0);
-    }
+    let from = new Date();
+    let to = new Date();
 
-    this.timeSelectionForm.setValue({'timeFrame': [this.from, this.to]});
-    this.resultSelectionFlatpickr.flatpickrElement.nativeElement._flatpickr.setDate(this.from);
-    this.resultSelectionFlatpickrSecondField.nativeElement.value = formatDate(this.to, 'dd.LL.yyyy HH:mm', 'en');
+    from.setSeconds(to.getSeconds() - this.timeFrameInSeconds);
+    if (this.timeFrameInSeconds >= 259200) {
+      to.setHours(23, 59, 59, 999);
+      from.setHours(0, 0, 0, 0);
+    }
+    this.selectedMoments = [from, to];
+  }
+
+  updateTimeFrame() {
+    this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[0];
+    // console.log(this.dateTimeTo);
+  }
+
+  updateDate() {
+
+    // console.log(this.dateTimeTo);
   }
 
   updateName() {
-    console.log(this.timeSelectionForm.value);
+    console.log(this.selectedMoments[0].toISOString());
+    console.log(this.selectedMoments[1].toISOString());
   }
 }

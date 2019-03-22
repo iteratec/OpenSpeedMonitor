@@ -13,6 +13,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "^7.2.4",
+    "@angular/cdk": "^7.3.5",
     "@angular/common": "^7.2.4",
     "@angular/compiler": "^7.2.4",
     "@angular/core": "^7.2.4",
@@ -25,6 +26,7 @@
     "@ngx-translate/http-loader": "^4.0.0",
     "core-js": "^2.6.3",
     "d3": "^5.8.2",
+    "ng-pick-datetime": "^7.0.0",
     "ngx-smart-modal": "^7.1.1",
     "rxjs": "^6.4.0",
     "zone.js": "^0.8.29"
