@@ -243,12 +243,16 @@ class WptResultXml {
         if (!WptStatus.byResultCode(statusCode).isSuccess()) {
             return false
         }
-        if (!atLeastExpectedToBeValid.any{ measurand ->
-            Integer value = testStepNode.getProperty(measurand.getTagInResultXml())?.toInteger()
-            return value != null && value > minValidLoadTime && value < maxValidLoadTime
-        }) {
+        if (noMetricsWithValidData(testStepNode)) {
             return false
         }
         return true
+    }
+
+    private noMetricsWithValidData(testStepNode) {
+        return !atLeastExpectedToBeValid.any { measurand ->
+            Integer value = testStepNode.getProperty(measurand.getTagInResultXml())?.toInteger()
+            return value != null && value > minValidLoadTime && value < maxValidLoadTime
+        }
     }
 }
