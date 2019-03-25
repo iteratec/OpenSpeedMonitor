@@ -34,7 +34,7 @@
 
                     <div class="btn-group pull-right" id="show-button-group">
                         <button type="button" id="graphButtonHtmlId"
-                           class="btn btn-primary show-button">
+                                class="btn btn-primary show-button">
                             ${g.message(code: 'de.iteratec.ism.ui.labels.show.graph', 'default': 'Show')}</button>
                     </div>
                     <g:render template="/_resultSelection/hiddenWarnings"/>
@@ -62,6 +62,17 @@
                                   model="['folders'             : folders, 'selectedFolder': selectedFolder,
                                           'tagToJobGroupNameMap': tagToJobGroupNameMap]"/>
                     </div>
+                </div>
+
+                <div id="filter-complete-tabbable" class="col-md-5">
+                    <g:render template="/_resultSelection/selectPageLocationConnectivityCard"
+                              model="[
+                                      'hideMeasuredEventForm': true,
+                                      'showOnlyBrowser'      : true,
+                                      'browsers'             : browsers,
+                                      'selectedBrowsers'     : selectedBrowsers,
+                                      'selectedAllBrowsers'  : selectedAllBrowsers
+                              ]"/>
                 </div>
 
                 <div class="row">

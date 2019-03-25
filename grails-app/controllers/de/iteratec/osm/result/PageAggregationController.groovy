@@ -6,6 +6,8 @@ import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.barchart.BarchartAggregationService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -88,6 +90,7 @@ class PageAggregationController extends ExceptionHandlerController {
         if (cmd.selectedJobGroups) {
             allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
         }
+
         List<Page> allPages = null
         if (cmd.selectedPages) {
             allPages = Page.findAllByNameInList(cmd.selectedPages)
@@ -113,7 +116,6 @@ class PageAggregationController extends ExceptionHandlerController {
 
 //      TODO: see ticket [IT-1614]
         chartDto.filterRules = createFilterRules(allPages, allJobGroups)
-//        barchartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         if (!chartDto.series) {
             ControllerUtils.sendSimpleResponseAsStream(
@@ -156,6 +158,7 @@ class PageAggregationController extends ExceptionHandlerController {
                     valueComparative: it.valueComparative,
                     page: it.page.name,
                     jobGroup: it.jobGroup.name,
+                    browser: it.browser?.name,
                     aggregationValue: it.aggregationValue
                 )]
             }

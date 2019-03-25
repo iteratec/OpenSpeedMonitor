@@ -3,6 +3,8 @@ package de.iteratec.osm.barchart
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
@@ -38,19 +40,19 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.selectedAggregationValue)
+        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.selectedAggregationValue, cmd.selectedBrowsers)
     }
 
-    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages, String selectedAggregationValue) {
-        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue)
+    List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative, List<JobGroup> allJobGroups, List<Page> allPages, String selectedAggregationValue, List<Long> browserIds) {
+        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue, browserIds)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
-            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue)
+            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue, browserIds)
         }
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
-    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages, String selectedAggregationValue) {
+    List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages, String selectedAggregationValue, List<Long> browserIds) {
         if (!selectedMeasurands) {
             return []
         }
@@ -65,6 +67,10 @@ class BarchartAggregationService {
             queryBuilder = queryBuilder.withPageIn(pages)
         } else {
             queryBuilder = queryBuilder.withoutPagesIn([Page.findByName(Page.UNDEFINED)])
+        }
+
+        if (browserIds) {
+            queryBuilder = queryBuilder.withBrowserIdsIn(browserIds)
         }
 
         List<EventResultProjection> eventResultProjections = []
@@ -119,12 +125,14 @@ class BarchartAggregationService {
         measurandAggregations.each { aggregation ->
             JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
             Page page = pages.find { it.id == aggregation.pageId }
+            Browser browser = Browser.findById(aggregation.browserId)
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
                         selectedMeasurand: selected,
                         jobGroup: jobGroup,
                         page: page,
+                        browser: browser ?: null,
                         aggregationValue: selectedAggregationValue,
                 )
             }

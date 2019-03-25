@@ -37,9 +37,8 @@ class I18nService {
 
 		def msg = messageSource.getMessage(msgKey,objs?.toArray(),defaultMessage,LocaleContextHolder.locale)
 
-		if (msg == null || msg == defaultMessage) {
+		if (msg == null) {
 			log.warn("No i18n messages specified for msgKey: ${msgKey}")
-			msg = defaultMessage
 		}
 
 		return msg
@@ -57,9 +56,8 @@ class I18nService {
 
         def msg = messageSource.getMessage(msgKey,objs?.toArray(),defaultMessage,locale)
 
-        if (msg == null || msg == defaultMessage) {
+        if (msg == null) {
             log.warn("No i18n messages specified for msgKey: ${msgKey}")
-            msg = defaultMessage
         }
 
         return msg
