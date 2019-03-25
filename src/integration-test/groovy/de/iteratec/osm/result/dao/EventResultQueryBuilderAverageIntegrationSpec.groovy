@@ -50,7 +50,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
         when: "the builder is configured for measurand and page"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getAverageData()
@@ -105,7 +105,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
         when: "the builder is configured for usertiming and page"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getAverageData()
@@ -161,7 +161,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         when: "the builder is configured for usertiming and measurand with page"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .getAverageData()
@@ -209,7 +209,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
         when: "the builder is configured for measurand and jobGroup"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getAverageData()
@@ -252,7 +252,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
         when: "the builder is configured for measurand and jobGroup and excludes a page"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .withoutPagesIn([page3])
@@ -309,7 +309,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
         when: "the builder is configured for usertiming and jobGroup"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withPageIdsIn([])
                 .withSelectedMeasurands([selectedMeasurand])
@@ -360,7 +360,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
 
         when: "the builder is configured for measurand and jobGroup and excludes a page"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withoutPagesIn([page3])
                 .withSelectedMeasurands([selectedMeasurand])
@@ -417,7 +417,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         when: "the builder is configured for usertiming and measurand with jobGroup"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .getAverageData()
@@ -468,7 +468,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         when: "the builder is configured for measurand and userTimings and jobGroup and excludes a page"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .withoutPagesIn([page3])
@@ -524,7 +524,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         when: "the builder is configured for usertiming and measurand with page and jobGroup"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
@@ -618,7 +618,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         when: "the builder is configured for usertiming and measurand with all pages and jobGroups"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id, page2.id, page3.id])
                 .withJobGroupIdsIn([jobGroup1.id, jobGroup2.id, jobGroup3.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
@@ -643,7 +643,7 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         when: "the builder is trimmed with two selectedMeasurands"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("_UTMK_usertimingMK", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 500)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .withTrim(700, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
                 .withTrim(500, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)

@@ -3,6 +3,7 @@ package de.iteratec.osm.measurement.environment.wptserver
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.result.WptXmlResultVersion
 import groovy.util.logging.Slf4j
@@ -15,6 +16,9 @@ import groovy.util.slurpersupport.GPathResult
  */
 @Slf4j
 class WptResultXml {
+
+    static List<Measurand> atLeastExpectedToBeValid = [Measurand.FIRST_BYTE, Measurand.START_RENDER, Measurand.VISUALLY_COMPLETE,
+                                                       Measurand.SPEED_INDEX, Measurand.DOC_COMPLETE_TIME, Measurand.FULLY_LOADED_TIME]
     /**
      * Base node of results xml.
      */
@@ -228,18 +232,27 @@ class WptResultXml {
 
     boolean isValidTestStep(GPathResult testStepNode) {
         if (!testStepNode || testStepNode.isEmpty()) {
+            log.error("Step node is empty: ${testStepNode}")
             return false
         }
-        Integer fullyLoaded = testStepNode.fullyLoaded?.toInteger()
-        WptStatus wptStatus = WptStatus.byResultCode(testStepNode.result?.toInteger())
-        Integer ttfb = testStepNode.TTFB?.toInteger()
-        if (ttfb <= 0) {
-            log.warn("Invalid TTFB '${ttfb}' in test:'${getTestId()}', regarding it as valid anyway because of known WPT problems.")
+        int statusCode = testStepNode.result?.toInteger()
+        if (statusCode == null) {
+            log.error("Can't parse status code for step result from wpt: ${testStepNode}")
+            return false
         }
-        boolean valid = wptStatus.isSuccess() && fullyLoaded >= minValidLoadTime && fullyLoaded <= maxValidLoadTime
-        if (!valid) {
-            log.info("Invalid EventResult in test:'${getTestId()}' (Status code: ${wptStatus}, TTFB: ${ttfb}, fullyLoaded: ${fullyLoaded})")
+        if (!WptStatus.byResultCode(statusCode).isSuccess()) {
+            return false
         }
-        return valid
+        if (noMetricsWithValidData(testStepNode)) {
+            return false
+        }
+        return true
+    }
+
+    private noMetricsWithValidData(testStepNode) {
+        return !atLeastExpectedToBeValid.any { measurand ->
+            Integer value = testStepNode.getProperty(measurand.getTagInResultXml())?.toInteger()
+            return value != null && value > minValidLoadTime && value < maxValidLoadTime
+        }
     }
 }

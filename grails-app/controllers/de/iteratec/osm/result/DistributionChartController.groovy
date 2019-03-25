@@ -183,7 +183,7 @@ class DistributionChartController extends ExceptionHandlerController {
     }
 
     private DistributionChartDTO createSeries(SelectedMeasurand selectedMeasurand, List<Page> allPages, List<JobGroup> allJobGroups, Date from, Date to) {
-        List<EventResultProjection> aggregations = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        List<EventResultProjection> aggregations = new EventResultQueryBuilder()
                 .withJobResultDateBetween(from,to)
                 .withSelectedMeasurands([selectedMeasurand])
                 .withPageIn(allPages)
