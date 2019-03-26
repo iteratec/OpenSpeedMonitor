@@ -24,21 +24,13 @@ export class MeasurandSelectComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.selectedMeasurand = {name: "frontend.de.iteratec.isr.measurand.DOC_COMPLETE_TIME", id: "DOC_COMPLETE_TIME"}
-    // this.selectableMeasurandGroups.entries().next((group: ResponseWithLoadingState<MeasurandGroup>) => {
-    //   group.data.values.filter((measurand: SelectableMeasurand) => measurand.name == this.initialValue)
-    //     .reduce((measurand: SelectableMeasurand) => {
-    //       this.selectedMeasurand = measurand;
-    //       return measurand
-    //     })
-    // })
   }
 
   selectMeasurand() {
-    console.log(`measurand in selectMeasurand=${JSON.stringify(this.selectedMeasurand)}`);
-    console.log(`measurand in selectMeasurand=${JSON.stringify(this.selectedMeasurand.id)}`);
-    console.log(`measurand in selectMeasurand=${JSON.stringify(this.selectedMeasurand.name)}`);
     this.onSelect.emit(this.selectedMeasurand);
   }
 
+  compareMeasurands(measurand1: SelectableMeasurand, measurand2: SelectableMeasurand): boolean {
+    return measurand1 && measurand2 ? measurand1.id == measurand2.id : measurand1 == measurand2;
+  }
 }

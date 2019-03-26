@@ -1,4 +1,5 @@
-<select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()">
+<select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()"
+        [compareWith]="compareMeasurands">
   <optgroup *ngFor="let group$ of selectableMeasurandGroups"
             label="{{(group$ | async)?.data?.name | translate}}">
     <option *ngIf="(group$ | async)?.data?.values.length == 0">
