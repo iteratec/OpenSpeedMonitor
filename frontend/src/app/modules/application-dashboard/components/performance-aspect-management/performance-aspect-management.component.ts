@@ -2,7 +2,7 @@ import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
 import {ResultSelectionService} from "../../../../services/result-selection.service";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {ApplicationService} from "../../../../services/application.service";
-import {ReplaySubject, Subject} from "rxjs";
+import {Subject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 
