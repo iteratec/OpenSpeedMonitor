@@ -1,9 +1,3 @@
-<!--initialValue={{initialValue}}-->
-<!--<div *ngFor="let group$ of selectableMeasurandGroups">-->
-<!--<div *ngFor="let selectableMeasurand of (group$ | async)?.data?.values">-->
-<!--{{selectableMeasurand.name == initialValue}}-->
-<!--</div>-->
-<!--</div>-->
 <select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()">
   <optgroup *ngFor="let group$ of selectableMeasurandGroups"
             label="{{(group$ | async)?.data?.name | translate}}">

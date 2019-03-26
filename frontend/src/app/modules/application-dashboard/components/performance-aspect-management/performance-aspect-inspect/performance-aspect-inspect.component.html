@@ -7,7 +7,8 @@
   <div class="measurand">
     <div *ngIf="!editMode; else measurandSelect">
       <ng-container [ngTemplateOutlet]="aspectMetricLabel"></ng-container>
-      <div class="form-control">{{(selectedMetric$ | async)?.name | translate}}</div>
+      <div
+        class="form-control">{{"frontend.de.iteratec.isr.measurand." + (selectedMetric$ | async)?.name | translate}}</div>
     </div>
   </div>
   <div class="buttons">
