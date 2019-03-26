@@ -1,16 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {EMPTY, Observable, OperatorFunction, ReplaySubject, combineLatest} from "rxjs";
-import {MeasurandGroup, SelectableMeasurand} from "../models/measurand.model";
-import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
-import {catchError, switchMap, map} from "rxjs/operators";
-import {Application} from "../models/application.model";
-import {Page} from "../models/page.model";
-import {group} from "@angular/animations";
+import {combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
+import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
+import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
+import {catchError, map, switchMap} from "rxjs/operators";
+import {Application} from "../../../models/application.model";
+import {Page} from "../../../models/page.model";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ResultSelectionService {
   loadTimes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
   userTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);

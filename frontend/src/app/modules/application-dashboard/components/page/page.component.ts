@@ -2,14 +2,11 @@ import {Component, Input} from '@angular/core';
 import {Observable} from "rxjs/internal/Observable";
 import {PageMetricsDto} from "../../models/page-metrics.model";
 import {ApplicationService} from "../../../../services/application.service";
-import {map, take} from "rxjs/operators";
+import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {Metrics} from "../../../../enums/metric.enum";
-import {ResultSelectionService} from "../../../../services/result-selection.service";
-import {ReplaySubject} from "rxjs";
-import {SelectableMeasurand} from "../../../../models/measurand.model";
 
 @Component({
   selector: 'osm-page',

@@ -5,7 +5,7 @@ import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {PerformanceAspectInspectComponent} from "./performance-aspect-inspect/performance-aspect-inspect.component";
 import {MeasurandSelectComponent} from "../../../result-selection/components/measurand-select/measurand-select.component";
 import {ApplicationService} from "../../../../services/application.service";
-import {ResultSelectionService} from "../../../../services/result-selection.service";
+import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
 
 describe('PerformanceAspectManagementComponent', () => {
   let component: PerformanceAspectManagementComponent;

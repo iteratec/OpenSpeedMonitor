@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewEncapsulation} from '@angular/core';
-import {ResultSelectionService} from "../../../../services/result-selection.service";
+import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import {ApplicationService} from "../../../../services/application.service";
 import {Subject} from "rxjs";

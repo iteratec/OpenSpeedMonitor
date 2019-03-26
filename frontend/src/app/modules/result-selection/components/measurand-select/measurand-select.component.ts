@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ResultSelectionService} from "../../../../services/result-selection.service";
+import {ResultSelectionService} from "../../services/result-selection.service";
 import {ReplaySubject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";

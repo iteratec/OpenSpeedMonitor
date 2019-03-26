@@ -17,7 +17,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {PerformanceAspectManagementComponent} from "./components/performance-aspect-management/performance-aspect-management.component";
 import {PerformanceAspectInspectComponent} from "./components/performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component";
 import {MeasurandSelectComponent} from "../result-selection/components/measurand-select/measurand-select.component";
-import {ResultSelectionService} from "../../services/result-selection.service";
+import {ResultSelectionService} from "../result-selection/services/result-selection.service";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;

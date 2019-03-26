@@ -10,6 +10,7 @@ import {PerformanceAspectManagementComponent} from "../performance-aspect-manage
 import {PerformanceAspectInspectComponent} from "../performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component";
 import {MeasurandSelectComponent} from "../../../result-selection/components/measurand-select/measurand-select.component";
 import {ResultSelectionModule} from "../../../result-selection/result-selection.module";
+import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
 
 describe('PageComponent', () => {
 
@@ -32,7 +33,8 @@ describe('PageComponent', () => {
       ],
       providers: [
         ApplicationService,
-        ResultSelectionModule
+        ResultSelectionModule,
+        ResultSelectionService
       ]
     })
       .compileComponents();

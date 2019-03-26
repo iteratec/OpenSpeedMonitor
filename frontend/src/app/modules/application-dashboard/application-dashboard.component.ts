@@ -8,7 +8,7 @@ import {PageMetricsDto} from "./models/page-metrics.model";
 import {ApplicationCsi, ApplicationCsiById} from "../../models/application-csi.model";
 import {Csi} from "../../models/csi.model";
 import {FailingJobStatistic} from "./models/failing-job-statistic.model";
-import {ResultSelectionService} from "../../services/result-selection.service";
+import {ResultSelectionService} from "../result-selection/services/result-selection.service";
 
 @Component({
   selector: 'osm-application-dashboard',
