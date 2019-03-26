@@ -164,8 +164,10 @@ export class ApplicationService {
       performanceAspectType: perfAspectToCreateOrUpdate.performanceAspectType,
       metricIdentifier: perfAspectToCreateOrUpdate.measurand.id
     };
-    this.http.post<PerformanceAspect>('/applicationDashboard/rest/createOrUpdatePerformanceAspect', params).pipe(
-      handleError()).subscribe((createdAspect: PerformanceAspect) => this.replacePerformanceAspect(createdAspect, false))
+    console.log(`to post: ${JSON.stringify(params)}`)
+    this.http.post<PerformanceAspect>('/applicationDashboard/rest/createOrUpdatePerformanceAspect', params)
+      .pipe(handleError())
+      .subscribe((createdAspect: PerformanceAspect) => this.replacePerformanceAspect(createdAspect, false))
   }
 
 
