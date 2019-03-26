@@ -1,8 +1,5 @@
 package de.iteratec.osm.result
 
-import grails.converters.JSON
-import org.hibernate.criterion.CriteriaSpecification
-import com.codahale.metrics.graphite.Graphite
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.ApplicationCsiDto
@@ -18,7 +15,6 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
-import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
@@ -132,10 +128,11 @@ class ApplicationDashboardService {
             SelectedMeasurand selectedMetric = new SelectedMeasurand(it.metricIdentifier, CachedView.UNCACHED)
             it.remove('metricIdentifier')
             it.measurand = [name: selectedMetric.name, id: selectedMetric.optionValue]
+            it.performanceAspectTypeIndex = it.performanceAspectType
             it.performanceAspectType = it.performanceAspectType.toString();
         }
 
-        return performanceAspects
+        return performanceAspects.sort { it.performanceAspectTypeIndex }
 
     }
 
