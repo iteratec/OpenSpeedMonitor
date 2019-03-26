@@ -14,6 +14,7 @@ import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 })
 export class PerformanceAspectManagementComponent implements OnInit {
   @Input() pageId: number;
+  @Input() pageName: string;
   performanceAspects$: Subject<ResponseWithLoadingState<PerformanceAspect>[]>;
 
   constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
@@ -21,7 +22,6 @@ export class PerformanceAspectManagementComponent implements OnInit {
   }
 
   ngOnInit() {
-
   }
 
   initDialog(){
