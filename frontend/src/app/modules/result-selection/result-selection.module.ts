@@ -1,13 +1,14 @@
-import { NgModule } from '@angular/core';
+import {NgModule} from '@angular/core';
 import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 import {SharedModule} from "../shared/shared.module";
-import { MeasurandGroupComponent } from './components/measurand-select/measurand-group/measurand-group.component';
+import {FormsModule} from "@angular/forms";
 
 @NgModule({
   imports: [
-    SharedModule
+    SharedModule,
+    FormsModule
   ],
-  declarations: [MeasurandSelectComponent, MeasurandGroupComponent],
+  declarations: [MeasurandSelectComponent],
   exports: [MeasurandSelectComponent]
 })
 export class ResultSelectionModule { }

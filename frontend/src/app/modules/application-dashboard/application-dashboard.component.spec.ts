@@ -17,7 +17,6 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {PerformanceAspectManagementComponent} from "./components/performance-aspect-management/performance-aspect-management.component";
 import {PerformanceAspectInspectComponent} from "./components/performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component";
 import {MeasurandSelectComponent} from "../result-selection/components/measurand-select/measurand-select.component";
-import {MeasurandGroupComponent} from "../result-selection/components/measurand-select/measurand-group/measurand-group.component";
 import {ResultSelectionService} from "../../services/result-selection.service";
 
 describe('ApplicationDashboardComponent', () => {
@@ -45,8 +44,7 @@ describe('ApplicationDashboardComponent', () => {
         CsiValueMediumComponent,
         PerformanceAspectManagementComponent,
         PerformanceAspectInspectComponent,
-        MeasurandSelectComponent,
-        MeasurandGroupComponent
+        MeasurandSelectComponent
       ],
       providers: [
         ApplicationService,
