@@ -4,7 +4,6 @@ import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
-import de.iteratec.osm.result.dao.query.TrimQualifier
 import grails.gorm.transactions.Rollback
 import grails.testing.mixin.integration.Integration
 
@@ -50,7 +49,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
 
         when: "the builder is configured for measurand and page"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getMedianData()
@@ -105,7 +104,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
 
         when: "the builder is configured for usertiming and page"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getMedianData()
@@ -161,7 +160,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         when: "the builder is configured for usertiming and measurand with page"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .getMedianData()
@@ -209,7 +208,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
 
         when: "the builder is configured for measurand and jobGroup"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getMedianData()
@@ -258,7 +257,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
 
         when: "the builder is configured for measurand and jobGroup"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .withoutPagesIn([page3])
@@ -315,7 +314,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
 
         when: "the builder is configured for usertiming and jobGroup"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .getMedianData()
@@ -373,7 +372,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
 
         when: "the builder is configured for usertiming and jobGroup"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand])
                 .withoutPagesIn([page3])
@@ -430,7 +429,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         when: "the builder is configured for usertiming and measurand with jobGroup"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .getMedianData()
@@ -490,7 +489,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         when: "the builder is configured for usertiming and measurand with jobGroup"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
                 .withoutPagesIn([page3])
@@ -546,7 +545,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         when: "the builder is configured for usertiming and measurand with page and jobGroup"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id])
                 .withJobGroupIdsIn([jobGroup1.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
@@ -640,7 +639,7 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         when: "the builder is configured for usertiming and measurand with all pages and jobGroups"
         SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("_UTME_mark1", CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        def result = new EventResultQueryBuilder(0, 1000)
+        def result = new EventResultQueryBuilder()
                 .withPageIdsIn([page1.id, page2.id, page3.id])
                 .withJobGroupIdsIn([jobGroup1.id, jobGroup2.id, jobGroup3.id])
                 .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
@@ -650,29 +649,4 @@ class EventResultQueryBuilderMedianIntegrationSpec extends NonTransactionalInteg
         result.size() == 9
     }
 
-    void "check impossible trims"() {
-        given: "one Eventresult"
-
-        EventResult.build(
-                fullyLoadedTimeInMillisecs: 600,
-                firstByteInMillisecs: 600,
-                medianValue: true,
-                userTimings: [
-                        UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
-                        UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
-                ]
-        )
-
-        when: "the builder is trimmed with two selectedMeasurands"
-        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
-        SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("_UTMK_usertimingMK", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 500)
-                .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .withTrim(700, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
-                .withTrim(500, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)
-                .getMedianData()
-
-        then: "nothing is found"
-        result.size() == 0
-    }
 }

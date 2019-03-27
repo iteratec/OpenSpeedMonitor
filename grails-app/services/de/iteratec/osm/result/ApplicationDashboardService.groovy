@@ -36,7 +36,7 @@ class ApplicationDashboardService {
         Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
 
-        return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        return new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroupId], false)
                 .withProjectedIdForAssociatedDomain('page')
                 .withJobResultDateBetween(from, to)

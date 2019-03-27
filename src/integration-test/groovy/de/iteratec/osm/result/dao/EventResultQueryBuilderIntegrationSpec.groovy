@@ -8,8 +8,8 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.TrimQualifier
-import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
+import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
@@ -25,38 +25,6 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
     Page page
     ConnectivityProfile connectivityProfile
     DateTime runDate = new DateTime(DateTimeZone.UTC)
-
-    void "check minimal specification"(boolean medianValue, def fullyLoaded) {
-        given: "two matching and 10 other Eventresults"
-        10.times {
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: fullyLoaded,
-                    medianValue: medianValue
-            )
-        }
-        2.times {
-            EventResult.build(
-                    fullyLoadedTimeInMillisecs: 500,
-                    medianValue: true
-            )
-        }
-
-
-        when: "the builder just has one measurand"
-        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).getRawData()
-
-        then: "only both matching event results are found"
-        result.size() == 2
-        result.every {
-            it.fullyLoadedTimeInMillisecs == 500
-        }
-
-        where:
-        medianValue | fullyLoaded
-        true        | 1100
-        false       | 900
-    }
 
     void "check base projections"() {
         given: "two matching and 10 other Eventresults"
@@ -93,7 +61,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], null, false).getRawData()
+        List<EventResultProjection> result = new EventResultQueryBuilder().withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], null, false).getRawData()
 
         then: "only both matching Eventresults are found with baseline projections"
         result.size() == 2
@@ -155,7 +123,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
         SelectedMeasurand selectedMeasurandFullyLoadedCount = new SelectedMeasurand(Measurand.FULLY_LOADED_REQUEST_COUNT.toString(), CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurandTTFB = new SelectedMeasurand(Measurand.FIRST_BYTE.toString(), CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurandFullyLoadedBytes = new SelectedMeasurand(Measurand.FULLY_LOADED_INCOMING_BYTES.toString(), CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurandFullyLoadedTime, selectedMeasurandFullyLoadedCount, selectedMeasurandTTFB, selectedMeasurandFullyLoadedBytes])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .withTrim(250, TrimQualifier.LOWER_THAN, measurandGroup)
@@ -208,7 +176,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder is trimmed with precentage"
         SelectedMeasurand selectedMeasurandCsByDCinPercent = new SelectedMeasurand(Measurand.CS_BY_WPT_DOC_COMPLETE.toString(), CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurandCsByDCinPercent])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .withTrim(new Double(250), TrimQualifier.LOWER_THAN, MeasurandGroup.PERCENTAGES)
@@ -266,7 +234,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder is trimmed"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTMK_usertiming", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurand])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .withTrim(250, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
@@ -326,7 +294,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
         when: "the builder is trimmed with two selectedMeasurands"
         SelectedMeasurand selectedMeasurandMatching = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
         SelectedMeasurand selectedMeasurandNotMatching = new SelectedMeasurand("_UTMK_usertimingMK", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurandMatching, selectedMeasurandNotMatching])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .withTrim(250, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
@@ -339,31 +307,6 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
             it.fullyLoadedTimeInMillisecs == 200 &&
                     !it.userTimingMK
         }
-    }
-
-    void "check impossible trims"() {
-        given: "one Eventresult"
-        EventResult.build(
-                fullyLoadedTimeInMillisecs: 600,
-                firstByteInMillisecs: 600,
-                medianValue: true,
-                userTimings: [
-                        UserTiming.build(name: "usertimingME", duration: new Double(600), type: UserTimingType.MEASURE),
-                        UserTiming.build(name: "usertimingMK", startTime: new Double(600), duration: null, type: UserTimingType.MARK)
-                ]
-        )
-
-        when: "the builder is trimmed with two selectedMeasurands"
-        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand(Measurand.FULLY_LOADED_TIME.toString(), CachedView.UNCACHED)
-        SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("_UTMK_usertimingMK", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 500)
-                .withSelectedMeasurands([selectedMeasurand1, selectedMeasurand2])
-                .withTrim(700, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
-                .withTrim(500, TrimQualifier.GREATER_THAN, MeasurandGroup.LOAD_TIMES)
-                .getRawData()
-
-        then: "nothing is found"
-        result.size() == 0
     }
 
     void "check trims for UserTiming Measures"() {
@@ -409,7 +352,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder is trimmed"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_usertiming", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurand])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .withTrim(250, TrimQualifier.LOWER_THAN, MeasurandGroup.LOAD_TIMES)
@@ -448,7 +391,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder is configured for marks"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTMK_mark2", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurand])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .getRawData()
@@ -490,7 +433,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder is configured for measurands"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("_UTME_mark2", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurand])
                 .withConnectivity([connectivityProfile.id], null, false)
                 .getRawData()
@@ -523,7 +466,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).withConnectivity(null, [customConnectivityName], false).getRawData()
+        List<EventResultProjection> result = new EventResultQueryBuilder().withSelectedMeasurands([selectedMeasurand]).withConnectivity(null, [customConnectivityName], false).getRawData()
 
         then: "only both matching event results are found"
         result.size() == 2
@@ -559,7 +502,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000).withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], [customConnectivityName], false).getRawData()
+        List<EventResultProjection> result = new EventResultQueryBuilder().withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], [customConnectivityName], false).getRawData()
 
         then: "only both matching event results are found"
         result.size() == 4
@@ -604,7 +547,7 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder(0, 1000)
+        List<EventResultProjection> result = new EventResultQueryBuilder()
                 .withSelectedMeasurands([selectedMeasurand])
                 .withConnectivity([connectivityProfile.id], [customConnectivityName], true)
                 .getRawData()
