@@ -3,7 +3,12 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {PageMetricsDto} from "../modules/application-dashboard/models/page-metrics.model";
 import {PageCsiDto} from "../modules/application-dashboard/models/page-csi.model";
-import {ApplicationCsi, ApplicationCsiById, ApplicationCsiDTO, ApplicationCsiDTOById} from "../models/application-csi.model";
+import {
+  ApplicationCsi,
+  ApplicationCsiById,
+  ApplicationCsiDTO,
+  ApplicationCsiDTOById
+} from "../models/application-csi.model";
 import {Application, ApplicationDTO} from "../models/application.model";
 import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
@@ -11,6 +16,8 @@ import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";
 import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
+import {PerformanceAspect} from "../models/perfomance-aspect.model";
+import {Page} from "../models/page.model";
 
 @Injectable()
 export class ApplicationService {
@@ -22,10 +29,16 @@ export class ApplicationService {
   failingJobs$: ReplaySubject<{}> = new ReplaySubject<{}>(1);
   jobHealthGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
   availableGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
+  performanceAspectForPage$: BehaviorSubject<ResponseWithLoadingState<PerformanceAspect>[]> = new BehaviorSubject([]);
 
+  selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
   selectedApplication$ = new ReplaySubject<Application>(1);
 
   constructor(private http: HttpClient) {
+    this.combinedParams().pipe(
+      switchMap(params => this.getPerformanceAspects(params))
+    ).subscribe(this.performanceAspectForPage$);
+
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
     ).subscribe(this.metrics$);
@@ -109,11 +122,68 @@ export class ApplicationService {
     this.selectedApplication$.next(application);
   }
 
+  updatePage(page: Page) {
+    this.selectedPage$.next(page);
+  }
+
+  private combinedParams(): Observable<any> {
+    return combineLatest(
+      this.selectedApplication$,
+      this.selectedPage$,
+      (application: Application, page: Page) => this.generateParams(application, page));
+  }
+
+  private generateParams(application: Application, page: Page) {
+    return {
+      applicationId: application.id,
+      pageId: page.id
+    }
+  }
+
   selectSelectedApplicationCsi(): Observable<ApplicationCsi> {
     return combineLatest(this.selectedApplication$, this.applicationCsiById$).pipe(
       map(([application, csiById]) => csiById[application.id]),
       filter(applicationCsi => !!applicationCsi)
     );
+  }
+
+  private getPerformanceAspects(params): Observable<ResponseWithLoadingState<PerformanceAspect>[]> {
+    this.performanceAspectForPage$.next([]);
+    return this.http.get<Performance[]>('/applicationDashboard/rest/getPerformanceAspectsForApplication', {params}).pipe(
+      handleError(),
+      map(dtos => dtos.map(dto => ({isLoading: false, data: dto})))
+    );
+  }
+
+  createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate: PerformanceAspect) {
+    this.replacePerformanceAspect(perfAspectToCreateOrUpdate, true);
+    const params = {
+      performanceAspectId: perfAspectToCreateOrUpdate.id,
+      pageId: perfAspectToCreateOrUpdate.pageId,
+      applicationId: perfAspectToCreateOrUpdate.jobGroupId,
+      performanceAspectType: perfAspectToCreateOrUpdate.performanceAspectType,
+      metricIdentifier: perfAspectToCreateOrUpdate.measurand.id
+    };
+    console.log(`to post: ${JSON.stringify(params)}`)
+    this.http.post<PerformanceAspect>('/applicationDashboard/rest/createOrUpdatePerformanceAspect', params)
+      .pipe(handleError())
+      .subscribe((createdAspect: PerformanceAspect) => this.replacePerformanceAspect(createdAspect, false))
+  }
+
+
+  private replacePerformanceAspect(perfAspectToReplace: PerformanceAspect, isLoading: boolean) {
+    let prevValue: ResponseWithLoadingState<PerformanceAspect>[] = this.performanceAspectForPage$.getValue();
+    let existingAspect: ResponseWithLoadingState<PerformanceAspect> = prevValue.find((exAspect: ResponseWithLoadingState<PerformanceAspect>) => {
+      return exAspect.data.id == perfAspectToReplace.id &&
+        exAspect.data.performanceAspectType == perfAspectToReplace.performanceAspectType &&
+        exAspect.data.pageId == perfAspectToReplace.pageId &&
+        exAspect.data.jobGroupId == perfAspectToReplace.jobGroupId
+    });
+    if (existingAspect) {
+      prevValue = this.performanceAspectForPage$.getValue();
+      prevValue[prevValue.indexOf(existingAspect)] = {isLoading: isLoading, data: perfAspectToReplace};
+      this.performanceAspectForPage$.next(prevValue);
+    }
   }
 
   private updateMetricsForPages(applicationDto: Application): Observable<PageMetricsDto[]> {
@@ -122,7 +192,7 @@ export class ApplicationService {
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
       handleError()
-    );
+    )
   }
 
   private updateCsiForApplication(applicationDto: Application): Observable<ApplicationCsiById> {
@@ -162,10 +232,10 @@ export class ApplicationService {
 
   removeAndAddJobHealthGraphiteServers(application: Application, add: GraphiteServer[], remove: GraphiteServer[]) {
     return this.sendRemoveJobHealthGraphiteServersRequest(application, remove).subscribe((res: any) => {
-        if (res.removed === true) {
-          this.saveJobHealthGraphiteServers(application, add);
-        }
-      })
+      if (res.removed === true) {
+        this.saveJobHealthGraphiteServers(application, add);
+      }
+    })
   }
 
   saveJobHealthGraphiteServers(application: Application, graphiteServers: GraphiteServer[]) {
@@ -189,13 +259,19 @@ export class ApplicationService {
 
   private sendAddJobHealthGraphiteServersRequest(application: Application, graphiteServers: GraphiteServer[]) {
     const graphiteServerIds = graphiteServers.map(value => value.id);
-    return this.http.post('/applicationDashboard/rest/saveJobHealthGraphiteServers', {applicationId: application.id, graphiteServerIds: graphiteServerIds})
+    return this.http.post('/applicationDashboard/rest/saveJobHealthGraphiteServers', {
+      applicationId: application.id,
+      graphiteServerIds: graphiteServerIds
+    })
       .pipe(handleError());
   }
 
   private sendRemoveJobHealthGraphiteServersRequest(application: Application, graphiteServers: GraphiteServer[]) {
     const graphiteServerIds = graphiteServers.map(value => value.id);
-    return this.http.post('/applicationDashboard/rest/removeJobHealthGraphiteServers', {applicationId: application.id, graphiteServerIds: graphiteServerIds})
+    return this.http.post('/applicationDashboard/rest/removeJobHealthGraphiteServers', {
+      applicationId: application.id,
+      graphiteServerIds: graphiteServerIds
+    })
       .pipe(handleError());
   }
 

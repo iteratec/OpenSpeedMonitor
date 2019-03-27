@@ -104,6 +104,38 @@ class ApplicationDashboardService {
         return recentMetrics
     }
 
+    List<Map> getPerformanceAspectsForJobGroup(Long jobGroupId, Long pageId) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+        Page page = Page.findById(pageId)
+        List<Map> performanceAspects = PerformanceAspect.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq 'jobGroup', jobGroup
+            eq 'page', page
+            projections {
+                property 'id', 'id'
+                property 'page.id', 'pageId'
+                property 'jobGroup.id', 'jobGroupId'
+                property 'metricIdentifier', 'metricIdentifier'
+                property 'performanceAspectType', 'performanceAspectType'
+            }
+        }
+        PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
+            if(!performanceAspects.collect{it.performanceAspectType}.contains(performanceAspectType)){
+                performanceAspects.add([id: null, pageId: page.id, jobGroupId: jobGroup.id, performanceAspectType: performanceAspectType, metricIdentifier: performanceAspectType.defaultMetric.toString()])
+            }
+        }
+        performanceAspects.each {
+            SelectedMeasurand selectedMetric = new SelectedMeasurand(it.metricIdentifier, CachedView.UNCACHED)
+            it.remove('metricIdentifier')
+            it.measurand = [name: selectedMetric.name, id: selectedMetric.optionValue]
+            it.performanceAspectTypeIndex = it.performanceAspectType
+            it.performanceAspectType = it.performanceAspectType.toString();
+        }
+
+        return performanceAspects.sort { it.performanceAspectTypeIndex }
+
+    }
+
     def createOrReturnCsiConfiguration(Long jobGroupId) {
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
 

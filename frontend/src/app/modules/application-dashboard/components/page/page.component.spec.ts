@@ -6,6 +6,11 @@ import {PageMetricComponent} from "../page-metric/page-metric.component";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {CsiValueMediumComponent} from "../../../shared/components/csi-value/csi-value-medium/csi-value-medium.component";
 import {CsiValueBaseComponent} from "../../../shared/components/csi-value/csi-value-base.component";
+import {PerformanceAspectManagementComponent} from "../performance-aspect-management/performance-aspect-management.component";
+import {PerformanceAspectInspectComponent} from "../performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component";
+import {MeasurandSelectComponent} from "../../../result-selection/components/measurand-select/measurand-select.component";
+import {ResultSelectionModule} from "../../../result-selection/result-selection.module";
+import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
 
 describe('PageComponent', () => {
 
@@ -18,13 +23,18 @@ describe('PageComponent', () => {
         PageComponent,
         CsiValueMediumComponent,
         CsiValueBaseComponent,
-        PageMetricComponent
+        PageMetricComponent,
+        PerformanceAspectManagementComponent,
+        PerformanceAspectInspectComponent,
+        MeasurandSelectComponent
       ],
       imports: [
         SharedMocksModule
       ],
       providers: [
-        ApplicationService
+        ApplicationService,
+        ResultSelectionModule,
+        ResultSelectionService
       ]
     })
       .compileComponents();

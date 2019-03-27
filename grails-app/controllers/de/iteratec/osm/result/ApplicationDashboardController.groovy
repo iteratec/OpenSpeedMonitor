@@ -1,8 +1,9 @@
 package de.iteratec.osm.result
 
-import de.iteratec.osm.annotations.RestAction
+
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.wptserver.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
@@ -10,7 +11,7 @@ import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.report.external.provider.GraphiteSocketProvider
 import de.iteratec.osm.util.ControllerUtils
 import grails.validation.Validateable
-import grails.converters.JSON
+import org.springframework.http.HttpStatus
 
 class ApplicationDashboardController {
 
@@ -46,6 +47,42 @@ class ApplicationDashboardController {
         List<Map> activePagesAndMetrics = applicationDashboardService.getAllActivePagesAndMetrics(jobGroupId)
 
         return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
+    }
+
+    def getPerformanceAspectsForApplication(PerformanceAspectManagementRequestCommand command) {
+        Long jobGroupId = command.applicationId
+        Long pageId = command.pageId
+        List<Map> performanceAspects = applicationDashboardService.getPerformanceAspectsForJobGroup(jobGroupId, pageId)
+
+        return ControllerUtils.sendObjectAsJSON(response, performanceAspects)
+    }
+
+    def createOrUpdatePerformanceAspect(PerformanceAspectCreationCommand command){
+        PerformanceAspectType performanceAspectType = PerformanceAspectType.valueOf(command.performanceAspectType)
+        SelectedMeasurand metric = new SelectedMeasurand(command.metricIdentifier, CachedView.UNCACHED)
+        Page page = Page.findById(command.pageId)
+        JobGroup jobGroup = JobGroup.findById(command.applicationId)
+
+        PerformanceAspect performanceAspect
+        if(!command.performanceAspectId){
+            performanceAspect = new PerformanceAspect(performanceAspectType: performanceAspectType, page: page,jobGroup: jobGroup)
+        } else {
+            performanceAspect = PerformanceAspect.findById(command.performanceAspectId)
+        }
+
+        try{
+            performanceAspect.metric = metric
+            performanceAspect = performanceAspect.save(flush: true, failOnError: true)
+            Map performanceAspectDto = [:]
+            performanceAspectDto.id = performanceAspect.id
+            performanceAspectDto.measurand = [name: performanceAspect.metric.name, id: performanceAspect.metric.optionValue]
+            performanceAspectDto.performanceAspectType = performanceAspect.performanceAspectType.toString()
+            performanceAspectDto.pageId = performanceAspect.page.id
+            performanceAspectDto.jobGroupId = performanceAspect.jobGroup.id
+            return ControllerUtils.sendObjectAsJSON(response, performanceAspectDto)
+        } catch (Exception e) {
+            return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, e.toString())
+        }
     }
 
     def getApplications() {
@@ -147,5 +184,31 @@ class DefaultApplicationCommand implements Validateable {
 
     static constraints = {
         applicationId(nullable: false)
+    }
+}
+
+class PerformanceAspectCreationCommand implements Validateable {
+    Long performanceAspectId
+    Long applicationId
+    Long pageId
+    String metricIdentifier
+    String performanceAspectType
+
+    static constraints = {
+        performanceAspectId(nullable: true)
+        applicationId(nullable: false)
+        pageId(nullable: false)
+        metricIdentifier(nullable: false)
+        performanceAspectType(nullable: false)
+    }
+}
+
+class PerformanceAspectManagementRequestCommand implements Validateable {
+    Long applicationId
+    Long pageId
+
+    static constraints = {
+        applicationId(nullable: false)
+        pageId(nullable: false)
     }
 }
