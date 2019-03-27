@@ -1,10 +1,23 @@
 <div class="card form-horizontal">
+  <h2>{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.title' | translate }}</h2>
   <h2>{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}</h2>
 
   <div class="row form-group">
-
     <label class="control-label col-md-4">
-      {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}
+      {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}:
+    </label>
+    <div class="col-md-8">
+      <select class="form-control" [(ngModel)]="aggregationIntervalInSeconds">
+        <option *ngFor="let intervals of selectableAggregationIntervalsInSeconds" [value]="intervals">
+          {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.intervals.' + intervals | translate }}
+        </option>
+      </select>
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label class="control-label col-md-4">
+      {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}:
     </label>
     <div class="col-md-8">
       <select class="form-control" [(ngModel)]="timeFrameInSeconds" (ngModelChange)="selectTimeFrame()">

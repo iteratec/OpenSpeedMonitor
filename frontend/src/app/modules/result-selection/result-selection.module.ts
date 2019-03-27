@@ -12,7 +12,7 @@ import {
 } from 'ng-pick-datetime';
 
 export const TIME_FORMAT = {
-  fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false},
+  fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
   monthYearLabel: {year: 'numeric', month: 'short'},
 };
 
@@ -35,7 +35,10 @@ export const TIME_FORMAT = {
       useValue: [ResultSelectionComponent],
       multi: true
     },
-    {provide: OWL_DATE_TIME_FORMATS, useValue: TIME_FORMAT},
+    {
+      provide: OWL_DATE_TIME_FORMATS,
+      useValue: TIME_FORMAT
+    },
     ResultSelectionService
   ],
   entryComponents: [
