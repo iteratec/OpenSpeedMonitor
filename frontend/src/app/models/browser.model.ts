@@ -1,13 +1,13 @@
-export interface SelectableBrowserDTO {
+export interface BrowserDTO {
   id: number;
   name: string;
 }
 
-export class SelectableBrowser implements SelectableBrowserDTO {
+export class Browser implements BrowserDTO {
   id: number;
   name: string;
 
-  constructor (dto: SelectableBrowserDTO) {
+  constructor (dto: BrowserDTO) {
     this.id = dto.id;
     this.name = dto.name;
   }

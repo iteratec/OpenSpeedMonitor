@@ -1,17 +1,17 @@
-import {SelectablePage} from "../modules/result-selection/models/selectable-page.model";
+import { Page } from "./page.model";
 
-export interface SelectableMeasuredEventDTO {
+export interface MeasuredEventDTO {
   id: number;
   name: string;
-  parent: SelectablePage;
+  parent: Page;
 }
 
-export class SelectableMeasuredEvent implements SelectableMeasuredEventDTO {
+export class MeasuredEvent implements MeasuredEventDTO {
   id: number;
   name: string;
-  parent: SelectablePage;
+  parent: Page;
 
-  constructor (dto: SelectableMeasuredEventDTO) {
+  constructor (dto: MeasuredEventDTO) {
     this.id = dto.id;
     this.name = dto.name;
     this.parent = dto.parent;

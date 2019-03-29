@@ -4,17 +4,15 @@ import {combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from 
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {catchError, map, switchMap, startWith} from "rxjs/operators";
-import {Application} from "../../../models/application.model";
+import {Application, SelectableApplication, ApplicationWithPages} from "../../../models/application.model";
 import {Page} from "../../../models/page.model";
-import {SelectableApplication} from "../models/selectable-application.model";
 import {Caller, ResultSelectionCommand} from "../models/result-selection-command.model";
-import {SelectableMeasuredEvent} from "../../../models/measured-event.model";
-import {SelectableLocation} from "../../../models/location.model";
-import {SelectableConnectivity} from "../../../models/connectivity.model";
-import {SelectableHeroTiming} from "../models/selectable-hero-timing.model";
-import {SelectableUserTiming} from "../models/selectable-user-timing.model";
+//import {SelectableHeroTiming} from "../models/selectable-hero-timing.model";
+//import {SelectableUserTiming} from "../models/selectable-user-timing.model";
 import {Chart} from "../models/chart.model";
-import {SelectableApplicationWithPages} from "../models/selectable-application-with-pages.model";
+import {Connectivity} from 'src/app/models/connectivity.model';
+import {Location} from 'src/app/models/location.model';
+import {MeasuredEvent} from 'src/app/models/measured-event.model';
 
 @Injectable()
 export class ResultSelectionService {
@@ -29,13 +27,13 @@ export class ResultSelectionService {
   selectedPages$: ReplaySubject<Page[]> = new ReplaySubject<Page[]>(1);
 
   // TODO
-  selectableApplications$: ReplaySubject<SelectableApplication[]> = new ReplaySubject<SelectableApplication[]>(1);
-  selectableApplicationsAndPages$: ReplaySubject<SelectableApplicationWithPages[]> = new ReplaySubject<SelectableApplicationWithPages[]>(1);
-  selectableEventsAndPages$: ReplaySubject<SelectableMeasuredEvent[]> = new ReplaySubject<SelectableMeasuredEvent[]>(1);
-  selectableLocationsAndBrowsers$: ReplaySubject<SelectableLocation[]> = new ReplaySubject<SelectableLocation[]>(1);
-  selectableConnectivities$: ReplaySubject<SelectableConnectivity[]> = new ReplaySubject<SelectableConnectivity[]>(1);
-  selectableHeroTimings$: ReplaySubject<SelectableHeroTiming[]> = new ReplaySubject<SelectableHeroTiming[]>(1);
-  selectableUserTimings$: ReplaySubject<SelectableUserTiming[]> = new ReplaySubject<SelectableUserTiming[]>(1);
+  applications$: ReplaySubject<SelectableApplication[]> = new ReplaySubject(1);
+  applicationsAndPages$: ReplaySubject<ApplicationWithPages[]> = new ReplaySubject(1);
+  eventsAndPages$: ReplaySubject<MeasuredEvent[]> = new ReplaySubject(1);
+  locationsAndBrowsers$: ReplaySubject<Location[]> = new ReplaySubject(1);
+  connectivities$: ReplaySubject<Connectivity[]> = new ReplaySubject(1);
+  //selectableHeroTimings$: ReplaySubject<SelectableHeroTiming[]> = new ReplaySubject<SelectableHeroTiming[]>(1);
+  //selectableUserTimings$: ReplaySubject<SelectableUserTiming[]> = new ReplaySubject<SelectableUserTiming[]>(1);
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
   constructor(private http: HttpClient) {
@@ -156,8 +154,8 @@ export class ResultSelectionService {
   loadSelectableData(resultSelectionCommand: ResultSelectionCommand, chart: Chart): void {
 
     this.loadResultCount(resultSelectionCommand);
-    this.loadSelectableUserTimings(resultSelectionCommand);
-    this.loadSelectableHeroTimings(resultSelectionCommand);
+    //this.loadSelectableUserTimings(resultSelectionCommand);
+    //this.loadSelectableHeroTimings(resultSelectionCommand);
 
     if(chart !== Chart.PageComparison) {
       this.loadSelectableApplications(resultSelectionCommand);
@@ -177,33 +175,33 @@ export class ResultSelectionService {
   }
 
   loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableApplications(resultSelectionCommand).subscribe(next => this.selectableApplications$.next(next));
+    this.updateSelectableApplications(resultSelectionCommand).subscribe(next => this.applications$.next(next));
   }
 
   loadSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableApplicationsAndPages(resultSelectionCommand).subscribe(next => this.selectableApplicationsAndPages$.next(next));
+    this.updateSelectableApplicationsAndPages(resultSelectionCommand).subscribe(next => this.applicationsAndPages$.next(next));
   }
 
   loadSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableEventsAndPages(resultSelectionCommand).subscribe(next => this.selectableEventsAndPages$.next(next));
+    this.updateSelectableEventsAndPages(resultSelectionCommand).subscribe(next => this.eventsAndPages$.next(next));
   }
 
   loadSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableLocationsAndBrowsers(resultSelectionCommand).subscribe(next => this.selectableLocationsAndBrowsers$.next(next));
+    this.updateSelectableLocationsAndBrowsers(resultSelectionCommand).subscribe(next => this.locationsAndBrowsers$.next(next));
   }
 
   loadSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableConnectivities(resultSelectionCommand).subscribe(next => this.selectableConnectivities$.next(next));
+    this.updateSelectableConnectivities(resultSelectionCommand).subscribe(next => this.connectivities$.next(next));
   }
 
-  loadSelectableUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
+  /*loadSelectableUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
     this.updateSelectableUserTimings(resultSelectionCommand).subscribe(next => this.selectableUserTimings$.next(next));
   }
 
   loadSelectableHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
     this.updateSelectableHeroTimings(resultSelectionCommand).subscribe(next => this.selectableHeroTimings$.next(next));
   }
-
+*/
   loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
     this.updateResultCount(resultSelectionCommand).subscribe(next => this.resultCount$.next(next));
   }
@@ -217,31 +215,31 @@ export class ResultSelectionService {
     )
   }
 
-  updateSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplicationWithPages[]> {
+  updateSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<ApplicationWithPages[]> {
     const params = this.createParams(resultSelectionCommand);
-    return this.http.get<SelectableApplicationWithPages[]>('/jobGroup/getJobGroupsWithPages', {params: params}).pipe(
+    return this.http.get<ApplicationWithPages[]>('/jobGroup/getJobGroupsWithPages', {params: params}).pipe(
       handleError(),
       startWith(null)
     )
   }
 
-  updateSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableMeasuredEvent[]> {
+  updateSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<MeasuredEvent[]> {
     const params = this.createParams(resultSelectionCommand);
-    return this.http.get<SelectableMeasuredEvent[]>('/resultSelection/getMeasuredEvents', {params: params}).pipe(
+    return this.http.get<MeasuredEvent[]>('/resultSelection/getMeasuredEvents', {params: params}).pipe(
       handleError(),
       startWith(null)
     )
   }
 
-  updateSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableLocation[]> {
+  updateSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): Observable<Location[]> {
     const params = this.createParams(resultSelectionCommand);
-    return this.http.get<SelectableLocation[]>('/resultSelection/getLocations', {params: params}).pipe(
+    return this.http.get<Location[]>('/resultSelection/getLocations', {params: params}).pipe(
       handleError(),
       startWith(null)
     )
   }
 
-  updateSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableConnectivity[]> {
+  updateSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): Observable<Connectivity[]> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get('/resultSelection/getConnectivityProfiles', {params: params}).pipe(
       handleError(),
@@ -249,7 +247,7 @@ export class ResultSelectionService {
     )
   }
 
-  updateSelectableUserTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableUserTiming[]> {
+  /*updateSelectableUserTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableUserTiming[]> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get('/resultSelection/getUserTimings', {params: params}).pipe(
       handleError(),
@@ -264,7 +262,7 @@ export class ResultSelectionService {
       startWith(null)
     )
   }
-
+*/
   updateResultCount(resultSelectionCommand: ResultSelectionCommand): Observable<string> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get('/resultSelection/getResultCount', {params: params}).pipe(

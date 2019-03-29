@@ -1,17 +1,17 @@
-import {SelectableBrowser} from "./browser.model";
+import {Browser} from "./browser.model";
 
-export interface SelectableLocationDTO {
+export interface LocationDTO {
   id: number;
   name: string;
-  parent: SelectableBrowser;
+  parent: Browser;
 }
 
-export class SelectableLocation implements SelectableLocationDTO {
+export class Location implements LocationDTO {
   id: number;
   name: string;
-  parent: SelectableBrowser;
+  parent: Browser;
 
-  constructor (dto: SelectableLocationDTO) {
+  constructor (dto: LocationDTO) {
     this.id = dto.id;
     this.name = dto.name;
     this.parent = dto.parent;

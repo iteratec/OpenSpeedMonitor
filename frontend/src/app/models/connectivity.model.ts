@@ -1,13 +1,13 @@
-export interface SelectableConnectivityDTO {
+export interface ConnectivityDTO {
   id: number;
   name: string;
 }
 
-export class SelectableConnectivity implements SelectableConnectivityDTO {
+export class Connectivity implements ConnectivityDTO {
   id: number;
   name: string;
 
-  constructor (dto: SelectableConnectivityDTO) {
+  constructor (dto: ConnectivityDTO) {
     this.id = dto.id;
     this.name = dto.name;
   }

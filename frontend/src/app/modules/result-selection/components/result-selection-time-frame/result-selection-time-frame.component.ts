@@ -90,8 +90,10 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       this.selectedDates = [from, to];
 
       if (this.comparativeSelectionActive) {
-        let comparativeTo = from;
+        let comparativeTo = new Date (from);
         let comparativeFrom = new Date(from);
+
+        comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
         comparativeFrom.setSeconds(comparativeTo.getSeconds() - this.timeFrameInSeconds);
         if (this.timeFrameInSeconds >= 259200) {
           comparativeFrom.setHours(0, 0, 0, 0);
@@ -102,12 +104,11 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     else if (this.comparativeSelectionActive) {
       let from = this.selectedDates[0];
       let to = this.selectedDates[1];
-      let comparativeTo = from;
+      let comparativeTo = new Date(from);
       let comparativeFrom = new Date(from);
       comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
-
-      let actualTimeFrameInSeconds = (to.getTime() - from.getTime()) / 1000;
-      comparativeFrom.setSeconds(comparativeTo.getSeconds() - actualTimeFrameInSeconds);
+      let timeFrameInMilliseconds = (to.getTime() - from.getTime());
+      comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
   }

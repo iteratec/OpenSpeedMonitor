@@ -1,4 +1,5 @@
 import {parseDate} from "../utils/date.util";
+import { Page } from "./page.model";
 
 export interface ApplicationDTO {
   id: number;
@@ -6,6 +7,7 @@ export interface ApplicationDTO {
   pageCount?: number;
   dateOfLastResults?: string | Date;
   csiConfigurationId?: number;
+  pages?: Page[];
 }
 
 export class Application implements ApplicationDTO {
@@ -31,5 +33,17 @@ export class SelectableApplication implements ApplicationDTO {
   constructor(dto: ApplicationDTO) {
     this.id = dto.id;
     this.name = dto.name;
+  }
+}
+
+export class ApplicationWithPages implements ApplicationDTO {
+  id: number;
+  name: string;
+  pages: Page[];
+
+  constructor(dto: ApplicationDTO) {
+    this.id = dto.id;
+    this.name = dto.name;
+    this.pages = dto.pages;
   }
 }
