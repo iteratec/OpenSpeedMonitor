@@ -34,7 +34,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         i18n = data.i18nMap || i18n;
         if (data.series || data.filterRules || data.selectedFilter || data.aggregationValue) {
             var filteredSeries = filterSeries(rawSeries);
-            if (filteredSeries.length === dataLength*2) filteredSeries.splice(dataLength);
+            if (filteredSeries.length === dataLength * 2) filteredSeries.splice(dataLength);
             Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
             measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
             allMeasurandDataMap = extractMeasurandData(filteredSeries);
@@ -49,7 +49,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         stackBars = data.stackBars !== undefined ? data.stackBars : stackBars;
         fullWidth = getActualSvgWidth();
         chartSideLabelsWidth = d3.max(OpenSpeedMonitor.ChartComponents.utility.getTextWidths(svg, sideLabelData));
-        chartBarsWidth = fullWidth - 2*OpenSpeedMonitor.ChartComponents.common.ComponentMargin - chartSideLabelsWidth;
+        chartBarsWidth = fullWidth - 2 * OpenSpeedMonitor.ChartComponents.common.ComponentMargin - chartSideLabelsWidth;
         chartBarsHeight = calculateChartBarsHeight();
         dataAvailalbe = data.series ? true : dataAvailalbe;
     };
@@ -62,9 +62,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         rawSeries = []
     };
 
-    var addAggregationToSeriesEntry = function (jobGroup, page, measurand, aggregationValue, value, valueComparative) {
+    var addAggregationToSeriesEntry = function (jobGroup, page, browser, measurand, aggregationValue, value, valueComparative) {
         rawSeries.forEach(function (it) {
-            if (it.jobGroup === jobGroup && it.page === page && it.measurand === measurand) {
+            if (it.jobGroup === jobGroup && it.page === page && it.measurand === measurand && it.browser === browser) {
                 it[aggregationValue] = value;
                 if (valueComparative) {
                     it[aggregationValue + 'Comparative'] = valueComparative
@@ -75,18 +75,18 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
 
     var transformAndMergeData = function (data) {
         if (data.series && (rawSeries.length === 0 || (rawSeries && rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)))) {
-            if(rawSeries.length === 0 || (data.series[0].aggregationValue === 'avg' && !rawSeries[0].hasOwnProperty('50'))) {
+            if (rawSeries.length === 0 || (data.series[0].aggregationValue === 'avg' && !rawSeries[0].hasOwnProperty('50'))) {
                 rawSeries = data.series;
                 dataLength = rawSeries.length;
             }
-            rawSeries.forEach(function (it){
+            rawSeries.forEach(function (it) {
                 data.series.forEach(function (newdata) {
-                    if(it.jobGroup === newdata.jobGroup && it.page === newdata.page && it.measurand === newdata.measurand) {
+                    if (it.jobGroup === newdata.jobGroup && it.page === newdata.page && it.measurand === newdata.measurand && it.browser === newdata.browser) {
                         it[newdata.aggregationValue] = newdata.value;
                         delete it.value;
                     }
                 });
-                if(data.hasComparativeData) {
+                if (data.hasComparativeData) {
                     it[data.series[0].aggregationValue + 'Comparative'] = it.valueComparative;
                     delete it.valueComparative;
                 }
@@ -95,9 +95,9 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         if (data.series && rawSeries && !rawSeries[0].hasOwnProperty(data.series[0].aggregationValue)) {
             data.series.forEach(function (it) {
                 if (data.hasComparativeData) {
-                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.measurand, data.series[0].aggregationValue, it.value, it.valueComparative);
+                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.browser, it.measurand, data.series[0].aggregationValue, it.value, it.valueComparative);
                 } else {
-                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.measurand, data.series[0].aggregationValue, it.value);
+                    addAggregationToSeriesEntry(it.jobGroup, it.page, it.browser, it.measurand, data.series[0].aggregationValue, it.value);
                 }
             })
         }
@@ -106,8 +106,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     var getAggregationValueLabel = function () {
         if (aggregationValue === 'avg') {
             return 'Average'
-        }
-        else {
+        } else {
             return "Percentile: " + aggregationValue + "%"
         }
     };
@@ -217,6 +216,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         return filter.map(function (datum) {
             return {
                 page: datum.page,
+                browser: datum.browser,
                 jobGroup: datum.jobGroup,
                 id: createSeriesValueId(datum)
             };
@@ -227,8 +227,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         var filteredSeries = [];
         if (selectedFilter === "asc" || selectedFilter === "desc") {
             Array.prototype.push.apply(filteredSeries, series);
-        }
-        else {
+        } else {
             filterRules[selectedFilter].forEach(function (filterEntry) {
                 Array.prototype.push.apply(filteredSeries, series.filter(function (datum) {
                     return datum.page === filterEntry.page && datum.jobGroup === filterEntry.jobGroup;
@@ -254,6 +253,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
             return {
                 page: value.page,
                 jobGroup: value.jobGroup,
+                browser: value.browser,
                 id: value.id
             }
         });
@@ -374,7 +374,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var createSeriesValueId = function (value) {
-        return value.page + ";" + value.jobGroup;
+        return value.browser ? value.page + ";" + value.jobGroup + ";" + value.browser : value.page + ";" + value.jobGroup;
     };
 
     var hasLoadTimes = function () {

@@ -1,4 +1,4 @@
-import {SelectablePage} from "./selectable-page.model";
+import {SelectablePage} from "../modules/result-selection/models/selectable-page.model";
 
 export interface SelectableMeasuredEventDTO {
   id: number;

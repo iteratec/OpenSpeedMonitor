@@ -172,7 +172,9 @@
         <div class="tab-content card-well">
             <div class="tab-pane in active" id="tabJobSelection">
                 <g:render template="/_resultSelection/selectMeasuringsAndTimeFrame"
-                          model="${['selectedTimeFrameInterval'      : selectedTimeFrameInterval,
+                          model="${['showConnectivityTab'            : true,
+                                    'showLocationInBrowserTab'       : true,
+                                    'selectedTimeFrameInterval'      : selectedTimeFrameInterval,
                                     'from'                           : from,
                                     'to'                             : to,
                                     'selectedInterval'               : selectedInterval,

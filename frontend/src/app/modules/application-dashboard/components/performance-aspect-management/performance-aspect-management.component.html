@@ -1,0 +1,20 @@
+<div class="btn">
+  <i class="fas fa-cog" (click)="initDialog()"></i>
+</div>
+
+<ngx-smart-modal id="preformanceAspectMgmtModal" identifier="preformanceAspectMgmtModal" [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="cancel()">
+  <h2>{{"frontend.de.iteratec.osm.performance-aspect.mgmt" | translate}} <span class="text-info">{{pageName}}</span>
+  </h2>
+  <hr>
+  <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading" class="aspect-management-box">
+    <osm-performance-aspect-inspect *ngFor="let performanceAspect of (performanceAspects$ | async)"
+                                    [performanceAspectWrapped]="performanceAspect"
+                                    class="aspect-inspect"></osm-performance-aspect-inspect>
+  </div>
+</ngx-smart-modal>
+
+<ng-template #isLoading>
+  <div>
+    <p>{{"frontend.de.iteratec.osm.queueDashboard.load-information.label" | translate}}</p>
+  </div>
+</ng-template>

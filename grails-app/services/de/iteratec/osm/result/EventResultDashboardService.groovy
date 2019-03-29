@@ -70,7 +70,7 @@ public class EventResultDashboardService {
      * 	Proxy for {@link MeasuredEvent}
      * </p>
      *
-     * @return all {@link MeasuredEvent} ordered by their name.
+     * @return all{@link MeasuredEvent} ordered by their name.
      */
     public List<MeasuredEvent> getAllMeasuredEvents() {
         return MeasuredEvent.findAll().sort(false, { it.name.toLowerCase() })
@@ -79,7 +79,7 @@ public class EventResultDashboardService {
     /**
      * Fetches all {@link Location}s from Database.
      *
-     * @return all {@link Location} ordered by their label.
+     * @return all{@link Location} ordered by their label.
      */
     public List<Location> getAllLocations() {
         return Location.list().sort(false, { it.label.toLowerCase() })
@@ -92,7 +92,7 @@ public class EventResultDashboardService {
      * 	Proxy for {@link ConnectivityDaoService}
      * </p>
      *
-     * @return all {@link ConnectivityProfile} ordered by their toString() representation.
+     * @return all{@link ConnectivityProfile} ordered by their toString() representation.
      */
     public List<ConnectivityProfile> getAllConnectivityProfiles() {
         return ConnectivityProfile.findAllByActive(true).sort(false, { it.name.toLowerCase() })
@@ -122,7 +122,7 @@ public class EventResultDashboardService {
      * 	Proxy for {@link BrowserService}
      * </p>
      *
-     * @return all {@link Browser} ordered by their name.
+     * @return all{@link Browser} ordered by their name.
      */
     public List<Browser> getAllBrowser() {
 
@@ -132,7 +132,7 @@ public class EventResultDashboardService {
     /**
      * Fetches all {@link Page}s from Database.
      *
-     * @return all {@link Page} ordered by their name.
+     * @return all{@link Page} ordered by their name.
      */
     public List<Page> getAllPages() {
         return Page.list().sort(false, { it.name.toLowerCase() })
@@ -145,7 +145,7 @@ public class EventResultDashboardService {
      * 	Proxy for {@link JobGroupService}
      * </p>
      *
-     * @return all {@link JobGroup} ordered by their name.
+     * @return all{@link JobGroup} ordered by their name.
      *
      */
     public List<JobGroup> getAllJobGroups() {
@@ -175,7 +175,7 @@ public class EventResultDashboardService {
 
             EventResultQueryBuilder queryBuilder
             performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - create query builder', 2) {
-                queryBuilder = new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+                queryBuilder = new EventResultQueryBuilder()
                         .withJobResultDateBetween(startDate, endDate)
                         .withJobGroupIdsIn(queryParams.jobGroupIds as List)
                         .withPageIdsIn(queryParams.pageIds as List)
@@ -267,35 +267,35 @@ public class EventResultDashboardService {
             eventResults.each { EventResultProjection eventResult ->
 
                 Double value
-                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get normalized value', 2){
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get normalized value', 2) {
                     value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                 }
 
                 if (selectedMeasurand.cachedView == eventResult.cachedView && value != null) {
 
                     GraphLabel graphLabel
-                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - create GraphLabels', 2){
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - create GraphLabels', 2) {
                         graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
                     }
                     URL testsDetailsURL
-                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', 2){
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', 2) {
                         testsDetailsURL = this.buildTestsDetailsURL(eventResult)
                     }
                     WptEventResultInfo chartPointWptInfo
-                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', 2){
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', 2) {
                         chartPointWptInfo = getChartPointsWptInfos(eventResult)
                     }
 
                     try {
-                        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - creating OsmChartPoints', 2){
+                        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - creating OsmChartPoints', 2) {
                             long time
                             String agent
-                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - get values', 3){
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - get values', 3) {
                                 time = eventResult.jobResultDate.time
                                 agent = eventResult.testAgent
                             }
                             OsmChartPoint chartPoint
-                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - creation', 3){
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - creation', 3) {
                                 chartPoint = new OsmChartPoint(
                                         time: time,
                                         csiAggregation: value,
@@ -305,8 +305,8 @@ public class EventResultDashboardService {
                                         chartPointWptInfo: chartPointWptInfo
                                 )
                             }
-                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', 3){
-                                if (chartPoint.isValid()){
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', 3) {
+                                if (chartPoint.isValid()) {
                                     // The following is a bit more verbose than using a groovy MapWithDefault, but significantly faster
                                     if (chartPointsForEachGraph[graphLabel] == null) {
                                         chartPointsForEachGraph[graphLabel] = []
@@ -370,7 +370,7 @@ public class EventResultDashboardService {
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
                         Double value = selectedMeasurand.getNormalizedValueFrom(eventResult)
-                        if (value != null){
+                        if (value != null) {
                             Long millisStartOfInterval = csiAggregationUtilService.resetToStartOfActualInterval(new DateTime(eventResult.jobResultDate), interval).getMillis()
                             GraphLabel key = new GraphLabel(eventResult, millisStartOfInterval, selectedMeasurand)
                             eventResultsToAggregate[key] << value

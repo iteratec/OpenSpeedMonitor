@@ -1,4 +1,4 @@
-import {SelectableBrowser} from "./selectable-browser.model";
+import {SelectableBrowser} from "./browser.model";
 
 export interface SelectableLocationDTO {
   id: number;

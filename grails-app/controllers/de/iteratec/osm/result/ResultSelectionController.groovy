@@ -163,6 +163,15 @@ class ResultSelectionController extends ExceptionHandlerController {
     }
 
     @RestAction
+    def getMeasurands(){
+        List dtos = []
+        MeasurandGroup.values().each { measurandGroup ->
+            dtos.add([name: measurandGroup.toString(), values: Measurand.values().findAll { it.measurandGroup == measurandGroup }.collect {[name: it.toString(), id: it.toString()]}])
+        }
+        ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    @RestAction
     def getUserTimings(ResultSelectionCommand command) {
         getUserOrHeroTiming(command, [UserTimingType.MARK, UserTimingType.MEASURE])
     }
@@ -248,10 +257,10 @@ class ResultSelectionController extends ExceptionHandlerController {
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
             def jobGroupAndPages = query(command, null, { existing ->
                 projections {
-                    distinct(['jobGroup','page'])
+                    distinct(['jobGroup', 'page'])
                 }
             })
-            Map<Long, Map> map = [:].withDefault {[name:"", pages:[] as Set]}
+            Map<Long, Map> map = [:].withDefault { [name: "", pages: [] as Set] }
             jobGroupAndPages.each {
                 JobGroup jobGroup = it[0] as JobGroup
                 Page page = it[1] as Page
@@ -259,10 +268,10 @@ class ResultSelectionController extends ExceptionHandlerController {
                 jobGroupMap.name = jobGroup.name
                 jobGroupMap.pages << page
             }
-            def nMap = [:].withDefault {[:]}
-            map.each{k,v ->
+            def nMap = [:].withDefault { [:] }
+            map.each { k, v ->
                 nMap[k].name = v.name
-                nMap[k].pages = v.pages.collect {[name: it.name, id: it.id]}.sort{it.name}
+                nMap[k].pages = v.pages.collect { [name: it.name, id: it.id] }.sort { it.name }
             }
             return nMap as ConcurrentHashMap
         })

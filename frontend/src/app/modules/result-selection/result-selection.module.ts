@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { ResultSelectionComponent } from './result-selection.component';
 import {ResultSelectionService} from "./services/result-selection.service";
+import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 import {SharedModule} from "../shared/shared.module";
 import { ResultSelectionTimeFrameComponent } from './components/result-selection-time-frame/result-selection-time-frame.component';
 import { ResultSelectionApplicationComponent } from './components/result-selection-application/result-selection-application.component';
@@ -28,7 +29,9 @@ export const TIME_FORMAT = {
     ResultSelectionComponent,
     ResultSelectionTimeFrameComponent,
     ResultSelectionApplicationComponent,
+    MeasurandSelectComponent
   ],
+  exports: [MeasurandSelectComponent],
   providers: [
     {
       provide: 'components',

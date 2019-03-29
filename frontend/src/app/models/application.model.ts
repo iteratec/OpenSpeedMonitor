@@ -23,3 +23,13 @@ export class Application implements ApplicationDTO {
     this.csiConfigurationId = dto.csiConfigurationId || null;
   }
 }
+
+export class SelectableApplication implements ApplicationDTO {
+  id: number;
+  name: string;
+
+  constructor(dto: ApplicationDTO) {
+    this.id = dto.id;
+    this.name = dto.name;
+  }
+}

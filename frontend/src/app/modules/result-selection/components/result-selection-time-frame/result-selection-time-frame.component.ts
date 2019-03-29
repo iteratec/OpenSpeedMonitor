@@ -5,7 +5,7 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {Caller, ResultSelectionCommand} from "../../models/result-selection-command.model";
-import {Chart} from "../../models/result-selection-chart.model";
+import {Chart} from "../../models/chart.model";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
 import {fromEvent, merge, Observable, Subscription} from "rxjs";

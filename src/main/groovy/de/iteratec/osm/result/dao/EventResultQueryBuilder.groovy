@@ -3,7 +3,6 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
@@ -21,7 +20,6 @@ import de.iteratec.osm.result.dao.query.trimmer.UserTimingDataTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
-
 /**
  * Created by mwg on 31.08.2017.
  */
@@ -34,12 +32,10 @@ class EventResultQueryBuilder {
     private EventResultQueryExecutor measurandQueryExecutor = new EventResultQueryExecutor()
     private EventResultQueryExecutor userTimingQueryExecutor = new EventResultQueryExecutor()
 
-    EventResultQueryBuilder(Integer minValidLoadtime, Integer maxValidLoadtime) {
+    EventResultQueryBuilder() {
         performanceLoggingService = new PerformanceLoggingService()
         filters.add(initBaseClosure())
         baseProjections = []
-        trims.add(new MeasurandTrim(onlyForSpecific: Measurand.FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, value: minValidLoadtime, qualifier: TrimQualifier.GREATER_THAN))
-        trims.add(new MeasurandTrim(onlyForSpecific: Measurand.FULLY_LOADED_TIME, measurandGroup: MeasurandGroup.LOAD_TIMES, value: maxValidLoadtime, qualifier: TrimQualifier.LOWER_THAN))
     }
 
     private Closure initBaseClosure() {
