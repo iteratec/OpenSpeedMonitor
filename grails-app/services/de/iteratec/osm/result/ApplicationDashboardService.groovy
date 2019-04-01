@@ -121,7 +121,12 @@ class ApplicationDashboardService {
         }
         PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
             if(!performanceAspects.collect{it.performanceAspectType}.contains(performanceAspectType)){
-                performanceAspects.add([id: null, pageId: page.id, jobGroupId: jobGroup.id, performanceAspectType: performanceAspectType, metricIdentifier: performanceAspectType.defaultMetric.toString()])
+                performanceAspects.add([
+                        id                   : null,
+                        pageId               : page.id,
+                        jobGroupId           : jobGroup.id,
+                        performanceAspectType: performanceAspectType,
+                        metricIdentifier     : performanceAspectType.defaultMetric.toString()])
             }
         }
         performanceAspects.each {
