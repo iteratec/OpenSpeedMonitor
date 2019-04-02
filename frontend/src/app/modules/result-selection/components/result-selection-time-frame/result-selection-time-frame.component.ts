@@ -104,10 +104,13 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     else if (this.comparativeSelectionActive) {
       let from = this.selectedDates[0];
       let to = this.selectedDates[1];
+
       let comparativeTo = new Date(from);
       let comparativeFrom = new Date(from);
       comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
-      let timeFrameInMilliseconds = (to.getTime() - from.getTime());
+
+      let timeZoneOffsetInMilliSeconds = (to.getTimezoneOffset() - from.getTimezoneOffset()) * 60000;
+      let timeFrameInMilliseconds = (to.getTime() - from.getTime() - timeZoneOffsetInMilliSeconds);
       comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
