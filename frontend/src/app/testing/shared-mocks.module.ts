@@ -5,6 +5,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {FormsModule} from "@angular/forms";
 import {NgxSmartModalModule} from "ngx-smart-modal";
+import {OwlDateTimeModule, OwlNativeDateTimeModule} from "ng-pick-datetime";
 
 
 @NgModule({
@@ -18,14 +19,18 @@ import {NgxSmartModalModule} from "ngx-smart-modal";
     FormsModule,
     HttpClientTestingModule,
     RouterTestingModule,
-    NgxSmartModalModule.forRoot()
+    NgxSmartModalModule.forRoot(),
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule
   ],
   exports: [
     TranslateModule,
     HttpClientTestingModule,
     RouterTestingModule,
     FormsModule,
-    NgxSmartModalModule
+    NgxSmartModalModule,
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule
   ]
 })
 export class SharedMocksModule {
