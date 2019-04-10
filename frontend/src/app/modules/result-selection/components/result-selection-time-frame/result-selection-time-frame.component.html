@@ -31,7 +31,7 @@
   <div class="row form-group">
     <div class="col-md-4">
       <label for="main-date-time-picker" class="text-muted sub" *ngIf="comparativeSelectionActive">
-        Main
+        {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.label' | translate }}
       </label>
     </div>
     <div class="col-md-8" id="main-date-time-picker">
@@ -51,9 +51,9 @@
       <div class="row form-group">
         <div class="col-md-4">
           <label for="comparative-date-time-picker" class="text-muted sub">
-            Comparison
+            {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.label' | translate }}
           </label>
-          <a href="#/" (click)="toggleComparativeSelection()" style="margin-left: 5px">
+          <a (click)="toggleComparativeSelection()" style="margin-left: 5px; cursor: pointer;">
             <i class="fas fa-times"></i>
           </a>
         </div>
@@ -72,7 +72,7 @@
 
   <div class="row form-group" *ngIf="!comparativeSelectionActive">
     <div class="col-md-8 col-md-offset-4">
-      <button type="button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()">
+      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()">
         <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
       </button>
     </div>

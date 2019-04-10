@@ -49,15 +49,12 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     } else {
       dateTimeAdapter.setLocale(osmLangService.getOsmLang());
     }
-
   }
 
   ngOnInit() {
     let defaultFrom = new Date();
     let defaultTo = new Date();
-    defaultTo.setHours(23, 59, 59, 999);
-    defaultFrom.setDate(defaultTo.getDate() - 28);
-    defaultFrom.setHours(0, 0, 0, 0);
+    defaultFrom.setDate(defaultTo.getDate() - 3);
 
     this.selectedDates = [defaultFrom, defaultTo];
 
@@ -74,7 +71,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     });
 
     this.resultSelectionService.loadSelectableData(defaultResultSelectionCommand, Chart[this.currentChart]);
-    this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[7];
+    this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[4];
   }
 
   selectTimeFrame(): void {
@@ -82,26 +79,17 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       let from = new Date();
       let to = new Date();
       from.setSeconds(to.getSeconds() - this.timeFrameInSeconds);
-
-      if (this.timeFrameInSeconds >= 259200) {
-        to.setHours(23, 59, 59, 999);
-        from.setHours(0, 0, 0, 0);
-      }
       this.selectedDates = [from, to];
 
       if (this.comparativeSelectionActive) {
-        let comparativeTo = new Date (from);
+        let comparativeTo = new Date(from);
         let comparativeFrom = new Date(from);
 
         comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
         comparativeFrom.setSeconds(comparativeTo.getSeconds() - this.timeFrameInSeconds);
-        if (this.timeFrameInSeconds >= 259200) {
-          comparativeFrom.setHours(0, 0, 0, 0);
-        }
         this.selectedComparativeDates = [comparativeFrom, comparativeTo];
       }
-    }
-    else if (this.comparativeSelectionActive) {
+    } else if (this.comparativeSelectionActive) {
       let from = this.selectedDates[0];
       let to = this.selectedDates[1];
 
