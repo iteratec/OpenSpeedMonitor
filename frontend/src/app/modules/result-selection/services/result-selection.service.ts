@@ -208,7 +208,7 @@ export class ResultSelectionService {
 
   updateSelectableApplications(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplication[]> {
     const params = this.createParams(resultSelectionCommand);
-    console.log(params);
+    //console.log(params);
     return this.http.get<SelectableApplication[]>('/resultSelection/getJobGroups', {params: params}).pipe(
       handleError(),
       startWith(null)

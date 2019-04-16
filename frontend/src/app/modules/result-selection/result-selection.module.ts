@@ -11,6 +11,8 @@ import {
   OwlDateTimeModule,
   OwlNativeDateTimeModule
 } from 'ng-pick-datetime';
+import { ResultSelectionJobGroupComponent } from './components/result-selection-job-group/result-selection-job-group.component';
+import { sharedService } from './services/sharedService';
 
 export const TIME_FORMAT = {
   fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
@@ -29,7 +31,8 @@ export const TIME_FORMAT = {
     ResultSelectionComponent,
     ResultSelectionTimeFrameComponent,
     ResultSelectionApplicationComponent,
-    MeasurandSelectComponent
+    MeasurandSelectComponent,
+    ResultSelectionJobGroupComponent
   ],
   exports: [MeasurandSelectComponent],
   providers: [
@@ -42,7 +45,8 @@ export const TIME_FORMAT = {
       provide: OWL_DATE_TIME_FORMATS,
       useValue: TIME_FORMAT
     },
-    ResultSelectionService
+    ResultSelectionService,
+    sharedService
   ],
   entryComponents: [
     ResultSelectionComponent

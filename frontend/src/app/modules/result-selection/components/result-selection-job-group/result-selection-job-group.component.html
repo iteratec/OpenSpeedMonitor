@@ -1,0 +1,15 @@
+<div class="card form-horizontal">
+  <h2>{{ 'frontend.de.iteratec.osm.resultSelection.jobGroup.title' | translate }}</h2>
+  <div class="form-group">
+    <select multiple class="form-control">
+      <option *ngFor="let jobGroup of jobGroupMappings$ | async" [value]="jobGroup.id" >
+        {{jobGroup.name}}
+      </option>
+    </select>
+  </div>
+  <div>
+    <button type="button" class="btn btn-xs btn-default filter-button">
+      <i class="fas fa-filter"></i>&nbsp;otto
+  </button>
+  </div>
+</div>

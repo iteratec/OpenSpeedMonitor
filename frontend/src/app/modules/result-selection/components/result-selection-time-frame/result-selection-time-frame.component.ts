@@ -2,7 +2,7 @@ import {
   Component, Input,
   OnInit,
   ViewChild,
-  ViewEncapsulation
+  ViewEncapsulation,
 } from '@angular/core';
 import {Caller, ResultSelectionCommand} from "../../models/result-selection-command.model";
 import {Chart} from "../../models/chart.model";
@@ -11,6 +11,7 @@ import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
 import {fromEvent, merge, Observable, Subscription} from "rxjs";
 import {filter} from "rxjs/operators";
 import {OsmLangService} from "../../../../services/osm-lang.service";
+import { sharedService } from '../../services/sharedService';
 
 @Component({
   selector: 'osm-result-selection-time-frame',
@@ -43,13 +44,12 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
   CalendarType: typeof CalendarType = CalendarType;
 
-  constructor(private resultSelectionService: ResultSelectionService, private dateTimeAdapter: DateTimeAdapter<any>, private osmLangService: OsmLangService) {
+  constructor(private resultSelectionService: ResultSelectionService, private dateTimeAdapter: DateTimeAdapter<any>, private osmLangService: OsmLangService, private sharedService: sharedService) {
     if (osmLangService.getOsmLang() == 'en') {
       dateTimeAdapter.setLocale('en-GB');
     } else {
       dateTimeAdapter.setLocale(osmLangService.getOsmLang());
     }
-
   }
 
   ngOnInit() {
@@ -60,6 +60,8 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     defaultFrom.setHours(0, 0, 0, 0);
 
     this.selectedDates = [defaultFrom, defaultTo];
+    this.sharedService.change(this.selectedDates);
+
 
     let defaultResultSelectionCommand = new ResultSelectionCommand({
       from: defaultFrom,
@@ -88,6 +90,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
         from.setHours(0, 0, 0, 0);
       }
       this.selectedDates = [from, to];
+      this.sharedService.change(this.selectedDates);
 
       if (this.comparativeSelectionActive) {
         let comparativeTo = new Date (from);
@@ -110,7 +113,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
 
       let timeZoneOffsetInMilliSeconds = (to.getTimezoneOffset() - from.getTimezoneOffset()) * 60000;
-      let timeFrameInMilliseconds = (to.getTime() - from.getTime() - timeZoneOffsetInMilliSeconds);
+      let timeFrameInMilliseconds = (to.getTime() - from.getTime() - timeZoneOffsetInMilliSeconds); 
       comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
@@ -130,6 +133,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
+    this.sharedService.change(this.selectedDates);
   }
 
   updateToDate(calendar: CalendarType): void {
@@ -146,6 +150,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeTo.selecteds;
     }
+      this.sharedService.change(this.selectedDates);
   }
 
   observeCalendarClicks(calendar: CalendarType): void {
