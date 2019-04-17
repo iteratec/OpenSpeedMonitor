@@ -271,6 +271,7 @@ export class ResultSelectionService {
     )
   }
 
+  
   private createParams(resultSelectionCommand: ResultSelectionCommand) {
     return {
       from: resultSelectionCommand.from.toISOString(),

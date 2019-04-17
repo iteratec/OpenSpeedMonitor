@@ -21,7 +21,8 @@ import { sharedService } from '../../services/sharedService';
     @Input() currentChart: string;
     @Input() jobGroupMappings$: ReplaySubject<SelectableApplication[]>;  
     resultSelectionCommand: ResultSelectionCommand;
-
+    jobGroups = new Array();
+    isEmpty = true;
     
     constructor(private resultSelectionService: ResultSelectionService, private sharedService: sharedService) {
 
@@ -46,19 +47,38 @@ import { sharedService } from '../../services/sharedService';
             selectedConnectivities: []
         }); 
         //this.resultSelectionService.loadSelectableData(this.resultSelectionCommand,Chart[this.currentChart]);
-        this.sharedService.currentMessage.subscribe(selectedDates => this.onTimeFrameChange(selectedDates));
+        this.sharedService.currentMessage.subscribe(selectedDates => this.registerTimeFrameChangeEvents(selectedDates));
       }
 
-      onTimeFrameChange(dates: Date[]):void {
-          this.resultSelectionCommand.from = dates[0];
-          this.resultSelectionCommand.to = dates[1];
-         this.getJobGroups(this.resultSelectionCommand);
+      registerTimeFrameChangeEvents(dates: Date[]):void {
+        this.resultSelectionCommand.from = dates[0];
+        this.resultSelectionCommand.to = dates[1];
+        this.getJobGroups(this.resultSelectionCommand);
+
       }
 
       getJobGroups(resultSelectionCommand: ResultSelectionCommand) {
-          this.resultSelectionService.loadSelectableApplications(resultSelectionCommand);
-          this.jobGroupMappings$ = this.resultSelectionService.applications$;
-          
+        this.resultSelectionService.loadSelectableApplications(resultSelectionCommand);
+        this.jobGroupMappings$ = this.resultSelectionService.applications$;
+        this.jobGroupMappings$.subscribe(jobGroups => this.sortJobGroups(jobGroups));
+      }
+
+      sortJobGroups(jobGroups: SelectableApplication[]): void{
+        this.jobGroups = jobGroups;
+        if(this.jobGroups!=null && this.jobGroups.length>0){
+          this.isEmpty=false;
+          this.jobGroups.sort((a, b) => {
+            if(a.name.toLowerCase() > b.name.toLowerCase()){
+              return 1;
+            }
+            if(a.name.toLowerCase() < b.name.toLowerCase()){
+              return -1;
+            }
+            return 0;
+          });
+        }else{
+          this.isEmpty=true;
+        }
       }
 
       
