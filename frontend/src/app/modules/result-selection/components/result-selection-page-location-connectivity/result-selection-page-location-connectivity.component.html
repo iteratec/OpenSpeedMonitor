@@ -1,0 +1,92 @@
+<div class="card">
+<!--  td:Header changes when only page visible -->
+  <h2>PLC</h2>
+
+  <ul class="nav nav-tabs result-selection-tabs">
+    <li #pageAndEventTab id="pageAndEventTab" (click)="switchTab(pageAndEventTab)"
+        [className]="pageAndEventSelectionActive ? 'active' : ''">
+      <a>Page | Measured step</a>
+    </li>
+    <li #browserAndLocationTab id="browserAndLocationTab" (click)="switchTab(browserAndLocationTab)"
+        [className]="browserAndLocationSelectionActive ? 'active' : ''">
+      <a>Browser | Location</a>
+    </li>
+    <li #connectivityTab id="connectivityTab" (click)="switchTab(connectivityTab)"
+        [className]="connectivitySelectionActive ? 'active' : ''">
+      <a>Connectivity</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active">
+      <ng-container *ngIf="pageAndEventSelectionActive; then pageAndEventSelection"></ng-container>
+      <ng-container *ngIf="browserAndLocationSelectionActive; then browserAndLocationSelection"></ng-container>
+      <ng-container *ngIf="connectivitySelectionActive; then connectivitySelection"></ng-container>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #pageAndEventSelection>
+  <div class="form-group">
+    <select id="result-selection-page-selection" class="form-control" multiple="multiple" [(ngModel)]="selectedPages">
+      <option *ngFor="let page of uniquePages$ | async" [value]="page.id">{{page.name}}</option>
+    </select>
+  </div>
+
+  <label for="result-selection-event-selection">
+    <strong>Measured step:</strong>
+  </label>
+  <ng-select id="result-selection-event-selection"
+             [items]="measuredEvents$ | async" [(ngModel)]="selectedEvents"
+             (change)="changedSelection(selectAllEventsCheckbox)"
+             [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name"
+             placeholder="Please select an option">
+  </ng-select>
+  <div class="checkbox-inline" (click)="selectAllItems(selectAllEventsCheckbox)">
+    <input id="selectAllEventsCheckbox" #selectAllEventsCheckbox type="checkbox" checked disabled>
+    Select all measured steps
+  </div>
+</ng-template>
+
+<ng-template #browserAndLocationSelection>
+  <div class="form-group">
+    <select id="result-selection-browser-selection" class="form-control" multiple="multiple"
+            [(ngModel)]="selectedBrowsers" style="opacity: 0.5;" (change)="changedSelection(selectAllBrowsersCheckbox)">
+      <option *ngFor="let browser of uniqueBrowsers$ | async" [value]="browser.id">{{browser.name}}</option>
+    </select>
+    <div class="checkbox-inline" (click)="selectAllItems(selectAllBrowsersCheckbox)">
+      <input id="selectAllBrowsersCheckbox" #selectAllBrowsersCheckbox type="checkbox" checked disabled>
+      Select all browsers
+    </div>
+  </div>
+
+  <label for="result-selection-event-selection">
+    <strong>Location:</strong>
+  </label>
+  <ng-select id="result-selection-location-selection"
+             [items]="locations$ | async" [(ngModel)]="selectedLocations"
+             (change)="changedSelection(selectAllLocationsCheckbox)"
+             [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name"
+             placeholder="Please select an option">
+  </ng-select>
+  <div class="checkbox-inline" (click)="selectAllItems(selectAllLocationsCheckbox)">
+    <input id="selectAllLocationsCheckbox" #selectAllLocationsCheckbox type="checkbox" checked disabled>
+    Select all locations
+  </div>
+</ng-template>
+
+<ng-template #connectivitySelection>
+  <div class="form-group">
+    <select id="result-selection-connectivity-selection" class="form-control" multiple="multiple"
+            [(ngModel)]="selectedConnectivities" style="opacity: 0.5;"
+            (change)="changedSelection(selectAllConnectivitiesCheckbox)">
+      <option *ngFor="let connectivityProfile of connectivities$ | async"
+              [value]="connectivityProfile.id">{{connectivityProfile.name}}</option>
+    </select>
+    <div class="checkbox-inline" (click)="selectAllItems(selectAllConnectivitiesCheckbox)">
+      <input id="selectAllConnectivitiesCheckbox" #selectAllConnectivitiesCheckbox type="checkbox" checked disabled>
+      Select all connectivity profiles
+    </div>
+  </div>
+</ng-template>
