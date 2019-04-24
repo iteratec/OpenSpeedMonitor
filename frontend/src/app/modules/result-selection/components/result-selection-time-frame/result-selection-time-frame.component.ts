@@ -56,7 +56,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     let defaultFrom = new Date();
     let defaultTo = new Date();
     defaultTo.setHours(23, 59, 59, 999);
-    defaultFrom.setDate(defaultTo.getDate() - 28);
+    defaultFrom.setDate(defaultTo.getDate() - 40);
     defaultFrom.setHours(0, 0, 0, 0);
 
     this.selectedDates = [defaultFrom, defaultTo];

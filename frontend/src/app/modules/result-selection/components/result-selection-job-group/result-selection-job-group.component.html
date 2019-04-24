@@ -3,7 +3,7 @@
   <div class="form-group">
     <select multiple class="form-control" >
       <ng-container *ngIf="!isEmpty; else elseBlock" >
-          <option  *ngFor="let jobGroup of jobGroups " [ngValue]="jobGroup.name" >
+          <option  *ngFor="let jobGroup of filteredJobGroups" [ngValue]="jobGroup.name" >
               {{jobGroup.name}}
           </option>
        </ng-container>
@@ -17,8 +17,9 @@
 
 
   <div>
-    <button type="button" class="btn btn-xs btn-default filter-button">
-      <i class="fas fa-filter"></i>&nbsp;otto
+    <button class="btn btn-xs btn-default filter-button" id="filterBtn" *ngFor="let tag of selectableTags" (click)="filterByTag($event)" [ngClass]="{'active': isSelected&&selectedTag===tag}">
+      <i class="fas fa-filter"></i>
+      &nbsp;{{tag}}
   </button>
   </div>
 </div>

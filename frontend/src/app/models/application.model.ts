@@ -8,6 +8,7 @@ export interface ApplicationDTO {
   dateOfLastResults?: string | Date;
   csiConfigurationId?: number;
   pages?: Page[];
+  tags?: Array<string>;
 }
 
 export class Application implements ApplicationDTO {
@@ -29,10 +30,12 @@ export class Application implements ApplicationDTO {
 export class SelectableApplication implements ApplicationDTO {
   id: number;
   name: string;
+  tags: Array<string>;
 
   constructor(dto: ApplicationDTO) {
     this.id = dto.id;
     this.name = dto.name;
+    this.tags = dto.tags;
   }
 }
 
