@@ -47,6 +47,7 @@ export class PerformanceAspectManagementComponent implements OnInit {
     this.changedMetrics.forEach((performanceAspect: PerformanceAspect) => {
       this.applicationService.createOrUpdatePerformanceAspect(performanceAspect);
     });
+    this.ngxSmartModalService.resetModalData('performanceAspectMgmtModal');
   }
 
 }
