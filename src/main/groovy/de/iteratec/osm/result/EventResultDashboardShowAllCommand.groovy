@@ -87,6 +87,12 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.get('aggrGroupValuesUnCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesUnCached.findAll {
             !SelectedMeasurand.isMeasurand(it)
         })
+        viewModelToCopyTo.get('aggrGroupValuesCached')?.HERO_TIMINGS?.addAll(this.selectedAggrGroupValuesCached.findAll {
+            !SelectedMeasurand.isMeasurand(it)
+        })
+        viewModelToCopyTo.get('aggrGroupValuesUnCached')?.HERO_TIMINGS?.addAll(this.selectedAggrGroupValuesUnCached.findAll {
+            !SelectedMeasurand.isMeasurand(it)
+        })
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
         viewModelToCopyTo.put('trimAboveLoadTimes', this.trimAboveLoadTimes)
