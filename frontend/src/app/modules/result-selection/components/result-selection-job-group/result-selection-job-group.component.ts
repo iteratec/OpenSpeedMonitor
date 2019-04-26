@@ -9,7 +9,7 @@ import {ResultSelectionService} from "../../services/result-selection.service";
 import { SelectableApplication } from 'src/app/models/application.model';
 import { Observable } from 'rxjs';
 import { Chart } from '../../models/chart.model';
-import { sharedService } from '../../services/sharedService';
+import { SharedService } from '../../services/sharedService';
 
 
 @Component({
@@ -30,7 +30,7 @@ export class ResultSelectionJobGroupComponent implements OnInit {
   selectedTag: string;
   isSelected = false;
     
-  constructor(private resultSelectionService: ResultSelectionService, private sharedService: sharedService) {
+  constructor(private resultSelectionService: ResultSelectionService, private sharedService: SharedService) {
     
   }
   
@@ -80,15 +80,14 @@ export class ResultSelectionJobGroupComponent implements OnInit {
     });
   }
 
-  filterByTag(event: any): void{
+  filterByTag(tag: string): void{
     if(this.isSelected === false){
       this.isSelected = true;
-      this.selectedTag = event.currentTarget.textContent.slice(2,-1);
+      this.selectedTag = tag;
       this.setFilteredJobGroups(this.selectedTag);
     }else{
-      if(event.currentTarget.textContent.slice(2,-1)!==this.selectedTag){
-        this.isSelected=true;
-        this.selectedTag = event.currentTarget.textContent.slice(2,-1);
+        if(tag!==this.selectedTag){
+        this.selectedTag = tag;
         this.setFilteredJobGroups(this.selectedTag);
       }else{
         this.isSelected =false;
@@ -105,7 +104,11 @@ export class ResultSelectionJobGroupComponent implements OnInit {
           filteredJobGroups.push(element);
         }
       });
+    }
+    if(filteredJobGroups.length > 0){
       this.filteredJobGroups = filteredJobGroups;
+    }else{
+      this.filteredJobGroups = this.jobGroups;
     }
   }
 
@@ -122,7 +125,11 @@ export class ResultSelectionJobGroupComponent implements OnInit {
         return 0;
         });
       this.jobGroups = jobGroups;
-      this.filteredJobGroups = jobGroups;
+      if(this.isSelected === true){
+        this.setFilteredJobGroups(this.selectedTag);
+      }else{
+        this.filteredJobGroups = jobGroups;
+      }
     }else{
       this.isEmpty=true;
     }

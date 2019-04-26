@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable()
-export class sharedService {
+export class SharedService {
 
   private dateSource= new BehaviorSubject<Date[]>([new Date(),new Date()]);
   currentMessage = this.dateSource.asObservable();
