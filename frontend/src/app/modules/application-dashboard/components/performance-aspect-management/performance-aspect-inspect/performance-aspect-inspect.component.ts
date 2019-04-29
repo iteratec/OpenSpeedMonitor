@@ -13,7 +13,6 @@ export class PerformanceAspectInspectComponent implements OnInit, OnChanges {
   @Input() performanceAspectWrapped: ResponseWithLoadingState<PerformanceAspect>;
   @Output() onSelect: EventEmitter<PerformanceAspect> = new EventEmitter<PerformanceAspect>();
   metric$: ReplaySubject<SelectableMeasurand> = new ReplaySubject<SelectableMeasurand>();
-  performanceAspectInEditing: PerformanceAspect;
 
   constructor() {
   }
