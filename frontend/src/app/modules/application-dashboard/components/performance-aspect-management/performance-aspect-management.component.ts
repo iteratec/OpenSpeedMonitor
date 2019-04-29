@@ -33,7 +33,7 @@ export class PerformanceAspectManagementComponent implements OnInit {
     this.ngxSmartModalService.open('performanceAspectMgmtModal');
   }
 
-  cancel() {
+  resetModalData() {
     this.changedMetrics.clear();
     this.ngxSmartModalService.resetModalData('performanceAspectMgmtModal');
   }
@@ -43,11 +43,11 @@ export class PerformanceAspectManagementComponent implements OnInit {
     this.changedMetrics.set(key, performanceAspect);
   }
 
-  save() {
+  saveAndClose() {
     this.changedMetrics.forEach((performanceAspect: PerformanceAspect) => {
       this.applicationService.createOrUpdatePerformanceAspect(performanceAspect);
     });
-    this.ngxSmartModalService.resetModalData('performanceAspectMgmtModal');
+    this.ngxSmartModalService.close('performanceAspectMgmtModal');
   }
 
 }

@@ -2,7 +2,8 @@
   <i class="fas fa-cog" (click)="initDialog()"></i>
 </div>
 
-<ngx-smart-modal #performanceAspectMgmtModal id="performanceAspectMgmtModal" identifier="performanceAspectMgmtModal" [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="cancel()" force="false">
+<ngx-smart-modal #performanceAspectMgmtModal id="performanceAspectMgmtModal" identifier="performanceAspectMgmtModal"
+                 [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="resetModalData()" force="false">
   <h2>
     {{"frontend.de.iteratec.osm.performance-aspect.title" | translate}} <span class="text-info">{{ performanceAspectMgmtModal.getData() }}</span>
   </h2>
@@ -16,7 +17,7 @@
   </main>
   <hr>
   <div class="buttons">
-    <a (click)="save()" class="btn btn-primary">{{ 'frontend.default.button.save' | translate }}</a>
+    <a (click)="saveAndClose()" class="btn btn-primary">{{ 'frontend.default.button.save' | translate }}</a>
     <a (click)="ngxSmartModalService.close('performanceAspectMgmtModal')" class="btn btn-default">{{ 'frontend.default.button.cancel' | translate }}</a>
   </div>
 </ngx-smart-modal>
