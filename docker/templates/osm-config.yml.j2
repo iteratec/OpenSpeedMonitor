@@ -14,24 +14,24 @@ grails:
       osm:
         security:
           initialOsmAdminUser:
-            username: '{{ default .Env.OSM_ADMIN_USER "admin" }}'
-            password: '{{ default .Env.OSM_ADMIN_PASSWORD "secret123" }}'
+            username: '{{ default "admin" .Env.OSM_ADMIN_USER }}'
+            password: '{{ default "secret123" .Env.OSM_ADMIN_PASSWORD }}'
           initialOsmRootUser:
-            username: '{{ default .Env.OSM_ROOT_USER "root" }}'
-            password: '{{ default .Env.OSM_ROOT_PASSWORD "muchMoreSecret!123" }}'
+            username: '{{ default "root" .Env.OSM_ROOT_USER }}'
+            password: '{{ default "muchMoreSecret!123" .Env.OSM_ROOT_PASSWORD }}'
 
 environments:
   production:
     grails:
-      serverURL: '{{ default .Env.OSM_URL "http://localhost:8080"}}'
+      serverURL: '{{ default "http://localhost:8080" .Env.OSM_URL }}'
       de.iteratec.osm.detailAnalysis:
-        enablePersistenceOfDetailAnalysisData: {{ default .Env.ENABLE_DETAIL_ANALYSIS "false" }}
-        microserviceUrl: '{{ default .Env.DETAIL_ANALYSIS_URL "http://your.detail.analysis.service.com" }}'
-        apiKey: '{{ default .Env.API_KEY_DETAIL_ANALYSIS "apiKeyForDetailAnalysisService" }}'
+        enablePersistenceOfDetailAnalysisData: {{ default "false" .Env.ENABLE_DETAIL_ANALYSIS }}
+        microserviceUrl: '{{ default "http://your.detail.analysis.service.com" .Env.DETAIL_ANALYSIS_URL }}'
+        apiKey: '{{ default "apiKeyForDetailAnalysisService" .Env.API_KEY_DETAIL_ANALYSIS }}'
     dataSource:
-      url: 'jdbc:mysql://{{ default .Env.MYSQL_HOST "osm-mysql" }}/{{ default .Env.MYSQL_DATABASE "osm" }}'
-      username: '{{ default .Env.MYSQL_USER "osm" }}'
-      password: '{{ default .Env.MYSQL_PASSWORD "osm123" }}'
+      url: 'jdbc:mysql://{{ default "osm-mysql" .Env.MYSQL_HOST }}/{{ default "osm" .Env.MYSQL_DATABASE }}'
+      username: '{{ default "osm" .Env.MYSQL_USER }}'
+      password: '{{ default "osm123" .Env.MYSQL_PASSWORD }}'
       dbCreate: "managed by liquibase"
       pooled: true
       properties:

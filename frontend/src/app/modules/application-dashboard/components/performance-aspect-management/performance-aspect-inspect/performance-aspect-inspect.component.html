@@ -1,0 +1,47 @@
+<div class="edit-container">
+  <div class="aspect-type">
+    <blockquote>
+      {{"frontend.de.iteratec.osm.performance-aspect." + performanceAspectWrapped?.data?.performanceAspectType + ".user-centric-question" | translate}}
+    </blockquote>
+  </div>
+  <div class="measurand">
+    <div *ngIf="!editMode; else measurandSelect">
+      <ng-container [ngTemplateOutlet]="aspectMetricLabel"></ng-container>
+      <div
+        class="form-control">{{"frontend.de.iteratec.isr.measurand." + (selectedMetric$ | async)?.name | translate}}</div>
+    </div>
+  </div>
+  <div class="buttons">
+      <div *ngIf="!performanceAspectWrapped?.isLoading">
+        <div *ngIf="!editMode; else saveOrCancel">
+        <button class="btn btn-primary edit-button" (click)="edit()">
+          {{"frontend.default.button.edit.label" | translate}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #measurandSelect>
+  <ng-container *ngTemplateOutlet="aspectMetricLabel"></ng-container>
+  <osm-measurand-select [selectedMeasurand]="selectedMetric$ | async"
+                        (onSelect)="selectMeasurandForAspect($event)"></osm-measurand-select>
+</ng-template>
+
+<ng-template #saveOrCancel>
+  <button class="btn btn-warning" (click)="cancel()">
+    {{"frontend.default.button.cancel.label" | translate}}
+  </button>
+  <button class="btn btn-success" (click)="save()">
+    {{"frontend.default.button.save.label" | translate}}
+  </button>
+</ng-template>
+
+<ng-template #aspectMetricLabel>
+  <div class="aspect-label">
+    {{"frontend.de.iteratec.osm.performance-aspect-metric" | translate}}
+    <span
+      class="text-info">{{"frontend.de.iteratec.osm.performance-aspect." + performanceAspectWrapped?.data?.performanceAspectType | translate}}</span>
+  </div>
+</ng-template>
+
