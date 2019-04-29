@@ -139,7 +139,7 @@ function RickshawGraphBuilder(args) {
         }
 
         if (args.width == "auto" || args.width == -1) {
-            args.width = $(window).width() - 145;
+            args.width = $("#graph_container").innerWidth();
         } else {
             args.width = parseInt(args.width);
         }

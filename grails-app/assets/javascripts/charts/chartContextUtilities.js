@@ -31,6 +31,10 @@ $.contextMenu({
 
     events: {
         show: function () {
+            var visibleDot = $('#visibleWhileActiveContextMenu');
+            if (visibleDot.length) {
+                visibleDot[0].remove();
+            }
             // don't loose the dot on which the context menu was called
 
             // get the current dot, clone it and mark the clone as visible while context menu is active
@@ -180,18 +184,27 @@ $.contextMenu({
 
 // select/deselect points on the graph with meta-key+click or ctrl-key+click
 $('#rickshaw_main').on('click', '.chart-context-menu', function (event) {
+    if (event.button > 0) {
+        return true;
+    }
+    var nearestPoint = rickshawGraphBuilder.graph.nearestPoint;
     if (event.metaKey || event.ctrlKey) {
-        var nearestPoint = rickshawGraphBuilder.graph.nearestPoint;
-
         if (OpenSpeedMonitor.chartContextUtil.isNotSelected(nearestPoint)) {
             OpenSpeedMonitor.chartContextUtil.selectPoint(nearestPoint);
         } else {
             OpenSpeedMonitor.chartContextUtil.deselectPoint(nearestPoint)
         }
-
-        event.preventDefault();
-        return false;
+    } else {
+        OpenSpeedMonitor.chartContextUtil.loadSidebar(nearestPoint);
     }
+    event.preventDefault();
+    return false;
+
+});
+
+$('.details-sidebar .close').on('click', function () {
+   $('.details-sidebar').toggleClass('visible', false);
+   $(window).trigger('resize');
 });
 
 
@@ -235,6 +248,10 @@ OpenSpeedMonitor.chartContextUtil = (function () {
                     "&testId=" + testId +
                     "&view=filmstrip" +
                     "&step=" + oneBaseStepIndexInJourney;
+            } else if (wptView == "waterfallSnippet") {
+                url = wptServerBaseurl + "/details_snippet.php?snippet=waterfall&cached=";
+                url += cachedView ? "1" : "0";
+                url += "&test=" + testId + "&run=" + numberOfWptRun + "&step=" + oneBaseStepIndexInJourney;
             } else {
                 cached = cachedView ? "cached/" : "";
 
@@ -373,12 +390,21 @@ OpenSpeedMonitor.chartContextUtil = (function () {
         }
     }
 
+    function loadSidebar(point) {
+        var url = buildWptUrl("waterfallSnippet", point);
+        var sidebar = $(".details-sidebar");
+        $('.details-sidebar .sidebar-content').html('<iframe src="'+url+'" class="card"></iframe>');
+        sidebar.toggleClass("visible", true);
+        $(window).trigger('resize');
+    }
+
     return {
         buildWptUrl: buildWptUrl,
         selectPoint: selectPoint,
         isNotSelected: isNotSelected,
         deselectPoint: deselectPoint,
-        deselectAllPoints: deselectAllPoints
+        deselectAllPoints: deselectAllPoints,
+        loadSidebar: loadSidebar
     }
 
 })();

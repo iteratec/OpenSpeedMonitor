@@ -13,7 +13,11 @@
 
 <body>
 
+<div class="sidebar-container">
+
+    <main>
 <g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'timeSeries']"/>
+
 
 <div class="row">
     <div class="col-md-12">
@@ -234,6 +238,13 @@
                   model="[item: [id: params.dashboardID], entityName: params.dashboardID]"/>
     </g:if>
 </g:if>
+    </main>
+
+    <div class="details-sidebar">
+        <a class="close"><i class="fas fa-times"></i> </a>
+        <div class="sidebar-content"></div>
+    </div>
+</div>
 
 <content tag="include.bottom">
     <asset:javascript src="eventresultdashboard/eventResultDashboard.js"/>
