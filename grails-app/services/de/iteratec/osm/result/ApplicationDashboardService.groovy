@@ -1,7 +1,5 @@
 package de.iteratec.osm.result
 
-import org.hibernate.criterion.CriteriaSpecification
-import com.codahale.metrics.graphite.Graphite
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.api.dto.ApplicationCsiDto
@@ -17,7 +15,6 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
-import grails.gorm.DetachedCriteria
 import grails.gorm.transactions.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
@@ -39,7 +36,7 @@ class ApplicationDashboardService {
         Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
 
-        return new EventResultQueryBuilder(osmConfigCacheService.getMinValidLoadtime(), osmConfigCacheService.getMaxValidLoadtime())
+        return new EventResultQueryBuilder()
                 .withJobGroupIdsIn([jobGroupId], false)
                 .withProjectedIdForAssociatedDomain('page')
                 .withJobResultDateBetween(from, to)
@@ -105,6 +102,38 @@ class ApplicationDashboardService {
         }
 
         return recentMetrics
+    }
+
+    List<Map> getPerformanceAspectsForJobGroup(Long jobGroupId, Long pageId) {
+        JobGroup jobGroup = JobGroup.findById(jobGroupId)
+        Page page = Page.findById(pageId)
+        List<Map> performanceAspects = PerformanceAspect.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq 'jobGroup', jobGroup
+            eq 'page', page
+            projections {
+                property 'id', 'id'
+                property 'page.id', 'pageId'
+                property 'jobGroup.id', 'jobGroupId'
+                property 'metricIdentifier', 'metricIdentifier'
+                property 'performanceAspectType', 'performanceAspectType'
+            }
+        }
+        PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
+            if(!performanceAspects.collect{it.performanceAspectType}.contains(performanceAspectType)){
+                performanceAspects.add([id: null, pageId: page.id, jobGroupId: jobGroup.id, performanceAspectType: performanceAspectType, metricIdentifier: performanceAspectType.defaultMetric.toString()])
+            }
+        }
+        performanceAspects.each {
+            SelectedMeasurand selectedMetric = new SelectedMeasurand(it.metricIdentifier, CachedView.UNCACHED)
+            it.remove('metricIdentifier')
+            it.measurand = [name: selectedMetric.name, id: selectedMetric.optionValue]
+            it.performanceAspectTypeIndex = it.performanceAspectType
+            it.performanceAspectType = it.performanceAspectType.toString();
+        }
+
+        return performanceAspects.sort { it.performanceAspectTypeIndex }
+
     }
 
     def createOrReturnCsiConfiguration(Long jobGroupId) {

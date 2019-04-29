@@ -243,7 +243,7 @@
                 <g:sortableColumn property="firstViewOnly" titleKey="job.2x.label" title="Runs"/>
             </tr>
             </thead>
-            <g:render template="jobTable" model="${['jobs': jobs, 'jobsWithTags': jobsWithTags]}"/>
+            <g:render template="jobTable" model="${['jobs': jobs]}"/>
         </table>
     </g:form>
 </div>
