@@ -601,10 +601,11 @@
     margin-top: -20px;
     margin-right: -20px;
     padding-left: 20px;
-    flex-basis: 990px;
+    flex-basis: 1000px;
     flex-shrink: 0;
     width: auto;
     overflow: auto;
+    height: 100vh;
 }
 
 .details-sidebar .sidebar-content {

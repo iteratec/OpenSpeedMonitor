@@ -248,10 +248,15 @@ OpenSpeedMonitor.chartContextUtil = (function () {
                     "&testId=" + testId +
                     "&view=filmstrip" +
                     "&step=" + oneBaseStepIndexInJourney;
-            } else if (wptView == "waterfallSnippet") {
-                url = wptServerBaseurl + "/details_snippet.php?snippet=waterfall&cached=";
-                url += cachedView ? "1" : "0";
-                url += "&test=" + testId + "&run=" + numberOfWptRun + "&step=" + oneBaseStepIndexInJourney;
+            } else if (wptView == "embed") {
+                cached = cachedView ? "1" : "0";
+
+                url = wptServerBaseurl + "video/filmstrip_embed.php?tests=" +
+                    testId +
+                    "-r:" + numberOfWptRun +
+                    "-c:" + cached +
+                    "-s:" + oneBaseStepIndexInJourney +
+                    defaultVideoParameter + "&width=950";
             } else {
                 cached = cachedView ? "cached/" : "";
 
@@ -391,7 +396,7 @@ OpenSpeedMonitor.chartContextUtil = (function () {
     }
 
     function loadSidebar(point) {
-        var url = buildWptUrl("waterfallSnippet", point);
+        var url = buildWptUrl("embed", point);
         var sidebar = $(".details-sidebar");
         $('.details-sidebar .sidebar-content').html('<iframe src="'+url+'" class="card"></iframe>');
         sidebar.toggleClass("visible", true);
