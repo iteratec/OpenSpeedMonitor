@@ -11,7 +11,7 @@
                                                                                    checked>Average</label>
             <label class="btn btn-sm btn-default" id="percentileButton"><input type="radio" name="aggregationValue"
                                                                                value="percentile">
-                ${g.message(code: 'de.iteratec.isocsi.pageAggregation.percentile.label', 'default': 'Percentile')}
+                ${g.message(code: 'de.iteratec.isocsi.aggregationChart.percentile.label', 'default': 'Percentile')}
             </label>
         </div>
         <input class="btn btn-sm btn-default perc-element"

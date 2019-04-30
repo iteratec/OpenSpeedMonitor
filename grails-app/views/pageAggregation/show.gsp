@@ -3,14 +3,14 @@
 <html>
 <head>
     <meta name="layout" content="layoutOsm"/>
-    <title><g:message code="de.iteratec.isocsi.pageAggregation" default="Page Aggregation"/></title>
+    <title><g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/></title>
     <asset:stylesheet src="/pageAggregation/show.less"/>
 </head>
 
 <body>
-<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'pageAggregation']"/>
+<g:render template="/chart/chartSwitchButtons" model="['currentChartName': 'aggregation']"/>
 <p>
-    <g:message code="de.iteratec.isocsi.pageAggregation.description.short"
+    <g:message code="de.iteratec.isocsi.aggregationChart.description.short"
                default="The webpagetest raw data of the respective interval is the basis for the displayed mean values."/>
 </p>
 
