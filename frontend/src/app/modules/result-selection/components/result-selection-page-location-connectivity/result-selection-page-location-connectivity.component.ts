@@ -45,22 +45,6 @@ export class ResultSelectionPageLocationConnectivityComponent {
     this.locationsAndBrowsers$ = this.resultSelectionService.locationsAndBrowsers$;
     this.connectivities$ = this.resultSelectionService.connectivities$;
 
-    let defaultFrom = new Date();
-    let defaultTo = new Date();
-    defaultFrom.setDate(defaultTo.getDate() - 28);
-    const testResultSelectionCommand = {
-      from: defaultFrom,
-      to: defaultTo,
-      caller: Caller.EventResult,
-      jobGroupIds: [],
-      pageIds: [],
-      locationIds: [],
-      browserIds: [],
-      measuredEventIds: [],
-      selectedConnectivities: []
-    };
-    this.resultSelectionService.loadSelectableData(testResultSelectionCommand, Chart.TimeSeries);
-
     this.eventsAndPages$.subscribe(next => {
       if (next) {
         this.measuredEvents$ = of(this.sortAlphabetically(next));
