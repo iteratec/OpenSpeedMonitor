@@ -53,6 +53,7 @@ A card to select page & measured step, browser & location, and the connectivity
                     selectedMeasuredEventIds : selectedMeasuredEventIds,
                     selectedAllMeasuredEvents: selectedAllMeasuredEvents,
                     eventsOfPages            : eventsOfPages,
+                    isOptional               : pageIsOptional
             ]"/>
         </div>
     </g:if>

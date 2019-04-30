@@ -37,6 +37,7 @@ OpenSpeedMonitor.resultSelection = (function () {
     var hasPageSelection = pageTabElement.length == 0 || ($("#pageSelectHtmlId").val().length != 0);
 
     var pageSelectionAvailable = $("#pageSelectHtmlId").length;
+    var pageSelectionIsOptional = !!$("#pageSelectHtmlId").data("is-optional");
 
     var hasMeasuredEventSelection = pageTabElement.length == 0 || !!$("#selectedMeasuredEventsHtmlId").val();
     var aggregationsWithoutPageNeed = ["weekly_shop", "daily_shop", "daily_system", "weekly_system"];
@@ -194,11 +195,12 @@ OpenSpeedMonitor.resultSelection = (function () {
         warningNoJobGroupSelected.toggle(!(hasJobGroupSelection || csiSystemSelected) && lastResultCount != 0);
         warningNoMeasurandSelected.toggle(!hasMeasurandSeries);
 
-        if (pageSelectionAvailable) {
+        if (pageSelectionAvailable && !pageSelectionIsOptional) {
             warningNoPageSelected.toggle(!(hasPageSelection || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) && lastResultCount != 0);
         }
 
-        var doDisable = lastResultCount === 0 || !(hasJobGroupSelection || csiSystemSelected) || !(hasPageSelection || hasNoPageSelectionTab || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation) || !hasMeasurandSeries;
+        var hasValidPageSelection = hasPageSelection || hasNoPageSelectionTab || hasMeasuredEventSelection || needsNoPageSelectionDueToCsiAggregation || pageSelectionIsOptional;
+        var doDisable = lastResultCount === 0 || !(hasJobGroupSelection || csiSystemSelected) || !hasValidPageSelection || !hasMeasurandSeries;
 
         showButtons.prop("disabled", doDisable);
         showButtons.toggleClass("disabled", doDisable)

@@ -1,5 +1,5 @@
 <div class="form-group">
-    <g:select id="pageSelectHtmlId" class="form-control" name="selectedPages"
+    <g:select id="pageSelectHtmlId" class="form-control" name="selectedPages" data-is-optional="${isOptional ? 'true' : ''}"
               from="${pages}" optionKey="id" optionValue="name" multiple="true"
               value="${selectedPages}"
               title="${message(code: 'de.iteratec.isr.wptrd.labels.filterPage')}"/>

@@ -71,7 +71,8 @@
                                       'selectedPages'        : selectedPages,
                                       'browsers'             : browsers,
                                       'selectedBrowsers'     : selectedBrowsers,
-                                      'selectedAllBrowsers'  : selectedAllBrowsers
+                                      'selectedAllBrowsers'  : selectedAllBrowsers,
+                                      'pageIsOptional'       : true
                               ]"/>
                 </div>
 
