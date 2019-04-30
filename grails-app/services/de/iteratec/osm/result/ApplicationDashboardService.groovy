@@ -6,6 +6,7 @@ import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.CsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.*
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -86,59 +87,82 @@ class ApplicationDashboardService {
         jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
                 .findAll { Page page -> page.name != Page.UNDEFINED }
                 .each { Page page ->
-            Map entry = recentMetrics.find {
-                it.pageId == page.id
-            }
-            if (!entry) {
-                recentMetrics.add(
-                        [
-                                'pageId'  : page.id,
-                                'pageName': page.name
-                        ]
-                )
-            } else {
-                entry.pageName = page.name
-            }
-        }
+                    Map entry = recentMetrics.find {
+                        it.pageId == page.id
+                    }
+                    if (!entry) {
+                        recentMetrics.add(
+                                [
+                                        'pageId'  : page.id,
+                                        'pageName': page.name
+                                ]
+                        )
+                    } else {
+                        entry.pageName = page.name
+                    }
+                }
 
         return recentMetrics
     }
 
-    List<Map> getPerformanceAspectsForJobGroup(Long jobGroupId, Long pageId) {
+    List<Map> getPerformanceAspects(Long jobGroupId, Long pageId, List<Long> browserIds) {
+
+        List<Map> performanceAspects = []
+
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
         Page page = Page.findById(pageId)
-        List<Map> performanceAspects = PerformanceAspect.createCriteria().list {
-            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
-            eq 'jobGroup', jobGroup
-            eq 'page', page
-            projections {
-                property 'id', 'id'
-                property 'page.id', 'pageId'
-                property 'jobGroup.id', 'jobGroupId'
-                property 'metricIdentifier', 'metricIdentifier'
-                property 'performanceAspectType', 'performanceAspectType'
-            }
+        List<Browser> browsers = browserIds.collect { Browser.get(it) }
+
+        browsers.each { browser ->
+            List<Map> aspectsOfBrowser = getAspectsAsMap(jobGroup, page, browser)
+            addDefaultsForMissing(aspectsOfBrowser, page, jobGroup, browser)
+            formatMeasurand(aspectsOfBrowser)
+            performanceAspects.addAll(aspectsOfBrowser)
         }
-        PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
-            if(!performanceAspects.collect{it.performanceAspectType}.contains(performanceAspectType)){
-                performanceAspects.add([
-                        id                   : null,
-                        pageId               : page.id,
-                        jobGroupId           : jobGroup.id,
-                        performanceAspectType: performanceAspectType,
-                        metricIdentifier     : performanceAspectType.defaultMetric.toString()])
-            }
-        }
-        performanceAspects.each {
+
+        return performanceAspects.sort { it.performanceAspectTypeIndex }
+
+    }
+
+    private formatMeasurand(List<Map> performanceAspects) {
+        return performanceAspects.each {
             SelectedMeasurand selectedMetric = new SelectedMeasurand(it.metricIdentifier, CachedView.UNCACHED)
             it.remove('metricIdentifier')
             it.measurand = [name: selectedMetric.name, id: selectedMetric.optionValue]
             it.performanceAspectTypeIndex = it.performanceAspectType
             it.performanceAspectType = it.performanceAspectType.toString();
         }
+    }
 
-        return performanceAspects.sort { it.performanceAspectTypeIndex }
+    private addDefaultsForMissing(List<Map> performanceAspects, Page page, JobGroup jobGroup, Browser browser) {
+        return PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
+            if (!performanceAspects.collect { it.performanceAspectType }.contains(performanceAspectType)) {
+                performanceAspects.add([
+                        id                   : null,
+                        pageId               : page.id,
+                        jobGroupId           : jobGroup.id,
+                        browserId            : browser.id,
+                        performanceAspectType: performanceAspectType,
+                        metricIdentifier     : performanceAspectType.defaultMetric.toString()])
+            }
+        }
+    }
 
+    private getAspectsAsMap(JobGroup jobGroup, Page page, Browser browser) {
+        return PerformanceAspect.createCriteria().list {
+            resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
+            eq 'jobGroup', jobGroup
+            eq 'page', page
+            eq 'browser', browser
+            projections {
+                property 'id', 'id'
+                property 'page.id', 'pageId'
+                property 'jobGroup.id', 'jobGroupId'
+                property 'browser.id', 'browserId'
+                property 'metricIdentifier', 'metricIdentifier'
+                property 'performanceAspectType', 'performanceAspectType'
+            }
+        }
     }
 
     def createOrReturnCsiConfiguration(Long jobGroupId) {
@@ -196,8 +220,8 @@ class ApplicationDashboardService {
                     .getOrCalculateShopCsiAggregations(startDate, today, dailyInterval, csiGroups)
                     .groupBy { csiAggregation -> csiAggregation.jobGroup.id }
                     .collectEntries { jobGroupId, csiAggregations ->
-                [(jobGroupId): csiAggregationsToDto(jobGroupId, csiAggregations, startDate)]
-            } as Map<Long, ApplicationCsiDto>
+                        [(jobGroupId): csiAggregationsToDto(jobGroupId, csiAggregations, startDate)]
+                    } as Map<Long, ApplicationCsiDto>
             dtosById.putAll(dtosByIdWithValues)
         }
         return dtosById
@@ -255,7 +279,7 @@ class ApplicationDashboardService {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             projections {
                 property 'id', 'job_id'
-                jobGroup { property 'name', 'application'}
+                jobGroup { property 'name', 'application' }
                 script { property 'label', 'script' }
                 location { property 'location', 'location' }
                 location { browser { property 'name', 'browser' } }
