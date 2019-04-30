@@ -27,7 +27,7 @@ export class ResultSelectionJobGroupComponent implements OnInit {
   isEmpty = true;
   selectableTags: string[];
   filteredJobGroups: SelectableApplication[];
-  selectedTag: string;
+  selectedTag: string ='';
   isSelected = false;
     
   constructor(private resultSelectionService: ResultSelectionService, private sharedService: SharedService) {
@@ -60,15 +60,15 @@ export class ResultSelectionJobGroupComponent implements OnInit {
   registerTimeFrameChangeEvents(dates: Date[]):void {
     this.resultSelectionCommand.from = dates[0];
     this.resultSelectionCommand.to = dates[1];
-    this.getJobGroups(this.resultSelectionCommand);
+    this.resultSelectionService.loadSelectableApplications(this.resultSelectionCommand);
+    this.jobGroupMappings$ = this.resultSelectionService.applications$;
+    this.upadteJobGroups();
     this.getJobGroupTags();
   }
 
-  getJobGroups(resultSelectionCommand: ResultSelectionCommand) {
-    this.resultSelectionService.loadSelectableApplications(resultSelectionCommand);
-      this.jobGroupMappings$ = this.resultSelectionService.applications$;
-      this.jobGroupMappings$.subscribe(jobGroups => this.sortJobGroupsByName(jobGroups));
-    }
+  upadteJobGroups() {
+    this.jobGroupMappings$.subscribe(jobGroups => this.sortJobGroupsByName(jobGroups));
+  }
 
   getJobGroupTags(){
     this.jobGroupMappings$.subscribe(next => {
@@ -104,11 +104,7 @@ export class ResultSelectionJobGroupComponent implements OnInit {
           filteredJobGroups.push(element);
         }
       });
-    }
-    if(filteredJobGroups.length > 0){
       this.filteredJobGroups = filteredJobGroups;
-    }else{
-      this.filteredJobGroups = this.jobGroups;
     }
   }
 
@@ -125,9 +121,10 @@ export class ResultSelectionJobGroupComponent implements OnInit {
         return 0;
         });
       this.jobGroups = jobGroups;
-      if(this.isSelected === true){
+      if(this.isSelected === true && (this.selectableTags.indexOf(this.selectedTag)>-1)){
         this.setFilteredJobGroups(this.selectedTag);
       }else{
+        this.isSelected = false;
         this.filteredJobGroups = jobGroups;
       }
     }else{

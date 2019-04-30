@@ -1,7 +1,7 @@
 <div class="card form-horizontal">
   <h2>{{ 'frontend.de.iteratec.osm.resultSelection.jobGroup.title' | translate }}</h2>
   <div class="form-group">
-    <select multiple class="form-control" >
+    <select multiple class="form-control" id='job-groups-selection'>
       <ng-container *ngIf="!isEmpty; else elseBlock" >
           <option  *ngFor="let jobGroup of filteredJobGroups" [ngValue]="jobGroup.name" >
               {{jobGroup.name}}

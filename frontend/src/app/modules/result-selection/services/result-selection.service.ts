@@ -7,8 +7,6 @@ import {catchError, map, switchMap, startWith} from "rxjs/operators";
 import {Application, SelectableApplication, ApplicationWithPages} from "../../../models/application.model";
 import {Page} from "../../../models/page.model";
 import {Caller, ResultSelectionCommand} from "../models/result-selection-command.model";
-//import {SelectableHeroTiming} from "../models/selectable-hero-timing.model";
-//import {SelectableUserTiming} from "../models/selectable-user-timing.model";
 import {Chart} from "../models/chart.model";
 import {Connectivity} from 'src/app/models/connectivity.model';
 import {Location} from 'src/app/models/location.model';
@@ -26,14 +24,11 @@ export class ResultSelectionService {
   selectedApplications$: ReplaySubject<Application[]> = new ReplaySubject<Application[]>(1);
   selectedPages$: ReplaySubject<Page[]> = new ReplaySubject<Page[]>(1);
 
-  // TODO
   applications$: ReplaySubject<SelectableApplication[]> = new ReplaySubject(1);
   applicationsAndPages$: ReplaySubject<ApplicationWithPages[]> = new ReplaySubject(1);
   eventsAndPages$: ReplaySubject<MeasuredEvent[]> = new ReplaySubject(1);
   locationsAndBrowsers$: ReplaySubject<Location[]> = new ReplaySubject(1);
   connectivities$: ReplaySubject<Connectivity[]> = new ReplaySubject(1);
-  //selectableHeroTimings$: ReplaySubject<SelectableHeroTiming[]> = new ReplaySubject<SelectableHeroTiming[]>(1);
-  //selectableUserTimings$: ReplaySubject<SelectableUserTiming[]> = new ReplaySubject<SelectableUserTiming[]>(1);
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
   constructor(private http: HttpClient) {
@@ -154,8 +149,6 @@ export class ResultSelectionService {
   loadSelectableData(resultSelectionCommand: ResultSelectionCommand, chart: Chart): void {
 
     this.loadResultCount(resultSelectionCommand);
-    //this.loadSelectableUserTimings(resultSelectionCommand);
-    //this.loadSelectableHeroTimings(resultSelectionCommand);
 
     if(chart !== Chart.PageComparison) {
       this.loadSelectableApplications(resultSelectionCommand);
@@ -194,21 +187,13 @@ export class ResultSelectionService {
     this.updateSelectableConnectivities(resultSelectionCommand).subscribe(next => this.connectivities$.next(next));
   }
 
-  /*loadSelectableUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableUserTimings(resultSelectionCommand).subscribe(next => this.selectableUserTimings$.next(next));
-  }
-
-  loadSelectableHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableHeroTimings(resultSelectionCommand).subscribe(next => this.selectableHeroTimings$.next(next));
-  }
-*/
+  
   loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
     this.updateResultCount(resultSelectionCommand).subscribe(next => this.resultCount$.next(next));
   }
 
   updateSelectableApplications(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplication[]> {
     const params = this.createParams(resultSelectionCommand);
-    //console.log(params);
     return this.http.get<SelectableApplication[]>('/resultSelection/getJobGroups', {params: params}).pipe(
       handleError(),
       startWith(null)
@@ -247,22 +232,6 @@ export class ResultSelectionService {
     )
   }
 
-  /*updateSelectableUserTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableUserTiming[]> {
-    const params = this.createParams(resultSelectionCommand);
-    return this.http.get('/resultSelection/getUserTimings', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateSelectableHeroTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableHeroTiming[]> {
-    const params = this.createParams(resultSelectionCommand);
-    return this.http.get('/resultSelection/getHeroTimings', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-*/
   updateResultCount(resultSelectionCommand: ResultSelectionCommand): Observable<string> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get('/resultSelection/getResultCount', {params: params}).pipe(
