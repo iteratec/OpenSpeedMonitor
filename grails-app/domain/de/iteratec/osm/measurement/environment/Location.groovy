@@ -17,6 +17,8 @@
 
 package de.iteratec.osm.measurement.environment
 
+import de.iteratec.osm.result.DeviceType
+import de.iteratec.osm.result.OperatingSystem
 import grails.gorm.annotation.Entity
 import groovy.transform.EqualsAndHashCode
 
@@ -49,6 +51,9 @@ class Location {
      */
     String location
     Browser browser
+    OperatingSystem operatingSystem
+    DeviceType deviceType
+
     int activeagents
     int queuethreshold
     int queuethresholdgreenlimit
@@ -64,6 +69,8 @@ class Location {
         active(nullable: false)
         wptServer(nullable: false)
         location(maxSize: 255)
+        operatingSystem(nullable: false)
+        deviceType(nullable: false)
         browser(nullable: false)
         activeagents(nullable: true, min: -2147483648, max: 2147483647)
         queuethreshold(nullable: true, min: -2147483648, max: 2147483647)
