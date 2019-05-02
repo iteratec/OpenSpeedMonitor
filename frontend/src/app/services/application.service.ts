@@ -10,7 +10,16 @@ import {
   ApplicationCsiDTOById
 } from "../models/application-csi.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+  catchError,
+  distinctUntilKeyChanged,
+  filter,
+  map,
+  mergeMap,
+  startWith,
+  switchMap,
+  withLatestFrom
+} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
@@ -18,6 +27,7 @@ import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboar
 import {FailingJob, FailingJobDTO} from '../modules/landing/models/failing-jobs.model';
 import {PerformanceAspect} from "../models/perfomance-aspect.model";
 import {Page} from "../models/page.model";
+import {LocationDto} from "../modules/application-dashboard/models/location.model";
 
 @Injectable()
 export class ApplicationService {
@@ -35,9 +45,11 @@ export class ApplicationService {
   selectedApplication$ = new ReplaySubject<Application>(1);
 
   constructor(private http: HttpClient) {
-    this.combinedParams().pipe(
-      switchMap(params => this.getPerformanceAspects(params))
-    ).subscribe(this.performanceAspectForPage$);
+    this.getPerfAspectParams()
+      .pipe(
+        switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams)),
+        startWith([])
+      ).subscribe(nextAspects => this.performanceAspectForPage$.next(nextAspects));
 
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
@@ -126,17 +138,44 @@ export class ApplicationService {
     this.selectedPage$.next(page);
   }
 
-  private combinedParams(): Observable<any> {
-    return combineLatest(
-      this.selectedApplication$,
-      this.selectedPage$,
-      (application: Application, page: Page) => this.generateParams(application, page));
+  getLocations() {
+    this.http.get('resultSelection/getLocations', {})
   }
 
-  private generateParams(application: Application, page: Page) {
+  createLocationParams(application: Application, page: Page) {
+    let now: Date = new Date();
+    let fourWeeksAgo: Date = new Date();
+    fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+    return {
+      jobGroupIds: application.id.toString(),
+      pageIds: page.id.toString(),
+      from: fourWeeksAgo.toISOString(),
+      to: now.toISOString()
+    };
+  }
+
+  private createParams(applicationId: number) {
+    return {
+      applicationId: applicationId ? applicationId.toString() : ""
+    };
+  }
+
+  private getPerfAspectParams(): Observable<any> {
+    return combineLatest(this.selectedApplication$, this.selectedPage$)
+      .pipe(
+        mergeMap(([application, page]: [Application, Page]) => {
+          const params = this.createLocationParams(application, page);
+          return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(
+            map((locations: LocationDto[]) => this.generateParams(application, page, locations)))
+        })
+      );
+  }
+
+  private generateParams(application: Application, page: Page, locations: LocationDto[]) {
     return {
       applicationId: application.id,
-      pageId: page.id
+      pageId: page.id,
+      browserIds: locations.map(loc => loc.parent.id)
     }
   }
 
@@ -148,11 +187,27 @@ export class ApplicationService {
   }
 
   private getPerformanceAspects(params): Observable<ResponseWithLoadingState<PerformanceAspect>[]> {
-    this.performanceAspectForPage$.next([]);
-    return this.http.get<Performance[]>('/applicationDashboard/rest/getPerformanceAspectsForApplication', {params}).pipe(
-      handleError(),
-      map(dtos => dtos.map(dto => ({isLoading: false, data: dto})))
-    );
+    return this.http.get<PerformanceAspect[]>('/applicationDashboard/rest/getPerformanceAspectsForApplication', {params})
+      .pipe(
+        handleError(),
+        map((aspects: PerformanceAspect[]) => this.filterOneBrowser(aspects).map(aspect => ({
+          isLoading: false,
+          data: aspect
+        })))
+      )
+      ;
+  }
+
+  /**
+   * Just for the moment. If we support one aspect per browser in the UI this should be removed.
+   * @param aspects
+   */
+  filterOneBrowser(aspects: PerformanceAspect[]) {
+    if (aspects.length < 1) {
+      return aspects
+    }
+    const arbitraryBrowserId = aspects[0].browserId;
+    return aspects.filter((aspect: PerformanceAspect) => aspect.browserId == arbitraryBrowserId)
   }
 
   createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate: PerformanceAspect) {
@@ -161,6 +216,7 @@ export class ApplicationService {
       performanceAspectId: perfAspectToCreateOrUpdate.id,
       pageId: perfAspectToCreateOrUpdate.pageId,
       applicationId: perfAspectToCreateOrUpdate.jobGroupId,
+      browserId: perfAspectToCreateOrUpdate.browserId,
       performanceAspectType: perfAspectToCreateOrUpdate.performanceAspectType,
       metricIdentifier: perfAspectToCreateOrUpdate.measurand.id
     };
@@ -214,12 +270,6 @@ export class ApplicationService {
       map(dto => <ResponseWithLoadingState<PageCsiDto[]>>{isLoading: false, data: dto}),
       handleError()
     );
-  }
-
-  private createParams(applicationId: number) {
-    return {
-      applicationId: applicationId ? applicationId.toString() : ""
-    };
   }
 
   createCsiConfiguration(applicationDto: ApplicationDTO) {
