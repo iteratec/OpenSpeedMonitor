@@ -1,7 +1,8 @@
 <div class="card">
   <ng-container *ngIf="showOnlyPageSelection || showOnlyBrowserSelection">
     <h2 *ngIf="showOnlyBrowserSelection">Browser</h2>
-    <h2 *ngIf="showOnlyPageSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.page.label' | translate }}</h2>
+    <h2
+      *ngIf="showOnlyPageSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.page.label' | translate }}</h2>
   </ng-container>
 
   <ul class="nav nav-tabs result-selection-tabs" *ngIf="!showOnlyPageSelection && !showOnlyBrowserSelection">
@@ -30,8 +31,10 @@
 
   <div class="tab-content">
     <div class="tab-pane active">
-      <ng-container *ngIf="(pageAndEventSelectionActive || showOnlyPageSelection) && !showOnlyBrowserSelection; then pageAndEventSelection"></ng-container>
-      <ng-container *ngIf="browserAndLocationSelectionActive || showOnlyBrowserSelection; then browserAndLocationSelection"></ng-container>
+      <ng-container
+        *ngIf="(pageAndEventSelectionActive || showOnlyPageSelection) && !showOnlyBrowserSelection; then pageAndEventSelection"></ng-container>
+      <ng-container
+        *ngIf="browserAndLocationSelectionActive || showOnlyBrowserSelection; then browserAndLocationSelection"></ng-container>
       <ng-container *ngIf="connectivitySelectionActive; then connectivitySelection"></ng-container>
     </div>
   </div>
@@ -39,7 +42,8 @@
 
 <ng-template #pageAndEventSelection>
   <div class="form-group">
-    <select id="result-selection-page-selection" class="form-control" multiple="multiple" [(ngModel)]="selectedPages">
+    <select id="result-selection-page-selection" class="form-control" multiple="multiple" [(ngModel)]="selectedPages"
+            (ngModelChange)="filterSelectableItems(selectedPages, 'events')">
       <option *ngFor="let page of uniquePages$ | async" [value]="page.id">{{page.name}}</option>
     </select>
   </div>
@@ -51,7 +55,7 @@
     </label>
     <ng-select id="result-selection-event-selection"
                [items]="measuredEvents$ | async" [(ngModel)]="selectedEvents"
-               [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name"
+               [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name" [groupBy]="'parent.id'"
                placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
     </ng-select>
     <div class="checkbox-inline" (click)="selectAllEventsCheckbox.checked = true; selectedEvents = []">
@@ -65,10 +69,11 @@
 <ng-template #browserAndLocationSelection>
   <div class="form-group">
     <select id="result-selection-browser-selection" class="form-control" multiple="multiple"
-            [(ngModel)]="selectedBrowsers" [style.opacity]="selectedBrowsers.length > 0 ? 1 : 0.5">
+            [(ngModel)]="selectedBrowsers" [style.opacity]="selectedBrowsers.length > 0 ? 1 : 0.5"
+            (ngModelChange)="filterSelectableItems(selectedBrowsers, 'locations')">
       <option *ngFor="let browser of uniqueBrowsers$ | async" [value]="browser.id">{{browser.name}}</option>
     </select>
-    <div class="checkbox-inline" (click)="selectAllBrowsersCheckbox.checked = true; selectedBrowsers = []">
+    <div class="checkbox-inline" (click)="selectAllBrowsersCheckbox.checked = true; selectedBrowsers = []; filterSelectableItems(selectedBrowsers, 'locations')">
       <input id="selectAllBrowsersCheckbox" #selectAllBrowsersCheckbox type="checkbox"
              [checked]="selectedBrowsers.length < 1">
       {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectAllBrowsers' | translate }}

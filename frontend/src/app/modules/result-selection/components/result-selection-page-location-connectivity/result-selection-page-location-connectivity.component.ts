@@ -1,7 +1,5 @@
 import {Component, Input} from '@angular/core';
 import {ResultSelectionService} from "../../services/result-selection.service";
-import {Caller} from "../../models/result-selection-command.model";
-import {Chart} from "../../models/chart.model";
 import {Observable, of} from "rxjs";
 import {MeasuredEvent} from "../../../../models/measured-event.model";
 import {Location} from "../../../../models/location.model";
@@ -50,7 +48,7 @@ export class ResultSelectionPageLocationConnectivityComponent {
         this.measuredEvents$ = of(this.sortAlphabetically(next));
         let pages: Page[] = next.map(value => value.parent);
         let uniquePages: Page[] = this.getUniqueElements(pages);
-        this.uniquePages$ = of(uniquePages);
+        this.uniquePages$ = of(this.sortAlphabetically(uniquePages));
       }
     });
 
@@ -59,9 +57,35 @@ export class ResultSelectionPageLocationConnectivityComponent {
         this.locations$ = of(this.sortAlphabetically(next));
         let browsers: Browser[] = next.map(value => value.parent);
         let uniqueBrowsers: Browser[] = this.getUniqueElements(browsers);
-        this.uniqueBrowsers$ = of(uniqueBrowsers);
+        this.uniqueBrowsers$ = of(this.sortAlphabetically(uniqueBrowsers));
       }
     });
+  }
+
+  filterSelectableItems(selectedParents: number[], children: String): void {
+    let items = [];
+    if (this.showMeasuredStepSelection && children === 'events') {
+      items = this.resultSelectionService.eventsAndPages$.getValue();
+    } else if (this.showLocationSelection && children === 'locations') {
+      items = this.resultSelectionService.locationsAndBrowsers$.getValue();
+    }
+
+    if (selectedParents && selectedParents.length > 0) {
+      let filteredItems = items.filter(item => selectedParents.includes(item.parent.id));
+      if (children === 'events') {
+        this.selectedEvents = filteredItems.filter(item => this.selectedEvents.includes(item.id)).map(item => item.id);
+        this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
+      } else if (children === 'locations') {
+        this.selectedLocations = filteredItems.filter(item => this.selectedLocations.includes(item.id)).map(item => item.id);
+        this.locations$ = of(this.sortAlphabetically(filteredItems));
+      }
+    } else {
+      if (children === 'events') {
+        this.measuredEvents$ = of(this.sortAlphabetically(items));
+      } else if (children === 'locations') {
+        this.locations$ = of(this.sortAlphabetically(items));
+      }
+    }
   }
 
   private getUniqueElements(items) {
