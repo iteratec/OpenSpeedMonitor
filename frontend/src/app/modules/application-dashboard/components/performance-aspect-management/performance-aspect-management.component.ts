@@ -18,7 +18,7 @@ export class PerformanceAspectManagementComponent implements OnInit {
   performanceAspects$: Subject<ResponseWithLoadingState<PerformanceAspect>[]>;
   changedMetrics: Map<string, PerformanceAspect>;
 
-  constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
+  constructor(public ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
     this.performanceAspects$ = this.applicationService.performanceAspectForPage$;
   }
 
