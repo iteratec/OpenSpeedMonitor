@@ -107,18 +107,13 @@ class ApplicationDashboardService {
 
     List<Map> getPerformanceAspects(Long jobGroupId, Long pageId, List<Long> browserIds) {
 
-        List<Map> performanceAspects = []
-
         JobGroup jobGroup = JobGroup.findById(jobGroupId)
         Page page = Page.findById(pageId)
         List<Browser> browsers = browserIds.collect { Browser.get(it) }
 
-        browsers.each { browser ->
-            List<Map> aspectsOfBrowser = getAspectsAsMap(jobGroup, page, browser)
-            addDefaultsForMissing(aspectsOfBrowser, page, jobGroup, browser)
-            formatMeasurand(aspectsOfBrowser)
-            performanceAspects.addAll(aspectsOfBrowser)
-        }
+        List<Map> performanceAspects = getAspectsAsMap(jobGroup, page, browsers)
+        addDefaultsForMissing(performanceAspects, page, jobGroup, browsers)
+        formatMeasurand(performanceAspects)
 
         return performanceAspects.sort { it.performanceAspectTypeIndex }
 
@@ -134,26 +129,28 @@ class ApplicationDashboardService {
         }
     }
 
-    private addDefaultsForMissing(List<Map> performanceAspects, Page page, JobGroup jobGroup, Browser browser) {
-        return PerformanceAspectType.values().each { PerformanceAspectType performanceAspectType ->
-            if (!performanceAspects.collect { it.performanceAspectType }.contains(performanceAspectType)) {
-                performanceAspects.add([
-                        id                   : null,
-                        pageId               : page.id,
-                        jobGroupId           : jobGroup.id,
-                        browserId            : browser.id,
-                        performanceAspectType: performanceAspectType,
-                        metricIdentifier     : performanceAspectType.defaultMetric.toString()])
+    private void addDefaultsForMissing(List<Map> performanceAspects, Page page, JobGroup jobGroup, List<Browser> browsers) {
+        PerformanceAspectType.values().each { PerformanceAspectType type ->
+            browsers.each { browser ->
+                if (!performanceAspects.any { it.performanceAspectType == type && it.browserId == browser.id }) {
+                    performanceAspects.add([
+                            id                   : null,
+                            pageId               : page.id,
+                            jobGroupId           : jobGroup.id,
+                            browserId            : browser.id,
+                            performanceAspectType: type,
+                            metricIdentifier     : type.defaultMetric.toString()])
+                }
             }
         }
     }
 
-    private getAspectsAsMap(JobGroup jobGroup, Page page, Browser browser) {
+    private getAspectsAsMap(JobGroup jobGroup, Page page, List<Browser> browsers) {
         return PerformanceAspect.createCriteria().list {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq 'jobGroup', jobGroup
             eq 'page', page
-            eq 'browser', browser
+            'in' 'browser', browsers
             projections {
                 property 'id', 'id'
                 property 'page.id', 'pageId'
