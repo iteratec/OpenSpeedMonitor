@@ -1,8 +1,7 @@
 <div class="card">
   <ng-container *ngIf="showOnlyPageSelection || showOnlyBrowserSelection">
     <h2 *ngIf="showOnlyBrowserSelection">Browser</h2>
-    <h2
-      *ngIf="showOnlyPageSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.page.label' | translate }}</h2>
+    <h2 *ngIf="showOnlyPageSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.page.label' | translate }}</h2>
   </ng-container>
 
   <ul class="nav nav-tabs result-selection-tabs" *ngIf="!showOnlyPageSelection && !showOnlyBrowserSelection">
@@ -80,7 +79,7 @@
     </div>
   </div>
   <ng-container *ngIf="showLocationSelection">
-    <label for="result-selection-event-selection">
+    <label for="result-selection-location-selection">
       <strong>Location:</strong>
     </label>
     <ng-select id="result-selection-location-selection"
