@@ -38,9 +38,3 @@ class AspectUtil {
     }
 
 }
-
-@EqualsAndHashCode
-class AspectMetric {
-    PerformanceAspectType aspectType
-    SelectedMeasurand measurand
-}
