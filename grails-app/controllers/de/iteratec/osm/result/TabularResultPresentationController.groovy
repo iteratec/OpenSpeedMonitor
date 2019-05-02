@@ -377,6 +377,7 @@ class TabularResultPresentationController {
                 property('connectivityProfile.bandwidthUp')
                 property('connectivityProfile.latency')
                 property('connectivityProfile.packetLoss')
+                property('jobResult')
             }
         }
 
@@ -388,6 +389,9 @@ class TabularResultPresentationController {
             row[8] = row[8]?.round(2).toString()
             // csByWptVisuallyCompleteInPercent
             row[23] = row[23]?.round(2).toString()
+            // get wptUrl
+            row[32] = row[32]?.wptServerBaseurl.toString() + "result/" + row[32]?.testId.toString() +
+                    "/" + row[19]?.toString() + "/details/#waterfall_view_step" + row[24]?.toString()
         }
         return result
     }
@@ -427,6 +431,7 @@ class TabularResultPresentationController {
         result << 'ConnectivityBandwithUp'
         result << 'ConnectivityLatency'
         result << 'ConnectivityPacketLoss'
+        result << 'WPTResultUrl'
         return result
     }
 }
