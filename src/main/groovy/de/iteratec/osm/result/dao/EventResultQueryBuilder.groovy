@@ -4,11 +4,9 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasurandGroup
+import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
-import de.iteratec.osm.result.dao.query.EventResultQueryExecutor
-import de.iteratec.osm.result.dao.query.MeasurandTrim
-import de.iteratec.osm.result.dao.query.ProjectionProperty
-import de.iteratec.osm.result.dao.query.TrimQualifier
+import de.iteratec.osm.result.dao.query.*
 import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
 import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
 import de.iteratec.osm.result.dao.query.projector.UserTimingAverageDataProjector
@@ -28,6 +26,7 @@ class EventResultQueryBuilder {
     private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
+    private AspectUtil aspectUtil
 
     private EventResultQueryExecutor measurandQueryExecutor = new EventResultQueryExecutor()
     private EventResultQueryExecutor userTimingQueryExecutor = new EventResultQueryExecutor()
@@ -36,6 +35,7 @@ class EventResultQueryBuilder {
         performanceLoggingService = new PerformanceLoggingService()
         filters.add(initBaseClosure())
         baseProjections = []
+        aspectUtil = new AspectUtil()
     }
 
     private Closure initBaseClosure() {
@@ -78,10 +78,12 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withJobGroupIdsIn(List<Long> jobGroupIds, boolean project = true) {
+        this.aspectUtil.setJobGroupIds(jobGroupIds)
         return withAssociatedDomainIdsIn(jobGroupIds, 'jobGroup', project)
     }
 
     EventResultQueryBuilder withPageIdsIn(List<Long> pageIds, boolean project = true) {
+        this.aspectUtil.setPageIds(pageIds)
         return withAssociatedDomainIdsIn(pageIds, 'page', project)
     }
 
@@ -98,15 +100,23 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
-        return withAssociatedDomainIdsIn(jobGroups.collect { it.ident() }, 'jobGroup', project)
+        List<Long> jobGroupIds = jobGroups.collect { it.ident() }
+        this.aspectUtil.setJobGroupIds(jobGroupIds)
+        return withAssociatedDomainIdsIn(jobGroupIds, 'jobGroup', project)
     }
 
     EventResultQueryBuilder withPageIn(List<Page> pages, boolean project = true) {
-        return withAssociatedDomainIdsIn(pages.collect { it.ident() }, 'page', project)
+        List<Long> pageIds = pages.collect { it.ident() }
+        this.aspectUtil.setPageIds(pageIds)
+        return withAssociatedDomainIdsIn(pageIds, 'page', project)
     }
 
     EventResultQueryBuilder withoutPagesIn(List<Page> pages) {
         return withAssociatedDomainIdsNotIn(pages.collect { it.ident() }, 'page')
+    }
+
+    EventResultQueryBuilder withPerformanceAspects(List<PerformanceAspectType> aspectTypes) {
+        this.aspectUtil.setAspectTypes(aspectTypes)
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
@@ -228,7 +238,21 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
+    private getResultsWithAspects() {
+
+    }
+
     private getResults() {
+
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - add missing aspect metrics', 3) {
+            aspectUtil.addMissingAspectMeasurands(userTimingQueryExecutor.selectedMeasurands) { SelectedMeasurand measurand ->
+                measurand.selectedType.isUserTiming()
+            }
+            aspectUtil.addMissingAspectMeasurands(measurandQueryExecutor.selectedMeasurands) { SelectedMeasurand measurand ->
+                !measurand.selectedType.isUserTiming()
+            }
+        }
+
         List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
         List<EventResultProjection> measurandResult = measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
 
