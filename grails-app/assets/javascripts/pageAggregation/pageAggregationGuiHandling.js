@@ -154,15 +154,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
     };
 
     var updateFilters = function (filterRules) {
-        filterRules = filterRules || [];
+        filterRules = filterRules || {};
         var $filterDropdownGroup = $("#filter-dropdown-group");
         var $customerJourneyHeader = $filterDropdownGroup.find("#customer-journey-header");
         var selectedFilter = getSelectedFilter();
         $filterDropdownGroup.find('.filterRule').remove();
         $filterDropdownGroup.toggleClass("hidden", false);
-        $customerJourneyHeader.toggleClass("hidden", !filterRules.length);
+        var filterRuleKeys = Object.keys(filterRules);
+        $customerJourneyHeader.toggleClass("hidden", !filterRuleKeys.length);
 
-        Object.keys(filterRules).forEach(function (filterRuleKey) {
+        filterRuleKeys.forEach(function (filterRuleKey) {
             var listItem = $("<li class='filterRule'><a href='#' class='chart-filter'><i class='fas fa-check' aria-hidden='true'></i>" + filterRuleKey + "</a></li>");
             var link = $("a", listItem);
             link.data('filter', filterRuleKey);
