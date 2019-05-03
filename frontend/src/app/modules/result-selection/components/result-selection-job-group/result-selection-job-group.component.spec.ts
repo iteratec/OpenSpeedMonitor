@@ -6,13 +6,24 @@ import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
 import { SharedService } from '../../services/sharedService';
-import { of } from 'rxjs';
+import { of, empty } from 'rxjs';
+import { By } from '@angular/platform-browser';
+import { copyAnimationEvent } from '@angular/animations/browser/src/render/shared';
 
 
 describe('ResultSelectionJobGroupComponent', () => {
   let component: ResultSelectionJobGroupComponent;
   let fixture: ComponentFixture<ResultSelectionJobGroupComponent>;
-  let resultSelectionService: ResultSelectionService;
+  const jobGroups = [new SelectableApplication({
+    id: 3,
+    name: 'test_Application',
+    tags: ['test','application']
+  }),
+  new SelectableApplication({
+    id: 1,
+    name: 'test2_Application',
+    tags: ['test2','application']
+  })];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -40,33 +51,20 @@ describe('ResultSelectionJobGroupComponent', () => {
   });
 
   it('should correctly show the tags according to the available job groups', () =>{
-    component.jobGroupMappings$ = of([new SelectableApplication({
-      id: 3,
-      name: 'test_Application',
-      tags: ['test','application']
-    }),
-    new SelectableApplication({
-      id: 1,
-      name: 'test2_Application',
-      tags: ['test2','application']
-    })])
-    let tags: string[] = ['test', 'application', 'test2'];
+    component.jobGroupMappings$ = of(jobGroups);
+    let tags: string[] = ['application','test','test2'];
 
     component.getJobGroupTags();
-    expect(component.selectableTags).toEqual(tags);
+    expect(component.selectableTags.sort()).toEqual(tags);
+
+    component.jobGroupMappings$ = of([]);
+    component.getJobGroupTags();
+    expect(component.selectableTags).toEqual([]);
+
   });
 
   it('should correctly show the job groups accordings to the selected tag',() => {
-    component.jobGroupMappings$ = of([new SelectableApplication({
-      id: 3,
-      name: 'test_Application',
-      tags: ['test','application']
-    }),
-    new SelectableApplication({
-      id: 1,
-      name: 'test2_Application',
-      tags: ['test2','application']
-    })])
+    component.jobGroupMappings$ = of(jobGroups);
     component.upadteJobGroups();
     component.getJobGroupTags();
     let tagJobGroupsMapping = getTagJobGroupsMapping(component.jobGroups, component.selectableTags);
@@ -85,21 +83,32 @@ describe('ResultSelectionJobGroupComponent', () => {
     component.filterByTag(component.selectableTags[2]);
     expect(component.filteredJobGroups).toEqual(component.jobGroups);
   });
-});
 
+  it('should show the no result message', ()=>{
+    const select = fixture.debugElement.query(By.css('select')).nativeElement;
+    
+    component.jobGroupMappings$ = of([]);
+    component.upadteJobGroups();
+    component.getJobGroupTags();
+    fixture.detectChanges();
+
+    expect(select.innerText.trim()).toEqual('frontend.de.iteratec.osm.resultSelection.jobGroup.noResults');
+    
+  })
+});
 function getTagJobGroupsMapping(jobGroups: SelectableApplication[], selectableTags: string[]): any{
   if(selectableTags){
-  let sortedJobGroups = [];
-  for(let i=1; i<=selectableTags.length; i++){
-    sortedJobGroups.push([]);
-  }
-  selectableTags.forEach(tag =>{
+    let sortedJobGroups = [];
+    for(let i=1; i<=selectableTags.length; i++){
+      sortedJobGroups.push([]);
+    }
+    selectableTags.forEach(tag =>{
     jobGroups.forEach(element => {
-    if(element.tags.indexOf(tag) > -1){
-      sortedJobGroups[selectableTags.indexOf(tag)].push(element);
-      }
-    })
-  });
-  return sortedJobGroups;
-}
+      if(element.tags.indexOf(tag) > -1){
+        sortedJobGroups[selectableTags.indexOf(tag)].push(element);
+        }
+      })
+    });
+    return sortedJobGroups;
+  }
 }
