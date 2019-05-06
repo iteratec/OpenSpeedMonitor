@@ -92,6 +92,7 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withBrowserIdsIn(List<Long> browserIds, boolean project = true) {
+        this.aspectUtil.setBrowserIds(browserIds)
         return withAssociatedDomainIdsIn(browserIds, 'browser', project)
     }
 
@@ -112,11 +113,14 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withoutPagesIn(List<Page> pages) {
-        return withAssociatedDomainIdsNotIn(pages.collect { it.ident() }, 'page')
+        List<Long> pageIds = pages.collect { it.ident() }
+        this.aspectUtil.removePageIds(pageIds)
+        return withAssociatedDomainIdsNotIn(pageIds, 'page')
     }
 
     EventResultQueryBuilder withPerformanceAspects(List<PerformanceAspectType> aspectTypes) {
         this.aspectUtil.setAspectTypes(aspectTypes)
+        return this
     }
 
     EventResultQueryBuilder withCachedView(CachedView cachedView) {
@@ -238,19 +242,10 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
-    private getResultsWithAspects() {
-
-    }
-
     private getResults() {
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - add missing aspect metrics', 3) {
-            aspectUtil.addMissingAspectMeasurands(userTimingQueryExecutor.selectedMeasurands) { SelectedMeasurand measurand ->
-                measurand.selectedType.isUserTiming()
-            }
-            aspectUtil.addMissingAspectMeasurands(measurandQueryExecutor.selectedMeasurands) { SelectedMeasurand measurand ->
-                !measurand.selectedType.isUserTiming()
-            }
+        if (this.aspectUtil.aspectsIncluded()) {
+            aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
         }
 
         List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
@@ -259,6 +254,15 @@ class EventResultQueryBuilder {
         List<EventResultProjection> merged
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - merge results', 3) {
             merged = mergeResults(measurandResult, userTimingsResult)
+        }
+
+        if (this.aspectUtil.aspectsIncluded()) {
+            try {
+                aspectUtil.expandByAspectMetrics(merged)
+            } catch (IllegalStateException e) {
+                log.error(e.getMessage(), e)
+                return []
+            }
         }
 
         return merged
