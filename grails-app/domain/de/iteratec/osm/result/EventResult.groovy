@@ -112,6 +112,10 @@ class EventResult implements CsiValue, RepresentableWptResult {
     // from JobResult
     Date jobResultDate
     Long jobResultJobConfigId
+
+    // from Location
+    OperatingSystem operatingSystem
+    DeviceType deviceType
     /**
      * This result was measured with a predefined connectivity profile.
      *
@@ -185,6 +189,10 @@ class EventResult implements CsiValue, RepresentableWptResult {
         // from JobResult
         jobResultDate(nullable: false)
         jobResultJobConfigId(nullable: false)
+
+        //from Location
+        operatingSystem(nullable: false)
+        deviceType(nullable: false)
 
         testAgent(nullable: true)
 

@@ -6,7 +6,7 @@
 <data>
 <location>
 <id>Agent1-urlblast</id>
-<Label>WPT 2.8 mobile Agent 1</Label>
+<Label>WPT Samsung 2.8 mobile Agent 1</Label>
 <location>Agent1-urlblast</location>
 <Browser>IE</Browser>
 <relayServer></relayServer>
@@ -31,7 +31,7 @@
 </location>
 <location>
 <id>Agent1-wptdriver:Chrome</id>
-<Label>WPT 2.8 mobile Agent 1</Label>
+<Label>WPT SamsungTab 2.8 mobile Agent 1</Label>
 <location>Agent1-wptdriver</location>
 <Browser>Chrome</Browser>
 <relayServer></relayServer>
@@ -55,7 +55,7 @@
 </location>
 <location>
 <id>Agent1-wptdriver:Firefox</id>
-<Label>WPT 2.8 mobile Agent 1</Label>
+<Label>WPT 2.8 nuc Agent 1</Label>
 <location>Agent1-wptdriver</location>
 <Browser>Firefox</Browser>
 <relayServer></relayServer>
@@ -79,7 +79,7 @@
 </location>
 <location>
 <id>Agent2-ios</id>
-<Label>WPT 2.8 mobile Agent 2 (iOS)</Label>
+<Label>WPT 2.8 iPad Agent 2 (iOS)</Label>
 <location>Agent2-ios</location>
 <Browser>IE</Browser>
 <relayServer></relayServer>
@@ -103,7 +103,7 @@
 </location>
 <location>
 <id>Agent3-ios</id>
-<Label>WPT 2.8 mobile Agent 3 (iOS)</Label>
+<Label>WPT 2.8 iPhone Agent 3 (iOS)</Label>
 <location>Agent3-ios</location>
 <Browser>IE</Browser>
 <relayServer></relayServer>

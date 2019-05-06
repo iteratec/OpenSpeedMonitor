@@ -21,6 +21,8 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.result.DeviceType
+import de.iteratec.osm.result.OperatingSystem
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -67,7 +69,9 @@ class LocationPersisterService implements iLocationListener {
                             browser: browserForLocation,
                             wptServer: wptserverForLocation,
                             dateCreated: new Date(),
-                            lastUpdated: new Date()
+                            lastUpdated: new Date(),
+                            deviceType: parseDeviceType(locationTagInXml.Label.toString()),
+                            operatingSystem: parseOperatingSystem(locationTagInXml.Label.toString())
                     ).save(failOnError: true)
                     addedLocations << newLocation
                     log.info("new location written while fetching locations: ${newLocation}")
@@ -97,6 +101,38 @@ class LocationPersisterService implements iLocationListener {
                 currentLocation.active = false
                 currentLocation.save(failOnError: true)
             }
+        }
+    }
+
+    /**
+     * Parses the location label to determine the possible device type
+     * @param label location label for wptServer
+     */
+    DeviceType parseDeviceType(String label) {
+        switch (label) {
+            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc).*/ :
+                return DeviceType.DESKTOP
+            case ~/(?i).*(Pad|Tab|Note|Xoom|Book|Tablet).*/ :
+                return DeviceType.TABLET
+            case ~/(?i)(?!(.*(Pad|Tab|Note|Xoom|Book|Tablet).*)).*(Samsung|Moto|Sony|Nexus|Huawei|Nokia|Alcatel|LG|OnePlus|HTC|Phone).*/ :
+                return DeviceType.SMARTPHONE
+            default: return DeviceType.UNDEFINED
+        }
+    }
+
+    /**
+     * Parses the location label to determine the possible operating system
+     * @param label location label for wptServer
+     */
+    OperatingSystem parseOperatingSystem(String label) {
+        switch (label) {
+            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc).*/ :
+                return OperatingSystem.WINDOWS
+            case ~/(?i)(?!(.*(Android|Desktop).*)).*(ios|iphone|ipad).*/ :
+                return OperatingSystem.IOS
+            case ~/(?i).*(Samsung|Moto|Sony|Nexus|Huawei|Nokie|LG|HTC|Alcatel|OnePlus).*/ :
+                return OperatingSystem.ANDROID
+            default: return OperatingSystem.UNKOWN
         }
     }
 }

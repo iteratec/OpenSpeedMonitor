@@ -91,6 +91,7 @@ class Location {
 
     @Override
     String toString() {
-        return this.location + ' @ ' + this.wptServer?.label + ' (' + this.browser?.name + ')'
+        return this.location + ' @ ' + this.wptServer?.label + ' (' + this.browser?.name +
+                ' | ' + this.deviceType + ' | ' + this.operatingSystem +')'
     }
 }
