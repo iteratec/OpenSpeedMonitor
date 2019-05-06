@@ -23,15 +23,7 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
     resultSelectionService = TestBed.get(ResultSelectionService);
     fixture = TestBed.createComponent(ResultSelectionPageLocationConnectivityComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('should show selectable pages and events', () => {
-    fixture.debugElement.query(By.css('#pageAndEventTab')).nativeElement.click();
     resultSelectionService.eventsAndPages$.next([
       {
         id: 100,
@@ -58,13 +50,6 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
         }
       }
     ]);
-    fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#result-selection-page-selection option')).length).toBe(2);
-    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items.length).toBe(3);
-  });
-
-  it('should show selectable browser and locations', () => {
-    fixture.debugElement.query(By.css('#browserAndLocationTab')).nativeElement.click();
     resultSelectionService.locationsAndBrowsers$.next([
       {
         id: 100,
@@ -78,7 +63,7 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
         id: 101,
         name: "prod-location-2",
         parent: {
-          id: 2,
+          id: 1,
           name: "Chrome"
         }
       },
@@ -86,18 +71,11 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
         id: 102,
         name: "prod-location-3",
         parent: {
-          id: 1,
+          id: 2,
           name: "Firefox"
         }
       }
     ]);
-    fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#result-selection-browser-selection option')).length).toBe(2);
-    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.length).toBe(3);
-  });
-
-  it('should show selectable connectivities', () => {
-    fixture.debugElement.query(By.css('#connectivityTab')).nativeElement.click();
     resultSelectionService.connectivities$.next([
       {
         id: 1,
@@ -108,8 +86,62 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
         name: "UMTS",
       }
     ]);
+
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should show selectable pages and events', () => {
+    fixture.debugElement.query(By.css('#pageAndEventTab')).nativeElement.click();
+    fixture.detectChanges();
+    expect(fixture.debugElement.queryAll(By.css('#result-selection-page-selection option')).length).toBe(2);
+    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items.length).toBe(3);
+  });
+
+  it('should show selectable browser and locations', () => {
+    fixture.debugElement.query(By.css('#browserAndLocationTab')).nativeElement.click();
+    fixture.detectChanges();
+    expect(fixture.debugElement.queryAll(By.css('#result-selection-browser-selection option')).length).toBe(2);
+    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.length).toBe(3);
+  });
+
+  it('should show selectable connectivities', () => {
+    fixture.debugElement.query(By.css('#connectivityTab')).nativeElement.click();
     fixture.detectChanges();
     expect(fixture.debugElement.queryAll(By.css('#result-selection-connectivity-selection option')).length).toBe(2);
+  });
+
+  it('should correctly show available items according to selections', () => {
+    fixture.debugElement.query(By.css('#pageAndEventTab')).nativeElement.click();
+    fixture.detectChanges();
+    let selectElement = fixture.debugElement.query(By.css('#result-selection-page-selection')).nativeElement;
+    selectElement.value = selectElement.options[0].value;
+    selectElement.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(component.selectedPages).toEqual([2]);
+    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items.length).toBe(1);
+    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items[0].id).toBe(101);
+
+    fixture.debugElement.query(By.css('#browserAndLocationTab')).nativeElement.click();
+    fixture.detectChanges();
+    selectElement = fixture.debugElement.query(By.css('#result-selection-browser-selection')).nativeElement;
+    selectElement.value = selectElement.options[0].value;
+    selectElement.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(component.selectedBrowsers).toEqual([1]);
+    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.length).toBe(2);
+    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.map(item => item.id)).toEqual([100, 101]);
+
+    fixture.debugElement.query(By.css('#connectivityTab')).nativeElement.click();
+    fixture.detectChanges();
+    selectElement = fixture.debugElement.query(By.css('#result-selection-connectivity-selection')).nativeElement;
+    selectElement.value = selectElement.options[0].value;
+    selectElement.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+    expect(component.selectedConnectivities).toEqual([1]);
   });
 
 });
