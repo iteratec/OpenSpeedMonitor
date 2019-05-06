@@ -1,10 +1,8 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
 import {PerformanceAspect} from "../../../../../models/perfomance-aspect.model";
-import {TranslateService} from "@ngx-translate/core";
 import {ReplaySubject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 import {SelectableMeasurand} from "../../../../../models/measurand.model";
-import {ApplicationService} from "../../../../../services/application.service";
 
 @Component({
   selector: 'osm-performance-aspect-inspect',
@@ -13,51 +11,30 @@ import {ApplicationService} from "../../../../../services/application.service";
 })
 export class PerformanceAspectInspectComponent implements OnInit, OnChanges {
   @Input() performanceAspectWrapped: ResponseWithLoadingState<PerformanceAspect>;
-  selectedMetric$: ReplaySubject<SelectableMeasurand> = new ReplaySubject<SelectableMeasurand>();
-  editMode: boolean = false;
-  performanceAspectInEditing: PerformanceAspect;
+  @Output() onSelect: EventEmitter<PerformanceAspect> = new EventEmitter<PerformanceAspect>();
+  metric$: ReplaySubject<SelectableMeasurand> = new ReplaySubject<SelectableMeasurand>();
 
-  constructor(private translateService: TranslateService, private applicationService: ApplicationService) {
+  constructor() {
   }
 
   ngOnInit() {
     if(this.performanceAspectWrapped){
-      this.setAspectInEditing();
       this.updateSelectedMetric();
     }
   }
 
   ngOnChanges(){
     if(this.performanceAspectWrapped){
-      this.setAspectInEditing();
       this.updateSelectedMetric();
     }
   }
 
   private updateSelectedMetric() {
-    this.selectedMetric$.next(this.performanceAspectWrapped.data.measurand);
-  }
-
-  private setAspectInEditing() {
-    this.performanceAspectInEditing = Object.assign({}, this.performanceAspectWrapped.data);
-  }
-
-  edit() {
-    this.setAspectInEditing();
-    this.editMode = true;
-  }
-
-  cancel() {
-    this.setAspectInEditing();
-    this.editMode = false;
-  }
-
-  save() {
-    this.applicationService.createOrUpdatePerformanceAspect(this.performanceAspectInEditing);
-    this.editMode = false;
+    this.metric$.next(this.performanceAspectWrapped.data.measurand);
   }
 
   selectMeasurandForAspect(measurand: SelectableMeasurand) {
-    this.performanceAspectInEditing.measurand = measurand;
+    this.performanceAspectWrapped.data.measurand = measurand;
+    this.onSelect.emit(this.performanceAspectWrapped.data);
   }
 }

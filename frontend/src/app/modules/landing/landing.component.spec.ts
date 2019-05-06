@@ -8,7 +8,6 @@ import {By} from "@angular/platform-browser";
 import {Application} from "../../models/application.model";
 import {CsiValueSmallComponent} from "../shared/components/csi-value/csi-value-small/csi-value-small.component";
 import {ApplicationCsi} from "../../models/application-csi.model";
-import { of } from 'rxjs';
 
 describe('LandingComponent', () => {
   let component: LandingComponent;
@@ -79,40 +78,55 @@ describe('LandingComponent', () => {
     expect(fixture.debugElement.query(By.css(".clickable-list"))).toBeTruthy();
     const links = fixture.debugElement.queryAll(By.css(".clickable-list a"));
     expect(links.length).toBe(2);
-    expect(links[0].nativeElement.href).toMatch(".*/applicationDashboard/1");
-    expect(links[0].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestOne");
+
+    const linkHrefs = [".*/applicationDashboard/1", ".*/applicationDashboard/2"];
+    const linkTitles = ["TestOne", "TestTwo"];
+    expect(links.some(element => element.nativeElement.href.match(linkHrefs[0])));
+    expect(links.some(element => element.query(By.css(".title")).nativeElement.textContent.trim().match(linkTitles[0])));
+    expect(links.some(element => element.nativeElement.href.match(linkHrefs[1])));
+    expect(links.some(element => element.query(By.css(".title")).nativeElement.textContent.trim().match(linkTitles[1])));
     expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeTruthy();
-    expect(links[1].nativeElement.href).toMatch(".*/applicationDashboard/2");
-    expect(links[1].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestTwo");
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeTruthy();
   });
 
-  it('should show a list of applications if existing, with CSI values', () => {
+  it('should show a list of applications if existing, with CSI values (in descending order)', () => {
     applicationService.applications$.next({
       isLoading: false,
       data: [
         new Application({id: 1, name: "TestOne"}),
-        new Application({id: 2, name: "TestTwo"})
+        new Application({id: 2, name: "TestTwo"}),
+        new Application({id: 3, name: "TestThree"}),
+        new Application({id: 4, name: "TestFour"})
       ]
     });
     applicationService.applicationCsiById$.next({
       isLoading: false,
       1: new ApplicationCsi({csiValues: [{csiDocComplete: 50}, {csiDocComplete: 60}]}),
-      2: new ApplicationCsi({csiValues: [{csiDocComplete: 60}, {csiDocComplete: 70}]})
+      2: new ApplicationCsi({csiValues: [{csiDocComplete: 60}, {csiDocComplete: 70}]}),
+      3: new ApplicationCsi({csiValues: [{csiDocComplete: 70}, {csiDocComplete: 80}]}),
+      4: new ApplicationCsi({csiValues: []})
     });
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css("main")).classes.center).toBeFalsy();
     expect(fixture.debugElement.query(By.css(".clickable-list"))).toBeTruthy();
     const links = fixture.debugElement.queryAll(By.css(".clickable-list a"));
-    expect(links.length).toBe(2);
-    expect(links[0].nativeElement.href).toMatch(".*/applicationDashboard/1");
-    expect(links[0].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestOne");
+    expect(links.length).toBe(4);
+    expect(links[0].nativeElement.href).toMatch(".*/applicationDashboard/3");
+    expect(links[0].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestThree");
     expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
-    expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(60);
+    expect(links[0].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(80);
     expect(links[1].nativeElement.href).toMatch(".*/applicationDashboard/2");
     expect(links[1].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestTwo");
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
     expect(links[1].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(70);
+    expect(links[2].nativeElement.href).toMatch(".*/applicationDashboard/1");
+    expect(links[2].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestOne");
+    expect(links[2].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
+    expect(links[2].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(60);
+    expect(links[3].nativeElement.href).toMatch(".*/applicationDashboard/4");
+    expect(links[3].query(By.css(".title")).nativeElement.textContent.trim()).toEqual("TestFour");
+    expect(links[3].query(By.directive(CsiValueSmallComponent)).componentInstance.showLoading).toBeFalsy();
+    expect(links[3].query(By.directive(CsiValueSmallComponent)).componentInstance.csiValue).toEqual(undefined);
   });
 
   it('should show a button to view all jobs', () => {

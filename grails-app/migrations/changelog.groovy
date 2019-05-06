@@ -75,4 +75,5 @@ databaseChangeLog = {
     include file: '2018-11-19-v500-job-group-graphite-servers.groovy'
     include file: '2018-12-12-v500-nullable-job-result-label.groovy'
     include file: '2019-03-13-v511-add-performance-aspect.groovy'
+    include file: '2019-04-30-v512-browser-in-perf-aspect.groovy'
 }
