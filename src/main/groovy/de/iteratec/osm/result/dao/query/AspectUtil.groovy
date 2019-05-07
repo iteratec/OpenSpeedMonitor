@@ -9,6 +9,8 @@ import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import org.grails.datastore.mapping.query.api.Criteria
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * Utility for querying {@link PerformanceAspectType} metrics via {@link de.iteratec.osm.result.dao.EventResultQueryBuilderQueryBuilder}.
@@ -16,10 +18,13 @@ import org.grails.datastore.mapping.query.api.Criteria
  */
 class AspectUtil {
 
+    static Logger log = LoggerFactory.getLogger(this)
+
     List<Long> jobGroupIds = []
     List<Long> pageIds = []
     List<Long> browserIds = []
     List<PerformanceAspectType> aspectTypes = []
+    List<SelectedMeasurand> metrics = []
 
     List<PerformanceAspect> usedAspects = []
     List<SelectedMeasurand> addedMetrics = []
@@ -93,6 +98,44 @@ class AspectUtil {
         }
     }
 
+    /**
+     * Groups given raw data projections by {@link JobGroup}, {@link Page} and {@Browser}, respective what was queried
+     * in builder. Calculates averages for all queried metrics inclusive {@link PerformanceAspectType} metrics.
+     * @param rawData
+     * {@link EventResultProjection}s queried via builder as raw data.
+     * @return List of aggregated projections with calculated averages.
+     */
+    public List<EventResultProjection> getAverageFrom(List<EventResultProjection> rawData) {
+        return rawData.groupBy { EventResultProjection resultProjection ->
+            StringBuilder b = new StringBuilder()
+            if (this.jobGroupIds) b.append("_${resultProjection.projectedProperties.jobGroupId}")
+            if (this.pageIds) b.append("_${resultProjection.projectedProperties.pageId}")
+            if (this.browserIds) b.append("_${resultProjection.projectedProperties.browserId}")
+            return b.toString()
+        }.collect { groupId, groupProjections ->
+            Map projectedProperties = [:]
+            if (this.jobGroupIds) projectedProperties["jobGroupId"] = groupProjections.projectedProperties.jobGroupId[0]
+            if (this.pageIds) projectedProperties["pageId"] = groupProjections.projectedProperties.pageId[0]
+            if (this.browserIds) projectedProperties["browserId"] = groupProjections.projectedProperties.browserId[0]
+            this.metrics.each { SelectedMeasurand metric ->
+                addAverageToMap(projectedProperties, groupProjections, metric.getDatabaseRelevantName())
+            }
+            this.aspectTypes.each { PerformanceAspectType type ->
+                addAverageToMap(projectedProperties, groupProjections, type.toString())
+            }
+            return new EventResultProjection(id: groupId, projectedProperties: projectedProperties)
+        }
+    }
+
+    private addAverageToMap(Map propertiesMap, List<EventResultProjection> projections, String metricName) {
+        List<Map> propMapsWithMetric = projections*.projectedProperties.findAll {
+            it[metricName]
+        }
+        if (propMapsWithMetric.size() == 0) return
+        List metricValues = propMapsWithMetric*."${metricName}"
+        propertiesMap[metricName] = metricValues.sum() / metricValues.size()
+    }
+
     private List<PerformanceAspect> getAspects() {
         if (this.aspectTypes.size() == 0) return []
         Criteria criteria = PerformanceAspect.createCriteria()
@@ -121,14 +164,14 @@ class AspectUtil {
     }
 
     private List<Long> getQueriedJobGroupIds() {
-        return this.jobGroupIds ?: JobGroup.list().collect(it.ident())
+        return this.jobGroupIds ?: JobGroup.list().collect { it.ident() }
     }
 
     private List<Long> getQueriedPageIds() {
-        return this.pageIds ?: Page.list().collect(it.ident())
+        return this.pageIds ?: Page.list().collect { it.ident() }
     }
 
     private List<Long> getQueriedBrowserIds() {
-        return this.browserIds ?: Browser.list().collect(it.ident())
+        return this.browserIds ?: Browser.list().collect { it.ident() }
     }
 }

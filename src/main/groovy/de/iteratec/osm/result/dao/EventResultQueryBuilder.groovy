@@ -18,15 +18,26 @@ import de.iteratec.osm.result.dao.query.trimmer.UserTimingDataTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
 /**
  * Created by mwg on 31.08.2017.
  */
 class EventResultQueryBuilder {
+
+    static Logger log = LoggerFactory.getLogger(this)
+
     private List<Closure> filters = []
     private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
     private AspectUtil aspectUtil
+    public enum MetaDataSet {
+        NONE,
+        COMPLETE,
+        ASPECT
+    }
 
     private EventResultQueryExecutor measurandQueryExecutor = new EventResultQueryExecutor()
     private EventResultQueryExecutor userTimingQueryExecutor = new EventResultQueryExecutor()
@@ -47,25 +58,38 @@ class EventResultQueryBuilder {
         }
     }
 
-    private List<ProjectionProperty> getRichMetaDataProjections() {
-        return [
-                new ProjectionProperty(dbName: 'id', alias: 'id'),
-                new ProjectionProperty(dbName: 'jobResult.wptServerBaseurl', alias: 'wptServerBaseurl'),
-                new ProjectionProperty(dbName: 'jobResult.testId', alias: 'testId'),
-                new ProjectionProperty(dbName: 'numberOfWptRun', alias: 'numberOfWptRun'),
-                new ProjectionProperty(dbName: 'cachedView', alias: 'cachedView'),
-                new ProjectionProperty(dbName: 'oneBasedStepIndexInJourney', alias: 'oneBasedStepIndexInJourney'),
-                new ProjectionProperty(dbName: 'connectivityProfile.name', alias: 'connectivityProfile'),
-                new ProjectionProperty(dbName: 'customConnectivityName', alias: 'customConnectivityName'),
-                new ProjectionProperty(dbName: 'noTrafficShapingAtAll', alias: 'noTrafficShapingAtAll'),
-                new ProjectionProperty(dbName: 'jobResultDate', alias: 'jobResultDate'),
-                new ProjectionProperty(dbName: 'testAgent', alias: 'testAgent'),
-                new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
-                new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
-                new ProjectionProperty(dbName: 'measuredEvent.id', alias: 'measuredEventId'),
-                new ProjectionProperty(dbName: 'location.id', alias: 'locationId'),
-                new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
-        ]
+    private List<ProjectionProperty> getMetaDataProjections(MetaDataSet dataSet) {
+        switch (dataSet) {
+            case MetaDataSet.COMPLETE:
+                return [
+                        new ProjectionProperty(dbName: 'id', alias: 'id'),
+                        new ProjectionProperty(dbName: 'jobResult.wptServerBaseurl', alias: 'wptServerBaseurl'),
+                        new ProjectionProperty(dbName: 'jobResult.testId', alias: 'testId'),
+                        new ProjectionProperty(dbName: 'numberOfWptRun', alias: 'numberOfWptRun'),
+                        new ProjectionProperty(dbName: 'cachedView', alias: 'cachedView'),
+                        new ProjectionProperty(dbName: 'oneBasedStepIndexInJourney', alias: 'oneBasedStepIndexInJourney'),
+                        new ProjectionProperty(dbName: 'connectivityProfile.name', alias: 'connectivityProfile'),
+                        new ProjectionProperty(dbName: 'customConnectivityName', alias: 'customConnectivityName'),
+                        new ProjectionProperty(dbName: 'noTrafficShapingAtAll', alias: 'noTrafficShapingAtAll'),
+                        new ProjectionProperty(dbName: 'jobResultDate', alias: 'jobResultDate'),
+                        new ProjectionProperty(dbName: 'testAgent', alias: 'testAgent'),
+                        new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
+                        new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
+                        new ProjectionProperty(dbName: 'measuredEvent.id', alias: 'measuredEventId'),
+                        new ProjectionProperty(dbName: 'location.id', alias: 'locationId'),
+                        new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
+                ]
+            case MetaDataSet.NONE:
+                return []
+            case MetaDataSet.ASPECT:
+                return [
+                        new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
+                        new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
+                        new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
+                ]
+            default:
+                return []
+        }
     }
 
     EventResultQueryBuilder withJobResultDateBetween(Date from, Date to) {
@@ -172,7 +196,7 @@ class EventResultQueryBuilder {
     private EventResultQueryBuilder withAssociatedDomainIdsNotIn(List<Long> associatedDomainIds, String associatedDomainFieldName) {
         if (associatedDomainIds) {
             Closure filterClosure = {
-                not {'in' "${associatedDomainFieldName}.id", associatedDomainIds}
+                not { 'in' "${associatedDomainFieldName}.id", associatedDomainIds }
             }
             filters.add(filterClosure)
         }
@@ -188,16 +212,16 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withSelectedMeasurands(List<SelectedMeasurand> selectedMeasurands) {
 
+        this.aspectUtil.setMetrics(selectedMeasurands)
+
         measurandQueryExecutor.setMeasurands(selectedMeasurands)
         userTimingQueryExecutor.setUserTimings(selectedMeasurands)
 
         return this
     }
 
-    List<EventResultProjection> getRawData(boolean withRichMetaData= true) {
-        if(withRichMetaData){
-            baseProjections.addAll(getRichMetaDataProjections())
-        }
+    List<EventResultProjection> getRawData(MetaDataSet metaDataSet = MetaDataSet.COMPLETE) {
+        baseProjections.addAll(getMetaDataProjections(metaDataSet))
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandRawDataTransformer())
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
@@ -208,7 +232,7 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
-    List<EventResultProjection> getMedianData(){
+    List<EventResultProjection> getMedianData() {
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
@@ -230,7 +254,16 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
-    List<EventResultProjection> getAverageData(){
+    List<EventResultProjection> getAverageData() {
+        if (this.aspectUtil.aspectsIncluded()) {
+            List<EventResultProjection> rawData = getRawData(MetaDataSet.ASPECT)
+            return this.aspectUtil.getAverageFrom(rawData)
+        } else {
+            return getAverageDataWithoutAspects()
+        }
+    }
+
+    List<EventResultProjection> getAverageDataWithoutAspects() {
         measurandQueryExecutor.setProjector(new MeasurandAverageDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandAverageDataTransformer(baseProjections: baseProjections))
         measurandQueryExecutor.setTrimmer(new MeasurandAverageDataTrimmer())
@@ -242,7 +275,7 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
-    private getResults() {
+    private List<EventResultProjection> getResults() {
 
         if (this.aspectUtil.aspectsIncluded()) {
             aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)

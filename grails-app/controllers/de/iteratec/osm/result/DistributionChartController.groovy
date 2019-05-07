@@ -188,7 +188,7 @@ class DistributionChartController extends ExceptionHandlerController {
                 .withSelectedMeasurands([selectedMeasurand])
                 .withPageIn(allPages)
                 .withJobGroupIn(allJobGroups)
-                .getRawData(false)
+                .getRawData(EventResultQueryBuilder.MetaDataSet.NONE)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
