@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
@@ -62,6 +63,7 @@ class BarchartAggregationService {
                 .withJobResultDateBetween(from, to)
                 .withSelectedMeasurands(selectedMeasurands)
                 .withJobGroupIn(jobGroups)
+                .withDeviceTypes([DeviceType.TABLET])
 
         if (pages){
             queryBuilder = queryBuilder.withPageIn(pages)

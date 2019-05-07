@@ -3,7 +3,9 @@ package de.iteratec.osm.result.dao
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.MeasurandGroup
+import de.iteratec.osm.result.OperatingSystem
 import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.query.*
@@ -18,6 +20,7 @@ import de.iteratec.osm.result.dao.query.trimmer.UserTimingDataTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
+
 /**
  * Created by mwg on 31.08.2017.
  */
@@ -64,7 +67,9 @@ class EventResultQueryBuilder {
                 new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
                 new ProjectionProperty(dbName: 'measuredEvent.id', alias: 'measuredEventId'),
                 new ProjectionProperty(dbName: 'location.id', alias: 'locationId'),
-                new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
+                new ProjectionProperty(dbName: 'browser.id', alias: 'browserId'),
+                new ProjectionProperty(dbName: 'deviceType', alias: 'deviceType'),
+                new ProjectionProperty(dbName: 'operatingSystem', alias: 'operatingSystem')
         ]
     }
 
@@ -97,6 +102,30 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withMeasuredEventIdsIn(List<Long> measuredEventIds, boolean project = true) {
         return withAssociatedDomainIdsIn(measuredEventIds, 'measuredEvent', project)
+    }
+
+    EventResultQueryBuilder withOperatingSystems(List<OperatingSystem> operatingSystems, boolean project = true) {
+        if (operatingSystems) {
+            filters.add({
+                'in'('operatingSystem', operatingSystems)
+            })
+            if (project) {
+                baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName + '.id', alias: associatedDomainFieldName + 'Id'))
+            }
+        }
+        return this
+    }
+
+    EventResultQueryBuilder withDeviceTypes(List<DeviceType> deviceTypes, boolean project = true) {
+        if (deviceTypes) {
+            filters.add({
+                'in'('deviceType', deviceTypes)
+            })
+            if (project) {
+                baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
+            }
+        }
+        return this
     }
 
     EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
@@ -168,7 +197,7 @@ class EventResultQueryBuilder {
     private EventResultQueryBuilder withAssociatedDomainIdsNotIn(List<Long> associatedDomainIds, String associatedDomainFieldName) {
         if (associatedDomainIds) {
             Closure filterClosure = {
-                not {'in' "${associatedDomainFieldName}.id", associatedDomainIds}
+                not { 'in' "${associatedDomainFieldName}.id", associatedDomainIds }
             }
             filters.add(filterClosure)
         }
@@ -190,8 +219,8 @@ class EventResultQueryBuilder {
         return this
     }
 
-    List<EventResultProjection> getRawData(boolean withRichMetaData= true) {
-        if(withRichMetaData){
+    List<EventResultProjection> getRawData(boolean withRichMetaData = true) {
+        if (withRichMetaData) {
             baseProjections.addAll(getRichMetaDataProjections())
         }
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
@@ -204,7 +233,7 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
-    List<EventResultProjection> getMedianData(){
+    List<EventResultProjection> getMedianData() {
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
@@ -226,7 +255,7 @@ class EventResultQueryBuilder {
         return getResults()
     }
 
-    List<EventResultProjection> getAverageData(){
+    List<EventResultProjection> getAverageData() {
         measurandQueryExecutor.setProjector(new MeasurandAverageDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandAverageDataTransformer(baseProjections: baseProjections))
         measurandQueryExecutor.setTrimmer(new MeasurandAverageDataTrimmer())
