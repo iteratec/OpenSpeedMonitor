@@ -312,8 +312,8 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
             WebPageTestServer wpt = WebPageTestServer.build(label: "TestWPTServer-564892#Afef1", proxyIdentifier: "TestIdentifier", active: true, baseUrl: "http://internet.de")
 
             Browser browser = Browser.build(name: "This is the very best browser I've ever seen")
-            Location location1 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location1Name, browser: browser, active: true)
-            Location location2 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location2Name, browser: browser, active: true)
+            Location location1 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location1Name, browser: browser, deviceType: DeviceType.DESKTOP, operatingSystem: OperatingSystem.WINDOWS, active: true)
+            Location location2 = Location.build(wptServer: wpt, uniqueIdentifierForServer: location2Name, browser: browser, deviceType: DeviceType.DESKTOP, operatingSystem: OperatingSystem.WINDOWS, active: true)
             Job job1 = Job.build(label: job1Name, script: script1, location: location1, jobGroup: jobGroup1, description: "This is the first test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
             Job job2 = Job.build(label: job2Name, script: script2, location: location2, jobGroup: jobGroup1, description: "This is the second test job", runs: 1, active: false, maxDownloadTimeInMinutes: 12)
 
@@ -357,7 +357,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
             new EventResult(
                     numberOfWptRun: 1,
@@ -388,7 +390,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
 
             new EventResult(
@@ -420,7 +424,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
 
             new EventResult(
@@ -451,7 +457,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
 
             new EventResult(
@@ -482,7 +490,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
 
             new EventResult(
@@ -513,7 +523,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
 
             new EventResult(
@@ -544,7 +556,9 @@ class EventResultDashboardAdjustChartGebSpec extends CustomUrlGebReportingSpec i
                     jobGroup: jobGroup1,
                     page: measuredEvent1.testedPage,
                     browser: browser,
-                    location: location1
+                    location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem
             ).save()
 
             new ResultSelectionInformation(
