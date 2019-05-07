@@ -86,7 +86,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
         window.setTimeout(function () {
             setBrowsers(state);
             loadedState = encodedState;
-            if (state.selectedFolder && state.selectedPages) {
+            if (state.selectedFolder) {
                 $(window).trigger("historyStateLoaded");
             }
         }, 1000);
