@@ -14,6 +14,7 @@ class EventResultQueryExecutor {
     private EventResultTrimmer trimmer
     List<SelectedMeasurand> selectedMeasurands
 
+
     void setUserTimings(List<SelectedMeasurand> selectedMeasurands) {
         this.selectedMeasurands = selectedMeasurands.findAll { it.selectedType.isUserTiming() }
     }

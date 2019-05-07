@@ -89,7 +89,6 @@ class JobController {
         }
         def model = [
                 jobs                                           : jobs,
-                jobsWithTags                                   : jobService.listJobsWithTags(),
                 filters                                        : params.filters,
                 measurementsEnabled                            : inMemoryConfigService.areMeasurementsGenerallyEnabled(),
                 lastNMinutesToShowSuccessfulResultsInJoblist   : LAST_N_MINUTES_TO_SHOW_SUCCESSFUL_RESULTS_IN_JOBLIST,

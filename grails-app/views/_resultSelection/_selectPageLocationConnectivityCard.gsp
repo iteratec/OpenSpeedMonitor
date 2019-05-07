@@ -21,8 +21,10 @@ A card to select page & measured step, browser & location, and the connectivity
     <ul class="nav nav-tabs">
         <li class="active" id="filter-navtab-page">
             <a href="#page-tab" data-toggle="tab">
-                <g:message code="de.iteratec.osm.result.page.label" default="Page"/>&nbsp;|&nbsp;<g:message
-                        code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
+                <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
+                <g:if test="${!hideMeasuredEventForm}">
+                            &nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
+                </g:if>
             </a>
         </li>
         <li id="filter-navtab-browser-and-location">
@@ -53,6 +55,7 @@ A card to select page & measured step, browser & location, and the connectivity
                     selectedMeasuredEventIds : selectedMeasuredEventIds,
                     selectedAllMeasuredEvents: selectedAllMeasuredEvents,
                     eventsOfPages            : eventsOfPages,
+                    isOptional               : pageIsOptional
             ]"/>
         </div>
     </g:if>
