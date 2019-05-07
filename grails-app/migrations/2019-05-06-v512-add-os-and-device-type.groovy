@@ -107,11 +107,12 @@ databaseChangeLog = {
             WHERE label REGEXP '(?i).*(Samsung|Moto|Sony|Nexus|Huawei|Nokie|LG|HTC|Alcatel|OnePlus).*';
         ''')
     }
+
     changeSet(author: "pal", id: "Task-11_populate_device_type_event_result") {
         sql('''
-               UPDATE event_result e, location l 
-               SET e.device_type = l.device_type, e.operating_system = l.operating_system 
-               WHERE e.location_id = l.id;
+            UPDATE event_result e
+            SET e.device_type = (SELECT l.device_type FROM location l WHERE l.id = e.location_id), 
+                e.operating_system = (SELECT l.operating_system FROM location l WHERE l.id = e.location_id);
         ''')
     }
 }
