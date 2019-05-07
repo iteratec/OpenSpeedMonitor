@@ -11,7 +11,6 @@ import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
 import {fromEvent, merge, Observable, Subscription} from "rxjs";
 import {filter} from "rxjs/operators";
 import {OsmLangService} from "../../../../services/osm-lang.service";
-import { SharedService } from '../../services/sharedService';
 
 @Component({
   selector: 'osm-result-selection-time-frame',
@@ -45,7 +44,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
   CalendarType: typeof CalendarType = CalendarType;
 
-  constructor(private resultSelectionService: ResultSelectionService, private dateTimeAdapter: DateTimeAdapter<any>, private osmLangService: OsmLangService, private sharedService: SharedService) {
+  constructor(private resultSelectionService: ResultSelectionService, private dateTimeAdapter: DateTimeAdapter<any>, private osmLangService: OsmLangService) {
     if (osmLangService.getOsmLang() == 'en') {
       dateTimeAdapter.setLocale('en-GB');
     } else {
@@ -57,12 +56,10 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     let defaultFrom = new Date();
     let defaultTo = new Date();
     defaultTo.setHours(23, 59, 59, 999);
-    defaultFrom.setDate(defaultTo.getDate() - 28);
+    defaultFrom.setDate(defaultTo.getDate() - 60);
     defaultFrom.setHours(0, 0, 0, 0);
 
     this.selectedDates = [defaultFrom, defaultTo];
-    this.sharedService.change(this.selectedDates);
-
 
     let defaultResultSelectionCommand = new ResultSelectionCommand({
       from: defaultFrom,
@@ -91,7 +88,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
         from.setHours(0, 0, 0, 0);
       }
       this.selectedDates = [from, to];
-      this.sharedService.change(this.selectedDates);
 
       if (this.comparativeSelectionActive) {
         let comparativeTo = new Date (from);
@@ -134,7 +130,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
-    this.sharedService.change(this.selectedDates);
   }
 
   updateToDate(calendar: CalendarType): void {
@@ -151,7 +146,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeTo.selecteds;
     }
-      this.sharedService.change(this.selectedDates);
   }
 
   observeCalendarClicks(calendar: CalendarType): void {

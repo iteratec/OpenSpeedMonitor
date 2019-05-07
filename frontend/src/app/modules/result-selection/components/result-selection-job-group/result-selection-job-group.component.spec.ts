@@ -5,11 +5,8 @@ import { ResultSelectionService } from '../../services/result-selection.service'
 import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
-import { SharedService } from '../../services/sharedService';
-import { of, empty } from 'rxjs';
+import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { copyAnimationEvent } from '@angular/animations/browser/src/render/shared';
-
 
 describe('ResultSelectionJobGroupComponent', () => {
   let component: ResultSelectionJobGroupComponent;
@@ -32,8 +29,7 @@ describe('ResultSelectionJobGroupComponent', () => {
       providers: [        
         ResultSelectionService,
         OsmLangService,
-        GrailsBridgeService,
-        SharedService
+        GrailsBridgeService
       ]
     })
       .compileComponents();
@@ -51,22 +47,18 @@ describe('ResultSelectionJobGroupComponent', () => {
   });
 
   it('should correctly show the tags according to the available job groups', () =>{
-    component.jobGroupMappings$ = of(jobGroups);
     let tags: string[] = ['application','test','test2'];
 
-    component.getJobGroupTags();
+    component.updateJobGroupsAndTags(jobGroups);
     expect(component.selectableTags.sort()).toEqual(tags);
 
-    component.jobGroupMappings$ = of([]);
-    component.getJobGroupTags();
+    component.updateJobGroupsAndTags([]);
     expect(component.selectableTags).toEqual([]);
 
   });
 
   it('should correctly show the job groups accordings to the selected tag',() => {
-    component.jobGroupMappings$ = of(jobGroups);
-    component.upadteJobGroups();
-    component.getJobGroupTags();
+    component.updateJobGroupsAndTags(jobGroups);
     let tagJobGroupsMapping = getTagJobGroupsMapping(component.jobGroups, component.selectableTags);
 
     expect(component.filteredJobGroups).toEqual(component.jobGroups);
@@ -87,9 +79,7 @@ describe('ResultSelectionJobGroupComponent', () => {
   it('should show the no result message', ()=>{
     const select = fixture.debugElement.query(By.css('select')).nativeElement;
     
-    component.jobGroupMappings$ = of([]);
-    component.upadteJobGroups();
-    component.getJobGroupTags();
+    component.updateJobGroupsAndTags([]);
     fixture.detectChanges();
 
     expect(select.innerText.trim()).toEqual('frontend.de.iteratec.osm.resultSelection.jobGroup.noResults');

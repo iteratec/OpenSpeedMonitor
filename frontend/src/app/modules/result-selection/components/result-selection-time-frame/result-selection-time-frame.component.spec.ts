@@ -5,7 +5,6 @@ import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { ResultSelectionService } from '../../services/result-selection.service';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
-import { SharedService } from '../../services/sharedService';
 
 describe('ResultSelectionTimeFrameComponent', () => {
   let component: ResultSelectionTimeFrameComponent;
@@ -18,8 +17,7 @@ describe('ResultSelectionTimeFrameComponent', () => {
       providers: [        
         ResultSelectionService,
         OsmLangService,
-        GrailsBridgeService,
-        SharedService
+        GrailsBridgeService
       ]
     })
     .compileComponents();

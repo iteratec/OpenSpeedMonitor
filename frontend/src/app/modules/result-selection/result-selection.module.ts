@@ -4,7 +4,6 @@ import {ResultSelectionService} from "./services/result-selection.service";
 import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 import {SharedModule} from "../shared/shared.module";
 import { ResultSelectionTimeFrameComponent } from './components/result-selection-time-frame/result-selection-time-frame.component';
-import { ResultSelectionApplicationComponent } from './components/result-selection-application/result-selection-application.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {
   OWL_DATE_TIME_FORMATS,
@@ -12,7 +11,6 @@ import {
   OwlNativeDateTimeModule
 } from 'ng-pick-datetime';
 import { ResultSelectionJobGroupComponent } from './components/result-selection-job-group/result-selection-job-group.component';
-import { SharedService } from './services/sharedService';
 
 export const TIME_FORMAT = {
   fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
@@ -49,7 +47,6 @@ export const TIME_FORMAT = {
       useValue: TIME_FORMAT
     },
     ResultSelectionService,
-    SharedService
   ],
   entryComponents: [
     ResultSelectionComponent
