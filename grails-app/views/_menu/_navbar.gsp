@@ -59,16 +59,9 @@
                     </li>
                     <li class="${controllerName.equals('pageAggregation') ? 'active' : ''}" id="pageAggregationMainMenu">
                         <g:link controller="pageAggregation" action="show"
-                                title="${message(code:'de.iteratec.pageAggregation.title', default:'Page Aggregation')}">
+                                title="${message(code:'de.iteratec.isocsi.aggregationChart', default:'Aggregation')}">
                             <i class="fas fa-chart-bar"></i>
-                                <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/>
-                        </g:link>
-                    </li>
-                    <li class="${controllerName.equals('jobGroupAggregation') ? 'active' : ''}" id="jobGroupAggregationMainMenu">
-                        <g:link controller="jobGroupAggregation" action="show"
-                                title="${message(code:'de.iteratec.jobGroupAggregation.title', default:'JobGroup Aggregation')}">
-                            <i class="fas fa-chart-bar fa-rotate-90"></i>
-                            <g:message code="de.iteratec.jobGroupAggregation.title" default="JobGroup Aggregation"/>
+                                <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/>
                         </g:link>
                     </li>
                     <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
