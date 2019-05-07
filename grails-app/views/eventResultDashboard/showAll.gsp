@@ -292,8 +292,5 @@
     </asset:script>
 </content>
 
-<sitemesh:parameter name="needsAngular" value="true"/>
-<!--<osm-result-selection data-module-path="src/app/modules/result-selection/result-selection.module#ResultSelectionModule"></osm-result-selection>-->
-
 </body>
 </html>
