@@ -138,7 +138,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     );
 
     this.calendarEventSubscription = merge(this.calendarClick$, this.calendarEnter$).subscribe((event) => {
-      console.log(event);
       if ((event.target as HTMLTableDataCellElement).matches('owl-date-time-month-view > table > tbody > tr > td')
         || (event.target as HTMLSpanElement).matches('owl-date-time-month-view > table > tbody > tr > td > span')) {
         if (calendar === CalendarType.From) {
