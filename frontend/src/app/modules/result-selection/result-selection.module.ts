@@ -10,7 +10,7 @@ import {
   OwlDateTimeModule,
   OwlNativeDateTimeModule
 } from 'ng-pick-datetime';
-import { ResultSelectionJobGroupComponent } from './components/result-selection-job-group/result-selection-job-group.component';
+import { ResultSelectionApplicationComponent } from './components/result-selection-application/result-selection-application.component';
 
 export const TIME_FORMAT = {
   fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
@@ -29,10 +29,10 @@ export const TIME_FORMAT = {
     ResultSelectionComponent,
     ResultSelectionTimeFrameComponent,
     MeasurandSelectComponent,
-    ResultSelectionJobGroupComponent
+    ResultSelectionApplicationComponent
   ],
   exports: [MeasurandSelectComponent,
-    ResultSelectionJobGroupComponent,
+    ResultSelectionApplicationComponent,
     ResultSelectionTimeFrameComponent,
     ResultSelectionComponent
   ],

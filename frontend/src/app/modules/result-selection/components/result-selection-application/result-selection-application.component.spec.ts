@@ -1,17 +1,16 @@
 import { async, ComponentFixture, TestBed} from '@angular/core/testing';
-import { ResultSelectionJobGroupComponent } from './result-selection-job-group.component';
+import { ResultSelectionApplicationComponent } from './result-selection-application.component';
 import { SelectableApplication } from 'src/app/models/application.model';
 import { ResultSelectionService } from '../../services/result-selection.service';
 import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
-import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
 
-describe('ResultSelectionJobGroupComponent', () => {
-  let component: ResultSelectionJobGroupComponent;
-  let fixture: ComponentFixture<ResultSelectionJobGroupComponent>;
-  const jobGroups = [new SelectableApplication({
+describe('ResultSelectionApplicationComponent', () => {
+  let component: ResultSelectionApplicationComponent;
+  let fixture: ComponentFixture<ResultSelectionApplicationComponent>;
+  const applications = [new SelectableApplication({
     id: 3,
     name: 'test_Application',
     tags: ['test','application']
@@ -24,7 +23,7 @@ describe('ResultSelectionJobGroupComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionJobGroupComponent],
+      declarations: [ResultSelectionApplicationComponent],
       imports: [SharedMocksModule],
       providers: [        
         ResultSelectionService,
@@ -36,7 +35,7 @@ describe('ResultSelectionJobGroupComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultSelectionJobGroupComponent);
+    fixture = TestBed.createComponent(ResultSelectionApplicationComponent);
     
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -49,44 +48,44 @@ describe('ResultSelectionJobGroupComponent', () => {
   it('should correctly show the tags according to the available job groups', () =>{
     let tags: string[] = ['application','test','test2'];
 
-    component.updateJobGroupsAndTags(jobGroups);
+    component.updateApplicationsAndTags(applications);
     expect(component.selectableTags.sort()).toEqual(tags);
 
-    component.updateJobGroupsAndTags([]);
+    component.updateApplicationsAndTags([]);
     expect(component.selectableTags).toEqual([]);
 
   });
 
   it('should correctly show the job groups accordings to the selected tag',() => {
-    component.updateJobGroupsAndTags(jobGroups);
-    let tagJobGroupsMapping = getTagJobGroupsMapping(component.jobGroups, component.selectableTags);
+    component.updateApplicationsAndTags(applications);
+    let tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
 
-    expect(component.filteredJobGroups).toEqual(component.jobGroups);
+    expect(component.filteredApplications).toEqual(component.applications);
 
     component.filterByTag(component.selectableTags[0]);
-    expect(component.filteredJobGroups).toEqual(tagJobGroupsMapping[0]);
+    expect(component.filteredApplications).toEqual(tagApplicationsMapping[0]);
 
     component.filterByTag(component.selectableTags[1]);
-    expect(component.filteredJobGroups).toEqual(tagJobGroupsMapping[1]);
+    expect(component.filteredApplications).toEqual(tagApplicationsMapping[1]);
 
     component.filterByTag(component.selectableTags[2]);
-    expect(component.filteredJobGroups).toEqual(tagJobGroupsMapping[2]);
+    expect(component.filteredApplications).toEqual(tagApplicationsMapping[2]);
 
     component.filterByTag(component.selectableTags[2]);
-    expect(component.filteredJobGroups).toEqual(component.jobGroups);
+    expect(component.filteredApplications).toEqual(component.applications);
   });
 
   it('should show the no result message', ()=>{
-    const select = fixture.debugElement.query(By.css('select')).nativeElement;
+    const select = fixture.debugElement.query(By.css('select > option')).nativeElement;
     
-    component.updateJobGroupsAndTags([]);
+    component.updateApplicationsAndTags([]);
     fixture.detectChanges();
 
-    expect(select.innerText.trim()).toEqual('frontend.de.iteratec.osm.resultSelection.jobGroup.noResults');
+    expect(select.innerText.trim()).toEqual('frontend.de.iteratec.osm.resultSelection.application.noResults');
     
   })
 });
-function getTagJobGroupsMapping(jobGroups: SelectableApplication[], selectableTags: string[]): any{
+function getTagApplicationsMapping(jobGroups: SelectableApplication[], selectableTags: string[]): any{
   if(selectableTags){
     let sortedJobGroups = [];
     for(let i=1; i<=selectableTags.length; i++){
