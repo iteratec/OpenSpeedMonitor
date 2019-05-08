@@ -221,7 +221,13 @@ class EventResultQueryBuilder {
     }
 
     List<EventResultProjection> getRawData(MetaDataSet metaDataSet = MetaDataSet.COMPLETE) {
+
+        if (this.aspectUtil.aspectsIncluded()) {
+            aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
+        }
+
         baseProjections.addAll(getMetaDataProjections(metaDataSet))
+
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandRawDataTransformer())
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
@@ -229,10 +235,31 @@ class EventResultQueryBuilder {
         userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
         userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer(baseProjections: baseProjections))
         userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
-        return getResults()
+
+        List<EventResultProjection> results = getResults()
+
+        if (this.aspectUtil.aspectsIncluded()) {
+            try {
+                aspectUtil.expandByAspects(results)
+            } catch (IllegalStateException e) {
+                log.error(e.getMessage(), e)
+                return []
+            }
+        }
+
+        return results
     }
 
     List<EventResultProjection> getMedianData() {
+        if (this.aspectUtil.aspectsIncluded()) {
+            List<EventResultProjection> rawData = getRawData(MetaDataSet.ASPECT)
+            return this.aspectUtil.getMedianFrom(rawData)
+        } else {
+            return getMedianDataWithoutAspects()
+        }
+    }
+
+    List<EventResultProjection> getMedianDataWithoutAspects() {
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
@@ -244,6 +271,15 @@ class EventResultQueryBuilder {
     }
 
     List<EventResultProjection> getPercentile(int percentile) {
+        if (this.aspectUtil.aspectsIncluded()) {
+            List<EventResultProjection> rawData = getRawData(MetaDataSet.ASPECT)
+            return this.aspectUtil.getPercentileFrom(rawData, percentile)
+        } else {
+            return getPercentileWithoutAspects(percentile)
+        }
+    }
+
+    List<EventResultProjection> getPercentileWithoutAspects(int percentile) {
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
         measurandQueryExecutor.setTransformer(new MeasurandPercentileDataTransformer(percentile, baseProjections, measurandQueryExecutor.selectedMeasurands))
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
@@ -277,25 +313,12 @@ class EventResultQueryBuilder {
 
     private List<EventResultProjection> getResults() {
 
-        if (this.aspectUtil.aspectsIncluded()) {
-            aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
-        }
-
-        List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
-        List<EventResultProjection> measurandResult = measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections)
+        List<EventResultProjection> measurandResult = measurandQueryExecutor.getResultFor(filters, trims, baseProjections)
 
         List<EventResultProjection> merged
         performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - merge results', 3) {
             merged = mergeResults(measurandResult, userTimingsResult)
-        }
-
-        if (this.aspectUtil.aspectsIncluded()) {
-            try {
-                aspectUtil.expandByAspectMetrics(merged)
-            } catch (IllegalStateException e) {
-                log.error(e.getMessage(), e)
-                return []
-            }
         }
 
         return merged

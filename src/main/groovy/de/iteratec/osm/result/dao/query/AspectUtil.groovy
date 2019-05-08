@@ -25,9 +25,7 @@ class AspectUtil {
     List<Long> browserIds = []
     List<PerformanceAspectType> aspectTypes = []
     List<SelectedMeasurand> metrics = []
-
     List<PerformanceAspect> usedAspects = []
-    List<SelectedMeasurand> addedMetrics = []
 
     public boolean aspectsIncluded() {
         return this.aspectTypes.size() > 0
@@ -78,7 +76,7 @@ class AspectUtil {
      *              and {@link Browser} as projected properties. This would be the case if someone uses this class with something
      *              else than raw data from query builder. This isn't supported.
      */
-    public void expandByAspectMetrics(List<EventResultProjection> resultsFromDb) throws IllegalStateException {
+    public void expandByAspects(List<EventResultProjection> resultsFromDb) throws IllegalStateException {
         aspectTypes.each { PerformanceAspectType type ->
             resultsFromDb.each { EventResultProjection result ->
                 Long jobGroupId = result.projectedProperties["jobGroupId"]
@@ -101,11 +99,34 @@ class AspectUtil {
     /**
      * Groups given raw data projections by {@link JobGroup}, {@link Page} and {@Browser}, respective what was queried
      * in builder. Calculates averages for all queried metrics inclusive {@link PerformanceAspectType} metrics.
-     * @param rawData
-     * {@link EventResultProjection}s queried via builder as raw data.
+     * @param rawData {@link EventResultProjection}s queried via builder as raw data.
      * @return List of aggregated projections with calculated averages.
      */
     public List<EventResultProjection> getAverageFrom(List<EventResultProjection> rawData) {
+        return getAggregatedFrom(rawData, this.&addAverageToMap)
+    }
+
+    /**
+     * Groups given raw data projections by {@link JobGroup}, {@link Page} and {@Browser}, respective what was queried
+     * in builder. Determines median for all queried metrics inclusive {@link PerformanceAspectType} metrics.
+     * @param rawData {@link EventResultProjection}s queried via builder as raw data.
+     * @return List of aggregated projections with determined median.
+     */
+    public List<EventResultProjection> getMedianFrom(List<EventResultProjection> rawData) {
+        return getAggregatedFrom(rawData, this.&addMedianToMap)
+    }
+
+    /**
+     * Groups given raw data projections by {@link JobGroup}, {@link Page} and {@Browser}, respective what was queried
+     * in builder. Determines percentile for all queried metrics inclusive {@link PerformanceAspectType} metrics.
+     * @param rawData {@link EventResultProjection}s queried via builder as raw data.
+     * @return List of aggregated projections with determined percentile.
+     */
+    public List<EventResultProjection> getPercentileFrom(List<EventResultProjection> rawData, int percentile) {
+        return getAggregatedFrom(rawData, this.&addPercentileToMap.curry(percentile))
+    }
+
+    private List<EventResultProjection> getAggregatedFrom(List<EventResultProjection> rawData, Closure aggregationClosure) {
         return rawData.groupBy { EventResultProjection resultProjection ->
             StringBuilder b = new StringBuilder()
             if (this.jobGroupIds) b.append("_${resultProjection.projectedProperties.jobGroupId}")
@@ -118,10 +139,10 @@ class AspectUtil {
             if (this.pageIds) projectedProperties["pageId"] = groupProjections.projectedProperties.pageId[0]
             if (this.browserIds) projectedProperties["browserId"] = groupProjections.projectedProperties.browserId[0]
             this.metrics.each { SelectedMeasurand metric ->
-                addAverageToMap(projectedProperties, groupProjections, metric.getDatabaseRelevantName())
+                aggregationClosure(projectedProperties, groupProjections, metric.getDatabaseRelevantName())
             }
             this.aspectTypes.each { PerformanceAspectType type ->
-                addAverageToMap(projectedProperties, groupProjections, type.toString())
+                aggregationClosure(projectedProperties, groupProjections, type.toString())
             }
             return new EventResultProjection(id: groupId, projectedProperties: projectedProperties)
         }
@@ -134,6 +155,24 @@ class AspectUtil {
         if (propMapsWithMetric.size() == 0) return
         List metricValues = propMapsWithMetric*."${metricName}"
         propertiesMap[metricName] = metricValues.sum() / metricValues.size()
+    }
+
+    private addMedianToMap(Map propertiesMap, List<EventResultProjection> projections, String metricName) {
+        List<Map> propMapsWithMetric = projections*.projectedProperties.findAll {
+            it[metricName]
+        }
+        if (propMapsWithMetric.size() == 0) return
+        List metricValues = propMapsWithMetric*."${metricName}"
+        propertiesMap[metricName] = AggregationUtil.getMedianFrom(metricValues)
+    }
+
+    private addPercentileToMap(Integer percentile, Map propertiesMap, List<EventResultProjection> projections, String metricName) {
+        List<Map> propMapsWithMetric = projections*.projectedProperties.findAll {
+            it[metricName]
+        }
+        if (propMapsWithMetric.size() == 0) return
+        List metricValues = propMapsWithMetric*."${metricName}"
+        propertiesMap[metricName] = AggregationUtil.getPercentile(metricValues, percentile)
     }
 
     private List<PerformanceAspect> getAspects() {
@@ -156,10 +195,8 @@ class AspectUtil {
     private appendMetricIfMissing(SelectedMeasurand metric, List<SelectedMeasurand> userTimings, List<SelectedMeasurand> measurands) {
         if (metric.selectedType.isUserTiming() && !userTimings.contains(metric)) {
             userTimings.add(metric)
-            this.addedMetrics.add(metric.getDatabaseRelevantName())
         } else if (!measurands.contains(metric)) {
             measurands.add(metric)
-            this.addedMetrics.add(metric.getDatabaseRelevantName())
         }
     }
 
