@@ -3,7 +3,6 @@ import {
     ViewEncapsulation,
   } from '@angular/core';
 
-import {ResultSelectionCommand} from "../../models/result-selection-command.model";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import { SelectableApplication } from 'src/app/models/application.model';
 import { Observable } from 'rxjs';
