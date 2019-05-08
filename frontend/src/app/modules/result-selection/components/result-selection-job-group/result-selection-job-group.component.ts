@@ -16,7 +16,6 @@ import { Observable } from 'rxjs';
   })
 
 export class ResultSelectionJobGroupComponent {
-  @Input() currentChart: string;
   @Input() jobGroupMappings$: Observable<SelectableApplication[]>;  
   jobGroups: SelectableApplication[];
   isEmpty = true;
