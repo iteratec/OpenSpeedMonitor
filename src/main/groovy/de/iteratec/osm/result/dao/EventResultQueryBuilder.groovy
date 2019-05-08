@@ -110,7 +110,7 @@ class EventResultQueryBuilder {
                 'in'('operatingSystem', operatingSystems)
             })
             if (project) {
-                baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName + '.id', alias: associatedDomainFieldName + 'Id'))
+                baseProjections.add(new ProjectionProperty(dbName: 'operatingSystem', alias: 'operatingSystem'))
             }
         }
         return this
@@ -122,7 +122,7 @@ class EventResultQueryBuilder {
                 'in'('deviceType', deviceTypes)
             })
             if (project) {
-                baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
+                baseProjections.add(new ProjectionProperty(dbName: 'deviceType', alias: 'deviceType'))
             }
         }
         return this
