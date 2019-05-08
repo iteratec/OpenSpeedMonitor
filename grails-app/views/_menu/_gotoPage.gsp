@@ -35,7 +35,7 @@
         </li>
         <li class="controller">
             <g:link controller="pageAggregation" action="showAll"><i class="fas fa-chart-bar"></i>
-                <g:message code="de.iteratec.pageAggregation.title" default="Page Aggregation"/></g:link>
+                <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/></g:link>
         </li>
         <li class="controller">
             <g:link controller="tabularResultPresentation" action="listResults"><i
