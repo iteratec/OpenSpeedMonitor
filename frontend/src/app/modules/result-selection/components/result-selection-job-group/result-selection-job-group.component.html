@@ -16,7 +16,6 @@
   </div>
 
 
-  <div>
     <button class="btn btn-xs btn-default filter-button" id="filterBtn" *ngFor="let tag of selectableTags" (click)="filterByTag(tag)" [ngClass]="{'active': isSelected&&selectedTag===tag}">
       <i class="fas fa-filter"></i>
       &nbsp;{{tag}}
