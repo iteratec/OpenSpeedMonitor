@@ -4,7 +4,7 @@
 <head>
     <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/></title>
-    <asset:stylesheet src="/pageAggregation/show.less"/>
+    <asset:stylesheet src="/Aggregation/show.less"/>
 </head>
 
 <body>

@@ -1,4 +1,4 @@
-//= require pageAggregationChart.js
+//= require aggregationChart.js
 //= require_self
 
 "use strict";
@@ -57,8 +57,8 @@ OpenSpeedMonitor.ChartModules.GuiHandling.handleComparativeTimeframeConstraints 
 
 })();
 
-OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
-    var pageAggregationChart = OpenSpeedMonitor.ChartModules.PageAggregation("#page-aggregation-svg");
+OpenSpeedMonitor.ChartModules.GuiHandling.aggregation = (function () {
+    var aggregationChart = OpenSpeedMonitor.ChartModules.Aggregation("#page-aggregation-svg");
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
     var stackBarSwitch = $("#stackBarSwitch");
@@ -85,7 +85,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             loadData(false);
         });
         $(window).on('resize', function () {
-            if (pageAggregationChart.isDataAvailable()) {
+            if (aggregationChart.isDataAvailable()) {
                 renderChart({}, false);
             }
         });
@@ -244,19 +244,19 @@ OpenSpeedMonitor.ChartModules.GuiHandling.pageAggregation = (function () {
             spinner.stop()
         }
         if (data && !noDataAvailable) {
-            pageAggregationChart.setData(data);
+            aggregationChart.setData(data);
             if (isStateChange) {
                 $(window).trigger("historyStateChanged");
             }
         }
-        if (!data.series) pageAggregationChart.render(isAggregationValueChange);
+        if (!data.series) aggregationChart.render(isAggregationValueChange);
         if (data.series && percentileLoaded && avgLoaded) {
-            pageAggregationChart.render(isAggregationValueChange);
+            aggregationChart.render(isAggregationValueChange);
         }
     };
 
     var loadData = function (isStateChange) {
-        pageAggregationChart.resetData();
+        aggregationChart.resetData();
         avgLoaded = false;
         percentileLoaded = false;
 

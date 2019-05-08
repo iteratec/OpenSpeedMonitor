@@ -6,11 +6,11 @@ var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 OpenSpeedMonitor.ChartModules.UrlHandling = OpenSpeedMonitor.ChartModules.UrlHandling || {};
 
-OpenSpeedMonitor.ChartModules.UrlHandling.PageAggregation = (function () {
+OpenSpeedMonitor.ChartModules.UrlHandling.Aggregation = (function () {
     var loadedState = "";
 
     var initWaitForPostload = function () {
-        var dependencies = ["pageAggregation", "selectIntervalTimeframeCard"];
+        var dependencies = ["aggregation", "selectIntervalTimeframeCard"];
         OpenSpeedMonitor.postLoader.onLoaded(dependencies, function () {
             loadState(OpenSpeedMonitor.ChartModules.UrlHandling.UrlHelper.getUrlParameter());
             addEventHandlers();

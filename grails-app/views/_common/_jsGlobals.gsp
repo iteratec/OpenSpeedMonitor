@@ -60,8 +60,8 @@
             addTagToJobs: "${createLink(controller: 'job', action: 'addTagToJobs')}"
         },
         eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
-        pageAggregationShow: "${createLink(action: 'show', controller: 'pageAggregation')}",
-        pageAggregationGetData: "${createLink(controller: 'pageAggregation', action: 'getBarchartData')}",
+        AggregationShow: "${createLink(action: 'show', controller: 'Aggregation')}",
+        AggregationGetData: "${createLink(controller: 'Aggregation', action: 'getBarchartData')}",
         tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
         getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
         detailAnalysisShow: "${createLink(action: 'show', controller: 'detailAnalysis')}",
