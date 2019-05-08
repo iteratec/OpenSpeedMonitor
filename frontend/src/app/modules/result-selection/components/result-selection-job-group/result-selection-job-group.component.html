@@ -3,7 +3,7 @@
   <div class="form-group">
     <select multiple class="form-control" id='job-groups-selection'>
       <ng-container *ngIf="!isEmpty; else elseBlock" >
-          <option  *ngFor="let jobGroup of filteredJobGroups" [ngValue]="jobGroup.name" >
+          <option  *ngFor="let jobGroup of filteredJobGroups" [ngValue]="jobGroup.id" >
               {{jobGroup.name}}
           </option>
        </ng-container>
