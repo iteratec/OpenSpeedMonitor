@@ -374,7 +374,14 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var createSeriesValueId = function (value) {
-        return value.browser ? value.page + ";" + value.jobGroup + ";" + value.browser : value.page + ";" + value.jobGroup;
+        var id = value.jobGroup;
+        if (value.page) {
+            id += ";" + value.page;
+        }
+        if (value.browser) {
+            id += ";" + value.browser;
+        }
+        return id;
     };
 
     var hasLoadTimes = function () {
