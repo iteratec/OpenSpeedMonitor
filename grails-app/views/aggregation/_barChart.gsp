@@ -62,7 +62,7 @@
         </a>
     </div>
     <div id="svg-container">
-        <svg id="page-aggregation-svg" class="d3chart" width="100%"></svg>
+        <svg id="aggregation-svg" class="d3chart" width="100%"></svg>
     </div>
 </div>
 <g:render template="/aggregation/adjustBarchartModal"/>

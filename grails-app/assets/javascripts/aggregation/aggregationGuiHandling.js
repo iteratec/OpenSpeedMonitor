@@ -58,7 +58,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.handleComparativeTimeframeConstraints 
 })();
 
 OpenSpeedMonitor.ChartModules.GuiHandling.aggregation = (function () {
-    var aggregationChart = OpenSpeedMonitor.ChartModules.Aggregation("#page-aggregation-svg");
+    var aggregationChart = OpenSpeedMonitor.ChartModules.Aggregation("#aggregation-svg");
     var spinner = OpenSpeedMonitor.Spinner("#chart-container");
     var drawGraphButton = $("#graphButtonHtmlId");
     var stackBarSwitch = $("#stackBarSwitch");
@@ -303,7 +303,7 @@ OpenSpeedMonitor.ChartModules.GuiHandling.aggregation = (function () {
         $.ajax({
             type: 'POST',
             data: queryData,
-            url: OpenSpeedMonitor.urls.pageAggregationGetData,
+            url: OpenSpeedMonitor.urls.aggregationGetData,
             dataType: "json",
             success: function (data) {
                 if (aggregationValue === "avg") {

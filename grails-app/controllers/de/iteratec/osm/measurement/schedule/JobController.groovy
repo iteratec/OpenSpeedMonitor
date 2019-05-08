@@ -523,6 +523,6 @@ class JobController {
 
     def showLastPageAggregationForJob(Long id) {
         Job job = Job.get(id)
-        redirect(controller: 'Aggregation', action: 'show', params: jobService.createPageAggregationParamsFor(job))
+        redirect(controller: 'aggregation', action: 'show', params: jobService.createPageAggregationParamsFor(job))
     }
 }

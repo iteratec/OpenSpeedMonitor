@@ -1,5 +1,5 @@
 <g:set var="lang" value="${session.'org.springframework.web.servlet.i18n.SessionLocaleResolver.LOCALE'}"/>
-<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('Aggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || request.forwardURI.equals('/applicationDashboard')}">
+<g:if test="${controllerName.equals('eventResultDashboard') || controllerName.equals('tabularResultPresentation') || controllerName.equals('aggregation') || controllerName.equals('pageComparison') || controllerName.equals('distributionChart') || controllerName.equals('detailAnalysis') || request.forwardURI.equals('/applicationDashboard')}">
     <g:set var="mainTab" value="results"/>
 </g:if>
 <g:elseif test="${controllerName.equals('csiDashboard')}"><g:set var="mainTab" value="csi"/></g:elseif>
@@ -57,8 +57,8 @@
                                 <g:message code="eventResultDashboard.label" default="Time Series"/>
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('Aggregation') ? 'active' : ''}" id="AggregationMainMenu">
-                        <g:link controller="Aggregation" action="show"
+                    <li class="${controllerName.equals('aggregation') ? 'active' : ''}" id="aggregationMainMenu">
+                        <g:link controller="aggregation" action="show"
                                 title="${message(code:'de.iteratec.isocsi.aggregationChart', default:'Aggregation')}">
                             <i class="fas fa-chart-bar"></i>
                                 <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/>

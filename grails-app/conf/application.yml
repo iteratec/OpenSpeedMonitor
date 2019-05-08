@@ -283,7 +283,7 @@ grails:
                             {pattern: '/csiBenchmark/**',                               access: ['permitAll']},
                             {pattern: '/detailAnalysis/**',                             access: ['permitAll']},
                             {pattern: '/distributionChart/**',                          access: ['permitAll']},
-                            {pattern: '/Aggregation/**',                                access: ['permitAll']},
+                            {pattern: '/aggregation/**',                                access: ['permitAll']},
                             {pattern: '/pageComparison/**',                             access: ['permitAll']},
                             {pattern: '/eventResultDashboard/**',                       access: ['permitAll']},
                             {pattern: '/tabularResultPresentation/**',                  access: ['permitAll']},
