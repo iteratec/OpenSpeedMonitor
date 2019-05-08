@@ -16,13 +16,14 @@ import { Observable } from 'rxjs';
   })
 
 export class ResultSelectionJobGroupComponent {
-  @Input() jobGroupMappings$: Observable<SelectableApplication[]>;  
+jobGroupMappings$: Observable<SelectableApplication[]>;  
   jobGroups: SelectableApplication[];
   isEmpty = true;
   selectableTags: string[];
   filteredJobGroups: SelectableApplication[];
   selectedTag: string ='';
   isSelected = false;
+  selectedJobGroups: number[] = [];
     
   constructor(private resultSelectionService: ResultSelectionService) {
     this.jobGroupMappings$ = this.resultSelectionService.applications$;

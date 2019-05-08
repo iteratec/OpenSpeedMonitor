@@ -1,7 +1,6 @@
 <div class="card form-horizontal">
   <h2>{{ 'frontend.de.iteratec.osm.resultSelection.jobGroup.title' | translate }}</h2>
-  <div class="form-group">
-    <select multiple class="form-control" id='job-groups-selection'>
+    <select multiple class="form-control" id='job-groups-selection' [(ngModel)]="selectedJobGroups">
       <ng-container *ngIf="!isEmpty; else elseBlock" >
           <option  *ngFor="let jobGroup of filteredJobGroups" [ngValue]="jobGroup.id" >
               {{jobGroup.name}}
@@ -13,12 +12,10 @@
           </option>
       </ng-template>
     </select>
-  </div>
 
 
-    <button class="btn btn-xs btn-default filter-button" id="filterBtn" *ngFor="let tag of selectableTags" (click)="filterByTag(tag)" [ngClass]="{'active': isSelected&&selectedTag===tag}">
+    <button class="btn btn-xs btn-default filter-buttons" id="filterBtn" *ngFor="let tag of selectableTags" (click)="filterByTag(tag)" [ngClass]="{'active': isSelected&&selectedTag===tag}">
       <i class="fas fa-filter"></i>
       &nbsp;{{tag}}
   </button>
-  </div>
 </div>
