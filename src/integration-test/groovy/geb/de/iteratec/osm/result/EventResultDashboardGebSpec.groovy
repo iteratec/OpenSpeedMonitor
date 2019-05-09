@@ -858,8 +858,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
             JobGroup jobGroup1 = JobGroup.build(name: jobGroup1Name)
             WebPageTestServer wpt = WebPageTestServer.build().save(failOnError: true)
             Browser browser = Browser.build().save(failOnError: true)
-            Location location1 = Location.build(uniqueIdentifierForServer: location1Name, browser: browser, wptServer: wpt).save(failOnError: true)
-            Location location2 = Location.build(uniqueIdentifierForServer: location2Name, browser: browser, wptServer: wpt).save(failOnError: true)
+            Location location1 = Location.build(uniqueIdentifierForServer: location1Name, browser: browser, wptServer: wpt, deviceType: DeviceType.DESKTOP, operatingSystem: OperatingSystem.WINDOWS).save(failOnError: true)
+            Location location2 = Location.build(uniqueIdentifierForServer: location2Name, browser: browser, wptServer: wpt, deviceType: DeviceType.DESKTOP, operatingSystem: OperatingSystem.WINDOWS).save(failOnError: true)
             Job job1 = Job.build().save(failOnError: true)
             Job job2 = Job.build().save(failOnError: true)
             Page page1 = Page.build().save(failOnError: true)
@@ -900,6 +900,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false
@@ -931,6 +933,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false
@@ -963,6 +967,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     connectivityProfile: connectivityProfile,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: false
@@ -995,6 +1001,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: true
             ).save()
@@ -1026,6 +1034,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     customConnectivityName: null,
                     noTrafficShapingAtAll: true
             ).save()
@@ -1057,6 +1067,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
                     noTrafficShapingAtAll: false
             ).save()
@@ -1088,6 +1100,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
                     page: measuredEvent1.testedPage,
                     browser: browser,
                     location: location1,
+                    deviceType: location1.deviceType,
+                    operatingSystem: location1.operatingSystem,
                     customConnectivityName: "Custom (6.000/512 Kbps, 50ms)",
                     noTrafficShapingAtAll: false
             ).save()

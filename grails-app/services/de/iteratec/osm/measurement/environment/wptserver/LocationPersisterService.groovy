@@ -21,6 +21,8 @@ import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.BrowserService
 import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.environment.WebPageTestServer
+import de.iteratec.osm.result.DeviceType
+import de.iteratec.osm.result.OperatingSystem
 import de.iteratec.osm.util.PerformanceLoggingService
 import grails.gorm.transactions.Transactional
 import groovy.util.slurpersupport.GPathResult
@@ -67,7 +69,9 @@ class LocationPersisterService implements iLocationListener {
                             browser: browserForLocation,
                             wptServer: wptserverForLocation,
                             dateCreated: new Date(),
-                            lastUpdated: new Date()
+                            lastUpdated: new Date(),
+                            deviceType: DeviceType.guessDeviceType(locationTagInXml.Label.toString()),
+                            operatingSystem: OperatingSystem.guessOperatingSystem(locationTagInXml.Label.toString())
                     ).save(failOnError: true)
                     addedLocations << newLocation
                     log.info("new location written while fetching locations: ${newLocation}")
