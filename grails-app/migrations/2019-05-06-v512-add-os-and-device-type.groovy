@@ -35,7 +35,7 @@ databaseChangeLog = {
     changeSet(author: "pal", id: "Task-1_populate_operating_system_location_init") {
         sql('''
             UPDATE location
-            SET operating_system = 'UNKOWN'
+            SET operating_system = 'UNKNOWN'
         ''')
     }
 
@@ -49,7 +49,7 @@ databaseChangeLog = {
     changeSet(author: "pal", id: "Task-3_populate_device_type_event_result_init") {
         sql('''
             UPDATE event_result
-            SET operating_system = 'UNKOWN'
+            SET operating_system = 'UNKNOWN'
         ''')
     }
 

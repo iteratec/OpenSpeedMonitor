@@ -5,7 +5,7 @@ enum PerformanceAspectType {
     PAGE_SHOWS_USEFUL_CONTENT(Measurand.VISUALLY_COMPLETE),
     PAGE_IS_USABLE(Measurand.CONSISTENTLY_INTERACTIVE)
 
-    private Measurand defaultMetric
+    Measurand defaultMetric
 
     private PerformanceAspectType(Measurand value){
         defaultMetric = value

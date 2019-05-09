@@ -82,10 +82,18 @@ class EventResultDashboardShowAllCommand extends TimeSeriesShowCommandBase {
         viewModelToCopyTo.put('selectedAggrGroupValuesCached', this.selectedAggrGroupValuesCached)
         viewModelToCopyTo.put('selectedAggrGroupValuesUnCached', this.selectedAggrGroupValuesUnCached)
         viewModelToCopyTo.get('aggrGroupValuesCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesCached.findAll {
-            !SelectedMeasurand.isMeasurand(it)
+            SelectedMeasurandType.USERTIMING_MARK == SelectedMeasurand.getMeasurandType(it) ||
+                    SelectedMeasurandType.USERTIMING_MEASURE == SelectedMeasurand.getMeasurandType(it)
         })
         viewModelToCopyTo.get('aggrGroupValuesUnCached')?.USER_TIMINGS?.addAll(this.selectedAggrGroupValuesUnCached.findAll {
-            !SelectedMeasurand.isMeasurand(it)
+            SelectedMeasurandType.USERTIMING_MARK == SelectedMeasurand.getMeasurandType(it) ||
+                    SelectedMeasurandType.USERTIMING_MEASURE == SelectedMeasurand.getMeasurandType(it)
+        })
+        viewModelToCopyTo.get('aggrGroupValuesCached')?.HERO_TIMINGS?.addAll(this.selectedAggrGroupValuesCached.findAll {
+            SelectedMeasurandType.HEROTIMING_MARK == SelectedMeasurand.getMeasurandType(it)
+        })
+        viewModelToCopyTo.get('aggrGroupValuesUnCached')?.HERO_TIMINGS?.addAll(this.selectedAggrGroupValuesUnCached.findAll {
+            SelectedMeasurandType.HEROTIMING_MARK == SelectedMeasurand.getMeasurandType(it)
         })
 
         viewModelToCopyTo.put('trimBelowLoadTimes', this.trimBelowLoadTimes)
