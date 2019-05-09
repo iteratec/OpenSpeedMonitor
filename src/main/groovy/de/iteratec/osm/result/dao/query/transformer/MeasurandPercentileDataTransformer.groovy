@@ -59,9 +59,7 @@ class MeasurandPercentileDataTransformer implements EventResultTransformer {
         return eventResultProjections.each { eventResultProjection ->
             measurandNames.each { measurandName ->
                 List rawDataForMeasurand = eventResultProjection."$measurandName"
-                int index = (rawDataForMeasurand.size() * (percentage.toFloat() / 100f)).toInteger()
-                index = Math.min( rawDataForMeasurand.size()-1, Math.max(0, index) )
-                eventResultProjection.projectedProperties.put(measurandName, AggregationUtil.getPercentile(rawDataForMeasurand, index))
+                eventResultProjection.projectedProperties.put(measurandName, AggregationUtil.getPercentile(rawDataForMeasurand, percentage))
             }
         }
     }
