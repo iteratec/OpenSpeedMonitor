@@ -18,7 +18,7 @@ OpenSpeedMonitor.selectPageLocationConnectivityCard = (function() {
     var browserLocationConnectedSelects;
 
     var init = function() {
-        pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $(),
+        pageEventsConnectedSelects = OpenSpeedMonitor.ConnectedSelects(pageSelectElement, $("#selectedAllPages"),
             measuredEventsSelectElement, $("#selectedAllMeasuredEvents"));
         browserLocationConnectedSelects = OpenSpeedMonitor.ConnectedSelects(browserSelectElement,
             $("#selectedAllBrowsers"), locationsSelectElement, $("#selectedAllLocations"));
