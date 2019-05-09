@@ -21,20 +21,9 @@ class SelectedMeasurand {
             throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
         }
 
-        if (isMeasurand(optionValue)) {
-            name = optionValue
-            selectedType = SelectedMeasurandType.MEASURAND
-        } else if (optionValue.startsWith(SelectedMeasurandType.USERTIMING_MARK.optionPrefix)) {
-            name = optionValue.substring(SelectedMeasurandType.USERTIMING_MARK.optionPrefix.length())
-            selectedType = SelectedMeasurandType.USERTIMING_MARK
-        } else if (optionValue.startsWith(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix)) {
-            name = optionValue.substring(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix.length())
-            selectedType = SelectedMeasurandType.USERTIMING_MEASURE
-        } else if (optionValue.startsWith(SelectedMeasurandType.HEROTIMING_MARK.optionPrefix)) {
-            name = optionValue.substring(SelectedMeasurandType.HEROTIMING_MARK.optionPrefix.length())
-            selectedType = SelectedMeasurandType.HEROTIMING_MARK
-        } else {
-            throw new IllegalArgumentException("Not a valid measurand or user timing: ${optionValue}")
+        selectedType = getMeasurandType(optionValue)
+        if (selectedType) {
+            name = optionValue.substring(selectedType.optionPrefix.length())
         }
     }
 
@@ -81,6 +70,20 @@ class SelectedMeasurand {
 
     static boolean isMeasurand(String name) {
         return Measurand.values().any { it.toString() == name }
+    }
+
+    static SelectedMeasurandType getMeasurandType(String name) {
+        if (isMeasurand(name)) {
+            return SelectedMeasurandType.MEASURAND
+        } else if (name.startsWith(SelectedMeasurandType.USERTIMING_MARK.optionPrefix)) {
+            return SelectedMeasurandType.USERTIMING_MARK
+        } else if (name.startsWith(SelectedMeasurandType.USERTIMING_MEASURE.optionPrefix)) {
+            return SelectedMeasurandType.USERTIMING_MEASURE
+        } else if (name.startsWith(SelectedMeasurandType.HEROTIMING_MARK.optionPrefix)) {
+            return SelectedMeasurandType.HEROTIMING_MARK
+        } else {
+            throw new IllegalArgumentException("Not a valid measurand or user timing: ${name}")
+        }
     }
 
     static boolean couldBeUserTiming(UserTimingType userTimingType, String name) {
