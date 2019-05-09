@@ -48,8 +48,6 @@ import grails.gorm.annotation.Entity
 @Entity
 class EventResult implements CsiValue, RepresentableWptResult {
 
-    public static String TEST_DETAILS_STATIC_URL = "details.php?test={testid}&run={wptRun}&cached={cachedType}";
-
     Long id
     Date dateCreated
     Date lastUpdated
@@ -295,28 +293,6 @@ class EventResult implements CsiValue, RepresentableWptResult {
     @Override
     Browser retrieveBrowser() {
         return browser
-    }
-/**
-     * <p>
-     * Build up an URL to display details of the given {@link EventResult}s.
-     * </p>
-     * @param jobRun
-     * 			The associated {@link JobResult} of the given {@link EventResult}s
-     * @return The created URL <code>null</code> if not possible to build up an URL
-     */
-    URL buildTestDetailsURL(JobResult jobRun, String waterfallAnchor) {
-        URL resultURL = null
-        String urlString = null
-
-        if (jobRun) {
-            urlString = jobRun.getWptServerBaseurl() + TEST_DETAILS_STATIC_URL + waterfallAnchor
-            urlString = urlString.replace("{testid}", jobRun.getTestId())
-            urlString = urlString.replace("{wptRun}", this.numberOfWptRun.toString())
-            urlString = urlString.replace("{cachedType}", (this.cachedView.toString() == "CACHED" ? "1" : "0"))
-            resultURL = new URL(urlString)
-        }
-
-        return resultURL
     }
 
     String toString() {
