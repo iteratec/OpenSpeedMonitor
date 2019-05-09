@@ -10,34 +10,34 @@ import {ResultSelectionService} from "../../services/result-selection.service";
 })
 export class MeasurandsComponent implements OnInit {
 
-  @ViewChild('additionalMeasurands') additionalMeasurands: ElementRef;
-  selectedMetric$: ReplaySubject<SelectableMeasurand[]> = new ReplaySubject<SelectableMeasurand[]>(null);
-  selectedMeasurands: string[];
-  selectedMeasurandsTest: SelectableMeasurand[];
+  selectedMeasurands: SelectableMeasurand[];
+  defaultValue: SelectableMeasurand;
 
-  constructor(private resultSelectionService: ResultSelectionService) {  }
-
-  ngOnInit() {
-    this.selectedMeasurands = ["DOC_COMPLETE_TIME"];
-    this.selectedMeasurandsTest = [];
+  constructor(private resultSelectionService: ResultSelectionService) {
+    this.resultSelectionService.loadTimes$.subscribe(next => {
+      if(next) {
+        this.defaultValue = next.data.values[0];
+        this.selectedMeasurands = [this.defaultValue];
+      }
+    });
   }
 
-  selectMeasurandForAspect(index: number, measurand: SelectableMeasurand) {
-    // this.selectedMeasurands[index] = measurand.id;
-    this.selectedMeasurandsTest[index] = measurand;
-    // this.selectedMetric$[index].next(measurand);
-    console.log(this.selectedMeasurands);
-    console.log(this.selectedMeasurandsTest);
-    console.log(index);
+  ngOnInit() {
+  }
+
+  selectMeasurand(index: number, measurand: SelectableMeasurand) {
+    this.selectedMeasurands[index] = measurand;
   }
 
   addMeasurandField() {
-    console.log(this.selectedMeasurandsTest);
-    this.selectedMeasurands.push("DOC_COMPLETE_TIME");
-
+    this.selectedMeasurands.push(this.defaultValue);
   }
 
-  private updateSelectedMetric() {
+  removeMeasurandField(index: number) {
+    this.selectedMeasurands.splice(index, 1);
+  }
 
+  trackByFn(index: number, item: any) {
+    return index;
   }
 }

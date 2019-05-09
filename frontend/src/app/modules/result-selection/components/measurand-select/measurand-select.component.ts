@@ -24,12 +24,9 @@ export class MeasurandSelectComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.selectedMeasurand);
-    this.onSelect.emit(this.selectedMeasurand);
   }
 
   selectMeasurand() {
-    console.log(this.selectedMeasurand);
     this.onSelect.emit(this.selectedMeasurand);
   }
 
