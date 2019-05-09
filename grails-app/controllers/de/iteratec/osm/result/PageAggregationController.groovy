@@ -6,8 +6,6 @@ import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.barchart.BarchartAggregationService
 import de.iteratec.osm.barchart.GetBarchartCommand
 import de.iteratec.osm.csi.Page
-import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -156,7 +154,7 @@ class PageAggregationController extends ExceptionHandlerController {
                     measurandGroup: it.selectedMeasurand.getMeasurandGroup(),
                     value: it.value,
                     valueComparative: it.valueComparative,
-                    page: it.page.name,
+                    page: it.page?.name,
                     jobGroup: it.jobGroup.name,
                     browser: it.browser?.name,
                     aggregationValue: it.aggregationValue
@@ -195,7 +193,7 @@ class PageAggregationController extends ExceptionHandlerController {
             }
 
             testedPages.each { p ->
-                if (pages.contains(p)) {
+                if (pages && pages.contains(p)) {
                     jobGroups.each {
                         filterRule << [page: p.name, jobGroup: it.name]
                     }
@@ -246,10 +244,6 @@ class PageAggregationController extends ExceptionHandlerController {
         String result = ""
         if (!cmd.selectedSeries) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedMeasurandSeries.error.validator.error.selectedMeasurandSeries", "Please select at least one measurand series")
-            result += "<br />"
-        }
-        if (!cmd.selectedPages) {
-            result += i18nService.msg("de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage", "Please select at least one page")
             result += "<br />"
         }
         if (!cmd.selectedJobGroups) {

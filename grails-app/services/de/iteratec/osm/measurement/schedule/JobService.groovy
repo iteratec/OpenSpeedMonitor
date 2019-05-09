@@ -66,22 +66,6 @@ class JobService {
         return csiJobs
     }
 
-    /**
-     * Returns a list of all Jobs which are tagged along with their tags.
-     * This was implemented using HQL since iterating over all jobs returned by Job.list()
-     * and querying job.tags on each of time usually takes at least 50 ms per job
-     * resulting in unacceptably long load times.
-     *
-     * @return A list of Maps. Each Map contains two items: "jobId" (long) and
-     *   "tag" (String). So if one Job has multiple tags, multiple Maps
-     *   with the same jobId but different tags will be returned.
-     */
-    List<Map> listJobsWithTags() {
-        return Job.executeQuery("""SELECT new map(tagLink.tagRef as jobId, tagLink.tag.name as tag)
-								   FROM TagLink tagLink
-								   WHERE tagLink.type = 'job'""")
-    }
-
     @Transactional
     void updateActivity(Job job, boolean activityToSet) {
         job.active = activityToSet

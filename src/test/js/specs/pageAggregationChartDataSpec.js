@@ -404,7 +404,7 @@ describe("PageAggregationChartData data transformation", function () {
             {
                 page: 'page2',
                 jobGroup: 'TestJobGroup',
-                id: 'page2;TestJobGroup',
+                id: 'TestJobGroup;page2',
                 avg: null,
                 valueComparative: null,
                 aggregationValue: 'avg'

@@ -4,6 +4,7 @@ package de.iteratec.osm.result
 import de.iteratec.osm.api.dto.ApplicationCsiDto
 import de.iteratec.osm.api.dto.PageCsiDto
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.environment.wptserver.Protocol
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
@@ -50,10 +51,12 @@ class ApplicationDashboardController {
     }
 
     def getPerformanceAspectsForApplication(PerformanceAspectManagementRequestCommand command) {
+
         Long jobGroupId = command.applicationId
         Long pageId = command.pageId
-        List<Map> performanceAspects = applicationDashboardService.getPerformanceAspectsForJobGroup(jobGroupId, pageId)
+        List<Long> browserIds = command.browserIds
 
+        List<Map> performanceAspects = applicationDashboardService.getPerformanceAspects(jobGroupId, pageId, browserIds)
         return ControllerUtils.sendObjectAsJSON(response, performanceAspects)
     }
 
@@ -62,10 +65,15 @@ class ApplicationDashboardController {
         SelectedMeasurand metric = new SelectedMeasurand(command.metricIdentifier, CachedView.UNCACHED)
         Page page = Page.findById(command.pageId)
         JobGroup jobGroup = JobGroup.findById(command.applicationId)
+        Browser browser = Browser.findById(command.browserId)
 
         PerformanceAspect performanceAspect
         if(!command.performanceAspectId){
-            performanceAspect = new PerformanceAspect(performanceAspectType: performanceAspectType, page: page,jobGroup: jobGroup)
+            performanceAspect = new PerformanceAspect(
+                    performanceAspectType: performanceAspectType,
+                    page: page,
+                    jobGroup: jobGroup,
+                    browser: browser)
         } else {
             performanceAspect = PerformanceAspect.findById(command.performanceAspectId)
         }
@@ -79,6 +87,7 @@ class ApplicationDashboardController {
             performanceAspectDto.performanceAspectType = performanceAspect.performanceAspectType.toString()
             performanceAspectDto.pageId = performanceAspect.page.id
             performanceAspectDto.jobGroupId = performanceAspect.jobGroup.id
+            performanceAspectDto.browserId = performanceAspect.browser.id
             return ControllerUtils.sendObjectAsJSON(response, performanceAspectDto)
         } catch (Exception e) {
             return ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, e.toString())
@@ -191,6 +200,7 @@ class PerformanceAspectCreationCommand implements Validateable {
     Long performanceAspectId
     Long applicationId
     Long pageId
+    Long browserId
     String metricIdentifier
     String performanceAspectType
 
@@ -198,6 +208,7 @@ class PerformanceAspectCreationCommand implements Validateable {
         performanceAspectId(nullable: true)
         applicationId(nullable: false)
         pageId(nullable: false)
+        browserId(nullable: false)
         metricIdentifier(nullable: false)
         performanceAspectType(nullable: false)
     }
@@ -206,6 +217,7 @@ class PerformanceAspectCreationCommand implements Validateable {
 class PerformanceAspectManagementRequestCommand implements Validateable {
     Long applicationId
     Long pageId
+    List<Long> browserIds
 
     static constraints = {
         applicationId(nullable: false)

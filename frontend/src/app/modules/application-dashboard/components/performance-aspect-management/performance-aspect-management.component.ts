@@ -16,22 +16,38 @@ export class PerformanceAspectManagementComponent implements OnInit {
   @Input() pageId: number;
   @Input() pageName: string;
   performanceAspects$: Subject<ResponseWithLoadingState<PerformanceAspect>[]>;
+  changedMetrics: Map<string, PerformanceAspect>;
 
-  constructor(private ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
-    this.performanceAspects$ = this.applicationService.performanceAspectForPage$
+  constructor(public ngxSmartModalService: NgxSmartModalService, private measurandsService: ResultSelectionService, private applicationService: ApplicationService) {
+    this.performanceAspects$ = this.applicationService.performanceAspectForPage$;
   }
 
   ngOnInit() {
+    this.changedMetrics = new Map<string, PerformanceAspect>();
   }
 
-  initDialog(){
-    this.measurandsService.updatePages([{id: this.pageId, name: "does-not-matter"}]);
-    this.applicationService.updatePage({id: this.pageId, name: "does-not-matter"});
-    this.ngxSmartModalService.open('preformanceAspectMgmtModal');
+  initDialog() {
+    this.ngxSmartModalService.setModalData(this.pageName, "performanceAspectMgmtModal");
+    this.measurandsService.updatePages([{id: this.pageId, name: this.pageName}]);
+    this.applicationService.updatePage({id: this.pageId, name: this.pageName});
+    this.ngxSmartModalService.open('performanceAspectMgmtModal');
   }
 
-  cancel(){
+  resetModalData() {
+    this.changedMetrics.clear();
+    this.ngxSmartModalService.resetModalData('performanceAspectMgmtModal');
+  }
 
+  updatePerformanceAspect(performanceAspect: PerformanceAspect) {
+    let key: string = performanceAspect.jobGroupId + "." + performanceAspect.pageId + "." + performanceAspect.performanceAspectType;
+    this.changedMetrics.set(key, performanceAspect);
+  }
+
+  saveAndClose() {
+    this.changedMetrics.forEach((performanceAspect: PerformanceAspect) => {
+      this.applicationService.createOrUpdatePerformanceAspect(performanceAspect);
+    });
+    this.ngxSmartModalService.close('performanceAspectMgmtModal');
   }
 
 }

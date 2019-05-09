@@ -1,26 +1,32 @@
 .edit-container {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: 1fr 3fr;
   grid-auto-columns: max-content;
   grid-template-rows: 1fr;
   grid-gap: 0.8em;
 }
 
-.aspect-label{
-  font-size: 14px;
+@media (max-width:768px) {
+  .edit-container {
+    grid-template-columns: 2fr 2fr;
+  }
+}
+
+.aspect-label {
+  font-size: 12px;
   color: #555555;
-  margin: 0 0 2px 2px;
+  font-weight: lighter;
 }
 
 .aspect-type {
   grid-column-start: 1;
-  //grid-column-end: span 2;
+  grid-column-end: span 1;
 }
 
 .measurand {
   grid-column-start: 2;
   grid-column-end: span 2;
-  align-self: end;
+  align-self: start;
 }
 
 .buttons {
@@ -32,4 +38,8 @@
 .btn {
   margin: 0 0.5em;
   width: 8em;
+}
+
+.performance-aspect-type {
+  font-size: 15px;
 }

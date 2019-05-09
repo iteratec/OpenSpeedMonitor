@@ -1,15 +1,24 @@
-<div class="btn">
+<div class="btn-init-dialog">
   <i class="fas fa-cog" (click)="initDialog()"></i>
 </div>
 
-<ngx-smart-modal id="preformanceAspectMgmtModal" identifier="preformanceAspectMgmtModal" [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="cancel()">
-  <h2>{{"frontend.de.iteratec.osm.performance-aspect.mgmt" | translate}} <span class="text-info">{{pageName}}</span>
+<ngx-smart-modal #performanceAspectMgmtModal id="performanceAspectMgmtModal" identifier="performanceAspectMgmtModal"
+                 [customClass]="'aspect-management-modal'" (onAnyCloseEvent)="resetModalData()" force="false">
+  <h2>
+    {{"frontend.de.iteratec.osm.performance-aspect.title" | translate}} <span class="text-info">{{ performanceAspectMgmtModal.getData() }}</span>
   </h2>
   <hr>
-  <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading" class="aspect-management-box">
-    <osm-performance-aspect-inspect *ngFor="let performanceAspect of (performanceAspects$ | async)"
-                                    [performanceAspectWrapped]="performanceAspect"
-                                    class="aspect-inspect"></osm-performance-aspect-inspect>
+  <main>
+    <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading" class="aspect-management-box">
+      <osm-performance-aspect-inspect *ngFor="let performanceAspect of (performanceAspects$ | async)"
+                                      [performanceAspectWrapped]="performanceAspect" (onSelect)="updatePerformanceAspect($event)"
+                                      class="aspect-inspect"></osm-performance-aspect-inspect>
+    </div>
+  </main>
+  <hr>
+  <div class="buttons">
+    <a (click)="saveAndClose()" class="btn btn-primary">{{ 'frontend.default.button.save' | translate }}</a>
+    <a (click)="ngxSmartModalService.close('performanceAspectMgmtModal')" class="btn btn-default">{{ 'frontend.default.button.cancel' | translate }}</a>
   </div>
 </ngx-smart-modal>
 
