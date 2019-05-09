@@ -80,7 +80,7 @@ databaseChangeLog = {
         sql('''
             UPDATE location
             SET device_type = 'SMARTPHONE'
-            WHERE LOWER(label) REGEXP '(?!(.*(pad|tab|note|xoom|book|tablet).*)).*(samsung|moto|sony|nexus|huawei|nokia|alcatel|lg|oneplus|htc|phone).*';
+            WHERE LOWER(label) REGEXP '.*(samsung|moto|sony|nexus|huawei|nokia|alcatel|lg|oneplus|htc|phone).*' AND NOT device_type = 'TABLET';
         ''')
     }
 
@@ -92,19 +92,19 @@ databaseChangeLog = {
         ''')
     }
 
-    changeSet(author: "pal", id: "Task-9_populate_operating_system_location") {
-        sql('''
-            UPDATE location
-            SET operating_system = 'IOS'
-            WHERE LOWER(label) REGEXP '(?!(.*(android|desktop).*)).*(ios|iphone|ipad).*';
-        ''')
-    }
-
     changeSet(author: "pal", id: "Task-10_populate_operating_system_location") {
         sql('''
             UPDATE location
             SET operating_system = 'ANDROID'
             WHERE LOWER(label) REGEXP '.*(samsung|moto|sony|nexus|huawei|nokie|lg|htc|alcatel|oneplus).*';
+        ''')
+    }
+
+    changeSet(author: "pal", id: "Task-9_populate_operating_system_location") {
+        sql('''
+            UPDATE location
+            SET operating_system = 'IOS'
+            WHERE LOWER(label) REGEXP '.*(ios|iphone|ipad).*' AND NOT (operating_system = 'DESKTOP') AND NOT (operating_system = 'WINDOWS');
         ''')
     }
 
