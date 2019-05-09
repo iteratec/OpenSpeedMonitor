@@ -1,0 +1,22 @@
+<div class="card form-horizontal">
+  <h2>{{ 'frontend.de.iteratec.osm.resultSelection.measurands.title' | translate }}</h2>
+
+  <div class="row form-group" *ngFor="let metric of selectedMeasurands; index as i; first as isFirst">
+    <label class="control-label col-md-4" *ngIf="isFirst">
+      {{ 'frontend.de.iteratec.osm.resultSelection.measurands.title' | translate }}:
+    </label>
+    <div class="col-md-8" [ngClass]="{'col-md-offset-4': !isFirst}">
+      <osm-measurand-select [selectedMeasurand]="selectedMetric$[i]"
+                            (onSelect)="selectMeasurandForAspect(i, $event)"></osm-measurand-select>
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <div class="col-md-8 col-md-offset-4">
+      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="addMeasurandField()">
+        <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate }}
+      </button>
+    </div>
+  </div>
+
+</div>
