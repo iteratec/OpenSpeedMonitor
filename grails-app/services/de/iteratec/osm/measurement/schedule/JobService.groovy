@@ -140,7 +140,7 @@ class JobService {
         return params
     }
 
-    Map createPageAggregationParamsFor(Job job) {
+    Map createAggregationParamsFor(Job job) {
         Map params = createCommonParams(job)
         Set<Long> pageIds = []
         new ScriptParser(pageService, job.script.navigationScript, job.script.label).eventNames.each {
