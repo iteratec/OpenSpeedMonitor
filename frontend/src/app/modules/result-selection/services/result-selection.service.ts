@@ -148,6 +148,9 @@ export class ResultSelectionService {
 
   loadSelectableData(resultSelectionCommand: ResultSelectionCommand, chart: Chart): void {
     this.loadResultCount(resultSelectionCommand);
+    this.loadUserTimings(resultSelectionCommand);
+    this.loadHeroTimings(resultSelectionCommand);
+
     if(chart !== Chart.PageComparison) {
       this.loadSelectableApplications(resultSelectionCommand);
     } else {
@@ -186,6 +189,28 @@ export class ResultSelectionService {
 
   loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
     this.updateResultCount(resultSelectionCommand).subscribe(next => this.resultCount$.next(next));
+  }
+
+  loadUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
+    this.updateUserTimings(resultSelectionCommand).subscribe(next => {
+      const groupName: string = "User Timings";
+      let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+        isLoading: false,
+        data: {name: groupName, values: next}
+      };
+      this.userTimings$.next(responseWithLoadingState);
+    });
+  }
+
+  loadHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
+    this.updateHeroTimings(resultSelectionCommand).subscribe(next => {
+      const groupName: string = "Hero Timings";
+      let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+        isLoading: false,
+        data: {name: groupName, values: next}
+      };
+      this.heroTimings$.next(responseWithLoadingState);
+    });
   }
 
   updateSelectableApplications(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplication[]> {
@@ -231,6 +256,21 @@ export class ResultSelectionService {
   updateResultCount(resultSelectionCommand: ResultSelectionCommand): Observable<string> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get('/resultSelection/getResultCount', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+  updateUserTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableMeasurand[]> {
+    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
+    return this.http.get('/resultSelection/getUserTimings', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+  updateHeroTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableMeasurand[]> {
+    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
+    return this.http.get('/resultSelection/getHeroTimings', {params: params}).pipe(
       handleError(),
       startWith(null)
     )

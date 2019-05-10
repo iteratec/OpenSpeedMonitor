@@ -2,7 +2,8 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angula
 import {PerformanceAspect} from "../../../../../models/perfomance-aspect.model";
 import {ReplaySubject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
-import {SelectableMeasurand} from "../../../../../models/measurand.model";
+import {MeasurandGroup, SelectableMeasurand} from "../../../../../models/measurand.model";
+import {ResultSelectionService} from "../../../../result-selection/services/result-selection.service";
 
 @Component({
   selector: 'osm-performance-aspect-inspect',
@@ -13,8 +14,14 @@ export class PerformanceAspectInspectComponent implements OnInit, OnChanges {
   @Input() performanceAspectWrapped: ResponseWithLoadingState<PerformanceAspect>;
   @Output() onSelect: EventEmitter<PerformanceAspect> = new EventEmitter<PerformanceAspect>();
   metric$: ReplaySubject<SelectableMeasurand> = new ReplaySubject<SelectableMeasurand>();
+  measurands: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>[];
 
-  constructor() {
+  constructor(private resultSelectionService: ResultSelectionService) {
+    this.measurands = [
+      this.resultSelectionService.loadTimes$,
+      this.resultSelectionService.heroTimings$,
+      this.resultSelectionService.userTimings$
+    ];
   }
 
   ngOnInit() {

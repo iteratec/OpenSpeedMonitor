@@ -6,6 +6,7 @@ import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {ResultSelectionService} from "./services/result-selection.service";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
+import {MeasurandsComponent} from "./components/measurands/measurands.component";
 
 describe('ResultSelectionComponent', () => {
   let component: ResultSelectionComponent;
@@ -15,7 +16,8 @@ describe('ResultSelectionComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         ResultSelectionComponent,
-        ResultSelectionTimeFrameComponent
+        ResultSelectionTimeFrameComponent,
+        MeasurandsComponent
       ],
       imports: [
         SharedMocksModule
