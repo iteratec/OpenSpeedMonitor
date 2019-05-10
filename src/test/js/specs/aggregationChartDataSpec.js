@@ -468,13 +468,13 @@ describe("aggregationChartData data transformation", function () {
             selectedFilter: "desc"
         });
         expect(aggregationData.getDataForSideLabels().labels).toEqual(["page1", "page2"]);
-        expect(AggregationData.getDataForBars("FIRST_BYTE").values.map(v => v.page)).toEqual(["page1", "page2"]);
-        expect(AggregationData.getDataForBars("DOC_COMPLETE_TIME").values.map(v => v.page)).toEqual(["page1", "page2"]);
+        expect(aggregationData.getDataForBars("FIRST_BYTE").values.map(v => v.page)).toEqual(["page1", "page2"]);
+        expect(aggregationData.getDataForBars("DOC_COMPLETE_TIME").values.map(v => v.page)).toEqual(["page1", "page2"]);
         expect(aggregationData.getDataForBars("DOC_COMPLETE_REQUESTS").values.map(v => v.page)).toEqual(["page1", "page2"]);
     });
 
     it("data is can be filtered and sorted be predefined filterRule; adding missing series", function() {
-        AggregationData.setData({
+        aggregationData.setData({
             series: [
                 new SeriesBuilder().makeDocComplete().page("page1").jobGroup("group").value(10).build(),
                 new SeriesBuilder().makeSpeedIndex().page("page1").jobGroup("group").value(20).build(),
