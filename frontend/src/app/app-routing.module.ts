@@ -17,6 +17,10 @@ const appRoutes: Routes = [
     loadChildren: './modules/landing/landing.module#LandingModule'
   },
   {
+    path: 'metricFinder',
+    loadChildren: './modules/metric-finder/metric-finder.module#MetricFinderModule'
+  },
+  {
     path: '',
     loadChildren: './modules/landing/landing.module#LandingModule',
     pathMatch: 'full'
