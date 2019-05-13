@@ -64,7 +64,7 @@ databaseChangeLog = {
         sql('''
             UPDATE location
             SET device_type = 'DESKTOP'
-            WHERE label REGEXP '(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc).*';
+            WHERE LOWER(label) REGEXP '.*(-win|ie\\s*[1-9]*|firefox|nuc).*';
         ''')
     }
 
@@ -72,7 +72,7 @@ databaseChangeLog = {
         sql('''
             UPDATE location
             SET device_type = 'TABLET'
-            WHERE label REGEXP '(?i).*(Pad|Tab|Note|Xoom|Book|Tablet).*';
+            WHERE LOWER(label) REGEXP '.*(pad|tab|note|xoom|book|tablet).*';
         ''')
     }
 
@@ -80,7 +80,7 @@ databaseChangeLog = {
         sql('''
             UPDATE location
             SET device_type = 'SMARTPHONE'
-            WHERE label REGEXP '(?i)(?!(.*(Pad|Tab|Note|Xoom|Book|Tablet).*)).*(Samsung|Moto|Sony|Nexus|Huawei|Nokia|Alcatel|LG|OnePlus|HTC|Phone).*';
+            WHERE LOWER(label) REGEXP '.*(samsung|moto|sony|nexus|huawei|nokia|alcatel|lg|oneplus|htc|phone).*' AND NOT device_type = 'TABLET';
         ''')
     }
 
@@ -88,15 +88,7 @@ databaseChangeLog = {
         sql('''
             UPDATE location
             SET operating_system = 'WINDOWS'
-            WHERE label REGEXP '(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc).*';
-        ''')
-    }
-
-    changeSet(author: "pal", id: "Task-9_populate_operating_system_location") {
-        sql('''
-            UPDATE location
-            SET operating_system = 'IOS'
-            WHERE label REGEXP '(?i)(?!(.*(Android|Desktop).*)).*(ios|iphone|ipad).*';
+            WHERE LOWER(label) REGEXP '.*(-win|ie\\s*[1-9]*|firefox|nuc).*';
         ''')
     }
 
@@ -104,7 +96,15 @@ databaseChangeLog = {
         sql('''
             UPDATE location
             SET operating_system = 'ANDROID'
-            WHERE label REGEXP '(?i).*(Samsung|Moto|Sony|Nexus|Huawei|Nokie|LG|HTC|Alcatel|OnePlus).*';
+            WHERE LOWER(label) REGEXP '.*(samsung|moto|sony|nexus|huawei|nokie|lg|htc|alcatel|oneplus).*';
+        ''')
+    }
+
+    changeSet(author: "pal", id: "Task-9_populate_operating_system_location") {
+        sql('''
+            UPDATE location
+            SET operating_system = 'IOS'
+            WHERE LOWER(label) REGEXP '.*(ios|iphone|ipad).*' AND NOT (operating_system = 'DESKTOP') AND NOT (operating_system = 'WINDOWS');
         ''')
     }
 
