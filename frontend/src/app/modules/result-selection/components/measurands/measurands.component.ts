@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 import {Observable, ReplaySubject} from "rxjs";
 import {ResultSelectionService} from "../../services/result-selection.service";

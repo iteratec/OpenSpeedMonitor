@@ -7,6 +7,7 @@ import {ResultSelectionService} from "./services/result-selection.service";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {MeasurandsComponent} from "./components/measurands/measurands.component";
+import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 
 describe('ResultSelectionComponent', () => {
   let component: ResultSelectionComponent;
@@ -17,7 +18,8 @@ describe('ResultSelectionComponent', () => {
       declarations: [
         ResultSelectionComponent,
         ResultSelectionTimeFrameComponent,
-        MeasurandsComponent
+        MeasurandsComponent,
+        MeasurandSelectComponent
       ],
       imports: [
         SharedMocksModule
