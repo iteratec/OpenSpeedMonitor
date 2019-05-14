@@ -65,7 +65,7 @@ class LocationSpec extends Specification implements BuildDataTest {
         String result = location.toString()
 
         then: "the result contains the location, server and browser"
-        result == "Agent1-wptdriver:Firefox7 @ wpt1 (Firefox)"
+        result == "Agent1-wptdriver:Firefox7 @ wpt1 (Firefox | DESKTOP | WINDOWS)"
     }
 
     void "removeBrowser returns the label without the browser name"(String uniqueIdentifierForServer) {

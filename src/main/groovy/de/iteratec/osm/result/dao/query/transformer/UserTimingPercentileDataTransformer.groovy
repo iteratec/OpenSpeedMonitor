@@ -1,6 +1,6 @@
 package de.iteratec.osm.result.dao.query.transformer
 
-import de.iteratec.osm.result.SelectedMeasurand
+
 import de.iteratec.osm.result.UserTimingType
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.AggregationUtil
@@ -31,9 +31,7 @@ class UserTimingPercentileDataTransformer implements EventResultTransformer {
             EventResultProjection erp = new EventResultProjection(id: key)
             erp.projectedProperties.putAll(metaDataForAggregations.get(key))
             valueMap.each { String nameKey, List valueList ->
-                int index = (valueList.size() * (percentage.toFloat() / 100f)).toInteger()
-                index = Math.min( valueList.size()-1, Math.max(0, index) )
-                erp.projectedProperties.put(nameKey, AggregationUtil.getPercentile(valueList, index))
+                erp.projectedProperties.put(nameKey, AggregationUtil.getPercentile(valueList, percentage))
             }
             result << erp
         }
