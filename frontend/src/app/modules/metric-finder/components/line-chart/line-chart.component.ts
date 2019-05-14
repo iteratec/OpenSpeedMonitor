@@ -10,12 +10,11 @@ import {
 } from '@angular/core';
 import {TestResult} from '../../models/test-result';
 import {select} from 'd3-selection';
-import {curveCatmullRom, line} from 'd3-shape';
+import {line} from 'd3-shape';
 import {ScaleLinear, scaleLinear, scaleTime, ScaleTime} from 'd3-scale';
 import {extent, max} from 'd3-array';
-import {axisBottom, axisLeft} from "d3-axis";
-import {timeDay} from "d3-time";
-import {timeFormat} from "d3-time-format";
+import {axisBottom, axisLeft} from 'd3-axis';
+import {format} from 'd3-format';
 
 @Component({
   selector: 'osm-line-chart',
@@ -38,7 +37,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   public height: number;
 
   private margin = {
-    left: 50,
+    left: 80,
     right: 40,
     top: 30,
     bottom: 30,
@@ -106,7 +105,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .select('g.y-axis')
       .call(
         axisLeft(this.yScale)
-          .tickFormat((tick: number) => (tick / 1000).toFixed(1) + 's')
+          .tickFormat(d => format(',')(d) + 'ms')
           .ticks(5)
       );
     selection
