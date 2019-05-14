@@ -9,6 +9,8 @@ import org.joda.time.DateTime
 import org.springframework.http.HttpStatus
 
 class MetricFinderController {
+    ResultSelectionService resultSelectionService
+
 
     @RestAction
     def getEventResults(EventResultCommand command) {
@@ -17,9 +19,7 @@ class MetricFinderController {
                     "Invalid parameters: " + command.getErrors().fieldErrors.collect { it.field }.join(", "))
             return
         }
-        List<SelectedMeasurand> measurands = Measurand.values()
-                .findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }
-                .collect { new SelectedMeasurand(it.toString(), CachedView.UNCACHED) }
+        List<SelectedMeasurand> measurands = getAllMeasurands(command)
         List<EventResultProjection> eventResults = new EventResultQueryBuilder()
                 .withJobResultDateBetween(command.from.toDate(), command.to.toDate())
                 .withPageIdsIn([command.pageId])
@@ -39,6 +39,22 @@ class MetricFinderController {
                 timings: result.projectedProperties.subMap(measurands.collect { it.databaseRelevantName })
         ]}
         ControllerUtils.sendObjectAsJSON(response, dtos)
+    }
+
+    List<SelectedMeasurand> getAllMeasurands(EventResultCommand command) {
+        ResultSelectionCommand resultSelectionCommand = new ResultSelectionCommand(from: command.from, to: command.to, jobGroupIds: [command.applicationId], pageIds: [command.pageId], browserIds: [command.browserId])
+        List<SelectedMeasurand> userTimings = resultSelectionService.query(resultSelectionCommand, ResultSelectionService.ResultSelectionType.UserTimings, { existing ->
+            projections {
+                userTimings {
+                    groupProperty('name')
+                    groupProperty('type')
+                }
+            }
+        }).collect { SelectedMeasurand.createForUserTiming(it[0], it[1], CachedView.UNCACHED) }.unique(false)
+        List<SelectedMeasurand> measurands = Measurand.values()
+                .findAll { it.measurandGroup == MeasurandGroup.LOAD_TIMES }
+                .collect { new SelectedMeasurand(it.toString(), CachedView.UNCACHED) }
+        return measurands + userTimings
     }
 }
 

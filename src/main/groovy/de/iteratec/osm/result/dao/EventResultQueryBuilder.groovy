@@ -90,6 +90,7 @@ class EventResultQueryBuilder {
                 ]
             case MetaDataSet.TEST_INFO:
                 return [
+                        new ProjectionProperty(dbName: 'id', alias: 'id'),
                         new ProjectionProperty(dbName: 'jobResult.wptServerBaseurl', alias: 'wptServerBaseurl'),
                         new ProjectionProperty(dbName: 'jobResult.testId', alias: 'testId'),
                         new ProjectionProperty(dbName: 'cachedView', alias: 'cachedView'),
