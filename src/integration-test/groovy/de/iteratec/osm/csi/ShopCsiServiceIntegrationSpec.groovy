@@ -212,6 +212,8 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
                 wptServer: webPageTestServer,
                 uniqueIdentifierForServer: "id",
                 browser: browser,
+                deviceType: DeviceType.DESKTOP,
+                operatingSystem: OperatingSystem.WINDOWS,
                 active: true)
         Job job = Job.build(
                 label: "Label${groups++}",
@@ -230,6 +232,8 @@ class ShopCsiServiceIntegrationSpec extends NonTransactionalIntegrationSpec {
                 page: page,
                 browser: browser,
                 location: location,
+                deviceType: location.deviceType,
+                operatingSystem: location.operatingSystem,
                 wptStatus: WptStatus.COMPLETED.getWptStatusCode(),
                 medianValue: true,
                 numberOfWptRun: 1,

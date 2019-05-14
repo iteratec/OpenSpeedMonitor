@@ -14,7 +14,7 @@ class AggregationUtilTest extends Specification {
 
         when:
         long time = System.currentTimeMillis()
-        int result = AggregationUtil.getPercentile( list, index )
+        int result = AggregationUtil.getPercentileByIndex(list, index)
         println("QuickSelect with ${list.size()} elements: ${(System.currentTimeMillis() - time)}ms")
 
         time = System.currentTimeMillis()
@@ -39,7 +39,7 @@ class AggregationUtilTest extends Specification {
 
         when:
         long time = System.currentTimeMillis()
-        int result = AggregationUtil.getPercentile( list, index )
+        int result = AggregationUtil.getPercentileByIndex(list, index)
         println("QuickSelect with ${list.size()} elements: ${(System.currentTimeMillis() - time)}ms")
 
         time = System.currentTimeMillis()
@@ -62,7 +62,7 @@ class AggregationUtilTest extends Specification {
 
         when:
         long time = System.currentTimeMillis()
-        int result = AggregationUtil.getPercentile( list, index )
+        int result = AggregationUtil.getPercentileByIndex(list, index)
         println("QuickSelect with ${list.size()} elements: ${(System.currentTimeMillis() - time)}ms")
 
         time = System.currentTimeMillis()
@@ -84,7 +84,7 @@ class AggregationUtilTest extends Specification {
 
         when:
         long time = System.currentTimeMillis()
-        int result = AggregationUtil.getPercentile( list, index )
+        int result = AggregationUtil.getPercentileByIndex(list, index)
         println("QuickSelect with ${list.size()} elements: ${(System.currentTimeMillis() - time)}ms")
 
         time = System.currentTimeMillis()

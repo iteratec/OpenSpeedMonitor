@@ -61,7 +61,10 @@ class EventResultQueryBuilderIntegrationSpec extends NonTransactionalIntegration
 
         when: "the builder just has one measurand and one connectivity profile"
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
-        List<EventResultProjection> result = new EventResultQueryBuilder().withSelectedMeasurands([selectedMeasurand]).withConnectivity([connectivityProfile.id], null, false).getRawData()
+        List<EventResultProjection> result = new EventResultQueryBuilder()
+                .withSelectedMeasurands([selectedMeasurand])
+                .withConnectivity([connectivityProfile.id], null, false)
+                .getRawData()
 
         then: "only both matching Eventresults are found with baseline projections"
         result.size() == 2

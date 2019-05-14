@@ -23,13 +23,16 @@ import de.iteratec.osm.measurement.environment.*
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.script.Script
+import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.MeasuredEvent
+import de.iteratec.osm.result.OperatingSystem
 import grails.buildtestdata.BuildDataTest
 import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
 import groovy.util.slurpersupport.GPathResult
+import org.springframework.objenesis.instantiator.android.Android10Instantiator
 import spock.lang.Specification
 
 /**
@@ -54,7 +57,7 @@ class PersistingLocationsSpec extends Specification implements BuildDataTest,
                 MeasuredEvent, JobGroup, Script)
     }
 
-    void "when listening to a WPT location respons, missing locations are added for this server"() {
+    void "when listening to a WPT location response, missing locations are added for this server"() {
         setup:
         def file = new File('src/test/resources/WptLocationXmls/locationResponse.xml')
         GPathResult result = new XmlSlurper().parse(file)
@@ -66,6 +69,16 @@ class PersistingLocationsSpec extends Specification implements BuildDataTest,
 
         then: "all 5 are added"
         Location.count() == 5
+        Location.findById(1).operatingSystem == OperatingSystem.ANDROID
+        Location.findById(2).operatingSystem == OperatingSystem.ANDROID
+        Location.findById(3).operatingSystem == OperatingSystem.WINDOWS
+        Location.findById(4).operatingSystem == OperatingSystem.IOS
+        Location.findById(5).operatingSystem == OperatingSystem.IOS
+        Location.findById(1).deviceType == DeviceType.SMARTPHONE
+        Location.findById(2).deviceType == DeviceType.TABLET
+        Location.findById(3).deviceType == DeviceType.DESKTOP
+        Location.findById(4).deviceType == DeviceType.TABLET
+        Location.findById(5).deviceType == DeviceType.SMARTPHONE
 
         when: "the services sees the same locations for the same server"
         Location.count() == 5
