@@ -6,11 +6,20 @@ osm-line-chart {
     height: 100%;
     min-width: 400px;
     min-height: 200px;
+    background: $color-card-background;
   }
 
   path.line {
     stroke: $color-primary;
     fill: none;
+  }
+
+  .y-axis, .x-axis {
+    color: $color-contour-light;
+
+    text {
+      color: $color-text-light;
+    }
   }
 }
 

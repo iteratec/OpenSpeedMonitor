@@ -54,8 +54,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     this.height = this.svgElement.nativeElement.parentElement.offsetHeight - this.margin.top - this.margin.bottom;
     this.xScale =  scaleTime()
       .domain(extent(this.results, result => result.date))
-      .range([0, this.width])
-      .nice();
+      .range([0, this.width]);
     this.yScale =  scaleLinear()
       .domain([0, max(this.results, result => result.timings[this.metric])])
       .range([this.height, 0])
@@ -105,7 +104,11 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
 
     selection
       .select('g.y-axis')
-      .call(axisLeft(this.yScale).tickFormat((tick: number) => (tick / 1000).toFixed(1) + 's'));
+      .call(
+        axisLeft(this.yScale)
+          .tickFormat((tick: number) => (tick / 1000).toFixed(1) + 's')
+          .ticks(5)
+      );
     selection
       .select('g.x-axis')
       .attr('transform', `translate(0,${this.height})`)
