@@ -1,26 +1,36 @@
 import { Injectable } from '@angular/core';
-import {TestInfo, TestResult} from '../models/test-result';
+import {TestResult, TestResultDTO} from '../models/test-result';
 import {BehaviorSubject} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {map} from 'rxjs/operators';
 
 @Injectable()
 export class MetricFinderService {
   public testResults$ = new BehaviorSubject<TestResult[]>([]);
 
-  constructor() {
-    this.mockData();
+  constructor(
+    private http: HttpClient
+  ) {
+    this.loadFixedData();
   }
 
-  private mockData() {
-    const testInfo = new TestInfo('XY_Z0_20190512', 1, false, 1, 'https://webpagetest.org')
+  private loadFixedData() {
     const now = Date.now();
-    const hourInMillisecs = 1000 * 60 * 60;
-    this.testResults$.next([
-      new TestResult(new Date(now - 5 * hourInMillisecs), testInfo, { 'SPEED_INDEX': 2000}),
-      new TestResult(new Date(now - 4 * hourInMillisecs), testInfo, { 'SPEED_INDEX': 3000}),
-      new TestResult(new Date(now - 3 * hourInMillisecs), testInfo, { 'SPEED_INDEX': 2400}),
-      new TestResult(new Date(now - 2 * hourInMillisecs), testInfo, { 'SPEED_INDEX': 1987}),
-      new TestResult(new Date(now - hourInMillisecs), testInfo, { 'SPEED_INDEX': 1698})
-    ]);
+    const dayInMillisecs = 1000 * 60 * 60 * 24;
+    this.loadData(new Date(now - 28 * dayInMillisecs), new Date(now), 94, 76, 4);
+  }
+
+  public loadData(from: Date, to: Date, application: number, page: number, browser: number) {
+    const params = {
+      from: from.toISOString(),
+      to: to.toISOString(),
+      applicationId: application.toString(),
+      pageId: page.toString(),
+      browserId: browser.toString()
+    };
+    this.http.get<TestResultDTO[]>('/metricFinder/rest/getEventResults', {params}).pipe(
+      map(dtos => dtos.map(dto => new TestResult(dto)))
+    ).subscribe(next => this.testResults$.next(next));
   }
 
 }
