@@ -377,6 +377,7 @@ class TabularResultPresentationController {
                 property('connectivityProfile.bandwidthUp')
                 property('connectivityProfile.latency')
                 property('connectivityProfile.packetLoss')
+                property('jobResult')
             }
         }
 
