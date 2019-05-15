@@ -13,6 +13,7 @@ export class MetricFinderComponent {
 
   constructor(private metricFinderService: MetricFinderService) {
     this.testResults$ = metricFinderService.testResults$;
+    metricFinderService.loadTestData();
   }
 
 }

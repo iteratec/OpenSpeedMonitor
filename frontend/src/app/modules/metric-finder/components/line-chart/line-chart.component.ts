@@ -49,6 +49,9 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   }
 
   redraw() {
+    if (!this.results) {
+      return;
+    }
     this.width = this.svgElement.nativeElement.parentElement.offsetWidth - this.margin.left - this.margin.right;
     this.height = this.svgElement.nativeElement.parentElement.offsetHeight - this.margin.top - this.margin.bottom;
     this.xScale =  scaleTime()

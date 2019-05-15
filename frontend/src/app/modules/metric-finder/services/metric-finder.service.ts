@@ -11,10 +11,9 @@ export class MetricFinderService {
   constructor(
     private http: HttpClient
   ) {
-    this.loadFixedData();
   }
 
-  private loadFixedData() {
+  public loadTestData() {
     const now = Date.now();
     const dayInMillisecs = 1000 * 60 * 60 * 24;
     this.loadData(new Date(now - 28 * dayInMillisecs), new Date(now), 94, 76, 4);
