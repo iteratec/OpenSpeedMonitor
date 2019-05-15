@@ -31,7 +31,7 @@ import {LocationDto} from "../modules/application-dashboard/models/location.mode
 
 @Injectable()
 export class ApplicationService {
-  metrics$: ReplaySubject<PageMetricsDto[]> = new ReplaySubject<PageMetricsDto[]>(1);
+  metrics$: BehaviorSubject<PageMetricsDto[]> = new BehaviorSubject<PageMetricsDto[]>([]);
   applicationCsiById$: BehaviorSubject<ApplicationCsiById> = new BehaviorSubject({isLoading: false});
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});

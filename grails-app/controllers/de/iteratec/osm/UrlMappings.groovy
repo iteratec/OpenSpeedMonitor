@@ -35,6 +35,7 @@ class UrlMappings {
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
         "/metricFinder/**?"(view: "/angularFrontend")
+        "/aspectConfiguration/**?"(view: "/angularFrontend")
         "/metricFinder/rest/$action"(controller: "metricFinder")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
