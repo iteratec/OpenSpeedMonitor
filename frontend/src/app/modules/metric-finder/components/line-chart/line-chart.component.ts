@@ -9,10 +9,10 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {TestResult} from '../../models/test-result';
-import {select} from 'd3-selection';
+import {mouse, select} from 'd3-selection';
 import {line} from 'd3-shape';
 import {ScaleLinear, scaleLinear, scaleTime, ScaleTime} from 'd3-scale';
-import {extent, max} from 'd3-array';
+import {bisector, extent, max} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {format} from 'd3-format';
 
@@ -80,18 +80,74 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
 
 
   private enter(selection: any) {
-    const svg = selection
+    const graph = selection
       .append('g')
       .attr('class', 'graph');
-    svg
+    graph
       .append('path')
       .attr('class', 'line');
-    svg
+    graph
       .append('g')
       .attr('class', 'y-axis');
-    svg
+    graph
       .append('g')
       .attr('class', 'x-axis');
+    this.createMouseOver(graph);
+  }
+
+  private createMouseOver(graph: any): any {
+    const mouseOver = graph
+      .append('g')
+      .attr('class', 'mouse-over')
+      .style('display', 'none');
+    mouseOver
+      .append('line')
+      .attr('class', 'mouse-over-line')
+      .attr('y1', 0)
+      .attr('y2', this.height)
+      .attr('stroke', 'currentColor')
+      .attr('stroke-width', '1');
+    mouseOver
+      .append('circle')
+      .attr('class', 'mouse-over-point')
+      .attr('r', '5')
+      .style('filter', 'url(#glow)');
+    const mouseEvents = graph.append('rect')
+      .attr('class', 'mouse-events')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('fill', 'none')
+      .attr('pointer-events', 'all');
+    mouseEvents
+      .on('mouseover', () => mouseOver.style('display', null))
+      .on('mouseout', () => mouseOver.style('display', 'none'))
+      .on('mousemove', () => this.mouseMove(mouseOver, mouse(mouseEvents.node())));
+  }
+
+  private mouseMove(mouseOver, [mouseX, mouseY]: [number, number]) {
+    const xDate = this.xScale.invert(mouseX);
+    const closestResult = this.closestResult(xDate);
+    const resultPos = this.xScale(closestResult.date);
+    mouseOver
+      .select('line.mouse-over-line')
+      .attr('x1', resultPos)
+      .attr('x2', resultPos);
+    mouseOver
+      .select('circle.mouse-over-point')
+      .attr('cx', resultPos)
+      .attr('cy', this.yScale(closestResult.timings[this.metric]));
+  }
+
+  private closestResult(date: Date) {
+    const timestamp = date.getTime();
+    const bisectResults = bisector((testResult: TestResult) => testResult.date).left;
+    const resultIndex = bisectResults(this.results, date);
+    if (resultIndex > 0 &&
+      timestamp - this.results[resultIndex - 1].date.getTime() < this.results[resultIndex].date.getTime() - timestamp) {
+      return this.results[resultIndex - 1];
+    } else {
+      return this.results[resultIndex];
+    }
   }
 
   private update(selection: any) {

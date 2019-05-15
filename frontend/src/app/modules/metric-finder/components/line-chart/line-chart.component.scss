@@ -21,5 +21,15 @@ osm-line-chart {
       color: $color-text-light;
     }
   }
+
+  .mouse-over-line {
+    stroke: $color-contour-medium;
+  }
+
+  .mouse-over-point {
+    stroke: $color-primary;
+    stroke-width: 2;
+    fill: $color-card-background;
+  }
 }
 
