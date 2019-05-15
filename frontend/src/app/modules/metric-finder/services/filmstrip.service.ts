@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs';
-import {ThumbnailDto} from '../models/thumbnail.model';
+import {Thumbnail, ThumbnailDto} from '../models/thumbnail.model';
 import {map} from 'rxjs/operators';
+import {WptResultDto} from '../models/wptResult-dto.model';
 
 @Injectable()
 export class FilmstripService {
@@ -16,8 +17,9 @@ export class FilmstripService {
   constructor (private http: HttpClient) {}
 
   getFilmstrip() {
-    return this.http.get(this.filmStripDataUrl).pipe(
-      map( (wptData: any) => (wptData.data.runs[1].firstView.steps[0].videoFrames.map(item => [item.time, item.image]))))
+    return this.http.get<WptResultDto>(this.filmStripDataUrl).pipe(
+      map( (wptData: WptResultDto) => (wptData.data.runs[1].firstView.steps[0].videoFrames)
+        .map(item => new Thumbnail(item.time, item.image))))
       .subscribe(value => this.filmStripData$.next(value),
           error => this.handleError(error));
   }

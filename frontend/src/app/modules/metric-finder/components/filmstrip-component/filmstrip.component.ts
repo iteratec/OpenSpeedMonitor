@@ -15,6 +15,7 @@ export class FilmstripComponent {
 
   constructor(filmstripService: FilmstripService) {
     this.filmstripService = filmstripService;
+    console.log(this.filmstripService.filmStripData$);
     this.filmStripData$ = this.filmstripService.filmStripData$;
     this.filmstripService.getFilmstrip();
   }
