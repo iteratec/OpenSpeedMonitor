@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs';
-import {Thumbnail, ThumbnailDto} from '../models/thumbnail.model';
+import {Thumbnail} from '../models/thumbnail.model';
 import {map} from 'rxjs/operators';
 import {WptResultDto} from '../models/wptResult-dto.model';
 
@@ -40,7 +40,6 @@ export class FilmstripService {
     const end = Math.max(...thumbnails.map(t => t.time));
     const filmstrip = [];
     let lastVideoFrame = null;
-    // debugger;
 
     for (let time = 0; time < end + interval; time += interval) {
       const videoFrame = this.findFrame(thumbnails, time);
