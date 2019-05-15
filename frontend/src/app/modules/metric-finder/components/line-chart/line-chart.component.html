@@ -1,5 +1,13 @@
 <div class="metric-finder">
   <svg #svg class="metric-finder" (window:resize)="redraw()" xmlns="http://www.w3.org/1999/html">
-
+    <defs>
+      <filter id="glow" x="-40%" y="-40%" width="180%" height="180%" filterUnits="userSpaceOnUse">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="3"/>
+        <feMerge>
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
   </svg>
 </div>
