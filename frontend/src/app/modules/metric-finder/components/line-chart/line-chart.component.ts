@@ -9,12 +9,13 @@ import {
   ViewEncapsulation
 } from '@angular/core';
 import {TestResult} from '../../models/test-result';
-import {mouse, select} from 'd3-selection';
+import {mouse, select, selectAll} from 'd3-selection';
 import {line} from 'd3-shape';
 import {ScaleLinear, scaleLinear, scaleTime, ScaleTime} from 'd3-scale';
 import {bisector, extent, max} from 'd3-array';
 import {axisBottom, axisLeft} from 'd3-axis';
 import {format} from 'd3-format';
+import {timeFormat} from 'd3-time-format';
 
 @Component({
   selector: 'osm-line-chart',
@@ -30,12 +31,16 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   @ViewChild('svg')
   svgElement: ElementRef;
 
+  @ViewChild('tooltip')
+  tooltipElement: ElementRef;
+
   @Input()
   metric: string;
 
   public width: number;
   public height: number;
 
+  private tooltipHeight = 35;
   private margin = {
     left: 80,
     right: 40,
@@ -44,6 +49,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   };
   private xScale: ScaleTime<number, number>;
   private yScale: ScaleLinear<number, number>;
+  private formatDate = timeFormat('%Y-%m-%d %H:%M:%S');
 
   constructor() {
   }
@@ -95,61 +101,6 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     this.createMouseOver(graph);
   }
 
-  private createMouseOver(graph: any): any {
-    const mouseOver = graph
-      .append('g')
-      .attr('class', 'mouse-over')
-      .style('display', 'none');
-    mouseOver
-      .append('line')
-      .attr('class', 'mouse-over-line')
-      .attr('y1', 0)
-      .attr('y2', this.height)
-      .attr('stroke', 'currentColor')
-      .attr('stroke-width', '1');
-    mouseOver
-      .append('circle')
-      .attr('class', 'mouse-over-point')
-      .attr('r', '5')
-      .style('filter', 'url(#glow)');
-    const mouseEvents = graph.append('rect')
-      .attr('class', 'mouse-events')
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('fill', 'none')
-      .attr('pointer-events', 'all');
-    mouseEvents
-      .on('mouseover', () => mouseOver.style('display', null))
-      .on('mouseout', () => mouseOver.style('display', 'none'))
-      .on('mousemove', () => this.mouseMove(mouseOver, mouse(mouseEvents.node())));
-  }
-
-  private mouseMove(mouseOver, [mouseX, mouseY]: [number, number]) {
-    const xDate = this.xScale.invert(mouseX);
-    const closestResult = this.closestResult(xDate);
-    const resultPos = this.xScale(closestResult.date);
-    mouseOver
-      .select('line.mouse-over-line')
-      .attr('x1', resultPos)
-      .attr('x2', resultPos);
-    mouseOver
-      .select('circle.mouse-over-point')
-      .attr('cx', resultPos)
-      .attr('cy', this.yScale(closestResult.timings[this.metric]));
-  }
-
-  private closestResult(date: Date) {
-    const timestamp = date.getTime();
-    const bisectResults = bisector((testResult: TestResult) => testResult.date).left;
-    const resultIndex = bisectResults(this.results, date);
-    if (resultIndex > 0 &&
-      timestamp - this.results[resultIndex - 1].date.getTime() < this.results[resultIndex].date.getTime() - timestamp) {
-      return this.results[resultIndex - 1];
-    } else {
-      return this.results[resultIndex];
-    }
-  }
-
   private update(selection: any) {
     selection
       .select('g.graph')
@@ -164,12 +115,83 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .select('g.y-axis')
       .call(
         axisLeft(this.yScale)
-          .tickFormat(d => format(',')(d) + 'ms')
+          .tickFormat(d => this.formatValue(d))
           .ticks(5)
       );
     selection
       .select('g.x-axis')
       .attr('transform', `translate(0,${this.height})`)
       .call(axisBottom(this.xScale));
+  }
+
+  private createMouseOver(graph: any): any {
+    const mouseOver = graph
+      .append('g')
+      .attr('class', 'mouse-over')
+    mouseOver
+      .append('line')
+      .attr('class', 'mouse-over-line')
+      .attr('y1', 0)
+      .attr('y2', this.height)
+      .attr('stroke', 'currentColor')
+      .attr('stroke-width', '1');
+    mouseOver
+      .append('circle')
+      .attr('class', 'mouse-over-point')
+      .attr('r', '5')
+      .style('filter', 'url(#glow)');
+    const tooltip = select(this.tooltipElement.nativeElement)
+      .attr('class', 'mouse-over tooltip');
+    const mouseEvents = graph.append('rect')
+      .attr('class', 'mouse-events')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('fill', 'none')
+      .attr('pointer-events', 'all');
+    mouseEvents
+      .on('mouseover', () => selectAll('.mouse-over').style('opacity', 1))
+      .on('mouseout', () => selectAll('.mouse-over').style('opacity', 0))
+      .on('mousemove', () => this.mouseMove(mouseOver, tooltip, mouse(mouseEvents.node())));
+  }
+
+  private mouseMove(mouseOver, tooltip, [mouseX, mouseY]: [number, number]) {
+    const xDate = this.xScale.invert(mouseX);
+    const closestResult = this.closestResult(xDate);
+    if (!closestResult) {
+      return;
+    }
+    const resultPosX = this.xScale(closestResult.date);
+    const yValue = closestResult.timings[this.metric];
+    const resultPosY = this.yScale(yValue);
+    mouseOver
+      .select('line.mouse-over-line')
+      .attr('x1', resultPosX)
+      .attr('x2', resultPosX);
+    mouseOver
+      .select('circle.mouse-over-point')
+      .attr('cx', resultPosX)
+      .attr('cy', resultPosY);
+    const formattedDate = this.formatDate(closestResult.date);
+    const bottom = this.height + this.margin.top - Math.max(resultPosY, this.tooltipHeight);
+    tooltip
+      .html(`<span class="y-value">${this.formatValue(yValue)}</span><span class="x-value">${formattedDate}</span>`)
+      .style('bottom', `${bottom}px`)
+      .style('left', `${resultPosX + this.margin.left + 20}px`);
+  }
+
+  private closestResult(date: Date) {
+    const timestamp = date.getTime();
+    const bisectResults = bisector((testResult: TestResult) => testResult.date).left;
+    const resultIndex = bisectResults(this.results, date);
+    if (resultIndex > 0 &&
+      timestamp - this.results[resultIndex - 1].date.getTime() < this.results[resultIndex].date.getTime() - timestamp) {
+      return this.results[resultIndex - 1];
+    } else {
+      return this.results[resultIndex];
+    }
+  }
+
+  private formatValue(value: number): string {
+    return format(',')(value) + 'ms';
   }
 }
