@@ -1,9 +1,9 @@
 import {
   AfterContentInit,
   Component,
-  ElementRef,
+  ElementRef, EventEmitter,
   Input,
-  OnChanges,
+  OnChanges, Output,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation
@@ -37,10 +37,14 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   @Input()
   metric: string;
 
+  @Output()
+  resultSelectionChange = new EventEmitter<TestResult[]>();
+
   public width: number;
   public height: number;
 
   private tooltipHeight = 35;
+  private tooltipWidth = 130;
   private margin = {
     left: 80,
     right: 40,
@@ -50,6 +54,9 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   private xScale: ScaleTime<number, number>;
   private yScale: ScaleLinear<number, number>;
   private formatDate = timeFormat('%Y-%m-%d %H:%M:%S');
+
+  private highlightedResult: TestResult;
+  private selectedResults: TestResult[] = [];
 
   constructor() {
   }
@@ -78,12 +85,27 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     const selection = select(this.svgElement.nativeElement).selectAll('g.graph').data<TestResult[]>([this.results]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
+    this.renderSelectedPoints();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     this.redraw();
   }
 
+  private renderSelectedPoints() {
+    const selectedPoints = select('g.selected-points')
+      .selectAll('circle.selected-point')
+      .data<TestResult>(this.selectedResults);
+    const entered = selectedPoints.enter()
+      .append('circle')
+      .attr('class', 'selected-point')
+      .attr('r', '4');
+    selectedPoints.merge(entered)
+      .attr('cx', d => this.xScale(d.date))
+      .attr('cy', d => this.yScale(d.timings[this.metric]));
+    selectedPoints.exit()
+      .remove();
+  }
 
   private enter(selection: any) {
     const graph = selection
@@ -98,6 +120,9 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     graph
       .append('g')
       .attr('class', 'x-axis');
+    graph
+      .append('g')
+      .attr('class', 'selected-points');
     this.createMouseOver(graph);
   }
 
@@ -122,12 +147,19 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .select('g.x-axis')
       .attr('transform', `translate(0,${this.height})`)
       .call(axisBottom(this.xScale));
+    this.updateHighlightedPoint();
   }
 
   private createMouseOver(graph: any): any {
+    const mouseEvents = graph.append('rect')
+      .attr('class', 'mouse-events')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('fill', 'none')
+      .attr('pointer-events', 'all');
     const mouseOver = graph
       .append('g')
-      .attr('class', 'mouse-over')
+      .attr('class', 'mouse-over');
     mouseOver
       .append('line')
       .attr('class', 'mouse-over-line')
@@ -139,29 +171,30 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .append('circle')
       .attr('class', 'mouse-over-point')
       .attr('r', '5')
-      .style('filter', 'url(#glow)');
+      .style('filter', 'url(#glow)')
+      .on('click', () => this.clickPoint());
     const tooltip = select(this.tooltipElement.nativeElement)
       .attr('class', 'mouse-over tooltip');
-    const mouseEvents = graph.append('rect')
-      .attr('class', 'mouse-events')
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('fill', 'none')
-      .attr('pointer-events', 'all');
     mouseEvents
       .on('mouseover', () => selectAll('.mouse-over').style('opacity', 1))
-      .on('mouseout', () => selectAll('.mouse-over').style('opacity', 0))
+      .on('mouseout', () => this.mouseOut(mouse(mouseEvents.node())))
       .on('mousemove', () => this.mouseMove(mouseOver, tooltip, mouse(mouseEvents.node())));
+  }
+
+  private mouseOut([mouseX, mouseY]: [number, number]) {
+    if (mouseX < 0 || mouseX > this.width || mouseY < 0 || mouseY > this.height) {
+      selectAll('.mouse-over').style('opacity', 0);
+    }
   }
 
   private mouseMove(mouseOver, tooltip, [mouseX, mouseY]: [number, number]) {
     const xDate = this.xScale.invert(mouseX);
-    const closestResult = this.closestResult(xDate);
-    if (!closestResult) {
+    this.highlightedResult = this.closestResult(xDate);
+    if (!this.highlightedResult) {
       return;
     }
-    const resultPosX = this.xScale(closestResult.date);
-    const yValue = closestResult.timings[this.metric];
+    const resultPosX = this.xScale(this.highlightedResult.date);
+    const yValue = this.highlightedResult.timings[this.metric];
     const resultPosY = this.yScale(yValue);
     mouseOver
       .select('line.mouse-over-line')
@@ -171,12 +204,33 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .select('circle.mouse-over-point')
       .attr('cx', resultPosX)
       .attr('cy', resultPosY);
-    const formattedDate = this.formatDate(closestResult.date);
+    this.updateHighlightedPoint();
+    const formattedDate = this.formatDate(this.highlightedResult.date);
     const bottom = this.height + this.margin.top - Math.max(resultPosY, this.tooltipHeight);
+    const left = Math.min(resultPosX + this.margin.left + 10, this.margin.left + this.margin.right + this.width - this.tooltipWidth);
     tooltip
       .html(`<span class="y-value">${this.formatValue(yValue)}</span><span class="x-value">${formattedDate}</span>`)
       .style('bottom', `${bottom}px`)
-      .style('left', `${resultPosX + this.margin.left + 20}px`);
+      .style('left', `${left}px`);
+  }
+
+  private updateHighlightedPoint() {
+    select('circle.mouse-over-point')
+      .classed('selected', this.selectedResults.indexOf(this.highlightedResult) >= 0);
+  }
+
+  private clickPoint() {
+    if (!this.highlightedResult) {
+      return;
+    }
+    const index = this.selectedResults.indexOf(this.highlightedResult);
+    if (index < 0) {
+      this.selectedResults.push(this.highlightedResult);
+    } else {
+      this.selectedResults.splice(index, 1);
+    }
+    this.resultSelectionChange.emit(this.selectedResults);
+    this.render();
   }
 
   private closestResult(date: Date) {

@@ -39,6 +39,16 @@ osm-line-chart {
     stroke-width: 2;
     fill: $color-card-background;
     cursor: pointer;
+
+    &.selected {
+      fill: transparent;
+    }
+  }
+
+  .selected-point {
+    stroke: transparent;
+    fill: $color-primary;
+    cursor: pointer;
   }
 
   .tooltip {
