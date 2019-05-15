@@ -13,15 +13,15 @@ import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.measurement.script.PlaceholdersUtility
 import de.iteratec.osm.measurement.script.Script
 import de.iteratec.osm.measurement.script.ScriptParser
-import de.iteratec.osm.result.dto.PageAggregationChartDTO
-import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
+import de.iteratec.osm.result.dto.AggregationChartDTO
+import de.iteratec.osm.result.dto.AggregationChartSeriesDTO
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import org.springframework.http.HttpStatus
 
-class PageAggregationController extends ExceptionHandlerController {
+class AggregationController extends ExceptionHandlerController {
 
     public final static String DATE_FORMAT_STRING_FOR_HIGH_CHART = 'dd.mm.yyyy';
     public final static int MONDAY_WEEKSTART = 1
@@ -74,7 +74,7 @@ class PageAggregationController extends ExceptionHandlerController {
     /**
      * Rest Method for ajax call.
      * @param cmd The requested data.
-     * @return PageAggregationChartDTO as JSON or string message if an error occurred
+     * @return AggregationChartDTO as JSON or string message if an error occurred
      */
     @RestAction
     def getBarchartData(GetBarchartCommand cmd) {
@@ -103,14 +103,14 @@ class PageAggregationController extends ExceptionHandlerController {
             return
         }
 
-        PageAggregationChartDTO chartDto = new PageAggregationChartDTO(hasComparativeData: hasComparativeData)
+        AggregationChartDTO chartDto = new AggregationChartDTO(hasComparativeData: hasComparativeData)
         chartDto.i18nMap.put("measurand", i18nService.msg("de.iteratec.result.measurand.label", "Measurand"))
         chartDto.i18nMap.put("jobGroup", i18nService.msg("de.iteratec.isr.wptrd.labels.filterFolder", "JobGroup"))
         chartDto.i18nMap.put("page", i18nService.msg("de.iteratec.isr.wptrd.labels.filterPage", "Page"))
         chartDto.i18nMap.put("comparativeImprovement", i18nService.msg("de.iteratec.osm.chart.comparative.improvement", "Improvement"))
         chartDto.i18nMap.put("comparativeDeterioration", i18nService.msg("de.iteratec.osm.chart.comparative.deterioration", "Deterioration"))
 
-        chartDto.series.addAll(convertToPageAggregationChartSeriesDTOs(barchartAggregations))
+        chartDto.series.addAll(convertToAggregationChartSeriesDTOs(barchartAggregations))
 
 //      TODO: see ticket [IT-1614]
         chartDto.filterRules = createFilterRules(allPages, allJobGroups)
@@ -142,12 +142,12 @@ class PageAggregationController extends ExceptionHandlerController {
         }
     }
 
-    private List<PageAggregationChartSeriesDTO> convertToPageAggregationChartSeriesDTOs(List<BarchartAggregation> barchartAggregations) {
+    private List<AggregationChartSeriesDTO> convertToAggregationChartSeriesDTOs(List<BarchartAggregation> barchartAggregations) {
         return barchartAggregations.collectMany {
             if (!it.value) {
                 return []
             } else {
-                return [new PageAggregationChartSeriesDTO(
+                return [new AggregationChartSeriesDTO(
                     unit: it.selectedMeasurand.getMeasurandGroup().unit.label,
                     measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name),
                     measurand: it.selectedMeasurand.name,

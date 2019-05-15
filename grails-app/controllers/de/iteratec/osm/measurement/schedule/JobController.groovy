@@ -521,8 +521,8 @@ class JobController {
         redirect(controller: 'eventResultDashboard', action: 'showAll', params: jobService.createTimeSeriesParamsFor(job))
     }
 
-    def showLastPageAggregationForJob(Long id) {
+    def showLastAggregationForJob(Long id) {
         Job job = Job.get(id)
-        redirect(controller: 'PageAggregation', action: 'show', params: jobService.createPageAggregationParamsFor(job))
+        redirect(controller: 'aggregation', action: 'show', params: jobService.createAggregationParamsFor(job))
     }
 }

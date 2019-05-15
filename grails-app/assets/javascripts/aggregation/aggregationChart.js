@@ -7,7 +7,7 @@
 //= require /chartComponents/chartHeader.js
 //= require /chartComponents/common.js
 //= require /d3/chartLabelUtil.js
-//= require /pageAggregation/pageAggregationChartData.js
+//= require /aggregation/aggregationChartData.js
 //= require_self
 
 "use strict";
@@ -15,14 +15,14 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.PageAggregation = (function (selector) {
+OpenSpeedMonitor.ChartModules.Aggregation = (function (selector) {
     var svg = d3.select(selector);
     var chartBarsComponents = {};
     var chartLegendComponent = OpenSpeedMonitor.ChartComponents.ChartLegend();
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
-    var data = OpenSpeedMonitor.ChartModules.PageAggregationData(svg);
+    var data = OpenSpeedMonitor.ChartModules.AggregationData(svg);
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
 
     chartLegendComponent.on("select", function (selectEvent) {
