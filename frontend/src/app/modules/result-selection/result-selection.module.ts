@@ -12,6 +12,7 @@ import {
 } from 'ng-pick-datetime';
 import {ResultSelectionPageLocationConnectivityComponent} from './components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component';
 import {NgSelectModule} from "@ng-select/ng-select";
+import { SelectionDataComponent } from './components/result-selection-page-location-connectivity/selection-data/selection-data.component';
 
 export const TIME_FORMAT = {
   fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
@@ -31,7 +32,8 @@ export const TIME_FORMAT = {
     ResultSelectionComponent,
     ResultSelectionTimeFrameComponent,
     MeasurandSelectComponent,
-    ResultSelectionPageLocationConnectivityComponent
+    ResultSelectionPageLocationConnectivityComponent,
+    SelectionDataComponent
   ],
   exports: [MeasurandSelectComponent],
   providers: [

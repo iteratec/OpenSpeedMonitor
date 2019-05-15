@@ -31,7 +31,7 @@ export class ResultSelectionService {
   applicationsAndPages$: ReplaySubject<ApplicationWithPages[]> = new ReplaySubject(1);
   eventsAndPages$: BehaviorSubject<MeasuredEvent[]> = new BehaviorSubject([]);
   locationsAndBrowsers$: BehaviorSubject<Location[]> = new BehaviorSubject([]);
-  connectivities$: ReplaySubject<Connectivity[]> = new ReplaySubject(1);
+  connectivities$: BehaviorSubject<Connectivity[]> = new BehaviorSubject([]);
   //selectableHeroTimings$: ReplaySubject<SelectableHeroTiming[]> = new ReplaySubject<SelectableHeroTiming[]>(1);
   //selectableUserTimings$: ReplaySubject<SelectableUserTiming[]> = new ReplaySubject<SelectableUserTiming[]>(1);
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
@@ -225,24 +225,21 @@ export class ResultSelectionService {
   updateSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<MeasuredEvent[]> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get<MeasuredEvent[]>('/resultSelection/getMeasuredEvents', {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 
   updateSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): Observable<Location[]> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get<Location[]>('/resultSelection/getLocations', {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 
   updateSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): Observable<Connectivity[]> {
     const params = this.createParams(resultSelectionCommand);
     return this.http.get('/resultSelection/getConnectivityProfiles', {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 
