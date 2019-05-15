@@ -4,7 +4,7 @@
 var OpenSpeedMonitor = OpenSpeedMonitor || {};
 OpenSpeedMonitor.ChartModules = OpenSpeedMonitor.ChartModules || {};
 
-OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
+OpenSpeedMonitor.ChartModules.AggregationData = (function (svgSelection) {
     var svg = svgSelection;
     var chartSideLabelsWidth = 200;
     var chartBarsWidth = 700;
@@ -179,7 +179,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var sortByMeasurandOrder = function (measurandList) {
-        var measurandOrder = OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder;
+        var measurandOrder = OpenSpeedMonitor.ChartModules.AggregationData.MeasurandOrder;
         measurandList.sort(function (a, b) {
             var idxA = measurandOrder.indexOf(a);
             var idxB = measurandOrder.indexOf(b);
@@ -271,7 +271,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
     };
 
     var getMeasurandDataForSorting = function () {
-        var measurandOrder = OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder;
+        var measurandOrder = OpenSpeedMonitor.ChartModules.AggregationData.MeasurandOrder;
         for (var i = 0; i < measurandOrder.length; i++) {
             var curMeasurandData = allMeasurandDataMap[measurandOrder[i]];
             if (curMeasurandData) {
@@ -421,7 +421,7 @@ OpenSpeedMonitor.ChartModules.PageAggregationData = (function (svgSelection) {
         sortByMeasurandOrder: sortByMeasurandOrder
     }
 });
-OpenSpeedMonitor.ChartModules.PageAggregationData.MeasurandOrder = [
+OpenSpeedMonitor.ChartModules.AggregationData.MeasurandOrder = [
     "CS_BY_WPT_VISUALLY_COMPLETE",
     "CS_BY_WPT_DOC_COMPLETE",
     "FULLY_LOADED_TIME",
