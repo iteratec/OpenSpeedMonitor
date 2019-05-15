@@ -1,7 +1,8 @@
 import {Component} from '@angular/core';
 import {FilmstripService} from '../../services/filmstrip.service';
-import {BehaviorSubject} from 'rxjs';
-import {ThumbnailDto} from '../../models/thumbnail.model';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {Thumbnail} from '../../models/thumbnail.model';
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'osm-filmstrip',
@@ -9,14 +10,15 @@ import {ThumbnailDto} from '../../models/thumbnail.model';
   styleUrls: ['./filmstrip.component.scss']
 })
 export class FilmstripComponent {
-
   private filmstripService: FilmstripService;
-  filmStripData$: BehaviorSubject<ThumbnailDto[]>;
+  filmStripData$: BehaviorSubject<Thumbnail[]>;
+  filmStrip$: Observable<Thumbnail[]>;
 
   constructor(filmstripService: FilmstripService) {
     this.filmstripService = filmstripService;
-    console.log(this.filmstripService.filmStripData$);
+    this.filmstripService.getFilmstripData();
     this.filmStripData$ = this.filmstripService.filmStripData$;
-    this.filmstripService.getFilmstrip();
+
+    this.filmStrip$ = this.filmStripData$.pipe(map(value => this.filmstripService.createFilmStrip(500, value)));
   }
 }
