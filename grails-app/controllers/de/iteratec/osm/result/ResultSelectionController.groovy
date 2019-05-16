@@ -34,16 +34,6 @@ class ResultSelectionController extends ExceptionHandlerController {
         String value
     }
 
-    enum ResultSelectionType {
-        JobGroups,
-        MeasuredEvents,
-        Locations,
-        ConnectivityProfiles,
-        Results,
-        Pages,
-        UserTimings
-    }
-
     def getResultCount(ResultSelectionCommand command) {
         if (command.hasErrors()) {
             sendError(command)
@@ -54,7 +44,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
             try {
                 return EventResult.createCriteria().list {
-                    resultSelectionService.applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionType.Results)
+                    resultSelectionService.applyResultSelectionFilters(delegate, command.from, command.to, command, ResultSelectionService.ResultSelectionType.Results)
                     maxResults MAX_RESULT_COUNT
                     timeout RESULT_COUNT_MAX_SECONDS
                     projections {
@@ -76,7 +66,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", 0, {
-            def jobGroups = query(command, ResultSelectionType.JobGroups, { existing ->
+            def jobGroups = query(command, ResultSelectionService.ResultSelectionType.JobGroups, { existing ->
                 if (existing) {
                     not { 'in'('jobGroup', existing) }
                 }
@@ -93,7 +83,8 @@ class ResultSelectionController extends ExceptionHandlerController {
             return jobGroups.collect {
                 [
                         id  : it.id,
-                        name: it.name
+                        name: it.name,
+                        tags: it.tags
                 ]
             }
         })
@@ -108,7 +99,7 @@ class ResultSelectionController extends ExceptionHandlerController {
         }
 
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getMeasuredEvents for ${command as JSON}", 0, {
-            def measuredEvents = query(command, ResultSelectionType.MeasuredEvents, { existing ->
+            def measuredEvents = query(command, ResultSelectionService.ResultSelectionType.MeasuredEvents, { existing ->
                 if (existing) {
                     or {
                         not { 'in'('measuredEvent', existing.collect { it[0] }) }
@@ -139,7 +130,7 @@ class ResultSelectionController extends ExceptionHandlerController {
         }
 
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getLocations for ${command as JSON}", 0, {
-            def locations = query(command, ResultSelectionType.Locations, { existing ->
+            def locations = query(command, ResultSelectionService.ResultSelectionType.Locations, { existing ->
                 if (existing) {
                     or {
                         not { 'in'('location', existing.collect { it[0] }) }
@@ -187,7 +178,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserOrHeroTimings for ${command as JSON}", 0, {
-            def userTimings = query(command, ResultSelectionType.UserTimings, { existing ->
+            def userTimings = query(command, ResultSelectionService.ResultSelectionType.UserTimings, { existing ->
                 projections {
                     userTimings {
                         'in'('type', selection)
@@ -229,7 +220,7 @@ class ResultSelectionController extends ExceptionHandlerController {
         }
 
         def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getPages for ${command as JSON}", 0, {
-            def pages = query(command, ResultSelectionType.Pages, { existing ->
+            def pages = query(command, ResultSelectionService.ResultSelectionType.Pages, { existing ->
                 if (existing) {
                     not { 'in'('page', existing) }
                 }
@@ -280,7 +271,7 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     private getPredefinedConnectivityProfiles(ResultSelectionCommand command) {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", 1, {
-            def connectivityProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
+            def connectivityProfiles = query(command, ResultSelectionService.ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
                 if (existing) {
                     not { 'in'('connectivityProfile', existing) }
@@ -300,7 +291,7 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     private getCustomConnectivity(ResultSelectionCommand command) {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles custom for ${command as JSON}", 1, {
-            def customProfiles = query(command, ResultSelectionType.ConnectivityProfiles, { existing ->
+            def customProfiles = query(command, ResultSelectionService.ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('customConnectivityName')
 
                 if (existing) {
@@ -322,7 +313,7 @@ class ResultSelectionController extends ExceptionHandlerController {
 
     private getNativeConnectivity(ResultSelectionCommand command) {
         return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles native for ${command as JSON}", 1, {
-            def nativeConnectivity = query(command, ResultSelectionType.ConnectivityProfiles, {
+            def nativeConnectivity = query(command, ResultSelectionService.ResultSelectionType.ConnectivityProfiles, {
                 eq('noTrafficShapingAtAll', true)
                 maxResults 1
                 projections {
@@ -338,7 +329,7 @@ class ResultSelectionController extends ExceptionHandlerController {
                 "Invalid parameters: " + command.getErrors().fieldErrors.collect { it.field }.join(", "))
     }
 
-    private def query(ResultSelectionCommand command, ResultSelectionType type, Closure projection) {
+    private def query(ResultSelectionCommand command, ResultSelectionService.ResultSelectionType type, Closure projection) {
         return resultSelectionService.query(command, type, projection)
     }
 

@@ -4,7 +4,7 @@
 <head>
     <meta name="layout" content="layoutOsm"/>
     <title><g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/></title>
-    <asset:stylesheet src="/pageAggregation/show.less"/>
+    <asset:stylesheet src="/aggregation/show.less"/>
 </head>
 
 <body>
@@ -94,7 +94,7 @@
     <asset:javascript src="chartSwitch"/>
     <asset:script type="text/javascript">
         $(window).on('load', function() {
-            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="pageAggregation/pageAggregation.js"/>', "pageAggregation");
+            OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="aggregation/aggregation.js"/>', "aggregation");
             OpenSpeedMonitor.postLoader.loadJavascript('<g:assetPath src="_resultSelection/resultSelection.js"/>', "resultSelection");
         });
     </asset:script>

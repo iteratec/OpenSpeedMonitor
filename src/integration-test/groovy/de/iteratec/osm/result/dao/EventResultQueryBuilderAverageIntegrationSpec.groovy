@@ -628,6 +628,73 @@ class EventResultQueryBuilderAverageIntegrationSpec extends NonTransactionalInte
         result.size() == 9
     }
 
+
+    void "check average for measurands with jobGroups, page, location and operatingSystem"() {
+        given: "three matching and two other Eventresults"
+        page1 = Page.build()
+        jobGroup1 = JobGroup.build()
+        jobGroup2 = JobGroup.build()
+        jobGroup3 = JobGroup.build()
+
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup1,
+                fullyLoadedTimeInMillisecs: 100,
+                deviceType: DeviceType.TABLET,
+                operatingSystem: OperatingSystem.IOS,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 200,
+                deviceType: DeviceType.TABLET,
+                operatingSystem: OperatingSystem.ANDROID,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup2,
+                fullyLoadedTimeInMillisecs: 350,
+                deviceType: DeviceType.TABLET,
+                operatingSystem: OperatingSystem.IOS,
+                medianValue: true,
+        )
+        EventResult.build(
+                page: page1,
+                jobGroup: jobGroup3,
+                fullyLoadedTimeInMillisecs: 600,
+                deviceType: DeviceType.DESKTOP,
+                operatingSystem: OperatingSystem.WINDOWS,
+                medianValue: true,
+        )
+
+        2.times {
+            EventResult.build(
+                    fullyLoadedTimeInMillisecs: 500,
+                    medianValue: true,
+            )
+        }
+
+        when: "the builder is configured for measurand, page, location and operatingSystem"
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand("FULLY_LOADED_TIME", CachedView.UNCACHED)
+        def result = new EventResultQueryBuilder()
+                .withPageIdsIn([page1.id])
+                .withSelectedMeasurands([selectedMeasurand])
+                .withDeviceTypes([DeviceType.TABLET])
+                .withOperatingSystems([OperatingSystem.IOS])
+                .getAverageData()
+
+        then: "only one aggregation is returned"
+        result.size() == 1
+        result.every {
+            it.fullyLoadedTimeInMillisecs == 225 &&
+                    it.pageId == page1.id
+                    it.deviceType == DeviceType.TABLET
+                    it.operatingSystem == OperatingSystem.IOS
+        }
+    }
+
     void "check impossible trims"() {
         given: "one Eventresult"
         EventResult.build(

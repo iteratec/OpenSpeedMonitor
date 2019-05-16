@@ -59,13 +59,14 @@ describe('FilmstripService', () => {
 
   it('fill up filmstrip list with interval steps and thumbnails', () => {
     const calculatedFilmstrip: Thumbnail[] = filmstripService.createFilmStrip(100, thumbnails);
-    const expectedFilmstrip: Thumbnail[] = [
-      {time: 100, imageUrl: 'bild1'},
-      {time: 200, imageUrl: 'bild1'},
-      {time: 300, imageUrl: 'bild1'},
-      {time: 400, imageUrl: 'bild2'}
+    const expectedFilmstrip = [
+      {time: 0, imageUrl: 'bild1', hasChange: true},
+      {time: 100, imageUrl: 'bild1', hasChange: false},
+      {time: 200, imageUrl: 'bild1', hasChange: false},
+      {time: 300, imageUrl: 'bild1', hasChange: false},
+      {time: 400, imageUrl: 'bild2', hasChange: true}
     ];
 
-    expect(calculatedFilmstrip === expectedFilmstrip);
+    expect(calculatedFilmstrip).toEqual(expectedFilmstrip);
   });
 });

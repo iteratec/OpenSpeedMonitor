@@ -5,23 +5,24 @@ import {MetricFinderComponent} from './metric-finder.component';
 import {FilmstripComponent} from './components/filmstrip-component/filmstrip.component';
 import {FilmstripService} from './services/filmstrip.service';
 import {CommonModule} from '@angular/common';
+import {LineChartComponent} from './components/line-chart/line-chart.component';
+import {MetricFinderService} from './services/metric-finder.service';
 
 @NgModule({
+  declarations: [
+    MetricFinderComponent,
+    LineChartComponent,
+    FilmstripComponent
+  ],
   imports: [
     RouterModule.forChild([{path: '', component: MetricFinderComponent}]),
     HttpClientModule,
     CommonModule,
   ],
-  declarations: [
-    MetricFinderComponent,
-    FilmstripComponent
-  ],
   providers: [
+    MetricFinderService,
     FilmstripService
   ],
-  exports: [
-    RouterModule,
-  ]
 })
 export class MetricFinderModule {
 }
