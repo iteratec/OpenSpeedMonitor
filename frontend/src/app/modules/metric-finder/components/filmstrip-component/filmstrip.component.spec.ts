@@ -26,8 +26,6 @@ describe('FilmstripComponent', () => {
   });
 
   it('should create', () => {
-    const filmstripService: FilmstripService = TestBed.get(FilmstripService);
     expect(component).toBeTruthy();
-    expect(filmstripService.getFilmstripData).toHaveBeenCalled();
   });
 });

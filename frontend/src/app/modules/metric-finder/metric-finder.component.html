@@ -1,3 +1,15 @@
-<h1>Metric Finder</h1>
 <osm-line-chart [results]="testResults$ | async" [metric]="'speedIndex'"></osm-line-chart>
+Metric:
+<select [(ngModel)]="metric">
+  <option [value]="'speedIndex'">Speed Index</option>
+  <option [value]="'docCompleteTimeInMillisecs'">Document Complete</option>
+  <option [value]="'startRenderInMillisecs'">Start Render</option>
+  <option [value]="'Image'">Hero Image</option>
+  <option [value]="'visuallyCompleteInMillisecs'">Visually Complete</option>
+</select>
+
+Selected:
+<p>
+  {{ selected | json}}
+</p>
 <osm-filmstrip></osm-filmstrip>
