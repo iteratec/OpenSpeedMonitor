@@ -55,7 +55,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   private xScale: ScaleTime<number, number>;
   private yScale: ScaleLinear<number, number>;
   private formatDate = timeFormat('%Y-%m-%d %H:%M:%S');
-  private defaultTransition = transition().duration(200).ease();
+  private defaultDuration = 200;
 
   private highlightedResult: TestResult;
   private selectedResults: TestResult[] = [];
@@ -105,7 +105,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .attr('cx', d => this.xScale(d.date))
       .attr('cy', d => this.yScale(d.timings[this.metric]));
     selectedPoints
-      .transition(this.defaultTransition)
+      .transition().duration(this.defaultDuration)
       .attr('cx', d => this.xScale(d.date))
       .attr('cy', d => this.yScale(d.timings[this.metric]));
     selectedPoints.exit()
@@ -139,7 +139,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .select('g.graph')
       .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
     selection.select('path.line')
-      .transition(this.defaultTransition)
+      .transition(transition().duration(this.defaultDuration))
       .attr('d', line<TestResult>()
         .x((result: TestResult) => this.xScale(result.date.getTime()))
         .y((result: TestResult) => this.yScale(result.timings[this.metric]))
@@ -148,11 +148,11 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     const yAxis = axisLeft(this.yScale).ticks(5);
     selection
       .select('g.y-axis')
-      .transition(this.defaultTransition)
+      .transition(transition().duration(this.defaultDuration))
       .call(yAxis.tickFormat((d: number) => this.formatValue(d)));
     selection
       .select('g.y-axis-lines')
-      .transition(this.defaultTransition)
+      .transition(transition().duration(this.defaultDuration))
       .call(yAxis.tickFormat(() => '').tickSize(-this.width));
     selection
       .select('g.x-axis')

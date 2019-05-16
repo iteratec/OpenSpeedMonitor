@@ -4,6 +4,7 @@ import { MetricFinderComponent } from './metric-finder.component';
 import {LineChartComponent} from './components/line-chart/line-chart.component';
 import {MetricFinderService} from './services/metric-finder.service';
 import {EMPTY} from 'rxjs';
+import {FormsModule} from '@angular/forms';
 
 describe('MetricFinderComponent', () => {
   let component: MetricFinderComponent;
@@ -12,6 +13,7 @@ describe('MetricFinderComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ MetricFinderComponent, LineChartComponent ],
+      imports: [ FormsModule ],
       providers: [ {
         provide: MetricFinderService,
         useClass: class {
