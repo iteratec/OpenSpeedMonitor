@@ -16,17 +16,17 @@ class CsvExportService {
      */
     static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 
-    public static String TEST_DETAILS_STATIC_URL = "result/{testId}/{numberOfWptRun}/details/#waterfall_view_step{oneBasedStepIndexInJourney}"
-
 
     String buildTestDetailsURL(JobResult jobResult, Integer numberOfWptRun, Integer oneBasedStepIndexInJourney) {
-        String urlString = ""
+        String urlString = "no_job_result_available"
 
         if (jobResult) {
-            urlString = jobResult?.wptServerBaseurl?.toString() + TEST_DETAILS_STATIC_URL
-            urlString.replace("{testId}",jobResult?.testId?.toString())
-            urlString.replace("{numberOfWptRun}", numberOfWptRun.toString())
-            urlString.replace("{oneBasedStepIndexInJourney}", oneBasedStepIndexInJourney.toString())
+            String baseUrl = jobResult?.wptServerBaseurl?.toString()
+            String testId = jobResult?.testId?.toString()
+            String wptRun = numberOfWptRun.toString()
+            String step = oneBasedStepIndexInJourney.toString()
+
+            urlString = "${baseUrl}result/${testId}/${wptRun}/details/#waterfall_view_step${step}"
         }
 
         return urlString
