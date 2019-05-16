@@ -4,7 +4,6 @@ import de.iteratec.osm.ConfigService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.ResultSelectionCommand
-import de.iteratec.osm.result.ResultSelectionController
 import de.iteratec.osm.result.ResultSelectionService
 import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
@@ -74,7 +73,7 @@ class JobGroupService {
         DateTime fourWeeksAgo = configService.getStartDateForRecentMeasurements()
 
         ResultSelectionCommand queryLastFourWeeks = new ResultSelectionCommand(from: fourWeeksAgo, to: today)
-        List<JobGroup> recentJobGroups = (List<JobGroup>) resultSelectionService.query(queryLastFourWeeks, ResultSelectionController.ResultSelectionType.JobGroups, { existing ->
+        List<JobGroup> recentJobGroups = (List<JobGroup>) resultSelectionService.query(queryLastFourWeeks, ResultSelectionService.ResultSelectionType.JobGroups, { existing ->
             if (existing) {
                 not { 'in'('jobGroup', existing) }
             }
@@ -108,7 +107,7 @@ class JobGroupService {
 
         Page undefinedPage = Page.findByName(Page.UNDEFINED)
 
-        return resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionController.ResultSelectionType.Pages, { existing ->
+        return resultSelectionService.query(pagesForGivenJobGroup, ResultSelectionService.ResultSelectionType.Pages, { existing ->
             and {
                 ne('page', undefinedPage)
                 if (existing) {
