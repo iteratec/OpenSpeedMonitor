@@ -23,7 +23,7 @@ class EventResultQueryExecutor {
     }
 
     private boolean isNotValid() {
-        return this.selectedMeasurands.isEmpty() || !transformer || !projector || !trimmer
+        return !this.selectedMeasurands || this.selectedMeasurands.isEmpty() || !transformer || !projector || !trimmer
     }
 
     void setProjector(EventResultProjector projector) {

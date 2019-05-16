@@ -52,6 +52,10 @@ class SelectedMeasurand {
         return this.selectedType.getDatabaseName(this.name)
     }
 
+    static SelectedMeasurand createForUserTiming(String name, UserTimingType type, CachedView cachedView) {
+        return new SelectedMeasurand(type.selectedMeasurandType.optionPrefix + name, cachedView)
+    }
+
     static Map createUserTimingOptionFor(String name, UserTimingType type) {
         return [name: name, id: type.selectedMeasurandType.optionPrefix + name]
     }
