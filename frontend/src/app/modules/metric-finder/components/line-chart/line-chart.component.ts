@@ -112,14 +112,17 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .append('g')
       .attr('class', 'graph');
     graph
-      .append('path')
-      .attr('class', 'line');
+      .append('g')
+      .attr('class', 'y-axis-lines');
     graph
       .append('g')
       .attr('class', 'y-axis');
     graph
       .append('g')
       .attr('class', 'x-axis');
+    graph
+      .append('path')
+      .attr('class', 'line');
     graph
       .append('g')
       .attr('class', 'selected-points');
@@ -136,13 +139,13 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
         .y((result: TestResult) => this.yScale(result.timings[this.metric]))
       );
 
+    const yAxis = axisLeft(this.yScale).ticks(5);
     selection
       .select('g.y-axis')
-      .call(
-        axisLeft(this.yScale)
-          .tickFormat(d => this.formatValue(d))
-          .ticks(5)
-      );
+      .call(yAxis.tickFormat((d: number) => this.formatValue(d)));
+    selection
+      .select('g.y-axis-lines')
+      .call(yAxis.tickFormat(() => '').tickSize(-this.width));
     selection
       .select('g.x-axis')
       .attr('transform', `translate(0,${this.height})`)
@@ -206,8 +209,8 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .attr('cy', resultPosY);
     this.updateHighlightedPoint();
     const formattedDate = this.formatDate(this.highlightedResult.date);
-    const bottom = this.height + this.margin.top - Math.max(resultPosY, this.tooltipHeight);
-    const left = Math.min(resultPosX + this.margin.left + 10, this.margin.left + this.margin.right + this.width - this.tooltipWidth);
+    const bottom = this.height + this.margin.top - Math.max(resultPosY - 5, this.tooltipHeight);
+    const left = Math.min(resultPosX + this.margin.left + 20, this.margin.left + this.margin.right + this.width - this.tooltipWidth);
     tooltip
       .html(`<span class="y-value">${this.formatValue(yValue)}</span><span class="x-value">${formattedDate}</span>`)
       .style('bottom', `${bottom}px`)
