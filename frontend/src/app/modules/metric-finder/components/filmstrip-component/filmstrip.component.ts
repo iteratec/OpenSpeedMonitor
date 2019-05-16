@@ -13,14 +13,11 @@ export class FilmstripComponent {
   private filmstripService: FilmstripService;
   filmStripData$: BehaviorSubject<Thumbnail[]>;
   filmStrip$: Observable<Thumbnail[]>;
-  imageHeight = 200;
 
   constructor(filmstripService: FilmstripService) {
     this.filmstripService = filmstripService;
     this.filmstripService.getFilmstripData();
     this.filmStripData$ = this.filmstripService.filmStripData$;
-
-
 
     this.filmStrip$ = this.filmStripData$.pipe(map(value => this.filmstripService.createFilmStrip(100, value)));
   }

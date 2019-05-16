@@ -1,5 +1,15 @@
 import {ThumbnailDto} from './thumbnail.model';
 
-export interface WptResultDto {
-  data: { runs: { firstView: { steps: { videoFrames: ThumbnailDto[] }[] } }[] };
+export interface WptResultDTO {
+  data: {
+    runs: {
+      [runNumber: number]: {
+        firstView: {
+          steps: {
+            videoFrames: ThumbnailDto[]
+          }[]
+        }
+      }
+    }
+  };
 }
