@@ -6,6 +6,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {FormsModule} from "@angular/forms";
 import {NgxSmartModalModule} from "ngx-smart-modal";
 import {OwlDateTimeModule, OwlNativeDateTimeModule} from "ng-pick-datetime";
+import {NgSelectModule} from "@ng-select/ng-select";
 
 
 @NgModule({
@@ -17,6 +18,7 @@ import {OwlDateTimeModule, OwlNativeDateTimeModule} from "ng-pick-datetime";
       }
     }),
     FormsModule,
+    NgSelectModule,
     HttpClientTestingModule,
     RouterTestingModule,
     NgxSmartModalModule.forRoot(),
@@ -28,6 +30,7 @@ import {OwlDateTimeModule, OwlNativeDateTimeModule} from "ng-pick-datetime";
     HttpClientTestingModule,
     RouterTestingModule,
     FormsModule,
+    NgSelectModule,
     NgxSmartModalModule,
     OwlDateTimeModule,
     OwlNativeDateTimeModule

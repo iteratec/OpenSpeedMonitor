@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {catchError, map, switchMap, startWith} from "rxjs/operators";
@@ -26,8 +26,8 @@ export class ResultSelectionService {
 
   applications$: ReplaySubject<SelectableApplication[]> = new ReplaySubject(1);
   applicationsAndPages$: ReplaySubject<ApplicationWithPages[]> = new ReplaySubject(1);
-  eventsAndPages$: ReplaySubject<MeasuredEvent[]> = new ReplaySubject(1);
-  locationsAndBrowsers$: ReplaySubject<Location[]> = new ReplaySubject(1);
+  eventsAndPages$: BehaviorSubject<MeasuredEvent[]> = new BehaviorSubject([]);
+  locationsAndBrowsers$: BehaviorSubject<Location[]> = new BehaviorSubject([]);
   connectivities$: ReplaySubject<Connectivity[]> = new ReplaySubject(1);
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
 
