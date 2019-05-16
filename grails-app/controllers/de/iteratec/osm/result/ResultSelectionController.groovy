@@ -83,7 +83,8 @@ class ResultSelectionController extends ExceptionHandlerController {
             return jobGroups.collect {
                 [
                         id  : it.id,
-                        name: it.name
+                        name: it.name,
+                        tags: it.tags
                 ]
             }
         })

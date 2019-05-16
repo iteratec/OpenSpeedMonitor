@@ -5,12 +5,14 @@ import {APP_BASE_HREF} from '@angular/common';
 import {NotFoundComponent} from "./not-found.component";
 import {APP_COMPONENT_SELECTOR, AppComponent} from "./app.component";
 import {GlobalModule} from "./global.module";
+import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 
 
 @NgModule({
   declarations: [NotFoundComponent, AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     GlobalModule
   ],
