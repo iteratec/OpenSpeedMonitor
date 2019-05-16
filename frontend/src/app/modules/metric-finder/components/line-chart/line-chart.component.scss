@@ -1,6 +1,10 @@
 @import "../../../../../styles/colors";
 
 osm-line-chart {
+  div.metric-finder {
+    position: relative;
+  }
+
   svg.metric-finder {
     width: 100%;
     height: 100%;
@@ -19,6 +23,52 @@ osm-line-chart {
 
     text {
       color: $color-text-light;
+    }
+  }
+
+  .y-axis-lines {
+    stroke-dasharray: 2, 4;
+    stroke-width: 1;
+    color: $color-background;
+  }
+
+  .mouse-over {
+    opacity: 0;
+  }
+
+  .mouse-over-line {
+    stroke: $color-contour-medium;
+  }
+
+  .mouse-over-point {
+    stroke: $color-primary;
+    stroke-width: 2;
+    fill: $color-card-background;
+    cursor: pointer;
+
+    &.selected {
+      fill: $color-primary;
+    }
+  }
+
+  .selected-point {
+    stroke: transparent;
+    fill: $color-primary;
+    cursor: pointer;
+  }
+
+  .tooltip {
+    background: rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    position: absolute;
+    color: $color-text-medium;
+    padding: 5px;
+    span {
+      display: block;
+      &.y-value {
+        font-weight: bold;
+      }
     }
   }
 }
