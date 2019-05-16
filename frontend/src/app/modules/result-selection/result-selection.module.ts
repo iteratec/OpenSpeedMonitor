@@ -5,7 +5,7 @@ import {MeasurandSelectComponent} from "./components/measurand-select/measurand-
 import {SharedModule} from "../shared/shared.module";
 import {ResultSelectionTimeFrameComponent} from './components/result-selection-time-frame/result-selection-time-frame.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import { MeasurandsComponent } from './components/measurands/measurands.component';
+import {MeasurandsComponent} from './components/measurands/measurands.component';
 import {
   OWL_DATE_TIME_FORMATS,
   OwlDateTimeModule,
@@ -32,8 +32,8 @@ export const TIME_FORMAT = {
   declarations: [
     ResultSelectionComponent,
     ResultSelectionTimeFrameComponent,
-    ResultSelectionApplicationComponent
-    ResultSelectionPageLocationConnectivityComponent
+    ResultSelectionApplicationComponent,
+    ResultSelectionPageLocationConnectivityComponent,
     MeasurandSelectComponent,
     MeasurandsComponent
   ],

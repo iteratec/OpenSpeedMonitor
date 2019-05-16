@@ -20,8 +20,8 @@ describe('ResultSelectionComponent', () => {
       declarations: [
         ResultSelectionComponent,
         ResultSelectionTimeFrameComponent,
-        ResultSelectionApplicationComponent
-        ResultSelectionPageLocationConnectivityComponent
+        ResultSelectionApplicationComponent,
+        ResultSelectionPageLocationConnectivityComponent,
         MeasurandsComponent,
         MeasurandSelectComponent
       ],
