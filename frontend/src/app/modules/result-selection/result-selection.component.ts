@@ -10,6 +10,7 @@ export class ResultSelectionComponent {
 
   currentChart: string;
 
+
   constructor(private resultSelectionService: ResultSelectionService, element: ElementRef) {
     this.currentChart = element.nativeElement.getAttribute('data-current-chart');
   }

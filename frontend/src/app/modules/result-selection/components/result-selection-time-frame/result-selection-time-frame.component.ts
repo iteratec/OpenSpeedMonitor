@@ -35,6 +35,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
   selectedDates: Date[];
   selectedComparativeDates: Date[];
+  max = new Date();
 
   comparativeSelectionActive: boolean = false;
 
