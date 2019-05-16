@@ -34,10 +34,12 @@ export class TestResult implements  TestResultDTO {
   public date: Date;
   public testInfo: TestInfo;
   public timings: {[metric: string]: number} = {};
+  public readonly id;
 
   constructor(dto: TestResultDTO) {
     this.date = parseDate(dto.date);
     this.timings = dto.timings;
     this.testInfo = new TestInfo(dto.testInfo);
+    this.id = [this.testInfo.testId, this.testInfo.run, this.testInfo.cached ? 1 : 0, this.testInfo.step].join('_');
   }
 }

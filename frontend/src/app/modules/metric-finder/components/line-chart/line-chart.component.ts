@@ -97,7 +97,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   private renderSelectedPoints() {
     const selectedPoints = select('g.selected-points')
       .selectAll('circle.selected-point')
-      .data<TestResult>(this.selectedResults);
+      .data<TestResult>(this.selectedResults, (result: TestResult) => result.id);
     selectedPoints.enter()
       .append('circle')
       .attr('class', 'selected-point')
