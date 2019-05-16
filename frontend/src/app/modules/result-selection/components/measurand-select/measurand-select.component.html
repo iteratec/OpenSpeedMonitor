@@ -2,7 +2,7 @@
         [compareWith]="compareMeasurands">
   <optgroup *ngFor="let group$ of selectableMeasurandGroups"
             label="{{(group$ | async)?.data?.name | translate}}">
-    <option *ngIf="(group$ | async)?.data?.values.length == 0" [disabled]="true">
+    <option *ngIf="(group$ | async)?.data?.values?.length == 0" [disabled]="true">
       {{(group$ | async)?.isLoading ? "frontend.de.iteratec.osm.queueDashboard.load-information.label" : "frontend.de.iteratec.osm.no-info.label" | translate}}
     </option>
     <option *ngFor="let selectableMeasurand of (group$ | async)?.data?.values"

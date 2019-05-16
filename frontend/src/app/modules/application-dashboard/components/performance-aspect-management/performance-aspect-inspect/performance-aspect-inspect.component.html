@@ -7,7 +7,7 @@
   </div>
   <div class="measurand">
 
-    <osm-measurand-select [selectedMeasurand]="metric$ | async"
+    <osm-measurand-select [selectedMeasurand]="metric$ | async" [selectableMeasurandGroups]="measurands"
                           (onSelect)="selectMeasurandForAspect($event)"></osm-measurand-select>
   </div>
 </div>

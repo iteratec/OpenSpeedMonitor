@@ -1,0 +1,111 @@
+<div class="card">
+  <ng-container *ngIf="showOnlyPageSelection || showOnlyBrowserSelection">
+    <h2 *ngIf="showOnlyBrowserSelection">Browser</h2>
+    <h2 *ngIf="showOnlyPageSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.page.label' | translate }}</h2>
+  </ng-container>
+
+  <ul class="nav nav-tabs result-selection-tabs" *ngIf="!showOnlyPageSelection && !showOnlyBrowserSelection">
+    <li id="pageAndEventTab"
+        (click)="pageAndEventSelectionActive = true; browserAndLocationSelectionActive = connectivitySelectionActive = false"
+        [className]="pageAndEventSelectionActive ? 'active' : ''">
+      <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.page.label' | translate }}
+        <ng-container *ngIf="showMeasuredStepSelection">
+          | {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.measuredStep.label' | translate }}
+        </ng-container>
+      </a>
+    </li>
+    <li id="browserAndLocationTab"
+        (click)="browserAndLocationSelectionActive = true; pageAndEventSelectionActive = connectivitySelectionActive = false"
+        [className]="browserAndLocationSelectionActive ? 'active' : ''">
+      <a>Browser
+        <ng-container *ngIf="showLocationSelection"> | Location</ng-container>
+      </a>
+    </li>
+    <li id="connectivityTab"
+        (click)="connectivitySelectionActive = true; pageAndEventSelectionActive = browserAndLocationSelectionActive = false"
+        [className]="connectivitySelectionActive ? 'active' : ''">
+      <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.connectivity.label' | translate }}</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active">
+      <ng-container
+        *ngIf="(pageAndEventSelectionActive || showOnlyPageSelection) && !showOnlyBrowserSelection; then pageAndEventSelection"></ng-container>
+      <ng-container
+        *ngIf="browserAndLocationSelectionActive || showOnlyBrowserSelection; then browserAndLocationSelection"></ng-container>
+      <ng-container *ngIf="connectivitySelectionActive; then connectivitySelection"></ng-container>
+    </div>
+  </div>
+</div>
+
+<ng-template #pageAndEventSelection>
+  <div class="form-group">
+    <select id="result-selection-page-selection" class="form-control" multiple="multiple" [(ngModel)]="selectedPages"
+            (ngModelChange)="filterSelectableItems(selectedPages, 'events')">
+      <option *ngFor="let page of uniquePages$ | async" [value]="page.id">{{page.name}}</option>
+    </select>
+  </div>
+
+  <ng-container *ngIf="showMeasuredStepSelection">
+    <label for="result-selection-event-selection">
+      <strong>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.measuredStep.label' | translate }}
+        :</strong>
+    </label>
+    <ng-select id="result-selection-event-selection"
+               [items]="measuredEvents$ | async" [(ngModel)]="selectedEvents"
+               [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name" [groupBy]="'parent.id'"
+               placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
+    </ng-select>
+    <div class="checkbox-inline" (click)="selectAllEventsCheckbox.checked = true; selectedEvents = []">
+      <input id="selectAllEventsCheckbox" #selectAllEventsCheckbox type="checkbox"
+             [checked]="selectedEvents.length < 1">
+      {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectAllMeasuredSteps' | translate }}
+    </div>
+  </ng-container>
+</ng-template>
+
+<ng-template #browserAndLocationSelection>
+  <div class="form-group">
+    <select id="result-selection-browser-selection" class="form-control" multiple="multiple"
+            [(ngModel)]="selectedBrowsers" [style.opacity]="selectedBrowsers.length > 0 ? 1 : 0.5"
+            (ngModelChange)="filterSelectableItems(selectedBrowsers, 'locations')">
+      <option *ngFor="let browser of uniqueBrowsers$ | async" [value]="browser.id">{{browser.name}}</option>
+    </select>
+    <div class="checkbox-inline" (click)="selectAllBrowsersCheckbox.checked = true; selectedBrowsers = []; filterSelectableItems(selectedBrowsers, 'locations')">
+      <input id="selectAllBrowsersCheckbox" #selectAllBrowsersCheckbox type="checkbox"
+             [checked]="selectedBrowsers.length < 1">
+      {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectAllBrowsers' | translate }}
+    </div>
+  </div>
+  <ng-container *ngIf="showLocationSelection">
+    <label for="result-selection-location-selection">
+      <strong>Location:</strong>
+    </label>
+    <ng-select id="result-selection-location-selection"
+               [items]="locations$ | async" [(ngModel)]="selectedLocations"
+               [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name"
+               placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
+    </ng-select>
+    <div class="checkbox-inline" (click)="selectAllLocationsCheckbox.checked = true; selectedLocations = []">
+      <input id="selectAllLocationsCheckbox" #selectAllLocationsCheckbox type="checkbox"
+             [checked]="selectedLocations.length < 1">
+      {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectAllLocations' | translate }}
+    </div>
+  </ng-container>
+</ng-template>
+
+<ng-template #connectivitySelection>
+  <div class="form-group">
+    <select id="result-selection-connectivity-selection" class="form-control" multiple="multiple"
+            [(ngModel)]="selectedConnectivities" [style.opacity]="selectedConnectivities.length > 0 ? 1 : 0.5">
+      <option *ngFor="let connectivityProfile of connectivities$ | async"
+              [value]="connectivityProfile.id">{{connectivityProfile.name}}</option>
+    </select>
+    <div class="checkbox-inline" (click)="selectAllConnectivitiesCheckbox.checked = true; selectedConnectivities = []">
+      <input id="selectAllConnectivitiesCheckbox" #selectAllConnectivitiesCheckbox type="checkbox"
+             [checked]="selectedConnectivities.length < 1">
+      {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectAllConnectivities' | translate }}
+    </div>
+  </div>
+</ng-template>
