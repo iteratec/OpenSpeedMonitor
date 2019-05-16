@@ -38,6 +38,7 @@ class EventResultQueryBuilder {
     public enum MetaDataSet {
         NONE,
         COMPLETE,
+        TEST_INFO,
         ASPECT
     }
 
@@ -90,6 +91,16 @@ class EventResultQueryBuilder {
                         new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
                         new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
                         new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
+                ]
+            case MetaDataSet.TEST_INFO:
+                return [
+                        new ProjectionProperty(dbName: 'id', alias: 'id'),
+                        new ProjectionProperty(dbName: 'jobResult.wptServerBaseurl', alias: 'wptServerBaseurl'),
+                        new ProjectionProperty(dbName: 'jobResult.testId', alias: 'testId'),
+                        new ProjectionProperty(dbName: 'cachedView', alias: 'cachedView'),
+                        new ProjectionProperty(dbName: 'oneBasedStepIndexInJourney', alias: 'oneBasedStepIndexInJourney'),
+                        new ProjectionProperty(dbName: 'jobResultDate', alias: 'jobResultDate'),
+                        new ProjectionProperty(dbName: 'numberOfWptRun', alias: 'numberOfWptRun')
                 ]
             default:
                 return []

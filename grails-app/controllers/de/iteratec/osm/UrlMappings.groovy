@@ -34,6 +34,8 @@ class UrlMappings {
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
+        "/metricFinder/**?"(view: "/angularFrontend")
+        "/metricFinder/rest/$action"(controller: "metricFinder")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller
