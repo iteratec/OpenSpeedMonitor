@@ -26,6 +26,12 @@ osm-line-chart {
     }
   }
 
+  .y-axis-lines {
+    stroke-dasharray: 2, 4;
+    stroke-width: 1;
+    color: $color-background;
+  }
+
   .mouse-over {
     opacity: 0;
   }
@@ -41,7 +47,7 @@ osm-line-chart {
     cursor: pointer;
 
     &.selected {
-      fill: transparent;
+      fill: $color-primary;
     }
   }
 
