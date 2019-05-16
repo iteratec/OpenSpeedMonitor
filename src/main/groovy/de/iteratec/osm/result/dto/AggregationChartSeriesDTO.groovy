@@ -3,7 +3,7 @@ package de.iteratec.osm.result.dto
 import groovy.transform.EqualsAndHashCode
 
 @EqualsAndHashCode
-class PageAggregationChartSeriesDTO {
+class AggregationChartSeriesDTO {
     String measurand = ""
     String measurandLabel = ""
     String measurandGroup = ""

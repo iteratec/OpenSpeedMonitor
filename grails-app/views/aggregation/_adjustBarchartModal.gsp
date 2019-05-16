@@ -129,7 +129,7 @@
 
 <asset:script type="text/javascript">
     function initModalDialogValues() {
-        var chart = OpenSpeedMonitor.ChartModules.PageAggregationBarChart;
+        var chart = OpenSpeedMonitor.ChartModules.AggregationBarChart;
         $("#x-axis-label").val(chart.getXLabel());
         $("#inputChartWidth").val(chart.getWidth());
         $("#inputChartHeight").val(chart.getHeight());
@@ -163,7 +163,7 @@
     }
 
     function adjustBarchartApply() {
-        OpenSpeedMonitor.ChartModules.PageAggregationBarChart.adjustChart();
+        OpenSpeedMonitor.ChartModules.AggregationBarChart.adjustChart();
         $('#adjustBarchartModal').modal('hide');
     }
 </asset:script>

@@ -4,7 +4,7 @@ import de.iteratec.osm.barchart.BarchartAggregation
 import de.iteratec.osm.csi.CsiConfiguration
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.result.dto.PageAggregationChartSeriesDTO
+import de.iteratec.osm.result.dto.AggregationChartSeriesDTO
 import de.iteratec.osm.util.I18nService
 import grails.buildtestdata.BuildDomainTest
 import grails.buildtestdata.mixin.Build
@@ -12,10 +12,10 @@ import grails.testing.web.controllers.ControllerUnitTest
 import spock.lang.Specification
 
 @Build([Page, JobGroup, CsiConfiguration])
-class PageAggregationControllerSpec extends Specification implements BuildDomainTest<Page>,
-        ControllerUnitTest<PageAggregationController> {
+class AggregationControllerSpec extends Specification implements BuildDomainTest<Page>,
+        ControllerUnitTest<AggregationController> {
 
-    private PageAggregationController controllerUnderTest
+    private AggregationController controllerUnderTest
 
     private Page page1
     private Page page2
@@ -108,11 +108,11 @@ class PageAggregationControllerSpec extends Specification implements BuildDomain
         }
 
         when: "being converted to DTO"
-        def seriesDTOs = controllerUnderTest.convertToPageAggregationChartSeriesDTOs(barchartAggregations)
+        def seriesDTOs = controllerUnderTest.convertToAggregationChartSeriesDTOs(barchartAggregations)
 
         then: "the resulting list contains DTOs for both aggregations"
         seriesDTOs == [
-                new PageAggregationChartSeriesDTO(
+                new AggregationChartSeriesDTO(
                         measurand: "DOC_COMPLETE_TIME",
                         measurandLabel: "de.iteratec.isr.measurand.DOC_COMPLETE_TIME;DOC_COMPLETE_TIME",
                         measurandGroup: "LOAD_TIMES",
@@ -123,7 +123,7 @@ class PageAggregationControllerSpec extends Specification implements BuildDomain
                         browser: null,
                         unit: "ms",
                         aggregationValue: "foo"),
-                new PageAggregationChartSeriesDTO(
+                new AggregationChartSeriesDTO(
                         measurand: "SPEED_INDEX",
                         measurandLabel: "de.iteratec.isr.measurand.SPEED_INDEX;SPEED_INDEX",
                         measurandGroup: "LOAD_TIMES",
