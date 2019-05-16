@@ -3,9 +3,10 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MetricFinderComponent} from './metric-finder.component';
 import {LineChartComponent} from './components/line-chart/line-chart.component';
 import {MetricFinderService} from './services/metric-finder.service';
-import {EMPTY, of} from 'rxjs';
+import {EMPTY} from 'rxjs';
 import {FilmstripComponent} from './components/filmstrip-component/filmstrip.component';
 import {FilmstripService} from './services/filmstrip.service';
+import {FilmstripServiceMock} from './services/filmstrip.service.mock';
 
 describe('MetricFinderComponent', () => {
   let component: MetricFinderComponent;
@@ -22,11 +23,7 @@ describe('MetricFinderComponent', () => {
         }
       }, {
         provide: FilmstripService,
-        useClass: class {
-          public filmStripData$ = of([[]]);
-          public getFilmstripData = jasmine.createSpy('getFilmstripData');
-          public createFilmstrip = jasmine.createSpy('createFilmstrip');
-        }
+        useClass: FilmstripServiceMock
       }]
     })
       .compileComponents();

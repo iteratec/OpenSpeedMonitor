@@ -17,7 +17,7 @@ export class FilmstripService {
   constructor (private http: HttpClient) {}
 
   getFilmstripData() {
-    return this.http.get<WptResultDTO>(this.filmStripDataUrl).pipe(
+    this.http.get<WptResultDTO>(this.filmStripDataUrl).pipe(
       map( (wptData: WptResultDTO) => (wptData.data.runs[1].firstView.steps[0].videoFrames)
         .map(item => new Thumbnail(item.time, item.image))))
       .subscribe(value => this.filmStripData$.next(value),

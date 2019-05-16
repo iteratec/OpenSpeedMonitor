@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {FilmstripComponent} from './filmstrip.component';
 import {FilmstripService} from '../../services/filmstrip.service';
-import {of} from 'rxjs';
+import {FilmstripServiceMock} from '../../services/filmstrip.service.mock';
 
 describe('FilmstripComponent', () => {
   let component: FilmstripComponent;
@@ -13,10 +13,7 @@ describe('FilmstripComponent', () => {
       declarations: [FilmstripComponent],
       providers: [{
         provide: FilmstripService,
-        useClass: class {
-          public filmStripData$ = of([[]]);
-          public getFilmstripData = jasmine.createSpy('getFilmstripData');
-        }
+        useClass: FilmstripServiceMock,
       }]
     })
       .compileComponents();
