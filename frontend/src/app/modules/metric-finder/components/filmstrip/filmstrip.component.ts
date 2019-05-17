@@ -1,27 +1,30 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {FilmstripService} from '../../services/filmstrip.service';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, Subject} from 'rxjs';
 import {Thumbnail} from '../../models/thumbnail.model';
 import {distinctUntilChanged, filter, map, pluck} from 'rxjs/operators';
 import {TestResult} from '../../models/test-result';
+import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 
 @Component({
   selector: 'osm-filmstrip',
   templateUrl: './filmstrip.component.html',
   styleUrls: ['./filmstrip.component.scss']
 })
-export class FilmstripComponent implements OnChanges{
+export class FilmstripComponent implements OnChanges {
 
   filmStrip$: Observable<Thumbnail[]>;
 
   @Input()
   result: TestResult;
 
+  private result$ = new Subject<TestResult>();
+
   constructor(
     private filmstripService: FilmstripService
   ) {
-    this.filmStrip$ = this.filmstripService.filmStripData$.pipe(
-      map(filmstrips => filmstrips[this.result.id]),
+    this.filmStrip$ = combineLatest(this.filmstripService.filmStripData$, this.result$).pipe(
+      map(([filmstrips, result]) => filmstrips[result.id]),
       filter(filmstrip => !!filmstrip),
       distinctUntilChanged(),
       map(filmstrip => this.filmstripService.createFilmStrip(100, filmstrip))
@@ -29,6 +32,9 @@ export class FilmstripComponent implements OnChanges{
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.filmstripService.loadFilmstripIfNecessary(this.result);
+    if (changes['result'].currentValue !== changes['result'].previousValue) {
+      this.filmstripService.loadFilmstripIfNecessary(this.result);
+      this.result$.next(this.result);
+    }
   }
 }

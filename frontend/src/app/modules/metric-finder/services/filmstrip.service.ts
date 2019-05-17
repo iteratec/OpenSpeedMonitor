@@ -30,6 +30,23 @@ export class FilmstripService {
     );
   }
 
+  createFilmStrip(interval: number, thumbnails: Thumbnail[]) {
+    const end = Math.max(...thumbnails.map(t => t.time));
+    const filmstrip = [];
+    let lastVideoFrame = null;
+
+    for (let time = 0; time < end + interval; time += interval) {
+      const videoFrame = this.findFrame(thumbnails, time);
+      filmstrip.push({
+        time: time,
+        imageUrl: videoFrame.imageUrl,
+        hasChange: !lastVideoFrame || lastVideoFrame.time !== videoFrame.time,
+      });
+      lastVideoFrame = videoFrame;
+    }
+    return filmstrip;
+  }
+
   private updateFilmstripData(result: TestResult, filmstrip: Thumbnail[]): void {
     this.filmStripData$.next({
       ...this.filmStripData$.getValue(),
@@ -58,23 +75,6 @@ export class FilmstripService {
       }
     }
     return frame;
-  }
-
-  createFilmStrip(interval: number, thumbnails: Thumbnail[]) {
-    const end = Math.max(...thumbnails.map(t => t.time));
-    const filmstrip = [];
-    let lastVideoFrame = null;
-
-    for (let time = 0; time < end + interval; time += interval) {
-      const videoFrame = this.findFrame(thumbnails, time);
-      filmstrip.push({
-        time: time,
-        imageUrl: videoFrame.imageUrl,
-        hasChange: !lastVideoFrame || lastVideoFrame.time !== videoFrame.time,
-      });
-      lastVideoFrame = videoFrame;
-    }
-    return filmstrip;
   }
 
   private handleError(error: any) {
