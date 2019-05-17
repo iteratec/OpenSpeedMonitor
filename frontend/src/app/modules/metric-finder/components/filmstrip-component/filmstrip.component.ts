@@ -10,12 +10,10 @@ import {map} from 'rxjs/operators';
   styleUrls: ['./filmstrip.component.scss']
 })
 export class FilmstripComponent {
-  private filmstripService: FilmstripService;
   filmStripData$: BehaviorSubject<Thumbnail[]>;
   filmStrip$: Observable<Thumbnail[]>;
 
-  constructor(filmstripService: FilmstripService) {
-    this.filmstripService = filmstripService;
+  constructor(private filmstripService: FilmstripService) {
     this.filmstripService.getFilmstripData();
     this.filmStripData$ = this.filmstripService.filmStripData$;
 
