@@ -12,6 +12,17 @@ import {Connectivity} from 'src/app/models/connectivity.model';
 import {Location} from 'src/app/models/location.model';
 import {MeasuredEvent} from 'src/app/models/measured-event.model';
 
+enum URL {
+  APPLICATIONS = '/resultSelection/getJobGroups',
+  APPLICATIONS_AND_PAGES = '/jobGroup/getJobGroupsWithPages',
+  EVENTS_AND_PAGES = '/resultSelection/getMeasuredEvents',
+  LOCATIONS_AND_BROWSERS = '/resultSelection/getLocations',
+  CONNECTIVITIES = '/resultSelection/getConnectivityProfiles',
+  RESULT_COUNT = '/resultSelection/getResultCount',
+  USER_TIMINGS = '/resultSelection/getUserTimings',
+  HERO_TIMINGS = '/resultSelection/getHeroTimings'
+}
+
 @Injectable()
 export class ResultSelectionService {
   loadTimes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
@@ -162,7 +173,7 @@ export class ResultSelectionService {
     this.loadUserTimings(resultSelectionCommand);
     this.loadHeroTimings(resultSelectionCommand);
 
-    if(chart !== Chart.PageComparison) {
+    if (chart !== Chart.PageComparison) {
       this.loadSelectableApplications(resultSelectionCommand);
     } else {
       this.loadSelectableApplicationsAndPages(resultSelectionCommand);
@@ -173,115 +184,68 @@ export class ResultSelectionService {
       this.loadSelectableConnectivities(resultSelectionCommand);
     }
 
-    if(chart === Chart.TimeSeries || chart === Chart.PageAggregation || chart === Chart.Distribution) {
+    if (chart === Chart.TimeSeries || chart === Chart.PageAggregation || chart === Chart.Distribution) {
       this.loadSelectableEventsAndPages(resultSelectionCommand);
     }
   }
 
   loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableApplications(resultSelectionCommand).subscribe(next => this.applications$.next(next));
+    this.fetchResultSelectionData<SelectableApplication[]>(resultSelectionCommand, URL.APPLICATIONS)
+      .subscribe(next => this.applications$.next(next));
   }
 
   loadSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableApplicationsAndPages(resultSelectionCommand).subscribe(next => this.applicationsAndPages$.next(next));
+    this.fetchResultSelectionData<ApplicationWithPages[]>(resultSelectionCommand, URL.APPLICATIONS_AND_PAGES)
+      .subscribe(next => this.applicationsAndPages$.next(next));
   }
 
   loadSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableEventsAndPages(resultSelectionCommand).subscribe(next => this.eventsAndPages$.next(next));
+    this.fetchResultSelectionData<MeasuredEvent[]>(resultSelectionCommand, URL.EVENTS_AND_PAGES)
+      .subscribe(next => this.eventsAndPages$.next(next));
   }
 
   loadSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableLocationsAndBrowsers(resultSelectionCommand).subscribe(next => this.locationsAndBrowsers$.next(next));
+    this.fetchResultSelectionData<Location[]>(resultSelectionCommand, URL.LOCATIONS_AND_BROWSERS)
+      .subscribe(next => this.locationsAndBrowsers$.next(next));
   }
 
   loadSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateSelectableConnectivities(resultSelectionCommand).subscribe(next => this.connectivities$.next(next));
+    this.fetchResultSelectionData<Connectivity[]>(resultSelectionCommand, URL.CONNECTIVITIES)
+      .subscribe(next => this.connectivities$.next(next));
   }
 
   loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateResultCount(resultSelectionCommand).subscribe(next => this.resultCount$.next(next));
+    this.fetchResultSelectionData<string>(resultSelectionCommand, URL.RESULT_COUNT)
+      .subscribe(next => this.resultCount$.next(next));
   }
 
   loadUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateUserTimings(resultSelectionCommand).subscribe(next => {
-      const groupName: string = "User Timings";
-      let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
-        isLoading: false,
-        data: {name: groupName, values: next}
-      };
-      this.userTimings$.next(responseWithLoadingState);
-    });
+    this.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
+      .subscribe(next => {
+        const groupName: string = "User Timings";
+        let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+          isLoading: false,
+          data: {name: groupName, values: next}
+        };
+        this.userTimings$.next(responseWithLoadingState);
+      });
   }
 
   loadHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
-    this.updateHeroTimings(resultSelectionCommand).subscribe(next => {
-      const groupName: string = "Hero Timings";
-      let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
-        isLoading: false,
-        data: {name: groupName, values: next}
-      };
-      this.heroTimings$.next(responseWithLoadingState);
-    });
+    this.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
+      .subscribe(next => {
+        const groupName: string = "Hero Timings";
+        let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+          isLoading: false,
+          data: {name: groupName, values: next}
+        };
+        this.heroTimings$.next(responseWithLoadingState);
+      });
   }
 
-  updateSelectableApplications(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableApplication[]> {
+  private fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get<SelectableApplication[]>('/resultSelection/getJobGroups', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<ApplicationWithPages[]> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get<ApplicationWithPages[]>('/jobGroup/getJobGroupsWithPages', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<MeasuredEvent[]> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get<MeasuredEvent[]>('/resultSelection/getMeasuredEvents', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): Observable<Location[]> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get<Location[]>('/resultSelection/getLocations', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): Observable<Connectivity[]> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get('/resultSelection/getConnectivityProfiles', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateResultCount(resultSelectionCommand: ResultSelectionCommand): Observable<string> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get('/resultSelection/getResultCount', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-
-  updateUserTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableMeasurand[]> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get('/resultSelection/getUserTimings', {params: params}).pipe(
-      handleError(),
-      startWith(null)
-    )
-  }
-  updateHeroTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableMeasurand[]> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get('/resultSelection/getHeroTimings', {params: params}).pipe(
+    return this.http.get<T>(url, {params: params}).pipe(
       handleError(),
       startWith(null)
     )
@@ -292,12 +256,12 @@ export class ResultSelectionService {
       from: resultSelectionCommand.from.toISOString(),
       to: resultSelectionCommand.to.toISOString(),
       ...(resultSelectionCommand.caller && {caller: Caller[resultSelectionCommand.caller]}),
-      ...((resultSelectionCommand.jobGroupIds && resultSelectionCommand.jobGroupIds.length) && { jobGroupIds: resultSelectionCommand.jobGroupIds.toLocaleString() }),
-      ...((resultSelectionCommand.pageIds && resultSelectionCommand.pageIds.length) && { pageIds: resultSelectionCommand.pageIds.toString() }),
-      ...((resultSelectionCommand.measuredEventIds && resultSelectionCommand.measuredEventIds.length) && { measuredEventIds: resultSelectionCommand.measuredEventIds.toString() }),
-      ...((resultSelectionCommand.browserIds && resultSelectionCommand.browserIds.length) && { browserIds: resultSelectionCommand.browserIds.toString() }),
-      ...((resultSelectionCommand.locationIds && resultSelectionCommand.locationIds.length) && { locationIds: resultSelectionCommand.locationIds.toString() }),
-      ...((resultSelectionCommand.selectedConnectivities && resultSelectionCommand.selectedConnectivities.length) && { selectedConnectivities: resultSelectionCommand.selectedConnectivities.toString() })
+      ...((resultSelectionCommand.jobGroupIds && resultSelectionCommand.jobGroupIds.length) && {jobGroupIds: resultSelectionCommand.jobGroupIds.toString()}),
+      ...((resultSelectionCommand.pageIds && resultSelectionCommand.pageIds.length) && {pageIds: resultSelectionCommand.pageIds.toString()}),
+      ...((resultSelectionCommand.measuredEventIds && resultSelectionCommand.measuredEventIds.length) && {measuredEventIds: resultSelectionCommand.measuredEventIds.toString()}),
+      ...((resultSelectionCommand.browserIds && resultSelectionCommand.browserIds.length) && {browserIds: resultSelectionCommand.browserIds.toString()}),
+      ...((resultSelectionCommand.locationIds && resultSelectionCommand.locationIds.length) && {locationIds: resultSelectionCommand.locationIds.toString()}),
+      ...((resultSelectionCommand.selectedConnectivities && resultSelectionCommand.selectedConnectivities.length) && {selectedConnectivities: resultSelectionCommand.selectedConnectivities})
     }
   }*/
 
