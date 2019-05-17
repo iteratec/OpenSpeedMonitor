@@ -1,4 +1,5 @@
 import {Component, ElementRef} from '@angular/core';
+
 import {ResultSelectionService} from "./services/result-selection.service";
 
 @Component({
