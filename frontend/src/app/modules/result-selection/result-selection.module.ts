@@ -14,6 +14,7 @@ import {
 import {ResultSelectionPageLocationConnectivityComponent} from './components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component';
 import {NgSelectModule} from "@ng-select/ng-select";
 import {ResultSelectionApplicationComponent} from './components/result-selection-application/result-selection-application.component';
+import {ResultSelectionStore} from "./services/result-selection.store";
 
 export const TIME_FORMAT = {
   fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
@@ -48,7 +49,8 @@ export const TIME_FORMAT = {
       provide: OWL_DATE_TIME_FORMATS,
       useValue: TIME_FORMAT
     },
-    ResultSelectionService
+    ResultSelectionService,
+    ResultSelectionStore
   ],
   entryComponents: [
     ResultSelectionComponent

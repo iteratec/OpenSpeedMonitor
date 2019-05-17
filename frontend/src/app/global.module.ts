@@ -6,6 +6,7 @@ import {TranslateHttpLoader} from "@ngx-translate/http-loader";
 import {OsmLangService} from "./services/osm-lang.service";
 import {ApplicationService} from "./services/application.service";
 import {ResultSelectionService} from "./modules/result-selection/services/result-selection.service";
+import {ResultSelectionStore} from "./modules/result-selection/services/result-selection.store";
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -27,7 +28,8 @@ export function createTranslateLoader(http: HttpClient) {
     GrailsBridgeService,
     OsmLangService,
     ApplicationService,
-    ResultSelectionService
+    ResultSelectionService,
+    ResultSelectionStore
   ],
 })
 export class GlobalModule {

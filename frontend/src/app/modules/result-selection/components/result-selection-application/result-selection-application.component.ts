@@ -6,6 +6,7 @@ import {
 import {ResultSelectionService} from "../../services/result-selection.service";
 import { SelectableApplication } from 'src/app/models/application.model';
 import { Observable } from 'rxjs';
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 
 @Component({
@@ -25,8 +26,9 @@ export class ResultSelectionApplicationComponent {
   isSelected = false;
   selectedApplications: number[] = [];
     
-  constructor(private resultSelectionService: ResultSelectionService) {
-    this.applicationMappings$ = this.resultSelectionService.applications$;
+  constructor(private resultSelectionStore: ResultSelectionStore) {
+    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadSelectableApplications(state));
+    this.applicationMappings$ = this.resultSelectionStore.applications$;
 
     this.applicationMappings$.subscribe(applications => this.updateApplicationsAndTags(applications));
   }
@@ -62,11 +64,13 @@ export class ResultSelectionApplicationComponent {
       }else{
         this.isSelected = false;
         this.filteredApplications = applications;
+        this.selectedApplications = this.selectedApplications.filter(item => applications.map(item => item.id).includes(item));
       }
     }else{
       this.isEmpty=true;
       this.updateTags(applications);
     }
+    console.log(this.selectedApplications);
   }
 
   private updateTags(applications: SelectableApplication[]){
@@ -88,7 +92,14 @@ export class ResultSelectionApplicationComponent {
         }
       });
       this.selectedApplications = this.selectedApplications.filter(item => filteredJobGroups.map(item => item.id).includes(item));
+      //this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
       this.filteredApplications = filteredJobGroups;
+    }
+  }
+
+  onChange(){
+    if(this.selectedApplications&&this.selectedApplications.length>=1){
+      this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
     }
   }
 }
