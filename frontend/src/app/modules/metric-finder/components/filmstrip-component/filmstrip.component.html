@@ -1,0 +1,3 @@
+<div class="filmstrip-container">
+  <div class="filmstrip-item" *ngFor="let thumbnail of filmStrip$ | async"><img [src]="thumbnail.imageUrl"></div>
+</div>

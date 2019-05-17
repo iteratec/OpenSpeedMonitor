@@ -1,4 +1,4 @@
-import { Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {Observable} from 'rxjs';
 import {TestResult} from './models/test-result';
 import {MetricFinderService} from './services/metric-finder.service';

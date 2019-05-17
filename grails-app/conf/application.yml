@@ -321,6 +321,7 @@ grails:
                             {pattern: '/applicationDashboard/rest/createGraphiteServer',            access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/rest/createCsiConfiguration',          access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/**',                       access: ['permitAll']},
+                            {pattern: '/metricFinder/**',                               access: ['permitAll']},
                             {pattern: '/queueDashboard/**',                             access: ['permitAll']},
                             {pattern: '/securityInfo/config',                           access: ['denyAll']},
                             {pattern: '/securityInfo/mappings',                         access: ['denyAll']},
