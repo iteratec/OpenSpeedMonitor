@@ -1,27 +1,51 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs';
-import {Thumbnail} from '../models/thumbnail.model';
+import {Thumbnail, ThumbnailDto} from '../models/thumbnail.model';
 import {map} from 'rxjs/operators';
 import {WptResultDTO} from '../models/wptResult-dto.model';
+import {TestInfo, TestResult} from '../models/test-result';
 
 @Injectable()
 export class FilmstripService {
 
-  // https://prod.server01.wpt.iteratec.de/video/compare.php?tests=190426_6D_94880eef447fa99fdb40ea094eef00fa-r:1-c:0-s:4&ival=100&end=full
-  // tslint:disable-next-line:max-line-length
-  filmStripDataUrl = 'https://prod.server01.wpt.iteratec.de/result/190423_CS_dcc38f026923b7e3fde79b617e360475/?f=json&average=0&median=0&standard=0&requests=0&console=0&multistepFormat=1';
-
-  filmStripData$: BehaviorSubject<Thumbnail[]> = new BehaviorSubject<Thumbnail[]>([]);
+  filmStripData$ = new BehaviorSubject<{[resultId: number]: Thumbnail[]}>({});
 
   constructor (private http: HttpClient) {}
 
-  getFilmstripData() {
-    this.http.get<WptResultDTO>(this.filmStripDataUrl).pipe(
-      map( (wptData: WptResultDTO) => (wptData.data.runs[1].firstView.steps[0].videoFrames)
-        .map(item => new Thumbnail(item.time, item.image))))
-      .subscribe(value => this.filmStripData$.next(value),
-          error => this.handleError(error));
+  loadFilmstripIfNecessary(result: TestResult): void {
+    const loadedResultIds = Object.keys(this.filmStripData$.getValue());
+    if (loadedResultIds.indexOf(result.id) < 0) {
+      this.loadFilmstrip(result);
+    }
+  }
+
+  loadFilmstrip(result: TestResult): void {
+    const wptUrl = this.createWptUrl(result.testInfo);
+    this.http.get<WptResultDTO>(wptUrl).pipe(
+      map( (wptData: WptResultDTO) => this.extractFilmstrip(wptData, result.testInfo))
+    ).subscribe(
+      filmstrip => this.updateFilmstripData(result, filmstrip),
+      error => this.handleError(error)
+    );
+  }
+
+  private updateFilmstripData(result: TestResult, filmstrip: Thumbnail[]): void {
+    this.filmStripData$.next({
+      ...this.filmStripData$.getValue(),
+      [result.id]: filmstrip
+    });
+  }
+
+  private extractFilmstrip(wptResult: WptResultDTO, testInfo: TestInfo): Thumbnail[] {
+    const cachedView = testInfo.cached ? 'repeatedView' : 'firstView';
+    const frames = wptResult.data.runs[testInfo.run][cachedView].steps[testInfo.step - 1].videoFrames;
+    return frames.map(item => new Thumbnail(item.time, item.image));
+  }
+
+
+  private createWptUrl(testInfo: TestInfo): string {
+    return `${testInfo.wptUrl}/result/${testInfo.testId}/?f=json&average=0&median=0&standard=0&requests=0&console=0&multistepFormat=1`;
   }
 
   private findFrame(thumbnails, time) {

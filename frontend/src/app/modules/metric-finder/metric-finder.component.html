@@ -10,8 +10,4 @@ Metric:
   <option [value]="'visuallyCompleteInMillisecs'">Visually Complete</option>
 </select>
 
-Selected:
-<p>
-  {{ selected | json}}
-</p>
-<osm-filmstrip></osm-filmstrip>
+<osm-filmstrip *ngFor="let testResult of selected" [result]="testResult"></osm-filmstrip>
