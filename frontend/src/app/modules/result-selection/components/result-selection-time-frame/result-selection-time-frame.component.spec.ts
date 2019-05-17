@@ -2,10 +2,10 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ResultSelectionTimeFrameComponent} from './result-selection-time-frame.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
-import {ResultSelectionService} from "../../services/result-selection.service";
 import {OsmLangService} from "../../../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 import {By} from "@angular/platform-browser";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 describe('ResultSelectionTimeFrameComponent', () => {
   let component: ResultSelectionTimeFrameComponent;
@@ -16,7 +16,7 @@ describe('ResultSelectionTimeFrameComponent', () => {
       declarations: [ResultSelectionTimeFrameComponent],
       imports: [SharedMocksModule],
       providers: [
-        ResultSelectionService,
+        ResultSelectionStore,
         OsmLangService,
         GrailsBridgeService
       ]

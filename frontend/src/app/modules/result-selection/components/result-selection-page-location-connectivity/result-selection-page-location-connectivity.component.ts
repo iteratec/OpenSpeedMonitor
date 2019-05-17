@@ -6,6 +6,7 @@ import {Location} from "../../../../models/location.model";
 import {Connectivity} from "../../../../models/connectivity.model";
 import {Page} from "../../../../models/page.model";
 import {Browser} from "../../../../models/browser.model";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
@@ -38,10 +39,11 @@ export class ResultSelectionPageLocationConnectivityComponent {
   @Input() showOnlyPageSelection: boolean = false;
   @Input() showOnlyBrowserSelection: boolean = false;
 
-  constructor(private resultSelectionService: ResultSelectionService) {
-    this.eventsAndPages$ = this.resultSelectionService.eventsAndPages$;
-    this.locationsAndBrowsers$ = this.resultSelectionService.locationsAndBrowsers$;
-    this.connectivities$ = this.resultSelectionService.connectivities$;
+  constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
+    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadSelectableData(state));
+    this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;
+    this.locationsAndBrowsers$ = this.resultSelectionStore.locationsAndBrowsers$;
+    this.connectivities$ = this.resultSelectionStore.connectivities$;
 
     this.eventsAndPages$.subscribe(next => {
       if (next) {
@@ -77,6 +79,7 @@ export class ResultSelectionPageLocationConnectivityComponent {
         this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
       } else if (children === 'locations') {
         this.selectedLocations = filteredItems.filter(item => this.selectedLocations.includes(item.id)).map(item => item.id);
+
         this.locations$ = of(this.sortAlphabetically(filteredItems));
       }
     } else {
@@ -86,6 +89,12 @@ export class ResultSelectionPageLocationConnectivityComponent {
         this.locations$ = of(this.sortAlphabetically(items));
       }
     }
+    this.resultSelectionStore.setSelectedPages(this.selectedPages);
+    this.resultSelectionStore.setSelectedLocations(this.selectedLocations);
+    this.resultSelectionStore.setSelectedBrowser(this.selectedBrowsers);
+    this.resultSelectionStore.setSelectedConnectivities(this.selectedConnectivities);
+
+
   }
 
   private getUniqueElements(items) {

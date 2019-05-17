@@ -113,7 +113,18 @@ export class ResultSelectionService {
     })
   }
 
-  private getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
+
+
+
+  updateMeasurands(resultSelectionCommand: ResultSelectionCommand): Observable<MeasurandGroup[]> {
+    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
+    return this.http.get('/resultSelection/getMeasurands', {params: params}).pipe(
+      handleError(),
+      startWith(null)
+    )
+  }
+
+   getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
     let subject$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>;
     switch (name) {
       case "LOAD_TIMES":
@@ -286,7 +297,7 @@ export class ResultSelectionService {
       ...((resultSelectionCommand.measuredEventIds && resultSelectionCommand.measuredEventIds.length) && { measuredEventIds: resultSelectionCommand.measuredEventIds.toString() }),
       ...((resultSelectionCommand.browserIds && resultSelectionCommand.browserIds.length) && { browserIds: resultSelectionCommand.browserIds.toString() }),
       ...((resultSelectionCommand.locationIds && resultSelectionCommand.locationIds.length) && { locationIds: resultSelectionCommand.locationIds.toString() }),
-      ...((resultSelectionCommand.selectedConnectivities && resultSelectionCommand.selectedConnectivities.length) && { selectedConnectivities: resultSelectionCommand.selectedConnectivities })
+      ...((resultSelectionCommand.selectedConnectivities && resultSelectionCommand.selectedConnectivities.length) && { selectedConnectivities: resultSelectionCommand.selectedConnectivities.toString() })
     }
   }
 }

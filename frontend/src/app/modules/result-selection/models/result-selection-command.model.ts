@@ -7,7 +7,7 @@ export interface ResultSelectionCommandDTO {
   measuredEventIds?: number[];
   browserIds?: number[];
   locationIds?: number[];
-  selectedConnectivities?: string[];
+  selectedConnectivities?: number[];
 }
 
 export class ResultSelectionCommand implements ResultSelectionCommandDTO {
@@ -19,7 +19,7 @@ export class ResultSelectionCommand implements ResultSelectionCommandDTO {
   measuredEventIds?: number[];
   browserIds?: number[];
   locationIds?: number[];
-  selectedConnectivities?: string[];
+  selectedConnectivities?: number[];
 
   constructor (dto: ResultSelectionCommandDTO) {
     this.from = dto.from;

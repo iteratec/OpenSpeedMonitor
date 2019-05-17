@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 import {Observable, ReplaySubject} from "rxjs";
-import {ResultSelectionService} from "../../services/result-selection.service";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-measurands',
@@ -23,45 +23,49 @@ export class MeasurandsComponent implements OnInit {
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
 
-  constructor(private resultSelectionService: ResultSelectionService) {
+  constructor(private resultSelectionStore: ResultSelectionStore) {
+    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadMeasurands(state));
+    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadUserTimings(state));
+    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadHeroTimings(state));
+
     this.measurands = [
-      this.resultSelectionService.loadTimes$,
-      this.resultSelectionService.userTimings$,
-      this.resultSelectionService.heroTimings$,
-      this.resultSelectionService.requestCounts$,
-      this.resultSelectionService.requestSizes$,
-      this.resultSelectionService.percentages$
+      this.resultSelectionStore.loadTimes$,
+      this.resultSelectionStore.userTimings$,
+      this.resultSelectionStore.heroTimings$,
+      this.resultSelectionStore.requestCounts$,
+      this.resultSelectionStore.requestSizes$,
+      this.resultSelectionStore.percentages$
     ];
 
-    this.resultSelectionService.loadTimes$.subscribe(next => {
+    this.resultSelectionStore.loadTimes$.subscribe(next => {
       if(next) {
         this.defaultValue = next.data.values[0];
         this.selectedMeasurands = [this.defaultValue];
       }
     });
 
-    this.resultSelectionService.userTimings$.subscribe(next => {
+    this.resultSelectionStore.userTimings$.subscribe(next => {
       if(next) {
         this.measurands = [
-          this.resultSelectionService.loadTimes$,
-          this.resultSelectionService.userTimings$,
-          this.resultSelectionService.heroTimings$,
-          this.resultSelectionService.requestCounts$,
-          this.resultSelectionService.requestSizes$,
-          this.resultSelectionService.percentages$
+          this.resultSelectionStore.loadTimes$,
+          this.resultSelectionStore.userTimings$,
+          this.resultSelectionStore.heroTimings$,
+          this.resultSelectionStore.requestCounts$,
+          this.resultSelectionStore.requestSizes$,
+          this.resultSelectionStore.percentages$
         ];
       }
     });
 
-    this.resultSelectionService.heroTimings$.subscribe(next => {
+    this.resultSelectionStore.heroTimings$.subscribe(next => {
       if(next) {
         this.measurands = [
-          this.resultSelectionService.loadTimes$,
-          this.resultSelectionService.userTimings$,
-          this.resultSelectionService.heroTimings$,
-          this.resultSelectionService.requestCounts$,
-          this.resultSelectionService.requestSizes$,
-          this.resultSelectionService.percentages$
+          this.resultSelectionStore.loadTimes$,
+          this.resultSelectionStore.userTimings$,
+          this.resultSelectionStore.heroTimings$,
+          this.resultSelectionStore.requestCounts$,
+          this.resultSelectionStore.requestSizes$,
+          this.resultSelectionStore.percentages$
         ];
       }
     });

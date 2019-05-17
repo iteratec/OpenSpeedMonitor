@@ -1,7 +1,4 @@
 import {Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {ResultSelectionCommand} from "../../models/result-selection-command.model";
-import {Chart} from "../../models/chart.model";
-import {ResultSelectionService} from "../../services/result-selection.service";
 import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
 import {fromEvent, merge, Observable, Subscription} from "rxjs";
 import {filter} from "rxjs/operators";
@@ -57,11 +54,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
     this.selectedDates = [defaultFrom, defaultTo];
 
-    let defaultResultSelectionCommand = new ResultSelectionCommand({
-      from: defaultFrom,
-      to: defaultTo
-    });
-
     this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
 
     this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[4];
@@ -95,7 +87,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
-    //this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
     this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
   }
 
@@ -113,7 +104,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
-    //this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
     this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
 
   }
@@ -132,7 +122,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeTo.selecteds;
     }
-    //this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
     this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
 
   }
@@ -171,10 +160,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
     }
     this.comparativeSelectionActive = !this.comparativeSelectionActive;
   }
-
-  //private loadSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
-    //this.resultSelectionService.loadSelectableData(resultSelectionCommand, Chart[this.currentChart]);
-  //}
 }
 
 export enum CalendarType {

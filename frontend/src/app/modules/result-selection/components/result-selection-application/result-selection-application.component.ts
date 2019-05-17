@@ -3,7 +3,6 @@ import {
     ViewEncapsulation,
   } from '@angular/core';
 
-import {ResultSelectionService} from "../../services/result-selection.service";
 import { SelectableApplication } from 'src/app/models/application.model';
 import { Observable } from 'rxjs';
 import {ResultSelectionStore} from "../../services/result-selection.store";
@@ -30,7 +29,11 @@ export class ResultSelectionApplicationComponent {
     this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadSelectableApplications(state));
     this.applicationMappings$ = this.resultSelectionStore.applications$;
 
-    this.applicationMappings$.subscribe(applications => this.updateApplicationsAndTags(applications));
+    this.applicationMappings$.subscribe(applications => {
+      if(!this.areApplicationListsEqual(this.applications,applications)) {
+        this.updateApplicationsAndTags(applications);
+      }
+    });
   }
 
   filterByTag(tag: string): void{
@@ -70,7 +73,6 @@ export class ResultSelectionApplicationComponent {
       this.isEmpty=true;
       this.updateTags(applications);
     }
-    console.log(this.selectedApplications);
   }
 
   private updateTags(applications: SelectableApplication[]){
@@ -92,14 +94,26 @@ export class ResultSelectionApplicationComponent {
         }
       });
       this.selectedApplications = this.selectedApplications.filter(item => filteredJobGroups.map(item => item.id).includes(item));
-      //this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
       this.filteredApplications = filteredJobGroups;
     }
+    //this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
   }
 
   onChange(){
-    if(this.selectedApplications&&this.selectedApplications.length>=1){
+    if(this.selectedApplications){
       this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
     }
+  }
+
+  private areApplicationListsEqual(oldApplications: SelectableApplication[], newApplications: SelectableApplication[]): boolean{
+    if (oldApplications && newApplications) {
+      if (oldApplications.length !== newApplications.length) {
+        return false;
+      } else {
+        //oldApplications.filter(item => newApplications.map(item => item.id).includes(item.id));
+        return oldApplications.filter(item => newApplications.indexOf(item) < 0).length === 0;
+      }
+    }
+    return false;
   }
 }

@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed} from '@angular/core/testing';
 import { ResultSelectionApplicationComponent } from './result-selection-application.component';
 import { SelectableApplication } from 'src/app/models/application.model';
-import { ResultSelectionService } from '../../services/result-selection.service';
 import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
 import { By } from '@angular/platform-browser';
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 describe('ResultSelectionApplicationComponent', () => {
   let component: ResultSelectionApplicationComponent;
@@ -25,8 +25,8 @@ describe('ResultSelectionApplicationComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ResultSelectionApplicationComponent],
       imports: [SharedMocksModule],
-      providers: [        
-        ResultSelectionService,
+      providers: [
+        ResultSelectionStore,
         OsmLangService,
         GrailsBridgeService
       ]

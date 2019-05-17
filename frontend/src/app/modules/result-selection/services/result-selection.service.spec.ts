@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ResultSelectionService } from './result-selection.service';
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 
-describe('ResultSelectionService', () => {
+describe('ResultSelectionStore', () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
       ResultSelectionService
