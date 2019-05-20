@@ -37,6 +37,7 @@ class UrlMappings {
         "/metricFinder/**?"(view: "/angularFrontend")
         "/aspectConfiguration/**?"(view: "/angularFrontend")
         "/metricFinder/rest/$action"(controller: "metricFinder")
+        "/aspectConfiguration/rest/$action"(controller: "aspectConfiguration")
 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // Pages with controller
