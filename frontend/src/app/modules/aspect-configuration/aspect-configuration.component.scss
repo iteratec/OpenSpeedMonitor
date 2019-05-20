@@ -1,13 +1,13 @@
+h2 {
+  margin-left: 10px;
+}
 .main-container {
+  margin-left: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
 
   osm-aspect-metrics {
     margin: 0 0 20px 20px;
-
-    h2 {
-      margin-left: 10px;
-    }
   }
 
 }
