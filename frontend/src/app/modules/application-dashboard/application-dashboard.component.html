@@ -25,5 +25,6 @@
   <osm-application-job-status [failingJobStatistic]="failingJobStatistic$ | async" [selectedApplication]="selectedApplication" class="card"></osm-application-job-status>
 
   <osm-page *ngFor="let metric of pages$ | async" [metricsForPage]="metric"
-            [lastDateOfResult]="selectedApplication.dateOfLastResults" class="card"></osm-page>
+            [lastDateOfResult]="selectedApplication.dateOfLastResults" [application]="selectedApplication"
+            class="card"></osm-page>
 </div>
