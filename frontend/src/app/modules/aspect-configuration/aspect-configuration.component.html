@@ -2,11 +2,11 @@
 <h2>{{ 'frontend.de.iteratec.osm.performance-aspect.title' | translate }} <span
   class="text-info">{{(page$ | async)?.name}}</span></h2>
 <div class="main-container">
-  <!--  <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading">-->
-  <osm-aspect-metrics *ngFor="let performanceAspect of (performanceAspects$ | async)"
-                      [performanceAspectWrapped]="performanceAspect"
-                      class="aspect-inspect"></osm-aspect-metrics>
-  <!--  </div>-->
+  <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading">
+    <osm-aspect-metrics *ngFor="let performanceAspect of (performanceAspects$ | async)"
+                        [performanceAspectWrapped]="performanceAspect"
+                        class="aspect-inspect"></osm-aspect-metrics>
+  </div>
 </div>
 
 <ng-template #isLoading>
