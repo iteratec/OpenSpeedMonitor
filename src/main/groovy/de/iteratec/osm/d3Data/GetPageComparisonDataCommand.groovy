@@ -15,6 +15,10 @@ class GetPageComparisonDataCommand implements Validateable {
     @BindUsing({ obj, source ->
         return JSON.parse(source['measurand']).measurands[0][0].replace("Uncached", "")
     })
+
+    List selectedDeviceTypes
+    List selectedOperatingSystems
+
     String measurand
     String selectedAggregationValue
 }

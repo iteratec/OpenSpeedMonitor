@@ -32,5 +32,15 @@ class GetBarchartCommand implements Validateable {
     })
     List<Long> selectedBrowsers
 
+    @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['selectedDeviceTypes'])
+    })
+    List selectedDeviceTypes
+
+    @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['selectedOperatingSystems'])
+    })
+    List selectedOperatingSystems
+
     String selectedAggregationValue
 }
