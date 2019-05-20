@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Application, ApplicationDTO} from "../../../models/application.model";
-import {catchError, map, startWith} from "rxjs/operators";
-import {BehaviorSubject, EMPTY} from "rxjs";
+import {catchError, map} from "rxjs/operators";
+import {EMPTY} from "rxjs";
 import {Loading} from "../../../models/Loading";
 import {Page} from "../../../models/page.model";
 
@@ -11,14 +11,11 @@ import {Page} from "../../../models/page.model";
 })
 export class AspectConfigurationService {
 
-  application$ = new BehaviorSubject<Application & Loading>(null);
-  page$ = new BehaviorSubject<Page & Loading>(null)
-
   constructor(private http: HttpClient) {
   }
 
   loadApplication(applicationId: string) {
-    this.http.get<ApplicationDTO>(
+    return this.http.get<ApplicationDTO>(
       "/applicationDashboard/rest/getApplication",
       {params: {applicationId: applicationId}}).pipe(
       catchError((error) => {
@@ -29,16 +26,12 @@ export class AspectConfigurationService {
       map(application => ({
         ...application,
         isLoading: false
-      })),
-      startWith({
-        ...this.application$.getValue(),
-        isLoading: true
-      })
-    ).subscribe((app: Application & Loading) => {this.application$.next(app)})
+      }))
+    )
   }
 
   loadPage(pageId: string) {
-    this.http.get<Page & Loading[]>(
+    return this.http.get<Page & Loading[]>(
       '/aspectConfiguration/rest/getPage',
       {params: {pageId: pageId}}).pipe(
       catchError((error) => {
@@ -48,11 +41,7 @@ export class AspectConfigurationService {
       map(page => ({
         ...page,
         isLoading: false
-      })),
-      startWith({
-        ...this.page$.getValue(),
-        isLoading: true
-      })
-    ).subscribe((page: Page & Loading) => this.page$.next(page))
+      }))
+    )
   }
 }

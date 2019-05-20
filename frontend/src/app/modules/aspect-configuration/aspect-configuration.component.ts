@@ -16,14 +16,14 @@ import {Loading} from "../../models/Loading";
 })
 export class AspectConfigurationComponent implements OnInit {
 
-  application$: Observable<Application & Loading>;
-  page$: Observable<Page & Loading>;
+  application$: Observable<Application>;
+  page$: Observable<Page>;
 
   performanceAspects$: Subject<ResponseWithLoadingState<PerformanceAspect>[]>;
 
   constructor(private route: ActivatedRoute, private applicationService: ApplicationService, private service: AspectConfigurationService) {
-    this.application$ = service.application$;
-    this.page$ = service.page$;
+    this.application$ = applicationService.selectedApplication$;
+    this.page$ = applicationService.selectedPage$;
     this.performanceAspects$ = this.applicationService.performanceAspectForPage$;
   }
 
@@ -35,10 +35,14 @@ export class AspectConfigurationComponent implements OnInit {
   }
 
   getApplication(applicationId: string) {
-    this.service.loadApplication(applicationId);
+    this.service.loadApplication(applicationId).subscribe((app: Application & Loading) => {
+      this.applicationService.selectedApplication$.next(app);
+    })
   }
 
   getPage(pageId: string) {
-    this.service.loadPage(pageId);
+    this.service.loadPage(pageId).subscribe((page: Page & Loading) => {
+      this.applicationService.selectedPage$.next(page);
+    })
   }
 }
