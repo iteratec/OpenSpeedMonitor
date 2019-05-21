@@ -7,5 +7,11 @@ export interface PerformanceAspect {
   jobGroupId: number
   browserId: number
   measurand: SelectableMeasurand
-  performanceAspectType: string
+  performanceAspectType: PerformanceAspectType
+  persistent: boolean
+}
+
+export interface PerformanceAspectType {
+  name: string
+  icon: string
 }
