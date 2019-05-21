@@ -1,8 +1,9 @@
 <div class="filmstrip-container">
   <div class="filmstrip-item"
        *ngFor="let thumbnail of filmStrip$ | async"
-       [class.had-change]="thumbnail.hasChange"
+       [class.has-change]="thumbnail.hasChange"
        [class.highlighted]="thumbnail.isHighlighted">
+    <span class="time">{{formatTime(thumbnail)}}</span>
     <img [src]="thumbnail.imageUrl" />
   </div>
 </div>

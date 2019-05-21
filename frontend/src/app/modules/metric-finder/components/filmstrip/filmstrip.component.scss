@@ -1,5 +1,6 @@
 .filmstrip-container {
   display: flex;
+  padding: 0 5px 5px 5px;
 }
 
 .filmstrip-item {
@@ -11,5 +12,14 @@
   &.highlighted img, &:hover img {
     filter: brightness(100%);
   }
-  padding: 10px;
+  .time {
+    display: block;
+    text-align: center;
+    color: white;
+    padding: 0 5px 5px 5px;
+  }
+  &.has-change .time {
+    font-weight: bold;
+  }
+  padding: 5px;
 }

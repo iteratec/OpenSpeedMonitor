@@ -4,7 +4,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {TestResult} from '../../models/test-result';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
-import {FilmstripView} from '../../models/filmstrip-view.model';
+import {FilmstripView, FilmstripViewThumbnail} from '../../models/filmstrip-view.model';
 
 
 @Component({
@@ -43,6 +43,10 @@ export class FilmstripComponent implements OnChanges {
       this.filmstripService.loadFilmstripIfNecessary(this.result);
       this.result$.next(this.result);
     }
+  }
+
+  formatTime(thumbnail: FilmstripViewThumbnail): string {
+    return (thumbnail.time / 1000).toFixed(1) + 's';
   }
 
 }
