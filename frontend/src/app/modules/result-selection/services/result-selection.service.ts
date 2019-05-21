@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
@@ -281,6 +281,11 @@ export class ResultSelectionService {
   }
   updateHeroTimings(resultSelectionCommand: ResultSelectionCommand): Observable<SelectableMeasurand[]> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
+    let param;
+    if(resultSelectionCommand.jobGroupIds) {
+       param = resultSelectionCommand.jobGroupIds.toString();
+    }
+    console.log(param);
     return this.http.get('/resultSelection/getHeroTimings', {params: params}).pipe(
       handleError(),
       startWith(null)
@@ -301,6 +306,7 @@ export class ResultSelectionService {
     }
   }
 }
+
 
 function handleError(): OperatorFunction<any, any> {
   return catchError((error) => {

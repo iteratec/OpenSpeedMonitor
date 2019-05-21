@@ -40,7 +40,15 @@ export class ResultSelectionPageLocationConnectivityComponent {
   @Input() showOnlyBrowserSelection: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadSelectableData(state));
+    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => {
+      if (!(this.resultSelectionStore.selectedPagesChanged ||this.resultSelectionStore.selectedBrowserChanged ||this.resultSelectionStore.selectedLocationChanged ||this.resultSelectionStore.selectedConnectivityChanged)) {
+        this.resultSelectionStore.loadSelectableData(state);
+      }
+      this.resultSelectionStore.selectedConnectivityChanged = false;
+      this.resultSelectionStore.selectedLocationChanged = false;
+      this.resultSelectionStore.selectedBrowserChanged = false;
+      this.resultSelectionStore.selectedPagesChanged = false;
+    });
     this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;
     this.locationsAndBrowsers$ = this.resultSelectionStore.locationsAndBrowsers$;
     this.connectivities$ = this.resultSelectionStore.connectivities$;

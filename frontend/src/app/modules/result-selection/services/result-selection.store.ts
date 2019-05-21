@@ -8,6 +8,7 @@ import {ApplicationWithPages, SelectableApplication} from "../../../models/appli
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {MeasurandGroup} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
+import {forEach} from "@angular/router/src/utils/collection";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -16,11 +17,11 @@ export class ResultSelectionStore {
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
 
 
-  applications$: ReplaySubject<SelectableApplication[]> = new ReplaySubject(1);
-  applicationsAndPages$: ReplaySubject<ApplicationWithPages[]> = new ReplaySubject(1);
+  applications$: BehaviorSubject<SelectableApplication[]> = new BehaviorSubject([]);
+  applicationsAndPages$: BehaviorSubject<ApplicationWithPages[]> = new BehaviorSubject([]);
   eventsAndPages$: BehaviorSubject<MeasuredEvent[]> = new BehaviorSubject([]);
   locationsAndBrowsers$: BehaviorSubject<Location[]> = new BehaviorSubject([]);
-  connectivities$: ReplaySubject<Connectivity[]> = new ReplaySubject(1);
+  connectivities$: BehaviorSubject<Connectivity[]> = new BehaviorSubject([]);
   loadTimes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
   userTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
   heroTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
@@ -28,7 +29,12 @@ export class ResultSelectionStore {
   requestSizes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
   percentages$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
-
+  oldResult: ResultSelectionCommand;
+  selectedJobGroupsChanged: boolean = false;
+  selectedPagesChanged: boolean = false;
+  selectedBrowserChanged: boolean = false;
+  selectedLocationChanged: boolean = false;
+  selectedConnectivityChanged: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService){
     let defaultFrom = new Date();
@@ -43,22 +49,27 @@ export class ResultSelectionStore {
 
   setSelectedJobGroups(ids: number[]){
     this.setResultSelectionCommand({...this.resultSelectionCommand, jobGroupIds: ids});
+    this.selectedJobGroupsChanged = true;
   }
 
   setSelectedPages(ids: number[]){
     this.setResultSelectionCommand({...this.resultSelectionCommand, pageIds: ids});
+    this.selectedPagesChanged = true;
   }
 
   setSelectedBrowser(ids: number[]){
     this.setResultSelectionCommand({...this.resultSelectionCommand, browserIds: ids});
+    this.selectedBrowserChanged = true;
   }
 
   setSelectedConnectivities(connectivities: number[]){
-    this.setResultSelectionCommand({...this.resultSelectionCommand, selectedConnectivities: connectivities})
+    this.setResultSelectionCommand({...this.resultSelectionCommand, selectedConnectivities: connectivities});
+    this.selectedConnectivityChanged = true;
   }
 
   setSelectedLocations(ids: number[]){
     this.setResultSelectionCommand({...this.resultSelectionCommand, locationIds: ids});
+    this.selectedLocationChanged = true;
   }
 
   get resultSelectionCommand(){
@@ -66,6 +77,7 @@ export class ResultSelectionStore {
   }
 
   setResultSelectionCommand(newState: ResultSelectionCommand){
+    this.oldResult = this.resultSelectionCommand;
     this._resultSelectionCommand$.next(newState);
   }
 
@@ -163,4 +175,5 @@ export class ResultSelectionStore {
     }
     return subject$;
   }
+
 }
