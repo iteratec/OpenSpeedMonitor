@@ -78,8 +78,6 @@ class BarchartAggregationService {
                 .withJobResultDateBetween(from, to)
                 .withSelectedMeasurands(selectedMeasurands)
                 .withJobGroupIn(jobGroups)
-                .withOperatingSystems(operatingSystems)
-                .withDeviceTypes(deviceTypes)
 
         if (pages) {
             queryBuilder = queryBuilder.withPageIn(pages)
