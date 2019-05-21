@@ -34,6 +34,7 @@ export class ResultSelectionStore {
   selectedBrowserChanged: boolean = false;
   selectedLocationChanged: boolean = false;
   selectedConnectivityChanged: boolean = false;
+  selectedMeasuredEventsChanged: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService){
     let defaultFrom = new Date();
@@ -56,19 +57,25 @@ export class ResultSelectionStore {
     this.setResultSelectionCommand({...this.resultSelectionCommand, pageIds: ids});
   }
 
+  measuredEventIds?: number[];
+  setSelectedMeasuredEvents(ids: number[]){
+    this.selectedMeasuredEventsChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, measuredEventIds: ids});
+  }
+
   setSelectedBrowser(ids: number[]){
     this.selectedBrowserChanged = true;
     this.setResultSelectionCommand({...this.resultSelectionCommand, browserIds: ids});
   }
 
-  setSelectedConnectivities(connectivities: number[]){
-    this.selectedConnectivityChanged = true;
-    this.setResultSelectionCommand({...this.resultSelectionCommand, selectedConnectivities: connectivities});
-  }
-
   setSelectedLocations(ids: number[]){
     this.selectedLocationChanged = true;
     this.setResultSelectionCommand({...this.resultSelectionCommand, locationIds: ids});
+  }
+
+  setSelectedConnectivities(connectivities: number[]){
+    this.selectedConnectivityChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, selectedConnectivities: connectivities});
   }
 
   get resultSelectionCommand(){
@@ -78,6 +85,40 @@ export class ResultSelectionStore {
   setResultSelectionCommand(newState: ResultSelectionCommand){
     this.oldResult = this.resultSelectionCommand;
     this._resultSelectionCommand$.next(newState);
+  }
+
+  resultSelectionCommandListener(selectedComponent: string){
+    if(selectedComponent ==="APPLICATION"){
+    this._resultSelectionCommand$.subscribe(state => {
+      if (!this.selectedJobGroupsChanged) {
+        this.loadSelectableApplications(state);
+        }
+      this.selectedJobGroupsChanged = false;
+    });
+    }else if(selectedComponent === "PAGE_LOCATION_CONNECTIVITY"){
+      this._resultSelectionCommand$.subscribe(state => {
+        if (!(this.selectedPagesChanged || this.selectedMeasuredEventsChanged)) {
+          this.loadSelectableEventsAndPages(state);
+        }
+        if(!(this.selectedBrowserChanged || this.selectedLocationChanged)){
+          this.loadSelectableLocationsAndBrowsers(state);
+        }
+        if(!this.selectedConnectivityChanged){
+          this.loadSelectableConnectivities(state);
+        }
+        this.selectedConnectivityChanged = false;
+        this.selectedLocationChanged = false;
+        this.selectedBrowserChanged = false;
+        this.selectedPagesChanged = false;
+        this.selectedMeasuredEventsChanged = false;
+      });
+    }else if(selectedComponent ==="MEASURAND"){
+      this._resultSelectionCommand$.subscribe(state => {
+        this.loadMeasurands(state);
+        this.loadUserTimings(state);
+        this.loadHeroTimings(state);
+      });
+    }
   }
 
   loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
@@ -104,7 +145,6 @@ export class ResultSelectionStore {
     this.loadSelectableEventsAndPages(resultSelectionCommand);
     this.loadSelectableConnectivities(resultSelectionCommand);
     this.loadSelectableLocationsAndBrowsers(resultSelectionCommand);
-
   }
 
   loadMeasurands(resultSelectionCommand: ResultSelectionCommand): void {

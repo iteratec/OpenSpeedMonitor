@@ -22,11 +22,10 @@ export class MeasurandsComponent implements OnInit {
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
+  selectedComponent: string = "MEASURAND";
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadMeasurands(state));
-    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadUserTimings(state));
-    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => this.resultSelectionStore.loadHeroTimings(state));
+    this.resultSelectionStore.resultSelectionCommandListener(this.selectedComponent);
 
     this.measurands = [
       this.resultSelectionStore.loadTimes$,

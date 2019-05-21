@@ -24,14 +24,10 @@ export class ResultSelectionApplicationComponent {
   selectedTag: string ='';
   isSelected = false;
   selectedApplications: number[] = [];
+   selectedComponent: string = "APPLICATION";
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-      this.resultSelectionStore._resultSelectionCommand$.subscribe(state => {
-        if (!this.resultSelectionStore.selectedJobGroupsChanged) {
-          this.resultSelectionStore.loadSelectableApplications(state);
-        }
-        this.resultSelectionStore.selectedJobGroupsChanged = false;
-      });
+      this.resultSelectionStore.resultSelectionCommandListener(this.selectedComponent);
       this.applicationMappings$ = this.resultSelectionStore.applications$;
       this.applicationMappings$.subscribe(applications => {
         if(applications){

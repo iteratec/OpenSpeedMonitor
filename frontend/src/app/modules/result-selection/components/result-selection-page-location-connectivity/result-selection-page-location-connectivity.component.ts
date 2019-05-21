@@ -32,6 +32,7 @@ export class ResultSelectionPageLocationConnectivityComponent {
   selectedBrowsers: number[] = [];
   selectedLocations: number[] = [];
   selectedConnectivities: number[] = [];
+  selectedComponent: string = "PAGE_LOCATION_CONNECTIVITY";
 
   @Input() currentChart: string;
   @Input() showMeasuredStepSelection: boolean = true;
@@ -40,15 +41,7 @@ export class ResultSelectionPageLocationConnectivityComponent {
   @Input() showOnlyBrowserSelection: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore._resultSelectionCommand$.subscribe(state => {
-      if (!(this.resultSelectionStore.selectedPagesChanged ||this.resultSelectionStore.selectedBrowserChanged ||this.resultSelectionStore.selectedLocationChanged ||this.resultSelectionStore.selectedConnectivityChanged)) {
-        this.resultSelectionStore.loadSelectableData(state);
-      }
-      this.resultSelectionStore.selectedConnectivityChanged = false;
-      this.resultSelectionStore.selectedLocationChanged = false;
-      this.resultSelectionStore.selectedBrowserChanged = false;
-      this.resultSelectionStore.selectedPagesChanged = false;
-    });
+    this.resultSelectionStore.resultSelectionCommandListener(this.selectedComponent);
     this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;
     this.locationsAndBrowsers$ = this.resultSelectionStore.locationsAndBrowsers$;
     this.connectivities$ = this.resultSelectionStore.connectivities$;
@@ -83,6 +76,7 @@ export class ResultSelectionPageLocationConnectivityComponent {
     if (selectedParents && selectedParents.length > 0) {
       let filteredItems = items.filter(item => selectedParents.includes(item.parent.id));
       if (children === 'events') {
+        console.log(this.selectedEvents);
         this.selectedEvents = filteredItems.filter(item => this.selectedEvents.includes(item.id)).map(item => item.id);
         this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
       } else if (children === 'locations') {
@@ -97,10 +91,12 @@ export class ResultSelectionPageLocationConnectivityComponent {
         this.locations$ = of(this.sortAlphabetically(items));
       }
     }
+    //TODO: measurand event and location selection not working yet
     this.resultSelectionStore.setSelectedPages(this.selectedPages);
     this.resultSelectionStore.setSelectedLocations(this.selectedLocations);
     this.resultSelectionStore.setSelectedBrowser(this.selectedBrowsers);
     this.resultSelectionStore.setSelectedConnectivities(this.selectedConnectivities);
+    this.resultSelectionStore.setSelectedMeasuredEvents(this.selectedEvents);
   }
 
   private getUniqueElements(items) {
