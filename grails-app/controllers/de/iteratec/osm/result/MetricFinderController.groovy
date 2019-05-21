@@ -36,7 +36,9 @@ class MetricFinderController {
                         cached: result.projectedProperties.cachedView == CachedView.CACHED,
                         step: result.projectedProperties.oneBasedStepIndexInJourney
                 ],
-                timings: result.projectedProperties.subMap(measurands.collect { it.databaseRelevantName })
+                timings: measurands.collectEntries {
+                    [(it.frontendIdentifier): result.projectedProperties[it.databaseRelevantName]]
+                }
         ]}
         ControllerUtils.sendObjectAsJSON(response, dtos)
     }

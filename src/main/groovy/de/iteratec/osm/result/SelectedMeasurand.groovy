@@ -52,6 +52,10 @@ class SelectedMeasurand {
         return this.selectedType.getDatabaseName(this.name)
     }
 
+    String getFrontendIdentifier() {
+        return selectedType.optionPrefix + name
+    }
+
     static SelectedMeasurand createForUserTiming(String name, UserTimingType type, CachedView cachedView) {
         return new SelectedMeasurand(type.selectedMeasurandType.optionPrefix + name, cachedView)
     }

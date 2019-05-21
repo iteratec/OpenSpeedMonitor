@@ -11,7 +11,7 @@ import {MetricFinderService} from './services/metric-finder.service';
 export class MetricFinderComponent {
   public testResults$: Observable<TestResult[]>;
   public selected: TestResult[] = [];
-  public metric = 'speedIndex';
+  public metric = 'SPEED_INDEX';
 
   constructor(private metricFinderService: MetricFinderService) {
     this.testResults$ = metricFinderService.testResults$;

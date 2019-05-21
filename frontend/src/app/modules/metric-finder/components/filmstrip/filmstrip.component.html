@@ -8,7 +8,7 @@
     <span class="time">{{formatTime(thumbnail.time, 1)}}</span>
     <img [src]="thumbnail.imageUrl" />
     <ul class="timings" *ngIf="thumbnail.timings.length">
-      <li *ngFor="let timing of thumbnail.timings">{{timing.metric}}: {{formatTime(timing.time, 3)}}</li>
+      <li *ngFor="let timing of thumbnail.timings">{{ formatTiming(timing) }}</li>
     </ul>
   </div>
 </div>
