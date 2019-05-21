@@ -18,12 +18,15 @@ export class FilmstripComponent implements OnChanges {
   @Input()
   result: TestResult;
 
-  private result$ = new Subject<TestResult>();
+  private result$ = new BehaviorSubject<TestResult>(null);
 
   constructor(
     private filmstripService: FilmstripService
   ) {
-    this.filmStrip$ = combineLatest(this.filmstripService.filmStripData$, this.result$).pipe(
+    this.filmStrip$ = combineLatest(
+      this.filmstripService.filmStripData$,
+      this.result$
+    ).pipe(
       map(([filmstrips, result]) => filmstrips[result.id]),
       filter(filmstrip => !!filmstrip),
       distinctUntilChanged(),
