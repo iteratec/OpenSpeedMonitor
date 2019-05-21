@@ -37,7 +37,7 @@ class MetricFinderController {
                         step: result.projectedProperties.oneBasedStepIndexInJourney
                 ],
                 timings: measurands.collectEntries {
-                    [(it.frontendIdentifier): result.projectedProperties[it.databaseRelevantName]]
+                    [(it.optionValue): result.projectedProperties[it.databaseRelevantName]]
                 }
         ]}
         ControllerUtils.sendObjectAsJSON(response, dtos)
