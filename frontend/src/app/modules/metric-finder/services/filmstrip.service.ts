@@ -5,6 +5,7 @@ import {Thumbnail, ThumbnailDto} from '../models/thumbnail.model';
 import {map} from 'rxjs/operators';
 import {WptResultDTO} from '../models/wptResult-dto.model';
 import {TestInfo, TestResult} from '../models/test-result';
+import {FilmstripView} from '../models/filmstrip-view.model';
 
 @Injectable()
 export class FilmstripService {
@@ -30,7 +31,7 @@ export class FilmstripService {
     );
   }
 
-  createFilmStrip(interval: number, thumbnails: Thumbnail[]) {
+  createFilmstripView(interval: number, thumbnails: Thumbnail[], highlightedTime?: number): FilmstripView {
     const end = Math.max(...thumbnails.map(t => t.time));
     const filmstrip = [];
     let lastVideoFrame = null;
@@ -41,10 +42,23 @@ export class FilmstripService {
         time: time,
         imageUrl: videoFrame.imageUrl,
         hasChange: !lastVideoFrame || lastVideoFrame.time !== videoFrame.time,
+        isHighlighted: highlightedTime !== undefined && highlightedTime > (time - interval) && highlightedTime <= time
       });
       lastVideoFrame = videoFrame;
     }
     return filmstrip;
+  }
+
+  private findFrame(thumbnails, time) {
+    let frame = thumbnails[0];
+    for (const currentFrame of thumbnails) {
+      if (time >= currentFrame.time) {
+        frame = currentFrame;
+      } else {
+        break;
+      }
+    }
+    return frame;
   }
 
   private updateFilmstripData(result: TestResult, filmstrip: Thumbnail[]): void {
@@ -63,18 +77,6 @@ export class FilmstripService {
 
   private createWptUrl(testInfo: TestInfo): string {
     return `${testInfo.wptUrl}/result/${testInfo.testId}/?f=json&average=0&median=0&standard=0&requests=0&console=0&multistepFormat=1`;
-  }
-
-  private findFrame(thumbnails, time) {
-    let frame = thumbnails[0];
-    for (const currentFrame of thumbnails) {
-      if (time >= currentFrame.time) {
-        frame = currentFrame;
-      } else {
-        break;
-      }
-    }
-    return frame;
   }
 
   private handleError(error: any) {

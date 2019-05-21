@@ -1,10 +1,11 @@
 import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {FilmstripService} from '../../services/filmstrip.service';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {Thumbnail} from '../../models/thumbnail.model';
 import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {TestResult} from '../../models/test-result';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
+import {FilmstripView} from '../../models/filmstrip-view.model';
+
 
 @Component({
   selector: 'osm-filmstrip',
@@ -13,10 +14,13 @@ import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 })
 export class FilmstripComponent implements OnChanges {
 
-  filmStrip$: Observable<Thumbnail[]>;
+  filmStrip$: Observable<FilmstripView>;
 
   @Input()
   result: TestResult;
+
+  @Input()
+  highlightedMetric: string;
 
   private result$ = new BehaviorSubject<TestResult>(null);
 
@@ -27,10 +31,10 @@ export class FilmstripComponent implements OnChanges {
       this.filmstripService.filmStripData$,
       this.result$
     ).pipe(
-      map(([filmstrips, result]) => filmstrips[result.id]),
+      map(([filmstrips, result]) => result ? filmstrips[result.id] : null),
       filter(filmstrip => !!filmstrip),
       distinctUntilChanged(),
-      map(filmstrip => this.filmstripService.createFilmStrip(100, filmstrip))
+      map(filmstrip => this.filmstripService.createFilmstripView(100, filmstrip, this.result.timings[this.highlightedMetric]))
     );
   }
 
@@ -40,4 +44,5 @@ export class FilmstripComponent implements OnChanges {
       this.result$.next(this.result);
     }
   }
+
 }

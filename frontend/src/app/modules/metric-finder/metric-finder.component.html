@@ -11,5 +11,5 @@ Metric:
 </select>
 
 <div class="filmstrips">
-<osm-filmstrip *ngFor="let testResult of selected" [result]="testResult"></osm-filmstrip>
+<osm-filmstrip *ngFor="let testResult of selected" [result]="testResult" [highlightedMetric]="metric"></osm-filmstrip>
 </div>

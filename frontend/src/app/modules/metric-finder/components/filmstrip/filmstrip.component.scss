@@ -5,6 +5,11 @@
 .filmstrip-item {
   img{
     height: 150px;
+    filter: brightness(50%);
+    transition: filter 0.2s ease;
+  }
+  &.highlighted img, &:hover img {
+    filter: brightness(100%);
   }
   padding: 10px;
 }
