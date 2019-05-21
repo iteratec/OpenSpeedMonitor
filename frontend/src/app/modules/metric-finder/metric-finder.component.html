@@ -1,5 +1,5 @@
 
-<osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="selected = $event"></osm-line-chart>
+<osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
 
 Metric:
 <select [(ngModel)]="metric">

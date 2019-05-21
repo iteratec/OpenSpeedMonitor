@@ -1,8 +1,8 @@
-import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
+import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {FilmstripService} from '../../services/filmstrip.service';
-import {BehaviorSubject, Observable, Subject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {Thumbnail} from '../../models/thumbnail.model';
-import {distinctUntilChanged, filter, map, pluck} from 'rxjs/operators';
+import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {TestResult} from '../../models/test-result';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 
