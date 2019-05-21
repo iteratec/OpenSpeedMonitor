@@ -4,6 +4,9 @@
 }
 
 .filmstrip-item {
+  color: white;
+  padding: 5px;
+
   img{
     height: 150px;
     filter: brightness(50%);
@@ -15,11 +18,22 @@
   .time {
     display: block;
     text-align: center;
-    color: white;
     padding: 0 5px 5px 5px;
   }
   &.has-change .time {
     font-weight: bold;
   }
-  padding: 5px;
+
+  .timings {
+    list-style: none;
+    padding: 5px;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1;
+    display: none;
+    border-radius: 4px;
+  }
+  &:hover .timings {
+    display: block;
+  }
 }

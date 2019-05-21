@@ -1,16 +1,17 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs';
-import {Thumbnail, ThumbnailDto} from '../models/thumbnail.model';
+import {Thumbnail} from '../models/thumbnail.model';
 import {map} from 'rxjs/operators';
 import {WptResultDTO} from '../models/wptResult-dto.model';
-import {TestInfo, TestResult} from '../models/test-result';
-import {FilmstripView} from '../models/filmstrip-view.model';
+import {TestInfo, TestResult, TimingsMap} from '../models/test-result';
+import {FilmstripView, Timing} from '../models/filmstrip-view.model';
 
 @Injectable()
 export class FilmstripService {
 
   filmStripData$ = new BehaviorSubject<{[resultId: number]: Thumbnail[]}>({});
+  private viewInterval = 100;
 
   constructor (private http: HttpClient) {}
 
@@ -31,18 +32,20 @@ export class FilmstripService {
     );
   }
 
-  createFilmstripView(interval: number, thumbnails: Thumbnail[], highlightedTime?: number): FilmstripView {
+  createFilmstripView(thumbnails: Thumbnail[], timings: TimingsMap, highlightedMetric?: string): FilmstripView {
     const end = Math.max(...thumbnails.map(t => t.time));
     const filmstrip = [];
     let lastVideoFrame = null;
 
-    for (let time = 0; time < end + interval; time += interval) {
+    for (let time = 0; time < end + this.viewInterval; time += this.viewInterval) {
       const videoFrame = this.findFrame(thumbnails, time);
+      const timingsInFrame = this.findTimingsInInterval(timings, time - this.viewInterval, time);
       filmstrip.push({
         time: time,
         imageUrl: videoFrame.imageUrl,
         hasChange: !lastVideoFrame || lastVideoFrame.time !== videoFrame.time,
-        isHighlighted: highlightedTime !== undefined && highlightedTime > (time - interval) && highlightedTime <= time
+        isHighlighted: !!timingsInFrame.find(timing => timing.metric === highlightedMetric),
+        timings: timingsInFrame
       });
       lastVideoFrame = videoFrame;
     }
@@ -81,5 +84,11 @@ export class FilmstripService {
 
   private handleError(error: any) {
     console.error(error);
+  }
+
+  private findTimingsInInterval(timings: TimingsMap, start: number, end: number): Timing[] {
+    return Object.keys(timings)
+      .filter(metric => timings[metric] > start && timings[metric] <= end)
+      .map(metric => ({metric: metric, time: timings[metric]}));
   }
 }

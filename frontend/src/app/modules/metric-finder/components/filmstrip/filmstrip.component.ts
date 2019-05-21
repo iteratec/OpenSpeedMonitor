@@ -34,7 +34,7 @@ export class FilmstripComponent implements OnChanges {
       map(([filmstrips, result]) => result ? filmstrips[result.id] : null),
       filter(filmstrip => !!filmstrip),
       distinctUntilChanged(),
-      map(filmstrip => this.filmstripService.createFilmstripView(100, filmstrip, this.result.timings[this.highlightedMetric]))
+      map(filmstrip => this.filmstripService.createFilmstripView(filmstrip, this.result.timings, this.highlightedMetric))
     );
   }
 
@@ -45,8 +45,27 @@ export class FilmstripComponent implements OnChanges {
     }
   }
 
-  formatTime(thumbnail: FilmstripViewThumbnail): string {
-    return (thumbnail.time / 1000).toFixed(1) + 's';
+  formatTime(millisecs: number, precision: number): string {
+    return (millisecs / 1000).toFixed(precision) + 's';
   }
 
+  positionTimings(event: MouseEvent) {
+    const container = event.currentTarget as HTMLElement;
+    const timings = container ? container.querySelector('.timings') as HTMLElement : null;
+    if (timings) {
+      const offsetLeft = this.getOffsetLeft(container);
+      timings.style.top = container.offsetTop + container.offsetHeight + 'px';
+      timings.style.left = offsetLeft + 'px';
+      timings.style.minWidth = container.getBoundingClientRect().width + 'px';
+    }
+  }
+
+  private getOffsetLeft(element: HTMLElement) {
+    const offsetParent = element.offsetParent;
+    let offsetLeft = element.offsetLeft;
+    for (let parent = element.parentElement; parent !== offsetParent; parent = parent.parentElement) {
+      offsetLeft -= parent.scrollLeft;
+    }
+    return offsetLeft;
+  }
 }

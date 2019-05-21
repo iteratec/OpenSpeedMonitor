@@ -76,13 +76,14 @@ describe('FilmstripService', () => {
   });
 
   it('fill up filmstrip list with interval steps and thumbnails', () => {
-    const calculatedFilmstrip: Thumbnail[] = filmstripService.createFilmstripView(100, thumbnails, 120);
+    const timings = {speedIndex: 120, docComplete: 220};
+    const calculatedFilmstrip: Thumbnail[] = filmstripService.createFilmstripView(thumbnails, timings, 'speedIndex');
     const expectedFilmstrip = [
-      {time: 0, imageUrl: 'bild1', hasChange: true, isHighlighted: false},
-      {time: 100, imageUrl: 'bild1', hasChange: false, isHighlighted: false},
-      {time: 200, imageUrl: 'bild1', hasChange: false, isHighlighted: true},
-      {time: 300, imageUrl: 'bild1', hasChange: false, isHighlighted: false},
-      {time: 400, imageUrl: 'bild2', hasChange: true, isHighlighted: false}
+      {time: 0, imageUrl: 'bild1', hasChange: true, isHighlighted: false, timings: []},
+      {time: 100, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: []},
+      {time: 200, imageUrl: 'bild1', hasChange: false, isHighlighted: true, timings: [{metric: 'speedIndex', time: 120}]},
+      {time: 300, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [{metric: 'docComplete', time: 220}]},
+      {time: 400, imageUrl: 'bild2', hasChange: true, isHighlighted: false, timings: []}
     ];
 
     expect(calculatedFilmstrip).toEqual(expectedFilmstrip);
