@@ -8,6 +8,7 @@ import {PerformanceAspect} from "../../models/perfomance-aspect.model";
 import {Application} from "../../models/application.model";
 import {AspectConfigurationService} from "./services/aspect-configuration.service";
 import {Loading} from "../../models/Loading";
+import {BrowserInfoDto} from "../../models/browser.model";
 
 @Component({
   selector: 'osm-aspect-configuration',
@@ -20,6 +21,7 @@ export class AspectConfigurationComponent implements OnInit {
   page$: Observable<Page>;
 
   performanceAspects$: Subject<ResponseWithLoadingState<PerformanceAspect>[]>;
+  browserInfos: BrowserInfoDto[];
 
   constructor(private route: ActivatedRoute, private applicationService: ApplicationService, private service: AspectConfigurationService) {
     this.application$ = applicationService.selectedApplication$;
@@ -28,6 +30,7 @@ export class AspectConfigurationComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getBrowserInfos();
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.getApplication(params.get('applicationId'));
       this.getPage(params.get('pageId'));
@@ -44,5 +47,9 @@ export class AspectConfigurationComponent implements OnInit {
     this.service.loadPage(pageId).subscribe((page: Page & Loading) => {
       this.applicationService.selectedPage$.next(page);
     })
+  }
+
+  getBrowserInfos() {
+    this.service.loadBrowserInfos().subscribe((browserInfos: BrowserInfoDto[]) => this.browserInfos = browserInfos)
   }
 }

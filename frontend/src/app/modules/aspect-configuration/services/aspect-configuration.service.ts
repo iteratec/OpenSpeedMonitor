@@ -5,6 +5,7 @@ import {catchError, map} from "rxjs/operators";
 import {EMPTY} from "rxjs";
 import {Loading} from "../../../models/Loading";
 import {Page} from "../../../models/page.model";
+import {BrowserInfoDto} from "../../../models/browser.model";
 
 @Injectable({
   providedIn: 'root'
@@ -42,6 +43,16 @@ export class AspectConfigurationService {
         ...page,
         isLoading: false
       }))
+    )
+  }
+
+  loadBrowserInfos() {
+    return this.http.get<BrowserInfoDto[]>(
+      '/aspectConfiguration/rest/getBrowserInformations').pipe(
+      catchError((error) => {
+        console.error(error);
+        return EMPTY;
+      })
     )
   }
 }
