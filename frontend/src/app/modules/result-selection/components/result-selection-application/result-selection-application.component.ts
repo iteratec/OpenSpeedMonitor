@@ -4,7 +4,7 @@ import {
   } from '@angular/core';
 
 import { SelectableApplication } from 'src/app/models/application.model';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {Observable} from 'rxjs';
 import {ResultSelectionStore} from "../../services/result-selection.store";
 
 
@@ -16,7 +16,7 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
   })
 
 export class ResultSelectionApplicationComponent {
-  applicationMappings$: BehaviorSubject<SelectableApplication[]>;
+  applicationMappings$: Observable<SelectableApplication[]>;
   applications: SelectableApplication[];
   isEmpty = true;
   selectableTags: string[];
@@ -34,7 +34,9 @@ export class ResultSelectionApplicationComponent {
       });
       this.applicationMappings$ = this.resultSelectionStore.applications$;
       this.applicationMappings$.subscribe(applications => {
+        if(applications){
         this.updateApplicationsAndTags(applications);
+        }
       });
   }
 

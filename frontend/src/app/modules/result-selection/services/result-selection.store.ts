@@ -8,7 +8,6 @@ import {ApplicationWithPages, SelectableApplication} from "../../../models/appli
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {MeasurandGroup} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
-import {forEach} from "@angular/router/src/utils/collection";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -48,28 +47,28 @@ export class ResultSelectionStore {
   }
 
   setSelectedJobGroups(ids: number[]){
-    this.setResultSelectionCommand({...this.resultSelectionCommand, jobGroupIds: ids});
     this.selectedJobGroupsChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, jobGroupIds: ids});
   }
 
   setSelectedPages(ids: number[]){
-    this.setResultSelectionCommand({...this.resultSelectionCommand, pageIds: ids});
     this.selectedPagesChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, pageIds: ids});
   }
 
   setSelectedBrowser(ids: number[]){
-    this.setResultSelectionCommand({...this.resultSelectionCommand, browserIds: ids});
     this.selectedBrowserChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, browserIds: ids});
   }
 
   setSelectedConnectivities(connectivities: number[]){
-    this.setResultSelectionCommand({...this.resultSelectionCommand, selectedConnectivities: connectivities});
     this.selectedConnectivityChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, selectedConnectivities: connectivities});
   }
 
   setSelectedLocations(ids: number[]){
-    this.setResultSelectionCommand({...this.resultSelectionCommand, locationIds: ids});
     this.selectedLocationChanged = true;
+    this.setResultSelectionCommand({...this.resultSelectionCommand, locationIds: ids});
   }
 
   get resultSelectionCommand(){

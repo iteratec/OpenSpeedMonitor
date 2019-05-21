@@ -101,8 +101,6 @@ export class ResultSelectionPageLocationConnectivityComponent {
     this.resultSelectionStore.setSelectedLocations(this.selectedLocations);
     this.resultSelectionStore.setSelectedBrowser(this.selectedBrowsers);
     this.resultSelectionStore.setSelectedConnectivities(this.selectedConnectivities);
-
-
   }
 
   private getUniqueElements(items) {
