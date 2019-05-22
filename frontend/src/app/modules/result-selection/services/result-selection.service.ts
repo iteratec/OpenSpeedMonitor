@@ -12,7 +12,7 @@ import {Connectivity} from 'src/app/models/connectivity.model';
 import {Location} from 'src/app/models/location.model';
 import {MeasuredEvent} from 'src/app/models/measured-event.model';
 
-enum URL {
+export enum URL {
   APPLICATIONS = '/resultSelection/getJobGroups',
   APPLICATIONS_AND_PAGES = '/jobGroup/getJobGroupsWithPages',
   EVENTS_AND_PAGES = '/resultSelection/getMeasuredEvents',
@@ -243,7 +243,7 @@ export class ResultSelectionService {
       });
   }
 
-  private fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
+  fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get<T>(url, {params: params}).pipe(
       handleError(),

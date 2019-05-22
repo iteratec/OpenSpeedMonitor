@@ -6,8 +6,8 @@ import {Connectivity} from "../../../models/connectivity.model";
 import {Injectable} from "@angular/core";
 import {ApplicationWithPages, SelectableApplication} from "../../../models/application.model";
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
-import {MeasurandGroup} from "../../../models/measurand.model";
-import {ResultSelectionService} from "./result-selection.service";
+import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
+import {ResultSelectionService, URL} from "./result-selection.service";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -122,23 +122,28 @@ export class ResultSelectionStore {
   }
 
   loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateSelectableApplications(resultSelectionCommand).subscribe(next => this.applications$.next(next));
+    this.resultSelectionService.fetchResultSelectionData<SelectableApplication[]>(resultSelectionCommand, URL.APPLICATIONS)
+      .subscribe(next => this.applications$.next(next));
   }
 
   loadSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateSelectableApplicationsAndPages(resultSelectionCommand).subscribe(next => this.applicationsAndPages$.next(next));
+    this.resultSelectionService.fetchResultSelectionData<ApplicationWithPages[]>(resultSelectionCommand, URL.APPLICATIONS_AND_PAGES)
+      .subscribe(next => this.applicationsAndPages$.next(next));
   }
 
   loadSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateSelectableEventsAndPages(resultSelectionCommand).subscribe(next => this.eventsAndPages$.next(next));
+    this.resultSelectionService.fetchResultSelectionData<MeasuredEvent[]>(resultSelectionCommand, URL.EVENTS_AND_PAGES)
+      .subscribe(next => this.eventsAndPages$.next(next));
   }
 
   loadSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateSelectableLocationsAndBrowsers(resultSelectionCommand).subscribe(next => this.locationsAndBrowsers$.next(next));
+    this.resultSelectionService.fetchResultSelectionData<Location[]>(resultSelectionCommand, URL.LOCATIONS_AND_BROWSERS)
+      .subscribe(next => this.locationsAndBrowsers$.next(next));
   }
 
   loadSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateSelectableConnectivities(resultSelectionCommand).subscribe(next => this.connectivities$.next(next));
+    this.resultSelectionService.fetchResultSelectionData<Connectivity[]>(resultSelectionCommand, URL.CONNECTIVITIES)
+      .subscribe(next => this.connectivities$.next(next));
   }
 
   loadSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
@@ -171,7 +176,8 @@ export class ResultSelectionStore {
   }
 
   loadUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateUserTimings(resultSelectionCommand).subscribe(next => {
+    this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
+      .subscribe(next => {
       const groupName: string = "User Timings";
       let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
         isLoading: false,
@@ -182,7 +188,8 @@ export class ResultSelectionStore {
   }
 
   loadHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateHeroTimings(resultSelectionCommand).subscribe(next => {
+    this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
+      .subscribe(next => {
       const groupName: string = "Hero Timings";
       let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
         isLoading: false,
@@ -193,7 +200,8 @@ export class ResultSelectionStore {
   }
 
   loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.updateResultCount(resultSelectionCommand).subscribe(next => this.resultCount$.next(next));
+    this.resultSelectionService.fetchResultSelectionData<string>(resultSelectionCommand, URL.RESULT_COUNT)
+      .subscribe(next => this.resultCount$.next(next));
   }
 
   private getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
