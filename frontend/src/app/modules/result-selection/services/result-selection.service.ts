@@ -251,43 +251,21 @@ export class ResultSelectionService {
     )
   }
 
-  /*private createParamsFromResultSelectionCommand(resultSelectionCommand: ResultSelectionCommand) {
-    return {
-      from: resultSelectionCommand.from.toISOString(),
-      to: resultSelectionCommand.to.toISOString(),
-      ...(resultSelectionCommand.caller && {caller: Caller[resultSelectionCommand.caller]}),
-      ...((resultSelectionCommand.jobGroupIds && resultSelectionCommand.jobGroupIds.length) && {jobGroupIds: resultSelectionCommand.jobGroupIds.toString()}),
-      ...((resultSelectionCommand.pageIds && resultSelectionCommand.pageIds.length) && {pageIds: resultSelectionCommand.pageIds.toString()}),
-      ...((resultSelectionCommand.measuredEventIds && resultSelectionCommand.measuredEventIds.length) && {measuredEventIds: resultSelectionCommand.measuredEventIds.toString()}),
-      ...((resultSelectionCommand.browserIds && resultSelectionCommand.browserIds.length) && {browserIds: resultSelectionCommand.browserIds.toString()}),
-      ...((resultSelectionCommand.locationIds && resultSelectionCommand.locationIds.length) && {locationIds: resultSelectionCommand.locationIds.toString()}),
-      ...((resultSelectionCommand.selectedConnectivities && resultSelectionCommand.selectedConnectivities.length) && {selectedConnectivities: resultSelectionCommand.selectedConnectivities})
-    }
-  }*/
-
   private createParamsFromResultSelectionCommand(resultSelectionCommand: ResultSelectionCommand) {
     let params = new HttpParams()
       .set('from', resultSelectionCommand.from.toISOString())
       .set('to', resultSelectionCommand.to.toISOString())
       .set('caller', Caller[resultSelectionCommand.caller]);
-    if(resultSelectionCommand.jobGroupIds) {
-      resultSelectionCommand.jobGroupIds.forEach(id => {params = params.append('jobGroupIds', id.toString())});
-    }
-    if(resultSelectionCommand.pageIds) {
-      resultSelectionCommand.pageIds.forEach(id => {params = params.append('pageIds', id.toString())});
-    }
-    if(resultSelectionCommand.measuredEventIds) {
-      resultSelectionCommand.measuredEventIds.forEach(id => {params = params.append('measuredEventIds', id.toString())});
-    }
-    if(resultSelectionCommand.browserIds) {
-      resultSelectionCommand.browserIds.forEach(id => {params = params.append('browserIds', id.toString())});
-    }
-    if(resultSelectionCommand.locationIds) {
-      resultSelectionCommand.locationIds.forEach(id => {params = params.append('locationIds', id.toString())});
-    }
-    if(resultSelectionCommand.selectedConnectivities) {
-      resultSelectionCommand.selectedConnectivities.forEach(id => {params = params.append('selectedConnectivities', id.toString())});
-    }
+
+    Object.keys(resultSelectionCommand).forEach(key => {
+      if (key === 'from' || key === 'to' || key === 'caller') {
+        return;
+      }
+      resultSelectionCommand[key].forEach(id => {
+        params = params.append(key, id.toString())
+      })
+    });
+
     return params;
   }
 
