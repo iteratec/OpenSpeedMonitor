@@ -18,4 +18,6 @@ class BarchartAggregation {
     JobGroup jobGroup
     Browser browser
     String aggregationValue
+    String deviceType
+    String operatingSystem
 }
