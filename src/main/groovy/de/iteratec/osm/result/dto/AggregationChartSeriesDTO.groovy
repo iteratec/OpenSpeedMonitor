@@ -14,4 +14,6 @@ class AggregationChartSeriesDTO {
     String unit = ""
     String browser = ""
     String aggregationValue = ""
+    String deviceType
+    String operatingSystem
 }
