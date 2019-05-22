@@ -22,7 +22,7 @@ enum DeviceType {
      */
     static DeviceType guessDeviceType(String label) {
         switch (label) {
-            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc|desktop).*/ :
+            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc|desktop|hetzner|netlab).*/ :
                 return DeviceType.DESKTOP
             case ~/(?i).*(Pad|Tab|Note|Xoom|Book|Tablet).*/ :
                 return DeviceType.TABLET
