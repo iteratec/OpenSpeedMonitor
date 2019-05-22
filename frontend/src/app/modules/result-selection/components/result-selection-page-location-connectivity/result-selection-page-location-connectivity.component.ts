@@ -76,32 +76,24 @@ export class ResultSelectionPageLocationConnectivityComponent {
     if (selectedParents && selectedParents.length > 0) {
       let filteredItems = items.filter(item => selectedParents.includes(item.parent.id));
       if (children === 'events') {
-        this.resultSelectionStore.setSelectedPages(this.selectedPages);
         this.selectedEvents = filteredItems.filter(item => this.selectedEvents.includes(item.id)).map(item => item.id);
-        this.resultSelectionStore.setSelectedMeasuredEvents(this.selectedEvents);
+        this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
         this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
+        debugger
       } else if (children === 'locations') {
-        this.resultSelectionStore.setSelectedBrowser(this.selectedBrowsers);
         this.selectedLocations = filteredItems.filter(item => this.selectedLocations.includes(item.id)).map(item => item.id);
-        this.resultSelectionStore.setSelectedLocations(this.selectedLocations);
+        this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);
         this.locations$ = of(this.sortAlphabetically(filteredItems));
       }
     } else {
       if (children === 'events') {
         this.measuredEvents$ = of(this.sortAlphabetically(items));
-        this.resultSelectionStore.setSelectedPages(this.selectedPages);
-        this.resultSelectionStore.setSelectedMeasuredEvents(this.selectedEvents);
+        this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
       } else if (children === 'locations') {
         this.locations$ = of(this.sortAlphabetically(items));
-        this.resultSelectionStore.setSelectedBrowser(this.selectedBrowsers);
-        this.resultSelectionStore.setSelectedLocations(this.selectedLocations);
+        this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);
       }
     }
-    //TODO: measurand event and location selection not working yet
-  }
-  //send selected connectivities to store, only for testing
-  updateConnectivities(){
-    this.resultSelectionStore.setSelectedConnectivities(this.selectedConnectivities);
   }
 
   private getUniqueElements(items) {

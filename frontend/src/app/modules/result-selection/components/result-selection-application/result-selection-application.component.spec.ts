@@ -6,6 +6,7 @@ import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
 import { By } from '@angular/platform-browser';
 import {ResultSelectionStore} from "../../services/result-selection.store";
+import {ResultSelectionService} from "../../services/result-selection.service";
 
 describe('ResultSelectionApplicationComponent', () => {
   let component: ResultSelectionApplicationComponent;
@@ -28,7 +29,8 @@ describe('ResultSelectionApplicationComponent', () => {
       providers: [
         ResultSelectionStore,
         OsmLangService,
-        GrailsBridgeService
+        GrailsBridgeService,
+        ResultSelectionService
       ]
     })
       .compileComponents();
