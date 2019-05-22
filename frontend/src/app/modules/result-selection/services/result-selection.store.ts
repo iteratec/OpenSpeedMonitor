@@ -97,12 +97,8 @@ export class ResultSelectionStore {
     });
     }else if(selectedComponent === "PAGE_LOCATION_CONNECTIVITY"){
       this._resultSelectionCommand$.subscribe(state => {
-        if (!(this.selectedPagesChanged || this.selectedMeasuredEventsChanged)) {
-          this.loadSelectableEventsAndPages(state);
-        }
-        if(!(this.selectedBrowserChanged || this.selectedLocationChanged)){
-          this.loadSelectableLocationsAndBrowsers(state);
-        }
+        this.loadSelectableEventsAndPages(state);
+        this.loadSelectableLocationsAndBrowsers(state);
         if(!this.selectedConnectivityChanged){
           this.loadSelectableConnectivities(state);
         }
@@ -139,12 +135,6 @@ export class ResultSelectionStore {
 
   loadSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): void {
     this.resultSelectionService.updateSelectableConnectivities(resultSelectionCommand).subscribe(next => this.connectivities$.next(next));
-  }
-
-  loadSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
-    this.loadSelectableEventsAndPages(resultSelectionCommand);
-    this.loadSelectableConnectivities(resultSelectionCommand);
-    this.loadSelectableLocationsAndBrowsers(resultSelectionCommand);
   }
 
   loadMeasurands(resultSelectionCommand: ResultSelectionCommand): void {

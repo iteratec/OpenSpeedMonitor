@@ -98,7 +98,8 @@
 <ng-template #connectivitySelection>
   <div class="form-group">
     <select id="result-selection-connectivity-selection" class="form-control" multiple="multiple"
-            [(ngModel)]="selectedConnectivities" [style.opacity]="selectedConnectivities.length > 0 ? 1 : 0.5">
+            [(ngModel)]="selectedConnectivities" [style.opacity]="selectedConnectivities.length > 0 ? 1 : 0.5"
+            (ngModelChange)="updateConnectivities()">
       <option *ngFor="let connectivityProfile of connectivities$ | async"
               [value]="connectivityProfile.id">{{connectivityProfile.name}}</option>
     </select>
