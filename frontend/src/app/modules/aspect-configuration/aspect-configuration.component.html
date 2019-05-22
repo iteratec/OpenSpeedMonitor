@@ -7,11 +7,10 @@
   {{ 'frontend.de.iteratec.osm.dashboard' | translate }}
 </a>
 <div class="grid-container">
-  <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading">
-    <osm-aspect-metrics *ngFor="let performanceAspect of (performanceAspects$ | async)"
-                        [performanceAspectWrapped]="performanceAspect"
-                        class="aspect-inspect"></osm-aspect-metrics>
-  </div>
+  <osm-aspect-metrics *ngFor="let aspectType of (aspectTypes$ | async)"
+                      [aspects]="performanceAspects$ | async"
+                      [aspectType]="aspectType"
+                      class="aspect-inspect"></osm-aspect-metrics>
 </div>
 
 <ng-template #isLoading>

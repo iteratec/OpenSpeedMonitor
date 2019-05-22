@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ExtendedPerformanceAspect} from "../../../../models/perfomance-aspect.model";
+import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
+import {Observable, of} from "rxjs";
 
 @Component({
   selector: 'osm-aspect-metrics',
@@ -7,10 +8,15 @@ import {ExtendedPerformanceAspect} from "../../../../models/perfomance-aspect.mo
   styleUrls: ['./aspect-metrics.component.scss']
 })
 export class AspectMetricsComponent implements OnInit {
-  @Input() performanceAspectWrapped: ExtendedPerformanceAspect;
-  constructor() { }
+  @Input() aspects: ExtendedPerformanceAspect[];
+  @Input() aspectType: PerformanceAspectType;
+  aspectsToShow$: Observable<ExtendedPerformanceAspect[]>;
+
+  constructor() {
+  }
 
   ngOnInit() {
+    this.aspectsToShow$ = of(this.aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == this.aspectType.name));
   }
 
 }

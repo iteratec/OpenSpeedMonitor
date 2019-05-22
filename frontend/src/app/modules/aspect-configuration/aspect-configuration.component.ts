@@ -1,9 +1,13 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ApplicationService} from "../../services/application.service";
 import {ActivatedRoute, ParamMap} from "@angular/router";
 import {Page} from "../../models/page.model";
 import {combineLatest, Observable} from "rxjs";
-import {ExtendedPerformanceAspect, PerformanceAspect} from "../../models/perfomance-aspect.model";
+import {
+  ExtendedPerformanceAspect,
+  PerformanceAspect,
+  PerformanceAspectType
+} from "../../models/perfomance-aspect.model";
 import {Application} from "../../models/application.model";
 import {AspectConfigurationService} from "./services/aspect-configuration.service";
 import {BrowserInfoDto} from "../../models/browser.model";
@@ -14,12 +18,13 @@ import {map} from "rxjs/operators";
   templateUrl: './aspect-configuration.component.html',
   styleUrls: ['./aspect-configuration.component.scss']
 })
-export class AspectConfigurationComponent implements OnInit, OnDestroy {
+export class AspectConfigurationComponent implements OnInit {
 
   application$: Observable<Application>;
   page$: Observable<Page>;
 
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
+  aspectTypes$: Observable<PerformanceAspectType[]>;
 
   constructor(private route: ActivatedRoute, private applicationService: ApplicationService, private aspectConfService: AspectConfigurationService) {
     this.application$ = applicationService.selectedApplication$;
@@ -33,23 +38,36 @@ export class AspectConfigurationComponent implements OnInit, OnDestroy {
       this.getApplication(params.get('applicationId'));
       this.getPage(params.get('pageId'));
     });
+    this.initAspectTypes();
     // this.activateDebugging();
   }
 
-  ngOnDestroy(): void {
-
+  initAspectTypes() {
+    this.aspectTypes$ = this.performanceAspects$.pipe(
+      map((extendedAspects: ExtendedPerformanceAspect[]) => {
+        const uniqueAspectTypes = [];
+        const lookupMap = new Map();
+        for (const aspect of extendedAspects) {
+          if (!lookupMap.has(aspect.performanceAspectType.name)) {
+            lookupMap.set(aspect.performanceAspectType.name, true);
+            uniqueAspectTypes.push(aspect.performanceAspectType)
+          }
+        }
+        return uniqueAspectTypes
+      })
+    )
   }
 
   private activateDebugging() {
-    this.application$.subscribe(app => console.log(`app=${JSON.stringify(app)}`));
-    this.page$.subscribe(page => console.log(`page=${JSON.stringify(page)}`));
-    this.applicationService.performanceAspectsForPage$.subscribe(aspects => console.log(`aspect=${JSON.stringify(aspects)}`));
-    this.aspectConfService.browserInfos$.subscribe(browserInfos => console.log(`browserInfos=${browserInfos}`));
+    // this.application$.subscribe(app => console.log(`app=${JSON.stringify(app)}`));
+    // this.page$.subscribe(page => console.log(`page=${JSON.stringify(page)}`));
+    // this.applicationService.performanceAspectsForPage$.subscribe(aspects => console.log(`aspect=${JSON.stringify(aspects)}`));
+    // this.aspectConfService.browserInfos$.subscribe(browserInfos => console.log(`browserInfos=${browserInfos}`));
     this.performanceAspects$.subscribe(extendedAspects => console.log(`extendedAspects=${JSON.stringify(extendedAspects)}`))
+    this.aspectTypes$.subscribe(aspectTypes => console.log(`aspectTypes=${JSON.stringify(aspectTypes)}`))
   }
 
   private prepareExtensionOfAspects() {
-    debugger;
     this.performanceAspects$ = combineLatest(this.applicationService.performanceAspectsForPage$, this.aspectConfService.browserInfos$).pipe(
       map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
         const extendedAspects = this.extendAspects(aspects, browserInfos);

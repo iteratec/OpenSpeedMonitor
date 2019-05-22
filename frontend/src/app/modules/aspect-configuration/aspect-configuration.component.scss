@@ -3,12 +3,11 @@ a {
 }
 
 .grid-container {
-  margin-left: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
 
   osm-aspect-metrics {
-    margin: 0 0 20px 20px;
+    margin: 10px 0 20px 10px;
   }
 
 }

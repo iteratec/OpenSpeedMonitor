@@ -189,8 +189,7 @@ export class ApplicationService {
   private getPerformanceAspects(params): Observable<PerformanceAspect[]> {
     return this.http.get<PerformanceAspect[]>('/applicationDashboard/rest/getPerformanceAspectsForApplication', {params})
       .pipe(
-        handleError(),
-        map((aspects: PerformanceAspect[]) => this.filterOneBrowser(aspects))
+        handleError()
       );
   }
 
