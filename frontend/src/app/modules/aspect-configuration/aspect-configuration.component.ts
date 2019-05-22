@@ -81,9 +81,17 @@ export class AspectConfigurationComponent implements OnInit {
     if (aspects.length > 0 && browserInfos.length > 0) {
       aspects.forEach((aspect: PerformanceAspect) => {
         const additionalInfos = browserInfos.filter((browserInfo: BrowserInfoDto) => browserInfo.browserId == aspect.browserId)
+        let extension: BrowserInfoDto;
         if (additionalInfos.length == 1) {
-          extendedAspects.push({...aspect, ...additionalInfos[0]})
+          extension = additionalInfos[0];
+        } else {
+          extension = {
+            browserId: aspect.browserId,
+            operatingSystem: 'Unknown',
+            deviceType: {name: 'Unknown', icon: 'question'}
+          }
         }
+        extendedAspects.push({...aspect, ...extension})
       });
     }
     return extendedAspects;

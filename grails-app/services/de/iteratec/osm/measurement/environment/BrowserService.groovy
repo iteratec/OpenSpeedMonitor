@@ -18,6 +18,8 @@
 package de.iteratec.osm.measurement.environment
 
 import de.iteratec.osm.api.dto.BrowserInfoDto
+import de.iteratec.osm.api.dto.DeviceTypeDto
+import de.iteratec.osm.result.DeviceType
 import grails.gorm.transactions.Transactional
 
 @Transactional
@@ -55,9 +57,10 @@ class BrowserService {
             it.browser.id
         }.findResults { Long browserId, List<Location> locationsOfBrowser ->
             List<Object> operatingSystemsOfBrowser = locationsOfBrowser*.operatingSystem.unique(false)
-            List<Object> devTypesOfBrowser = locationsOfBrowser*.deviceType.unique(false)
+            List<DeviceType> devTypesOfBrowser = locationsOfBrowser*.deviceType.unique(false)
             if (operatingSystemsOfBrowser.size() == 1 && devTypesOfBrowser.size() == 1) {
-                return new BrowserInfoDto(browserId: browserId, operatingSystem: operatingSystemsOfBrowser[0], deviceType: devTypesOfBrowser[0])
+                return new BrowserInfoDto(browserId: browserId, operatingSystem: operatingSystemsOfBrowser[0], deviceType:
+                        new DeviceTypeDto(name: devTypesOfBrowser[0].getDeviceTypeLabel(), icon: devTypesOfBrowser[0].getDeviceTypeIcon()))
             } else {
                 return null // will be skipped
             }
