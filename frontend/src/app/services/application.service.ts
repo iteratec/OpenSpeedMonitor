@@ -50,7 +50,6 @@ export class ApplicationService {
         switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams)),
         startWith([])
       ).subscribe(nextAspects => {
-        debugger;
         this.performanceAspectForPage$.next(nextAspects)
       }
     )
