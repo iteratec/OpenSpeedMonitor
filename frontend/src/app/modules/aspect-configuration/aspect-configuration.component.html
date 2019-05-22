@@ -1,7 +1,12 @@
-<h1>{{(application$ | async)?.name}}</h1>
-<h2>{{ 'frontend.de.iteratec.osm.performance-aspect.title' | translate }} <span
-  class="text-info">{{(page$ | async)?.name}}</span></h2>
-<div class="main-container">
+<h1>{{ 'frontend.de.iteratec.osm.performance-aspects' | translate }}: {{(application$ | async)?.name}}
+  - {{(page$ | async)?.name}}</h1>
+<a [routerLink]="['/applicationDashboard', (application$ | async)?.id]">
+  <i class="fas fa-arrow-left"></i>
+  {{ 'frontend.back.label' | translate }}
+  {{(application$ | async)?.name}}
+  {{ 'frontend.de.iteratec.osm.dashboard' | translate }}
+</a>
+<div class="grid-container">
   <div *ngIf="(performanceAspects$ | async)?.length > 0; else isLoading">
     <osm-aspect-metrics *ngFor="let performanceAspect of (performanceAspects$ | async)"
                         [performanceAspectWrapped]="performanceAspect"

@@ -2,8 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Application, ApplicationDTO} from "../../../models/application.model";
 import {catchError, map} from "rxjs/operators";
-import {EMPTY} from "rxjs";
-import {Loading} from "../../../models/Loading";
+import {BehaviorSubject, EMPTY} from "rxjs";
 import {Page} from "../../../models/page.model";
 import {BrowserInfoDto} from "../../../models/browser.model";
 
@@ -11,6 +10,8 @@ import {BrowserInfoDto} from "../../../models/browser.model";
   providedIn: 'root'
 })
 export class AspectConfigurationService {
+
+  browserInfos$ = new BehaviorSubject<BrowserInfoDto[]>([]);
 
   constructor(private http: HttpClient) {
   }
@@ -23,36 +24,28 @@ export class AspectConfigurationService {
         console.error(error);
         return EMPTY;
       }),
-      map(dto => new Application(dto)),
-      map(application => ({
-        ...application,
-        isLoading: false
-      }))
+      map(dto => new Application(dto))
     )
   }
 
   loadPage(pageId: string) {
-    return this.http.get<Page & Loading[]>(
+    return this.http.get<Page>(
       '/aspectConfiguration/rest/getPage',
       {params: {pageId: pageId}}).pipe(
       catchError((error) => {
         console.error(error);
         return EMPTY;
-      }),
-      map(page => ({
-        ...page,
-        isLoading: false
-      }))
+      })
     )
   }
 
   loadBrowserInfos() {
-    return this.http.get<BrowserInfoDto[]>(
+    this.http.get<BrowserInfoDto[]>(
       '/aspectConfiguration/rest/getBrowserInformations').pipe(
       catchError((error) => {
         console.error(error);
         return EMPTY;
       })
-    )
+    ).subscribe(nextBrowserInfo => this.browserInfos$.next(nextBrowserInfo))
   }
 }

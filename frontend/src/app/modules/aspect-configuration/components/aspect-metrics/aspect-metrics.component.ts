@@ -1,6 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
+import {ExtendedPerformanceAspect} from "../../../../models/perfomance-aspect.model";
 
 @Component({
   selector: 'osm-aspect-metrics',
@@ -8,7 +7,7 @@ import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
   styleUrls: ['./aspect-metrics.component.scss']
 })
 export class AspectMetricsComponent implements OnInit {
-  @Input() performanceAspectWrapped: ResponseWithLoadingState<PerformanceAspect>;
+  @Input() performanceAspectWrapped: ExtendedPerformanceAspect;
   constructor() { }
 
   ngOnInit() {

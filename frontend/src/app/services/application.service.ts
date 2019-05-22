@@ -39,7 +39,7 @@ export class ApplicationService {
   failingJobs$: ReplaySubject<{}> = new ReplaySubject<{}>(1);
   jobHealthGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
   availableGraphiteServers$: ReplaySubject<GraphiteServer[]> = new ReplaySubject<GraphiteServer[]>(1);
-  performanceAspectForPage$: BehaviorSubject<ResponseWithLoadingState<PerformanceAspect>[]> = new BehaviorSubject([]);
+  performanceAspectsForPage$: BehaviorSubject<PerformanceAspect[]> = new BehaviorSubject([]);
 
   selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
   selectedApplication$ = new ReplaySubject<Application>(1);
@@ -49,12 +49,7 @@ export class ApplicationService {
       .pipe(
         switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams)),
         startWith([])
-      ).subscribe(nextAspects => {
-        debugger;
-        this.performanceAspectForPage$.next(nextAspects)
-      }
-    )
-    ;
+      ).subscribe(nextAspects => this.performanceAspectsForPage$.next(nextAspects));
 
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
@@ -191,16 +186,12 @@ export class ApplicationService {
     );
   }
 
-  private getPerformanceAspects(params): Observable<ResponseWithLoadingState<PerformanceAspect>[]> {
+  private getPerformanceAspects(params): Observable<PerformanceAspect[]> {
     return this.http.get<PerformanceAspect[]>('/applicationDashboard/rest/getPerformanceAspectsForApplication', {params})
       .pipe(
         handleError(),
-        map((aspects: PerformanceAspect[]) => this.filterOneBrowser(aspects).map(aspect => ({
-          isLoading: false,
-          data: aspect
-        })))
-      )
-      ;
+        map((aspects: PerformanceAspect[]) => this.filterOneBrowser(aspects))
+      );
   }
 
   /**
@@ -233,17 +224,17 @@ export class ApplicationService {
 
 
   private replacePerformanceAspect(perfAspectToReplace: PerformanceAspect, isLoading: boolean) {
-    let prevValue: ResponseWithLoadingState<PerformanceAspect>[] = this.performanceAspectForPage$.getValue();
-    let existingAspect: ResponseWithLoadingState<PerformanceAspect> = prevValue.find((exAspect: ResponseWithLoadingState<PerformanceAspect>) => {
-      return exAspect.data.id == perfAspectToReplace.id &&
-        exAspect.data.performanceAspectType == perfAspectToReplace.performanceAspectType &&
-        exAspect.data.pageId == perfAspectToReplace.pageId &&
-        exAspect.data.jobGroupId == perfAspectToReplace.jobGroupId
+    let prevValue: PerformanceAspect[] = this.performanceAspectsForPage$.getValue();
+    let existingAspect: PerformanceAspect = prevValue.find((exAspect: PerformanceAspect) => {
+      return exAspect.id == perfAspectToReplace.id &&
+        exAspect.performanceAspectType == perfAspectToReplace.performanceAspectType &&
+        exAspect.pageId == perfAspectToReplace.pageId &&
+        exAspect.jobGroupId == perfAspectToReplace.jobGroupId
     });
     if (existingAspect) {
-      prevValue = this.performanceAspectForPage$.getValue();
-      prevValue[prevValue.indexOf(existingAspect)] = {isLoading: isLoading, data: perfAspectToReplace};
-      this.performanceAspectForPage$.next(prevValue);
+      prevValue = this.performanceAspectsForPage$.getValue();
+      prevValue[prevValue.indexOf(existingAspect)] = perfAspectToReplace;
+      this.performanceAspectsForPage$.next(prevValue);
     }
   }
 

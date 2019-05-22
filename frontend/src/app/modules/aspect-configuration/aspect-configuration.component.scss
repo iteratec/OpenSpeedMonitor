@@ -1,7 +1,8 @@
-h2 {
+a {
   margin-left: 10px;
 }
-.main-container {
+
+.grid-container {
   margin-left: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
