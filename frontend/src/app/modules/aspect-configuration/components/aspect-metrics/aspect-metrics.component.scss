@@ -1,5 +1,10 @@
 .performance-aspect-type {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   font-size: 1.5em;
+  i {
+    justify-self: end;
+  }
 }
 
 .clickable-list {
