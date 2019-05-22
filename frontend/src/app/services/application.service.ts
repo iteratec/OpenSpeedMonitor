@@ -49,7 +49,11 @@ export class ApplicationService {
       .pipe(
         switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams)),
         startWith([])
-      ).subscribe(nextAspects => this.performanceAspectForPage$.next(nextAspects));
+      ).subscribe(nextAspects => {
+        this.performanceAspectForPage$.next(nextAspects)
+      }
+    )
+    ;
 
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateMetricsForPages(application))
