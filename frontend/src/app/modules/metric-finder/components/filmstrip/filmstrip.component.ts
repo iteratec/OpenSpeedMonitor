@@ -2,7 +2,7 @@ import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
 import {FilmstripService} from '../../services/filmstrip.service';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {distinctUntilChanged, filter, map} from 'rxjs/operators';
-import {TestResult} from '../../models/test-result';
+import {TestResult} from '../../models/test-result.model';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 import {FilmstripView, Timing} from '../../models/filmstrip-view.model';
 import {TranslateService} from '@ngx-translate/core';

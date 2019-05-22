@@ -1,6 +1,6 @@
 import {BehaviorSubject} from 'rxjs';
 import {Thumbnail} from '../models/thumbnail.model';
-import {TestResult} from '../models/test-result';
+import {TestResult} from '../models/test-result.model';
 
 export class FilmstripServiceMock {
 

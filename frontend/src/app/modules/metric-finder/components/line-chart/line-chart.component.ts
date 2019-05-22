@@ -8,7 +8,7 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import {TestResult} from '../../models/test-result';
+import {TestResult} from '../../models/test-result.model';
 import {mouse, select, selectAll} from 'd3-selection';
 import {line} from 'd3-shape';
 import {ScaleLinear, scaleLinear, scaleTime, ScaleTime} from 'd3-scale';

@@ -4,7 +4,7 @@ import {BehaviorSubject} from 'rxjs';
 import {Thumbnail} from '../models/thumbnail.model';
 import {map} from 'rxjs/operators';
 import {WptResultDTO} from '../models/wptResult-dto.model';
-import {TestInfo, TestResult, TimingsMap} from '../models/test-result';
+import {TestInfo, TestResult, TimingsMap} from '../models/test-result.model';
 import {FilmstripView, Timing} from '../models/filmstrip-view.model';
 
 @Injectable()

@@ -4,7 +4,7 @@ import {skip} from 'rxjs/operators';
 import {FilmstripService} from './filmstrip.service';
 import {WptResultDTO} from '../models/wptResult-dto.model';
 import {Thumbnail} from '../models/thumbnail.model';
-import {TestResult} from '../models/test-result';
+import {TestResult} from '../models/test-result.model';
 
 describe('FilmstripService', () => {
   let httpMock: HttpTestingController;
