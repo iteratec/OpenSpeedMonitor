@@ -7,7 +7,10 @@
        (mouseover)="positionTimings($event)"
   >
     <span class="time">{{formatTime(thumbnail.time, 1)}}</span>
-    <img [src]="thumbnail.imageUrl" />
+
+    <img *ngIf="thumbnail.isHighlighted" [src]="thumbnail.imageUrl" (load)="highlightLoaded($event)" />
+    <img *ngIf="!thumbnail.isHighlighted" [src]="thumbnail.imageUrl" />
+
     <ul class="timings" *ngIf="thumbnail.timings.length">
       <li *ngFor="let timing of thumbnail.timings">{{ formatTiming(timing) }}</li>
     </ul>

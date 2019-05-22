@@ -1,6 +1,7 @@
 <div class="filmstrips-wrapper">
-  <div class="filmstrips">
-    <osm-filmstrip *ngFor="let testResult of results; index as i"
+  <div class="filmstrips" #scrollContainer>
+    <osm-filmstrip *ngFor="let testResult of results; index as i; trackBy:identifyResult"
+                   (highlightLoad)="highlightLoaded($event)"
                    [result]="testResult" [highlightedMetric]="highlightedMetric" [offset]="offsets[i]">
 
     </osm-filmstrip>

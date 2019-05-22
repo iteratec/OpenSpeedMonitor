@@ -1,8 +1,8 @@
-import {Component, Input, OnChanges, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
 import {FilmstripService} from '../../services/filmstrip.service';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {distinctUntilChanged, filter, map} from 'rxjs/operators';
 import {TestResult} from '../../models/test-result.model';
+import {filter, map} from 'rxjs/operators';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 import {FilmstripView, Timing} from '../../models/filmstrip-view.model';
 import {TranslateService} from '@ngx-translate/core';
@@ -25,6 +25,9 @@ export class FilmstripComponent implements OnChanges {
 
   @Input()
   offset: number;
+
+  @Output()
+  highlightLoad = new EventEmitter<HTMLElement>();
 
   private result$ = new BehaviorSubject<TestResult>(null);
 
@@ -89,5 +92,9 @@ export class FilmstripComponent implements OnChanges {
       offsetLeft -= parent.scrollLeft;
     }
     return offsetLeft;
+  }
+
+  highlightLoaded(event: Event) {
+    this.highlightLoad.emit(event.target as HTMLElement);
   }
 }

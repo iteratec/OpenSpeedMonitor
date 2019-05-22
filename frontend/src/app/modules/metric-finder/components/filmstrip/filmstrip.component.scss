@@ -19,9 +19,14 @@
     display: block;
     text-align: center;
     padding: 0 5px 5px 5px;
+    line-height: 1.2em;
   }
   &.has-change .time {
     font-weight: bold;
+  }
+  &.is-highlighted .time {
+    font-size: 1.2em;
+    line-height: 1em;
   }
 
   .timings {
