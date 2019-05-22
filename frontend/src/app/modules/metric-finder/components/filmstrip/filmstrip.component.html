@@ -1,0 +1,14 @@
+<div class="filmstrip-container">
+  <div class="filmstrip-item"
+       *ngFor="let thumbnail of filmStrip$ | async"
+       [class.has-change]="thumbnail.hasChange || thumbnail.timings.length"
+       [class.highlighted]="thumbnail.isHighlighted"
+       (mouseover)="positionTimings($event)"
+  >
+    <span class="time">{{formatTime(thumbnail.time, 1)}}</span>
+    <img [src]="thumbnail.imageUrl" />
+    <ul class="timings" *ngIf="thumbnail.timings.length">
+      <li *ngFor="let timing of thumbnail.timings">{{ formatTiming(timing) }}</li>
+    </ul>
+  </div>
+</div>

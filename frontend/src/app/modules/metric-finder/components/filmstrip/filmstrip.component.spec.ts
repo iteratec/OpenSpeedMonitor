@@ -3,6 +3,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {FilmstripComponent} from './filmstrip.component';
 import {FilmstripService} from '../../services/filmstrip.service';
 import {FilmstripServiceMock} from '../../services/filmstrip.service.mock';
+import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
 
 describe('FilmstripComponent', () => {
   let component: FilmstripComponent;
@@ -14,7 +15,8 @@ describe('FilmstripComponent', () => {
       providers: [{
         provide: FilmstripService,
         useClass: FilmstripServiceMock,
-      }]
+      }],
+      imports: [ SharedMocksModule ]
     })
       .compileComponents();
   }));

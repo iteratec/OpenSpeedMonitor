@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {TestResult, TestResultDTO} from '../models/test-result';
+import {TestResult, TestResultDTO} from '../models/test-result.model';
 import {BehaviorSubject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';

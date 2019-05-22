@@ -1,17 +1,16 @@
 
-<osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="selected = $event"></osm-line-chart>
+<osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
 
+<div class="filmstrips-wrapper">
+  <div class="filmstrips">
+  <osm-filmstrip *ngFor="let testResult of selected" [result]="testResult" [highlightedMetric]="metric"></osm-filmstrip>
+  </div>
+</div>
 Metric:
 <select [(ngModel)]="metric">
-  <option [value]="'speedIndex'">Speed Index</option>
-  <option [value]="'docCompleteTimeInMillisecs'">Document Complete</option>
-  <option [value]="'startRenderInMillisecs'">Start Render</option>
-  <option [value]="'Image'">Hero Image</option>
-  <option [value]="'visuallyCompleteInMillisecs'">Visually Complete</option>
+  <option [value]="'SPEED_INDEX'">Speed Index</option>
+  <option [value]="'DOC_COMPLETE_TIME'">Document Complete</option>
+  <option [value]="'START_RENDER'">Start Render</option>
+  <option [value]="'_HERO_Image'">Hero Image</option>
+  <option [value]="'VISUALLY_COMPLETE'">Visually Complete</option>
 </select>
-
-Selected:
-<p>
-  {{ selected | json}}
-</p>
-<osm-filmstrip></osm-filmstrip>
