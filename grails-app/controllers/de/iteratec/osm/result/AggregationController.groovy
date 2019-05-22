@@ -157,7 +157,9 @@ class AggregationController extends ExceptionHandlerController {
                     page: it.page?.name,
                     jobGroup: it.jobGroup.name,
                     browser: it.browser?.name,
-                    aggregationValue: it.aggregationValue
+                    aggregationValue: it.aggregationValue,
+                    deviceType: it?.deviceType,
+                    operatingSystem:  it?.operatingSystem
                 )]
             }
         }

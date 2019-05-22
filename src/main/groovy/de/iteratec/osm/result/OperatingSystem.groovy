@@ -22,7 +22,7 @@ enum OperatingSystem {
      */
     static OperatingSystem guessOperatingSystem(String label) {
         switch (label) {
-            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc).*/ :
+            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc|desktop).*/ :
                 return OperatingSystem.WINDOWS
             case ~/(?i)(?!(.*(Android|Desktop).*)).*(ios|iphone|ipad).*/ :
                 return OperatingSystem.IOS
