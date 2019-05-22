@@ -9,4 +9,6 @@ export class FilmstripServiceMock {
   loadFilmstripIfNecessary(result: TestResult): void {}
 
   loadFilmstrip(result: TestResult): void { }
+
+  getThumbnailTime(time: number): number { return 0; }
 }

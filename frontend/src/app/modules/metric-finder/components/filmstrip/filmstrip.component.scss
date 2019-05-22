@@ -12,7 +12,7 @@
     filter: brightness(50%);
     transition: filter 0.2s ease;
   }
-  &.highlighted img, &:hover img {
+  &.is-highlighted img, &:hover img {
     filter: brightness(100%);
   }
   .time {
@@ -35,5 +35,9 @@
   }
   &:hover .timings {
     display: block;
+  }
+
+  &.is-offset {
+    visibility: hidden;
   }
 }

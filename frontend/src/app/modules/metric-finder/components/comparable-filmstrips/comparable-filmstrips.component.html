@@ -1,5 +1,8 @@
 <div class="filmstrips-wrapper">
   <div class="filmstrips">
-    <osm-filmstrip *ngFor="let testResult of results" [result]="testResult" [highlightedMetric]="highlightedMetric"></osm-filmstrip>
+    <osm-filmstrip *ngFor="let testResult of results; index as i"
+                   [result]="testResult" [highlightedMetric]="highlightedMetric" [offset]="offsets[i]">
+
+    </osm-filmstrip>
   </div>
 </div>

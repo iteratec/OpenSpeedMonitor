@@ -23,6 +23,9 @@ export class FilmstripComponent implements OnChanges {
   @Input()
   highlightedMetric: string;
 
+  @Input()
+  offset: number;
+
   private result$ = new BehaviorSubject<TestResult>(null);
 
   constructor(
@@ -35,16 +38,15 @@ export class FilmstripComponent implements OnChanges {
     ).pipe(
       map(([filmstrips, result]) => result ? filmstrips[result.id] : null),
       filter(filmstrip => !!filmstrip),
-      distinctUntilChanged(),
-      map(filmstrip => this.filmstripService.createFilmstripView(filmstrip, this.result.timings, this.highlightedMetric))
+      map(filmstrip => this.filmstripService.createFilmstripView(filmstrip, this.result.timings, this.highlightedMetric, this.offset))
     );
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['result'].currentValue !== changes['result'].previousValue) {
+    if (changes['result'] && changes['result'].currentValue !== changes['result'].previousValue) {
       this.filmstripService.loadFilmstripIfNecessary(this.result);
-      this.result$.next(this.result);
     }
+    this.result$.next(this.result);
   }
 
   formatTime(millisecs: number, precision: number): string {

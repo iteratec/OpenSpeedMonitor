@@ -2,7 +2,8 @@
   <div class="filmstrip-item"
        *ngFor="let thumbnail of filmStrip$ | async"
        [class.has-change]="thumbnail.hasChange || thumbnail.timings.length"
-       [class.highlighted]="thumbnail.isHighlighted"
+       [class.is-highlighted]="thumbnail.isHighlighted"
+       [class.is-offset]="thumbnail.isOffset"
        (mouseover)="positionTimings($event)"
   >
     <span class="time">{{formatTime(thumbnail.time, 1)}}</span>
