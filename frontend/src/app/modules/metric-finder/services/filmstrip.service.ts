@@ -10,7 +10,7 @@ import {FilmstripView, Timing} from '../models/filmstrip-view.model';
 @Injectable()
 export class FilmstripService {
 
-  filmStripData$ = new BehaviorSubject<{[resultId: number]: Thumbnail[]}>({});
+  filmStripData$ = new BehaviorSubject<{[resultId: string]: Thumbnail[]}>({});
   private viewInterval = 100;
 
   constructor (private http: HttpClient) {}
