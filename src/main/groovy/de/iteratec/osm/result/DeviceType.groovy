@@ -2,8 +2,8 @@ package de.iteratec.osm.result
 
 enum DeviceType {
     DESKTOP("Desktop", "desktop"),
-    TABLET("Tablet", "tablet"),
-    SMARTPHONE("Smartphone", "mobile"),
+    TABLET("Tablet", "tablet-alt"),
+    SMARTPHONE("Smartphone", "mobile-alt"),
     UNDEFINED("Undefined", "question")
 
     private String label

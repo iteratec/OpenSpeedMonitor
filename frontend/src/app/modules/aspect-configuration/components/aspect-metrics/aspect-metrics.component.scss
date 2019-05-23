@@ -1,25 +1,48 @@
+@import "../../../../../styles/clickable-list";
+
 .performance-aspect-type {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  font-size: 1.5em;
+  font-size: 2em;
+  font-weight: bold;
+
   i {
     justify-self: end;
   }
 }
 
-.clickable-list {
-  li {
-    a {
-      margin-bottom: 2px;
+i.aspect-device-type {
+  grid-area: icon;
+  align-self: center;
+  justify-self: start;
+}
 
-      p.percentage-big {
-        font-size: 18px;
-      }
+.aspect-row-top {
+  grid-area: browser;
+  font-size: 1.2em;
+}
 
-      p.percentage {
-        font-weight: bold;
-        margin: 0;
-      }
-    }
-  }
+.aspect-row-bottom {
+  grid-area: os;
+}
+
+.aspect-right {
+  grid-area: measurand;
+  align-self: center;
+  font-size: 1.2em;
+}
+
+.aspect-links {
+  display: grid;
+  grid-template-columns: 2fr 8fr 5fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: "icon browser measurand" "icon os measurand";
+}
+
+.persistent-aspect {
+  font-weight: bold;
+}
+
+.non-persistent-aspect {
+  color: darkgray;
 }

@@ -6,8 +6,19 @@
   <ul class="clickable-list">
     <li *ngFor="let aspect of aspectsToShow$ | async">
       <a [routerLink]="['/applicationDashboard', 7]">
-        <i class="fas fa-{{aspect.deviceType.icon}}"></i>
-        {{aspect.measurand.name}}
+        <div class="aspect-links">
+          <i class="fas fa-3x fa-{{aspect.deviceType.icon}} aspect-device-type"></i>
+          <span class="aspect-row-top">
+          {{aspect.browserName}}
+        </span>
+          <span class="aspect-row-bottom">
+          {{aspect.operatingSystem}}
+        </span>
+          <span class="aspect-right"
+                [ngClass]="{'persistent-aspect': aspect.persistent, 'non-persistent-aspect': !aspect.persistent}">
+          {{aspect.measurand.name}}
+        </span>
+        </div>
       </a>
     </li>
   </ul>
