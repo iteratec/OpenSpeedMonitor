@@ -1,6 +1,11 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AspectConfigurationComponent } from './aspect-configuration.component';
+import {AspectConfigurationComponent} from './aspect-configuration.component';
+import {SharedMocksModule} from "../../testing/shared-mocks.module";
+import {AspectMetricsComponent} from "./components/aspect-metrics/aspect-metrics.component";
+import {ApplicationService} from "../../services/application.service";
+import {AspectConfigurationService} from "./services/aspect-configuration.service";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 describe('AspectConfigurationComponent', () => {
   let component: AspectConfigurationComponent;
@@ -8,7 +13,19 @@ describe('AspectConfigurationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AspectConfigurationComponent ]
+      declarations: [
+        AspectConfigurationComponent,
+        AspectMetricsComponent
+      ],
+      imports: [
+        SharedMocksModule,
+        FormsModule,
+        ReactiveFormsModule
+      ],
+      providers: [
+        ApplicationService,
+        AspectConfigurationService
+      ]
     })
     .compileComponents();
   }));

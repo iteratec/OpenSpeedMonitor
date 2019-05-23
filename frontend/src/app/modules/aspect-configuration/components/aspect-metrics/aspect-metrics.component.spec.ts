@@ -1,6 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { AspectMetricsComponent } from './aspect-metrics.component';
+import {AspectMetricsComponent} from './aspect-metrics.component';
+import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 describe('AspectMetricsComponent', () => {
   let component: AspectMetricsComponent;
@@ -8,7 +10,14 @@ describe('AspectMetricsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AspectMetricsComponent ]
+      declarations: [
+        AspectMetricsComponent
+      ],
+      imports: [
+        SharedMocksModule,
+        FormsModule,
+        ReactiveFormsModule
+      ]
     })
     .compileComponents();
   }));
@@ -16,6 +25,8 @@ describe('AspectMetricsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AspectMetricsComponent);
     component = fixture.componentInstance;
+    component.aspects = [];
+    component.aspectType = {name: '', icon: ''};
     fixture.detectChanges();
   });
 
