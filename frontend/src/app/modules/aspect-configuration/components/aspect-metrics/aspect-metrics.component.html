@@ -16,7 +16,9 @@
         </span>
           <span class="aspect-right"
                 [ngClass]="{'persistent-aspect': aspect.persistent, 'non-persistent-aspect': !aspect.persistent}">
-          {{aspect.measurand.name}}
+            <div *ngIf="aspect.measurand.isUserTiming; then userTiming else measurand"></div>
+<ng-template #userTiming>{{aspect.measurand.name}}</ng-template>
+<ng-template #measurand>{{"frontend.de.iteratec.isr.measurand." + aspect.measurand.name | translate}}</ng-template>
         </span>
         </div>
       </a>
