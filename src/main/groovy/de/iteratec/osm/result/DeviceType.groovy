@@ -19,7 +19,7 @@ enum DeviceType {
     }
 
     String getDeviceTypeIcon() {
-        return label
+        return icon
     }
 
     /**
