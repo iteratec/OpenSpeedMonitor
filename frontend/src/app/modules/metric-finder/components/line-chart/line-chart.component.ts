@@ -248,6 +248,9 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     const timestamp = date.getTime();
     const bisectResults = bisector((testResult: TestResult) => testResult.date).left;
     const resultIndex = bisectResults(this.results, date);
+    if (!this.results[resultIndex]) {
+      return null;
+    }
     if (resultIndex > 0 &&
       timestamp - this.results[resultIndex - 1].date.getTime() < this.results[resultIndex].date.getTime() - timestamp) {
       return this.results[resultIndex - 1];

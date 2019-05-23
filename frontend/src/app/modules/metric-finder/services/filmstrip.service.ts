@@ -32,28 +32,43 @@ export class FilmstripService {
     );
   }
 
-  createFilmstripView(thumbnails: Thumbnail[], timings: TimingsMap, highlightedMetric?: string): FilmstripView {
+  createFilmstripView(thumbnails: Thumbnail[], timings: TimingsMap, highlightedMetric?: string, offset?: number): FilmstripView {
     const end = Math.max(...thumbnails.map(t => t.time));
     const filmstrip = [];
     let lastVideoFrame = null;
+    const start = offset ? -offset : 0;
 
-    for (let time = 0; time < end + this.viewInterval; time += this.viewInterval) {
+    for (let time = start; time < end + this.viewInterval; time += this.viewInterval) {
       const videoFrame = this.findFrame(thumbnails, time);
       const timingsInFrame = this.findTimingsInInterval(timings, time - this.viewInterval, time);
       filmstrip.push({
         time: time,
         imageUrl: videoFrame.imageUrl,
-        hasChange: !lastVideoFrame || lastVideoFrame.time !== videoFrame.time,
+        hasChange: lastVideoFrame !== null && lastVideoFrame.time !== videoFrame.time,
         isHighlighted: !!timingsInFrame.find(timing => timing.metric === highlightedMetric),
+        isOffset: time < 0,
         timings: timingsInFrame
       });
-      lastVideoFrame = videoFrame;
+      if (time >= 0) {
+        lastVideoFrame = videoFrame;
+      }
     }
     return filmstrip;
   }
 
+  getThumbnailTime(time: number) {
+    if (!time) {
+      return 0;
+    }
+    const remaining = time % this.viewInterval;
+    return time + (this.viewInterval - remaining);
+  }
+
   private findFrame(thumbnails, time) {
     let frame = thumbnails[0];
+    if (time < 0) {
+      return frame;
+    }
     for (const currentFrame of thumbnails) {
       if (time >= currentFrame.time) {
         frame = currentFrame;

@@ -1,11 +1,8 @@
 
 <osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
 
-<div class="filmstrips-wrapper">
-  <div class="filmstrips">
-  <osm-filmstrip *ngFor="let testResult of selected" [result]="testResult" [highlightedMetric]="metric"></osm-filmstrip>
-  </div>
-</div>
+<osm-comparable-filmstrips [results]="selected" [highlightedMetric]="metric"></osm-comparable-filmstrips>
+
 Metric:
 <select [(ngModel)]="metric">
   <option [value]="'SPEED_INDEX'">Speed Index</option>

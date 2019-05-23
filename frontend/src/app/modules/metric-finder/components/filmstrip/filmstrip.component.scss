@@ -12,16 +12,21 @@
     filter: brightness(50%);
     transition: filter 0.2s ease;
   }
-  &.highlighted img, &:hover img {
+  &.is-highlighted img, &:hover img {
     filter: brightness(100%);
   }
   .time {
     display: block;
     text-align: center;
     padding: 0 5px 5px 5px;
+    line-height: 1.2em;
   }
   &.has-change .time {
     font-weight: bold;
+  }
+  &.is-highlighted .time {
+    font-size: 1.2em;
+    line-height: 1em;
   }
 
   .timings {
@@ -35,5 +40,9 @@
   }
   &:hover .timings {
     display: block;
+  }
+
+  &.is-offset {
+    visibility: hidden;
   }
 }

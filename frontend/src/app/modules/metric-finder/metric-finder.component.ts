@@ -19,6 +19,6 @@ export class MetricFinderComponent {
   }
 
   setSelectedResults(results: TestResult[]) {
-    this.selected = results.sort((a, b) => a.date.getTime() - b.date.getTime());
+    this.selected = [...results].sort((a, b) => a.date.getTime() - b.date.getTime());
   }
 }

@@ -9,6 +9,7 @@ export interface FilmstripViewThumbnail {
   imageUrl: string;
   hasChange: boolean;
   isHighlighted: boolean;
+  isOffset: boolean;
   timings: Timing[];
 }
 
