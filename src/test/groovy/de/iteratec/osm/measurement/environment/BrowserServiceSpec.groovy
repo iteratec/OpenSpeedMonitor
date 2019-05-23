@@ -96,8 +96,9 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         BrowserInfoDto browserInfo = browserInfos.find { it.browserId == b.ident() }
 
         then: "Location information operating system and device type are provided correctly"
-        browserInfo.operatingSystem == os
-        browserInfo.deviceType == dt
+        browserInfo.operatingSystem == os.getOSLabel()
+        browserInfo.deviceType.name == dt.getDeviceTypeLabel()
+        browserInfo.deviceType.icon == dt.getDeviceTypeIcon()
 
         where:
         browserName    | os                      | dt
@@ -126,9 +127,11 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
 
         then: "Location information operating system and device type are provided just for browsers with conclusive informations available"
         browserInfos.size() == 2
-        firefoxInfo.operatingSystem == OperatingSystem.WINDOWS
-        firefoxInfo.deviceType == DeviceType.DESKTOP
-        androidInfos.operatingSystem == OperatingSystem.ANDROID
-        androidInfos.deviceType == DeviceType.SMARTPHONE
+        firefoxInfo.operatingSystem == OperatingSystem.WINDOWS.getOSLabel()
+        firefoxInfo.deviceType.name == DeviceType.DESKTOP.getDeviceTypeLabel()
+        firefoxInfo.deviceType.icon == DeviceType.DESKTOP.getDeviceTypeIcon()
+        androidInfos.operatingSystem == OperatingSystem.ANDROID.getOSLabel()
+        androidInfos.deviceType.name == DeviceType.SMARTPHONE.getDeviceTypeLabel()
+        androidInfos.deviceType.icon == DeviceType.SMARTPHONE.getDeviceTypeIcon()
     }
 }
