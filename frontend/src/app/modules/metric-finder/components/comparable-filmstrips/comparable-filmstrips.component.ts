@@ -1,5 +1,5 @@
 import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
-import {TestResult} from '../../models/test-result';
+import {TestResult} from '../../models/test-result.model';
 import {FilmstripService} from '../../services/filmstrip.service';
 
 @Component({
