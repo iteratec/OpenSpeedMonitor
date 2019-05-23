@@ -30,11 +30,7 @@ export class ResultSelectionStore {
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
   oldResult: ResultSelectionCommand;
   selectedJobGroupsChanged: boolean = false;
-  selectedPagesChanged: boolean = false;
-  selectedBrowserChanged: boolean = false;
-  selectedLocationChanged: boolean = false;
   selectedConnectivityChanged: boolean = false;
-  selectedMeasuredEventsChanged: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService){
     let defaultFrom = new Date();
@@ -52,25 +48,12 @@ export class ResultSelectionStore {
     this.setResultSelectionCommand({...this.resultSelectionCommand, jobGroupIds: ids});
   }
 
-  setSelectedPages(ids: number[]){
-    this.selectedPagesChanged = true;
-    this.setResultSelectionCommand({...this.resultSelectionCommand, pageIds: ids});
+  setSelectedPagesAndMeasurands(pageIds: number[], measuredEventIds: number[]){
+    this.setResultSelectionCommand({...this.resultSelectionCommand, pageIds: pageIds, measuredEventIds: measuredEventIds});
   }
 
-  measuredEventIds?: number[];
-  setSelectedMeasuredEvents(ids: number[]){
-    this.selectedMeasuredEventsChanged = true;
-    this.setResultSelectionCommand({...this.resultSelectionCommand, measuredEventIds: ids});
-  }
-
-  setSelectedBrowser(ids: number[]){
-    this.selectedBrowserChanged = true;
-    this.setResultSelectionCommand({...this.resultSelectionCommand, browserIds: ids});
-  }
-
-  setSelectedLocations(ids: number[]){
-    this.selectedLocationChanged = true;
-    this.setResultSelectionCommand({...this.resultSelectionCommand, locationIds: ids});
+  setSelectedBrowserAndLocation(browserIds: number[], locationIds: number[]){
+    this.setResultSelectionCommand({...this.resultSelectionCommand, browserIds: browserIds, locationIds: locationIds});
   }
 
   setSelectedConnectivities(connectivities: number[]){
@@ -83,7 +66,6 @@ export class ResultSelectionStore {
   }
 
   setResultSelectionCommand(newState: ResultSelectionCommand){
-    this.oldResult = this.resultSelectionCommand;
     this._resultSelectionCommand$.next(newState);
   }
 
@@ -97,20 +79,12 @@ export class ResultSelectionStore {
     });
     }else if(selectedComponent === "PAGE_LOCATION_CONNECTIVITY"){
       this._resultSelectionCommand$.subscribe(state => {
-        if (!(this.selectedPagesChanged || this.selectedMeasuredEventsChanged)) {
-          this.loadSelectableEventsAndPages(state);
-        }
-        if(!(this.selectedBrowserChanged || this.selectedLocationChanged)){
-          this.loadSelectableLocationsAndBrowsers(state);
-        }
+        this.loadSelectableEventsAndPages(state);
+        this.loadSelectableLocationsAndBrowsers(state);
         if(!this.selectedConnectivityChanged){
           this.loadSelectableConnectivities(state);
         }
         this.selectedConnectivityChanged = false;
-        this.selectedLocationChanged = false;
-        this.selectedBrowserChanged = false;
-        this.selectedPagesChanged = false;
-        this.selectedMeasuredEventsChanged = false;
       });
     }else if(selectedComponent ==="MEASURAND"){
       this._resultSelectionCommand$.subscribe(state => {
@@ -144,12 +118,6 @@ export class ResultSelectionStore {
   loadSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): void {
     this.resultSelectionService.fetchResultSelectionData<Connectivity[]>(resultSelectionCommand, URL.CONNECTIVITIES)
       .subscribe(next => this.connectivities$.next(next));
-  }
-
-  loadSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
-    this.loadSelectableEventsAndPages(resultSelectionCommand);
-    this.loadSelectableConnectivities(resultSelectionCommand);
-    this.loadSelectableLocationsAndBrowsers(resultSelectionCommand);
   }
 
   loadMeasurands(resultSelectionCommand: ResultSelectionCommand): void {

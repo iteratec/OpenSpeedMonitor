@@ -68,35 +68,32 @@ export class ResultSelectionPageLocationConnectivityComponent {
   filterSelectableItems(selectedParents: number[], children: String): void {
     let items = [];
     if (this.showMeasuredStepSelection && children === 'events') {
-      items = this.resultSelectionService.eventsAndPages$.getValue();
+      items = this.resultSelectionStore.eventsAndPages$.getValue();
     } else if (this.showLocationSelection && children === 'locations') {
-      items = this.resultSelectionService.locationsAndBrowsers$.getValue();
+      items = this.resultSelectionStore.locationsAndBrowsers$.getValue();
     }
 
     if (selectedParents && selectedParents.length > 0) {
       let filteredItems = items.filter(item => selectedParents.includes(item.parent.id));
       if (children === 'events') {
-        console.log(this.selectedEvents);
         this.selectedEvents = filteredItems.filter(item => this.selectedEvents.includes(item.id)).map(item => item.id);
+        this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
         this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
+        debugger
       } else if (children === 'locations') {
         this.selectedLocations = filteredItems.filter(item => this.selectedLocations.includes(item.id)).map(item => item.id);
-
+        this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);
         this.locations$ = of(this.sortAlphabetically(filteredItems));
       }
     } else {
       if (children === 'events') {
         this.measuredEvents$ = of(this.sortAlphabetically(items));
+        this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
       } else if (children === 'locations') {
         this.locations$ = of(this.sortAlphabetically(items));
+        this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);
       }
     }
-    //TODO: measurand event and location selection not working yet
-    this.resultSelectionStore.setSelectedPages(this.selectedPages);
-    this.resultSelectionStore.setSelectedLocations(this.selectedLocations);
-    this.resultSelectionStore.setSelectedBrowser(this.selectedBrowsers);
-    this.resultSelectionStore.setSelectedConnectivities(this.selectedConnectivities);
-    this.resultSelectionStore.setSelectedMeasuredEvents(this.selectedEvents);
   }
 
   private getUniqueElements(items) {

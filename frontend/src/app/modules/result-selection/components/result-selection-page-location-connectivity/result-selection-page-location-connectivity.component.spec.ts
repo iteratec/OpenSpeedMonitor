@@ -4,27 +4,32 @@ import {ResultSelectionPageLocationConnectivityComponent} from './result-selecti
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 describe('ResultSelectionPageLocationConnectivityComponent', () => {
   let component: ResultSelectionPageLocationConnectivityComponent;
   let fixture: ComponentFixture<ResultSelectionPageLocationConnectivityComponent>;
   let resultSelectionService: ResultSelectionService;
+  let resultSelectionStore: ResultSelectionStore;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ResultSelectionPageLocationConnectivityComponent],
       imports: [SharedMocksModule],
-      providers: [ResultSelectionService]
+      providers: [
+        ResultSelectionService,
+        ResultSelectionStore
+      ]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    resultSelectionService = TestBed.get(ResultSelectionService);
+    resultSelectionStore = TestBed.get(ResultSelectionStore);
     fixture = TestBed.createComponent(ResultSelectionPageLocationConnectivityComponent);
     component = fixture.componentInstance;
 
-    resultSelectionService.eventsAndPages$.next([
+    resultSelectionStore.eventsAndPages$.next([
       {
         id: 100,
         name: "Website1_HP_entry",
@@ -50,7 +55,7 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
         }
       }
     ]);
-    resultSelectionService.locationsAndBrowsers$.next([
+    resultSelectionStore.locationsAndBrowsers$.next([
       {
         id: 100,
         name: "prod-location-1",
@@ -76,7 +81,7 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
         }
       }
     ]);
-    resultSelectionService.connectivities$.next([
+    resultSelectionStore.connectivities$.next([
       {
         id: 1,
         name: "DSL 6.000",
