@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed} from '@angular/core/testing';
-import { ResultSelectionApplicationComponent } from './result-selection-application.component';
+import { ApplicationComponent } from './application.component';
 import { SelectableApplication } from 'src/app/models/application.model';
 import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
@@ -8,9 +8,9 @@ import { By } from '@angular/platform-browser';
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
 
-describe('ResultSelectionApplicationComponent', () => {
-  let component: ResultSelectionApplicationComponent;
-  let fixture: ComponentFixture<ResultSelectionApplicationComponent>;
+describe('ApplicationComponent', () => {
+  let component: ApplicationComponent;
+  let fixture: ComponentFixture<ApplicationComponent>;
   const applications = [new SelectableApplication({
     id: 3,
     name: 'test_Application',
@@ -24,7 +24,7 @@ describe('ResultSelectionApplicationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionApplicationComponent],
+      declarations: [ApplicationComponent],
       imports: [SharedMocksModule],
       providers: [
         ResultSelectionStore,
@@ -37,7 +37,7 @@ describe('ResultSelectionApplicationComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultSelectionApplicationComponent);
+    fixture = TestBed.createComponent(ApplicationComponent);
     
     component = fixture.componentInstance;
     fixture.detectChanges();

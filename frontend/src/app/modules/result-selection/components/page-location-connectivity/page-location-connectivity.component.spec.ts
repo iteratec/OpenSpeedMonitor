@@ -1,20 +1,20 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ResultSelectionPageLocationConnectivityComponent} from './result-selection-page-location-connectivity.component';
+import {PageLocationConnectivityComponent} from './page-location-connectivity.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 
-describe('ResultSelectionPageLocationConnectivityComponent', () => {
-  let component: ResultSelectionPageLocationConnectivityComponent;
-  let fixture: ComponentFixture<ResultSelectionPageLocationConnectivityComponent>;
+describe('PageLocationConnectivityComponent', () => {
+  let component: PageLocationConnectivityComponent;
+  let fixture: ComponentFixture<PageLocationConnectivityComponent>;
   let resultSelectionService: ResultSelectionService;
   let resultSelectionStore: ResultSelectionStore;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionPageLocationConnectivityComponent],
+      declarations: [PageLocationConnectivityComponent],
       imports: [SharedMocksModule],
       providers: [
         ResultSelectionService,
@@ -26,7 +26,7 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
 
   beforeEach(() => {
     resultSelectionStore = TestBed.get(ResultSelectionStore);
-    fixture = TestBed.createComponent(ResultSelectionPageLocationConnectivityComponent);
+    fixture = TestBed.createComponent(PageLocationConnectivityComponent);
     component = fixture.componentInstance;
 
     resultSelectionStore.eventsAndPages$.next([

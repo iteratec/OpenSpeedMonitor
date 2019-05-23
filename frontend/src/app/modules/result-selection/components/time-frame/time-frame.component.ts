@@ -7,11 +7,11 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-result-selection-time-frame',
-  templateUrl: './result-selection-time-frame.component.html',
-  styleUrls: ['./result-selection-time-frame.component.scss'],
+  templateUrl: './time-frame.component.html',
+  styleUrls: ['./time-frame.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ResultSelectionTimeFrameComponent implements OnInit {
+export class TimeFrameComponent implements OnInit {
 
   @Input() currentChart: string;
   @Input() enableAggregation: boolean = true;

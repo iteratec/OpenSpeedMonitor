@@ -10,10 +10,10 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
-  templateUrl: './result-selection-page-location-connectivity.component.html',
-  styleUrls: ['./result-selection-page-location-connectivity.component.scss']
+  templateUrl: './page-location-connectivity.component.html',
+  styleUrls: ['./page-location-connectivity.component.scss']
 })
-export class ResultSelectionPageLocationConnectivityComponent {
+export class PageLocationConnectivityComponent {
   eventsAndPages$: Observable<MeasuredEvent[]>;
   locationsAndBrowsers$: Observable<Location[]>;
   connectivities$: Observable<Connectivity[]>;

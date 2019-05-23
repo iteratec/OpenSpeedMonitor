@@ -3,7 +3,7 @@ import {ResultSelectionComponent} from './result-selection.component';
 import {ResultSelectionService} from "./services/result-selection.service";
 import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 import {SharedModule} from "../shared/shared.module";
-import {ResultSelectionTimeFrameComponent} from './components/result-selection-time-frame/result-selection-time-frame.component';
+import {TimeFrameComponent} from './components/time-frame/time-frame.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MeasurandsComponent} from './components/measurands/measurands.component';
 import {
@@ -11,9 +11,9 @@ import {
   OwlDateTimeModule,
   OwlNativeDateTimeModule
 } from 'ng-pick-datetime';
-import {ResultSelectionPageLocationConnectivityComponent} from './components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component';
+import {PageLocationConnectivityComponent} from './components/page-location-connectivity/page-location-connectivity.component';
 import {NgSelectModule} from "@ng-select/ng-select";
-import {ResultSelectionApplicationComponent} from './components/result-selection-application/result-selection-application.component';
+import {ApplicationComponent} from './components/application/application.component';
 import {ResultSelectionStore} from "./services/result-selection.store";
 
 export const TIME_FORMAT = {
@@ -32,9 +32,9 @@ export const TIME_FORMAT = {
   ],
   declarations: [
     ResultSelectionComponent,
-    ResultSelectionTimeFrameComponent,
-    ResultSelectionApplicationComponent,
-    ResultSelectionPageLocationConnectivityComponent,
+    TimeFrameComponent,
+    ApplicationComponent,
+    PageLocationConnectivityComponent,
     MeasurandSelectComponent,
     MeasurandsComponent
   ],

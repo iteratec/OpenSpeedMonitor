@@ -1,6 +1,6 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ResultSelectionTimeFrameComponent} from './result-selection-time-frame.component';
+import {TimeFrameComponent} from './time-frame.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {OsmLangService} from "../../../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
@@ -8,13 +8,13 @@ import {By} from "@angular/platform-browser";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
 
-describe('ResultSelectionTimeFrameComponent', () => {
-  let component: ResultSelectionTimeFrameComponent;
-  let fixture: ComponentFixture<ResultSelectionTimeFrameComponent>;
+describe('TimeFrameComponent', () => {
+  let component: TimeFrameComponent;
+  let fixture: ComponentFixture<TimeFrameComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionTimeFrameComponent],
+      declarations: [TimeFrameComponent],
       imports: [SharedMocksModule],
       providers: [
         ResultSelectionStore,
@@ -27,7 +27,7 @@ describe('ResultSelectionTimeFrameComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultSelectionTimeFrameComponent);
+    fixture = TestBed.createComponent(TimeFrameComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

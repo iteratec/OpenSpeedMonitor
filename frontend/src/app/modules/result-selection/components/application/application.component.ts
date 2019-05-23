@@ -10,12 +10,12 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
     selector: 'osm-result-selection-application',
-    templateUrl: './result-selection-application.component.html',
-    styleUrls: ['./result-selection-application.component.scss'],
+    templateUrl: './application.component.html',
+    styleUrls: ['./application.component.scss'],
     encapsulation: ViewEncapsulation.None
   })
 
-export class ResultSelectionApplicationComponent {
+export class ApplicationComponent {
   applicationMappings$: Observable<SelectableApplication[]>;
   applications: SelectableApplication[];
   isEmpty = true;
