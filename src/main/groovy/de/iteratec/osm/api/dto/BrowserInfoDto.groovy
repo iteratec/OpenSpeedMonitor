@@ -1,7 +1,4 @@
 package de.iteratec.osm.api.dto
-
-
-import de.iteratec.osm.result.OperatingSystem
 /**
  * Contains information of to the browser associated {@link de.iteratec.osm.measurement.environment.Location}s.
  * But only if the information is the same for all associated {@link de.iteratec.osm.measurement.environment.Location}s.
@@ -13,6 +10,7 @@ import de.iteratec.osm.result.OperatingSystem
  */
 class BrowserInfoDto {
     Long browserId
-    OperatingSystem operatingSystem
+    String browserName
+    String operatingSystem
     DeviceTypeDto deviceType
 }

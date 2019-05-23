@@ -87,6 +87,7 @@ export class AspectConfigurationComponent implements OnInit {
         } else {
           extension = {
             browserId: aspect.browserId,
+            browserName: 'Unknown',
             operatingSystem: 'Unknown',
             deviceType: {name: 'Unknown', icon: 'question'}
           }
