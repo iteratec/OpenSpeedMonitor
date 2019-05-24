@@ -1,13 +1,8 @@
 <div class="card">
-  <ng-container *ngIf="showPageSelection || showBrowserSelection">
-    <h2 *ngIf="showBrowserSelection && !showPageSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.browser' | translate }}</h2>
-    <h2 *ngIf="showPageSelection && !showBrowserSelection">{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.page' | translate }}</h2>
-  </ng-container>
-
-  <ul class="nav nav-tabs result-selection-tabs" *ngIf="showPageSelection && showBrowserSelection">
+  <ul class="nav nav-tabs result-selection-tabs">
     <li *ngIf="showPageSelection" id="pageAndEventTab"
-        (click)="pageAndEventSelectionActive = true; browserAndLocationSelectionActive = connectivitySelectionActive = false"
-        [class.active]="pageAndEventSelectionActive">
+        (click)="activeTab = ActiveTab.PageAndEvent"
+        [class.active]="activeTab === ActiveTab.PageAndEvent">
       <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.page' | translate }}
         <ng-container *ngIf="showMeasuredStepSelection">
           | {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.measuredStep' | translate }}
@@ -15,28 +10,28 @@
       </a>
     </li>
     <li *ngIf="showBrowserSelection" id="browserAndLocationTab"
-        (click)="browserAndLocationSelectionActive = true; pageAndEventSelectionActive = connectivitySelectionActive = false"
-        [class.active]="browserAndLocationSelectionActive">
+        (click)="activeTab = ActiveTab.BrowserAndLocation"
+        [class.active]="activeTab === ActiveTab.BrowserAndLocation">
       <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.browser' | translate }}
         <ng-container *ngIf="showLocationSelection"> | {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.location' | translate }}</ng-container>
       </a>
     </li>
     <li *ngIf="showConnectivitySelection" id="connectivityTab"
-        (click)="connectivitySelectionActive = true; pageAndEventSelectionActive = browserAndLocationSelectionActive = false"
-        [class.active]="connectivitySelectionActive">
+        (click)="activeTab = ActiveTab.Connectivity"
+        [class.active]="activeTab === ActiveTab.Connectivity">
       <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.connectivity' | translate }}</a>
     </li>
   </ul>
 
   <div class="tab-content">
     <div class="tab-pane active">
-      <osm-selection-data [hidden]="!pageAndEventSelectionActive" [parentChildData$]="eventsAndPages$" [showChildSelection]="showMeasuredStepSelection"
+      <osm-selection-data *ngIf="showPageSelection" [hidden]="activeTab !== ActiveTab.PageAndEvent" [parentChildData$]="eventsAndPages$" [showChildSelection]="showMeasuredStepSelection"
                           childType="measuredStep" parentType="page">
       </osm-selection-data>
-      <osm-selection-data [hidden]="!browserAndLocationSelectionActive" [parentChildData$]="locationsAndBrowsers$" [showChildSelection]="showLocationSelection"
+      <osm-selection-data *ngIf="showBrowserSelection" [hidden]="activeTab !== ActiveTab.BrowserAndLocation" [parentChildData$]="locationsAndBrowsers$" [showChildSelection]="showLocationSelection"
                           childType="location" parentType="browser">
       </osm-selection-data>
-      <osm-selection-data [hidden]="!connectivitySelectionActive" [parentChildData$]="connectivities$" [showChildSelection]="false"
+      <osm-selection-data *ngIf="showConnectivitySelection" [hidden]="activeTab !== ActiveTab.Connectivity" [parentChildData$]="connectivities$" [showChildSelection]="false"
                           parentType="connectivity">
       </osm-selection-data>
     </div>

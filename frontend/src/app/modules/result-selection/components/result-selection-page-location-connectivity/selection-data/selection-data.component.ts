@@ -26,19 +26,18 @@ export class SelectionDataComponent implements OnInit {
   parentSelection: number[] = [];
   childSelection: number[] = [];
 
-  constructor() {
-  }
+  constructor() { }
 
   ngOnInit(): void {
-      this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
-        map(([parentChildData, selectedParents]) => {
-          if (selectedParents && selectedParents.length) {
-            parentChildData = parentChildData.filter(item => selectedParents.includes(item.parent.id));
-            this.childSelection = parentChildData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
-          }
-          return this.sortAlphabetically(parentChildData);
-        })
-      );
+    this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
+      map(([parentChildData, selectedParents]) => {
+        if (selectedParents && selectedParents.length) {
+          parentChildData = parentChildData.filter(item => selectedParents.includes(item.parent.id));
+          this.childSelection = parentChildData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
+        }
+        return this.sortAlphabetically(parentChildData);
+      })
+    );
 
     this.uniqueParents$ = this.parentChildData$.pipe(
       map(next => {
@@ -82,7 +81,7 @@ export class SelectionDataComponent implements OnInit {
     return parentElements;
   }
 
-  private sortAlphabetically<T extends {name: string}>(items: T[]): T[] {
+  private sortAlphabetically<T extends { name: string }>(items: T[]): T[] {
     return items.sort((a, b) => {
       return a.name.localeCompare(b.name);
     })

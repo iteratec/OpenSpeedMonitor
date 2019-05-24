@@ -15,9 +15,8 @@ export class ResultSelectionPageLocationConnectivityComponent implements OnInit 
   locationsAndBrowsers$: Observable<Location[]>;
   connectivities$: Observable<Connectivity[]>;
 
-  pageAndEventSelectionActive: boolean = true;
-  browserAndLocationSelectionActive: boolean = false;
-  connectivitySelectionActive: boolean = false;
+  ActiveTab: typeof ActiveTab = ActiveTab;
+  activeTab: ActiveTab;
 
   @Input() showMeasuredStepSelection: boolean = true;
   @Input() showLocationSelection: boolean = true;
@@ -32,9 +31,20 @@ export class ResultSelectionPageLocationConnectivityComponent implements OnInit 
   }
 
   ngOnInit(): void {
-    if (!this.showPageSelection && this.pageAndEventSelectionActive) {
-      this.pageAndEventSelectionActive = false;
-      this.browserAndLocationSelectionActive = true;
+    if (this.showPageSelection) {
+      this.activeTab = ActiveTab.PageAndEvent
+    }
+    else if (!this.showPageSelection && this.showBrowserSelection) {
+      this.activeTab = ActiveTab.BrowserAndLocation
+    }
+    else {
+      this.activeTab = ActiveTab.Connectivity
     }
   }
+}
+
+export enum ActiveTab {
+  PageAndEvent,
+  BrowserAndLocation,
+  Connectivity
 }

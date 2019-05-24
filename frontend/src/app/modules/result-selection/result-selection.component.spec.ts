@@ -7,6 +7,7 @@ import {ResultSelectionService} from "./services/result-selection.service";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {ResultSelectionPageLocationConnectivityComponent} from "./components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component";
+import {SelectionDataComponent} from "./components/result-selection-page-location-connectivity/selection-data/selection-data.component";
 
 describe('ResultSelectionComponent', () => {
   let component: ResultSelectionComponent;
@@ -17,7 +18,8 @@ describe('ResultSelectionComponent', () => {
       declarations: [
         ResultSelectionComponent,
         ResultSelectionTimeFrameComponent,
-        ResultSelectionPageLocationConnectivityComponent
+        ResultSelectionPageLocationConnectivityComponent,
+        SelectionDataComponent
       ],
       imports: [
         SharedMocksModule
