@@ -106,6 +106,8 @@ jobs:
         provider: script
         script:
           bash scripts/ci/building/testscript.sh
+        on:
+          branch: feature/travisDeployKey
 after_deploy:
   - test $TRAVIS_BRANCH = "release" && bash scripts/ci/building/merge_release_into_dev_and_master.sh;
 
