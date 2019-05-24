@@ -27,19 +27,6 @@ notifications:
 addons:
   chrome: stable
 
-# set deployment key
-before_install:
-  - >-
-    openssl aes-256-cbc
-    -K $encrypted_0e6b9eee7eaa_key
-    -iv $encrypted_0e6b9eee7eaa_iv
-    -in travis_deploy_github.enc
-    -out github_deploy_key
-    -d
-  - chmod 600 github_deploy_key
-  - eval $(ssh-agent -s)
-  - ssh-add github_deploy_key
-
 # Install ChromeDriver
 install:
   - wget -N https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -P ~/
@@ -51,24 +38,24 @@ install:
 
 jobs:
   include:
-#    - stage: Tests
-#      name: "unitTests"
-#      script:
-#        - ./gradlew -x jasmineRun -x angularTests test
-#    - name: "integrationTests"
-#      script:
-#        - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
-#    - name: "gebTests"
-#      script:
-#        - whereis google-chrome-stable
-#        - whereis chromedriver
-#        - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
-#    - name: "jasmineTests"
-#      script:
-#        - ./gradlew jasmineRun
-#    - name: "angularTests"
-#      script:
-#        - ./gradlew angularTests
+    - stage: Tests
+      name: "unitTests"
+      script:
+        - ./gradlew -x jasmineRun -x angularTests test
+    - name: "integrationTests"
+      script:
+        - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+    - name: "gebTests"
+      script:
+        - whereis google-chrome-stable
+        - whereis chromedriver
+        - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
+    - name: "jasmineTests"
+      script:
+        - ./gradlew jasmineRun
+    - name: "angularTests"
+      script:
+        - ./gradlew angularTests
     - stage: Build and Push Docker Image for Develop
       if: branch = develop
       script: skip # You do not want to run the tests again
@@ -99,15 +86,6 @@ jobs:
           git stash -u;
         on:
           branch: release
-    - stage: TestStageForDeploymentKey
-      if: branch = feature/travisDeployKey
-      script: skip
-      deploy:
-        provider: script
-        script:
-          bash scripts/ci/building/testscript.sh
-        on:
-          branch: feature/travisDeployKey
 after_deploy:
   - test $TRAVIS_BRANCH = "release" && bash scripts/ci/building/merge_release_into_dev_and_master.sh;
 
