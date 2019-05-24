@@ -29,8 +29,16 @@ addons:
 
 # set deployment key
 before_install:
+  - >-
+    openssl aes-256-cbc
+    -K $encrypted_0e6b9eee7eaa_key
+    -iv $encrypted_0e6b9eee7eaa_iv
+    -in travis_deploy_github.enc
+    -out github_deploy_key
+    -d
+  - chmod 600 github_deploy_key
   - eval $(ssh-agent -s)
-  - ssh-add $GITHUB_DEPLOYMENT_PRIVATE_KEY
+  - ssh-add github_deploy_key
 
 # Install ChromeDriver
 install:
