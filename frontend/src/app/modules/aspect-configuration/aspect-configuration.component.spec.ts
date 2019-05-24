@@ -14,7 +14,7 @@ import {ApplicationService} from "../../services/application.service";
 import {AspectConfigurationService} from "./services/aspect-configuration.service";
 import {BrowserInfoDto} from "../../models/browser.model";
 
-fdescribe('AspectConfigurationComponent', () => {
+describe('AspectConfigurationComponent', () => {
   let component: AspectConfigurationComponent;
   let fixture: ComponentFixture<AspectConfigurationComponent>;
 
