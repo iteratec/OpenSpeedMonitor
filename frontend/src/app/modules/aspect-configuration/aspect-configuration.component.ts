@@ -39,7 +39,6 @@ export class AspectConfigurationComponent implements OnInit {
       this.getPage(params.get('pageId'));
     });
     this.initAspectTypes();
-    // this.activateDebugging();
   }
 
   initAspectTypes() {
@@ -56,15 +55,6 @@ export class AspectConfigurationComponent implements OnInit {
         return uniqueAspectTypes
       })
     )
-  }
-
-  private activateDebugging() {
-    // this.application$.subscribe(app => console.log(`app=${JSON.stringify(app)}`));
-    // this.page$.subscribe(page => console.log(`page=${JSON.stringify(page)}`));
-    // this.applicationService.performanceAspectsForPage$.subscribe(aspects => console.log(`aspect=${JSON.stringify(aspects)}`));
-    // this.aspectConfService.browserInfos$.subscribe(browserInfos => console.log(`browserInfos=${browserInfos}`));
-    this.performanceAspects$.subscribe(extendedAspects => console.log(`extendedAspects=${JSON.stringify(extendedAspects)}`))
-    this.aspectTypes$.subscribe(aspectTypes => console.log(`aspectTypes=${JSON.stringify(aspectTypes)}`))
   }
 
   private prepareExtensionOfAspects() {
