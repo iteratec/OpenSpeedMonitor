@@ -100,7 +100,7 @@ jobs:
         on:
           branch: release
     - stage: TestStageForDeploymentKey
-      if: branch == feature/travisDeployKey
+      if: branch = feature/travisDeployKey
       script: skip
       deploy:
         provider: script
