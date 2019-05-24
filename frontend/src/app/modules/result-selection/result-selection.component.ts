@@ -1,4 +1,5 @@
 import {Component, ElementRef} from '@angular/core';
+
 import {ResultSelectionService} from "./services/result-selection.service";
 
 @Component({
@@ -9,6 +10,7 @@ import {ResultSelectionService} from "./services/result-selection.service";
 export class ResultSelectionComponent {
 
   currentChart: string;
+
 
   constructor(private resultSelectionService: ResultSelectionService, element: ElementRef) {
     this.currentChart = element.nativeElement.getAttribute('data-current-chart');

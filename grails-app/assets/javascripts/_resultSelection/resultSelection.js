@@ -61,7 +61,7 @@ OpenSpeedMonitor.resultSelection = (function () {
             });
         }
 
-        // if caller is pageAggregation there is a need for a eventListener on removing and adding measurand series
+        // if caller is aggregation there is a need for a eventListener on removing and adding measurand series
         $(".removeMeasurandSeriesButton").on('click', function () {
             validateForm();
         });

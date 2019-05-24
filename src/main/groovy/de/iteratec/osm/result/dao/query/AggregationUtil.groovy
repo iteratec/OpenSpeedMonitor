@@ -59,7 +59,13 @@ class AggregationUtil {
         return trimClosures
     }
 
-    static def getPercentile(List<Number> data, int nthIndex) {
+    static def getPercentile(List<Number> data, int percentage) {
+        int index = (data.size() * (percentage.toFloat() / 100f)).toInteger()
+        index = Math.min(data.size() - 1, Math.max(0, index))
+        return getPercentileByIndex(data, index)
+    }
+
+    static def getPercentileByIndex(List<Number> data, int nthIndex) {
         if(data.size() > nthIndex){
             def rawData = data.toArray()
             int left = 0

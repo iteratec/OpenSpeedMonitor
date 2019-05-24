@@ -6,7 +6,6 @@ import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.projector.EventResultProjector
 import de.iteratec.osm.result.dao.query.transformer.EventResultTransformer
 import de.iteratec.osm.result.dao.query.trimmer.EventResultTrimmer
-import de.iteratec.osm.util.PerformanceLoggingService
 
 class EventResultQueryExecutor {
     private EventResultProjector projector
@@ -24,7 +23,7 @@ class EventResultQueryExecutor {
     }
 
     private boolean isNotValid() {
-        return this.selectedMeasurands.isEmpty() || !transformer || !projector || !trimmer
+        return !this.selectedMeasurands || this.selectedMeasurands.isEmpty() || !transformer || !projector || !trimmer
     }
 
     void setProjector(EventResultProjector projector) {
@@ -39,7 +38,7 @@ class EventResultQueryExecutor {
         this.trimmer = trimmer
     }
 
-    List<EventResultProjection> getResultFor(List<Closure> filters, List<MeasurandTrim> measurandTrims, Set<ProjectionProperty> baseProjections, PerformanceLoggingService performanceLoggingService) {
+    List<EventResultProjection> getResultFor(List<Closure> filters, List<MeasurandTrim> measurandTrims, Set<ProjectionProperty> baseProjections) {
         if (this.isNotValid()) {
             return []
         }

@@ -277,6 +277,8 @@ class EventResultPersisterService implements iResultListener {
         result.page = step.testedPage
         result.browser = jobRun.job.location.browser
         result.location = jobRun.job.location
+        result.deviceType = result.location.deviceType
+        result.operatingSystem = result.location.operatingSystem
         setAllMeasurands(viewTag, result)
         result.testAgent = jobRun.testAgent
         setConnectivity(result, jobRun)

@@ -7,7 +7,17 @@ import org.joda.time.Days
 @Transactional
 class ResultSelectionService {
 
-     def query(ResultSelectionCommand command, ResultSelectionController.ResultSelectionType type, Closure projection) {
+    enum ResultSelectionType {
+        JobGroups,
+        MeasuredEvents,
+        Locations,
+        ConnectivityProfiles,
+        Results,
+        Pages,
+        UserTimings
+    }
+
+     def query(ResultSelectionCommand command, ResultSelectionType type, Closure projection) {
 
         boolean isStartOfDay = isStartOfDay(command.from)
         def fromFullDay = command.from.withTimeAtStartOfDay()
@@ -38,7 +48,7 @@ class ResultSelectionService {
     }
 
     private
-    def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionController.ResultSelectionType type, Closure projection, Object existingResults) {
+    def queryEventTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
         return EventResult.createCriteria().list {
             applyResultSelectionFilters(delegate, from, to, command, type)
             projection.delegate = delegate
@@ -47,7 +57,7 @@ class ResultSelectionService {
     }
 
     private
-    def queryResultSelectionTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionController.ResultSelectionType type, Closure projection, Object existingResults) {
+    def queryResultSelectionTable(DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType type, Closure projection, Object existingResults) {
         return ResultSelectionInformation.createCriteria().list {
             applyResultSelectionFilters(delegate, from, to, command, type)
             projection.delegate = delegate
@@ -55,33 +65,33 @@ class ResultSelectionService {
         }
     }
 
-    private void applyResultSelectionFilters(Object criteriaBuilder, DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionController.ResultSelectionType resultSelectionType) {
+    private void applyResultSelectionFilters(Object criteriaBuilder, DateTime from, DateTime to, ResultSelectionCommand command, ResultSelectionType resultSelectionType) {
         def filterClosure = {
             and {
                 if (from && to) {
                     between("jobResultDate", from.toDate(), to.toDate())
                 }
-                if (resultSelectionType != ResultSelectionController.ResultSelectionType.JobGroups && command.jobGroupIds) {
+                if (resultSelectionType != ResultSelectionType.JobGroups && command.jobGroupIds) {
                     'in'('jobGroup.id', command.jobGroupIds)
                 }
 
-                if (resultSelectionType != ResultSelectionController.ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
+                if (resultSelectionType != ResultSelectionType.MeasuredEvents && command.measuredEventIds) {
                     'in'("measuredEvent.id", command.measuredEventIds)
                 }
 
-                if (resultSelectionType != ResultSelectionController.ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionController.ResultSelectionType.Pages && command.pageIds) {
+                if (resultSelectionType != ResultSelectionType.MeasuredEvents && resultSelectionType != ResultSelectionType.Pages && command.pageIds) {
                     'in'("page.id", command.pageIds)
                 }
 
-                if (resultSelectionType != ResultSelectionController.ResultSelectionType.Locations && command.locationIds) {
+                if (resultSelectionType != ResultSelectionType.Locations && command.locationIds) {
                     'in'("location.id", command.locationIds)
                 }
 
-                if (resultSelectionType != ResultSelectionController.ResultSelectionType.Locations && command.browserIds) {
+                if (resultSelectionType != ResultSelectionType.Locations && command.browserIds) {
                     'in'("browser.id", command.browserIds)
                 }
 
-                if (resultSelectionType != ResultSelectionController.ResultSelectionType.ConnectivityProfiles) {
+                if (resultSelectionType != ResultSelectionType.ConnectivityProfiles) {
                     or {
                         if (command.connectivityIds) {
                             'in'("connectivityProfile.id", command.connectivityIds)

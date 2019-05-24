@@ -1,13 +1,15 @@
 package de.iteratec.osm.result
 
 enum PerformanceAspectType {
-    PAGE_CONSTRUCTION_STARTED(Measurand.START_RENDER),
-    PAGE_SHOWS_USEFUL_CONTENT(Measurand.VISUALLY_COMPLETE),
-    PAGE_IS_USABLE(Measurand.CONSISTENTLY_INTERACTIVE)
+    PAGE_CONSTRUCTION_STARTED(Measurand.START_RENDER, 'hourglass-start'),
+    PAGE_SHOWS_USEFUL_CONTENT(Measurand.VISUALLY_COMPLETE, 'eye'),
+    PAGE_IS_USABLE(Measurand.CONSISTENTLY_INTERACTIVE, 'hand-pointer')
 
-    private Measurand defaultMetric
+    Measurand defaultMetric
+    String icon
 
-    private PerformanceAspectType(Measurand value){
+    private PerformanceAspectType(Measurand value, String i) {
         defaultMetric = value
+        icon = i
     }
 }

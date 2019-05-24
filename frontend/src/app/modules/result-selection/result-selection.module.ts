@@ -5,6 +5,7 @@ import {MeasurandSelectComponent} from "./components/measurand-select/measurand-
 import {SharedModule} from "../shared/shared.module";
 import {ResultSelectionTimeFrameComponent} from './components/result-selection-time-frame/result-selection-time-frame.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
+import {MeasurandsComponent} from './components/measurands/measurands.component';
 import {
   OWL_DATE_TIME_FORMATS,
   OwlDateTimeModule,
@@ -12,7 +13,8 @@ import {
 } from 'ng-pick-datetime';
 import {ResultSelectionPageLocationConnectivityComponent} from './components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component';
 import {NgSelectModule} from "@ng-select/ng-select";
-import { SelectionDataComponent } from './components/result-selection-page-location-connectivity/selection-data/selection-data.component';
+import {SelectionDataComponent} from './components/result-selection-page-location-connectivity/selection-data/selection-data.component';
+import {ResultSelectionApplicationComponent} from './components/result-selection-application/result-selection-application.component';
 
 export const TIME_FORMAT = {
   fullPickerInput: {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit'},
@@ -31,7 +33,10 @@ export const TIME_FORMAT = {
   declarations: [
     ResultSelectionComponent,
     ResultSelectionTimeFrameComponent,
+    ResultSelectionApplicationComponent,
+    ResultSelectionPageLocationConnectivityComponent,
     MeasurandSelectComponent,
+    MeasurandsComponent,
     ResultSelectionPageLocationConnectivityComponent,
     SelectionDataComponent
   ],
@@ -52,5 +57,4 @@ export const TIME_FORMAT = {
     ResultSelectionComponent
   ]
 })
-export class ResultSelectionModule {
-}
+export class ResultSelectionModule { }

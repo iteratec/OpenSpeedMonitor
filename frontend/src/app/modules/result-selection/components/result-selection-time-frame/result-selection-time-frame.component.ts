@@ -1,10 +1,5 @@
-import {
-  Component, Input,
-  OnInit,
-  ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
-import {Caller, ResultSelectionCommand} from "../../models/result-selection-command.model";
+import {Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {ResultSelectionCommand} from "../../models/result-selection-command.model";
 import {Chart} from "../../models/chart.model";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
@@ -21,6 +16,8 @@ import {OsmLangService} from "../../../../services/osm-lang.service";
 export class ResultSelectionTimeFrameComponent implements OnInit {
 
   @Input() currentChart: string;
+  @Input() enableAggregation: boolean = true;
+  @Input() enableComparative: boolean = true;
   @ViewChild('dateTimeFrom') dateTimeFrom: OwlDateTimeComponent<Date>;
   @ViewChild('dateTimeTo') dateTimeTo: OwlDateTimeComponent<Date>;
   @ViewChild('comparativeDateTimeFrom') comparativeDateTimeFrom: OwlDateTimeComponent<Date>;
@@ -38,6 +35,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
   selectedDates: Date[];
   selectedComparativeDates: Date[];
+  max = new Date();
 
   comparativeSelectionActive: boolean = false;
 
@@ -60,14 +58,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
     let defaultResultSelectionCommand = new ResultSelectionCommand({
       from: defaultFrom,
-      to: defaultTo,
-      caller: Caller.EventResult,
-      jobGroupIds: [],
-      pageIds: [],
-      locationIds: [],
-      browserIds: [],
-      measuredEventIds: [],
-      selectedConnectivities: []
+      to: defaultTo
     });
 
     this.resultSelectionService.loadSelectableData(defaultResultSelectionCommand, Chart[this.currentChart]);
@@ -102,6 +93,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
+    this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
   }
 
   updateFromDate(calendar: CalendarType): void {
@@ -118,6 +110,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
+    this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
   }
 
   updateToDate(calendar: CalendarType): void {
@@ -134,6 +127,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeTo.selecteds;
     }
+    this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
   }
 
   observeCalendarClicks(calendar: CalendarType): void {
@@ -169,6 +163,10 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       return
     }
     this.comparativeSelectionActive = !this.comparativeSelectionActive;
+  }
+
+  private loadSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
+    this.resultSelectionService.loadSelectableData(resultSelectionCommand, Chart[this.currentChart]);
   }
 }
 

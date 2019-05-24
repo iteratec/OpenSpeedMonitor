@@ -377,6 +377,7 @@ class TabularResultPresentationController {
                 property('connectivityProfile.bandwidthUp')
                 property('connectivityProfile.latency')
                 property('connectivityProfile.packetLoss')
+                property('jobResult')
             }
         }
 
@@ -388,6 +389,8 @@ class TabularResultPresentationController {
             row[8] = row[8]?.round(2).toString()
             // csByWptVisuallyCompleteInPercent
             row[23] = row[23]?.round(2).toString()
+            // get wptUrl
+            row[32] = csvExportService.buildTestDetailsURL(row[32], row[19], row[24])
         }
         return result
     }
@@ -427,6 +430,7 @@ class TabularResultPresentationController {
         result << 'ConnectivityBandwithUp'
         result << 'ConnectivityLatency'
         result << 'ConnectivityPacketLoss'
+        result << 'WPTResultUrl'
         return result
     }
 }

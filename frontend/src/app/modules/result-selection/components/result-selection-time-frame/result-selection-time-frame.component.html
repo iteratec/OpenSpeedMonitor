@@ -1,8 +1,10 @@
 <div class="card form-horizontal">
-  <h2>{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.title' | translate }}</h2>
-  <h2>{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}</h2>
+  <h2>
+    <ng-container *ngIf="enableAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }} & </ng-container>
+    {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}
+  </h2>
 
-  <div class="row form-group">
+  <div class="row form-group" *ngIf="enableAggregation">
     <label class="control-label col-md-4">
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}:
     </label>
@@ -36,11 +38,11 @@
     </div>
     <div class="col-md-8" id="main-date-time-picker">
       <div class="input-group">
-        <input class="form-control" [owlDateTimeTrigger]="dateTimeFrom" [owlDateTime]="dateTimeFrom" [(ngModel)]="selectedDates" [selectMode]="'rangeFrom'">
+        <input class="form-control" [owlDateTimeTrigger]="dateTimeFrom" [owlDateTime]="dateTimeFrom" [(ngModel)]="selectedDates" [selectMode]="'rangeFrom'" [max]="max">
         <owl-date-time #dateTimeFrom firstDayOfWeek="1" (afterPickerClosed)="updateFromDate(CalendarType.From)" (afterPickerOpen)="observeCalendarClicks(CalendarType.From)"></owl-date-time>
         <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
         <owl-date-time #dateTimeTo firstDayOfWeek="1" (afterPickerClosed)="updateToDate(CalendarType.To)" (afterPickerOpen)="observeCalendarClicks(CalendarType.To)"></owl-date-time>
-        <input class="form-control" [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [(ngModel)]="selectedDates" [selectMode]="'rangeTo'" [min]="selectedDates[0]">
+        <input class="form-control" [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [(ngModel)]="selectedDates" [selectMode]="'rangeTo'" [min]="selectedDates[0]" [max]="max">
       </div>
     </div>
   </div>
@@ -59,18 +61,18 @@
         </div>
         <div class="col-md-8" id="comparative-date-time-picker">
           <div class="input-group">
-            <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeFrom" [owlDateTime]="comparativeDateTimeFrom" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeFrom'">
+            <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeFrom" [owlDateTime]="comparativeDateTimeFrom" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeFrom'" [max]="max">
             <owl-date-time #comparativeDateTimeFrom firstDayOfWeek="1" (afterPickerClosed)="updateFromDate(CalendarType.ComparativeFrom)" (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeFrom)"></owl-date-time>
             <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
             <owl-date-time #comparativeDateTimeTo firstDayOfWeek="1" (afterPickerClosed)="updateToDate(CalendarType.ComparativeTo)" (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeTo)"></owl-date-time>
-            <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeTo'">
+            <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeTo'" [max]="max">
           </div>
         </div>
       </div>
     </div>
   </ng-template>
 
-  <div class="row form-group" *ngIf="!comparativeSelectionActive">
+  <div class="row form-group" *ngIf="!comparativeSelectionActive && enableComparative">
     <div class="col-md-8 col-md-offset-4">
       <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()">
         <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
