@@ -8,6 +8,7 @@ git add build.gradle
 git commit -m "this is a test for the deployment key"
 git push
 git checkout develop
+git status
 git merge feature/travisDeployKey
 git commit -m "merge feature branch"
 git push
