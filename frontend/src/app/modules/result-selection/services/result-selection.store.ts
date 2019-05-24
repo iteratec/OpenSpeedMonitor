@@ -9,12 +9,15 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService, URL} from "./result-selection.service";
 
+export enum UiComponent {
+  APPLICATION, PAGE_LOCATION_CONNECTIVITY, MEASURAND
+}
+
 @Injectable()
 export class ResultSelectionStore {
   from: Date;
   to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
-
 
   applications$: BehaviorSubject<SelectableApplication[]> = new BehaviorSubject([]);
   applicationsAndPages$: BehaviorSubject<ApplicationWithPages[]> = new BehaviorSubject([]);
@@ -29,7 +32,6 @@ export class ResultSelectionStore {
   percentages$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
   resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
   oldResult: ResultSelectionCommand;
-  selectedJobGroupsChanged: boolean = false;
   selectedConnectivityChanged: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService){
@@ -43,8 +45,7 @@ export class ResultSelectionStore {
     this.setResultSelectionCommand({...this.resultSelectionCommand, from: selectedTimeFrame[0], to:selectedTimeFrame[1]});
   }
 
-  setSelectedJobGroups(ids: number[]){
-    this.selectedJobGroupsChanged = true;
+  setSelectedApplications(ids: number[]){
     this.setResultSelectionCommand({...this.resultSelectionCommand, jobGroupIds: ids});
   }
 
@@ -69,15 +70,12 @@ export class ResultSelectionStore {
     this._resultSelectionCommand$.next(newState);
   }
 
-  resultSelectionCommandListener(selectedComponent: string){
-    if(selectedComponent ==="APPLICATION"){
-    this._resultSelectionCommand$.subscribe(state => {
-      if (!this.selectedJobGroupsChanged) {
+  registerComponent(component: UiComponent){
+    if(component === UiComponent.APPLICATION) {
+      this._resultSelectionCommand$.subscribe(state => {
         this.loadSelectableApplications(state);
-        }
-      this.selectedJobGroupsChanged = false;
-    });
-    }else if(selectedComponent === "PAGE_LOCATION_CONNECTIVITY"){
+      });
+    } else if(component === UiComponent.PAGE_LOCATION_CONNECTIVITY) {
       this._resultSelectionCommand$.subscribe(state => {
         this.loadSelectableEventsAndPages(state);
         this.loadSelectableLocationsAndBrowsers(state);
@@ -86,7 +84,7 @@ export class ResultSelectionStore {
         }
         this.selectedConnectivityChanged = false;
       });
-    }else if(selectedComponent ==="MEASURAND"){
+    } else if(component === UiComponent.MEASURAND) {
       this._resultSelectionCommand$.subscribe(state => {
         this.loadMeasurands(state);
         this.loadUserTimings(state);

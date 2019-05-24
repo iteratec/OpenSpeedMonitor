@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 import {Observable, ReplaySubject} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {ResultSelectionStore} from "../../services/result-selection.store";
+import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-measurands',
@@ -22,10 +22,9 @@ export class MeasurandsComponent implements OnInit {
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
-  selectedComponent: string = "MEASURAND";
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.resultSelectionCommandListener(this.selectedComponent);
+    this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
 
     this.measurands = [
       this.resultSelectionStore.loadTimes$,

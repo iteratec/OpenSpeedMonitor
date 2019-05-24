@@ -6,7 +6,7 @@ import {Location} from "../../../../models/location.model";
 import {Connectivity} from "../../../../models/connectivity.model";
 import {Page} from "../../../../models/page.model";
 import {Browser} from "../../../../models/browser.model";
-import {ResultSelectionStore} from "../../services/result-selection.store";
+import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
@@ -32,7 +32,6 @@ export class PageLocationConnectivityComponent {
   selectedBrowsers: number[] = [];
   selectedLocations: number[] = [];
   selectedConnectivities: number[] = [];
-  selectedComponent: string = "PAGE_LOCATION_CONNECTIVITY";
 
   @Input() currentChart: string;
   @Input() showMeasuredStepSelection: boolean = true;
@@ -41,7 +40,7 @@ export class PageLocationConnectivityComponent {
   @Input() showOnlyBrowserSelection: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.resultSelectionCommandListener(this.selectedComponent);
+    this.resultSelectionStore.registerComponent(UiComponent.PAGE_LOCATION_CONNECTIVITY);
     this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;
     this.locationsAndBrowsers$ = this.resultSelectionStore.locationsAndBrowsers$;
     this.connectivities$ = this.resultSelectionStore.connectivities$;
@@ -79,7 +78,6 @@ export class PageLocationConnectivityComponent {
         this.selectedEvents = filteredItems.filter(item => this.selectedEvents.includes(item.id)).map(item => item.id);
         this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
         this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
-        debugger
       } else if (children === 'locations') {
         this.selectedLocations = filteredItems.filter(item => this.selectedLocations.includes(item.id)).map(item => item.id);
         this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);

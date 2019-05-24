@@ -1,12 +1,6 @@
-import {
-    Component,
-    ViewEncapsulation,
-  } from '@angular/core';
-
-import { SelectableApplication } from 'src/app/models/application.model';
-import {Observable} from 'rxjs';
-import {ResultSelectionStore} from "../../services/result-selection.store";
-
+import {Component, ViewEncapsulation,} from '@angular/core';
+import {SelectableApplication} from 'src/app/models/application.model';
+import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
 
 @Component({
     selector: 'osm-result-selection-application',
@@ -16,92 +10,106 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
   })
 
 export class ApplicationComponent {
-  applicationMappings$: Observable<SelectableApplication[]>;
   applications: SelectableApplication[];
-  isEmpty = true;
-  selectableTags: string[];
   filteredApplications: SelectableApplication[];
-  selectedTag: string ='';
-  isSelected = false;
   selectedApplications: number[] = [];
-   selectedComponent: string = "APPLICATION";
+  selectableTags: string[];
+  selectedTag: string = '';
+
+  isEmpty = true;
+  isSelected = false;
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-      this.resultSelectionStore.resultSelectionCommandListener(this.selectedComponent);
-      this.applicationMappings$ = this.resultSelectionStore.applications$;
-      this.applicationMappings$.subscribe(applications => {
-        if(applications){
+    this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
+    this.resultSelectionStore.applications$.subscribe(applications => {
+      if(applications) {
         this.updateApplicationsAndTags(applications);
-        }
-      });
+      }
+    });
   }
 
-  filterByTag(tag: string): void{
-    if(this.isSelected === false){
+  filterByTag(tag: string): void {
+    if(!this.isSelected) {
       this.isSelected = true;
       this.selectedTag = tag;
       this.setFilteredApplications(this.selectedTag);
-    }else{
-        if(tag!==this.selectedTag){
-        this.selectedTag = tag;
-        this.setFilteredApplications(this.selectedTag);
-      }else{
-        this.isSelected =false;
-        this.filteredApplications = this.applications;
-      }
+    } else if(tag !== this.selectedTag) {
+      this.selectedTag = tag;
+      this.setFilteredApplications(this.selectedTag);
+    } else {
+      this.isSelected = false;
+      this.filteredApplications = this.applications;
     }
   }
 
-  updateApplicationsAndTags(applications: SelectableApplication[]): void{
-    if(applications!=null && applications.length>0){
-      this.isEmpty=false;
+  updateApplicationsAndTags(applications: SelectableApplication[]): void {
+    if(applications != null && applications.length > 0) {
+      this.isEmpty = false;
       applications.sort((a, b) => {
         return a.name.localeCompare(b.name);
       });
       this.applications = applications;
-
       this.updateTags(this.applications);
 
-      if(this.isSelected === true && (this.selectableTags.indexOf(this.selectedTag)>-1)){
+      if (this.isSelected && (this.selectableTags.indexOf(this.selectedTag) > -1)) {
         this.setFilteredApplications(this.selectedTag);
-      }else{
-        this.isSelected = false;
-        this.filteredApplications = applications;
-        this.selectedApplications = this.selectedApplications.filter(item => applications.map(item => item.id).includes(item));
+      } else {
+        this.removeSelection(applications);
       }
-    }else{
-      this.isEmpty=true;
+    } else {
+      this.isEmpty = true;
       this.updateTags(applications);
     }
   }
 
-  private updateTags(applications: SelectableApplication[]){
+  private updateTags(applications: SelectableApplication[]) {
     if(applications){
-      this.selectableTags = applications.map(value => value.tags).reduce((a,b) =>
+      this.selectableTags = applications.map(value => value.tags).reduce((a, b) =>
          a.concat(b), []).filter((v, i, a) => 
-         a.indexOf(v) ===i);
-    }else{
+         a.indexOf(v) === i);
+    } else {
       this.selectableTags = [];
     }
   }
 
-  private setFilteredApplications(tag: string): void{
-    let filteredJobGroups = [];
-    if(this.applications){
+  private setFilteredApplications(tag: string): void {
+    let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
+    let numberOfSelectedApplications = 0;
+
+    if(this.applications) {
+      let filteredApplications = [];
       this.applications.forEach(element => {
-        if(element.tags.indexOf(tag) > -1){
-          filteredJobGroups.push(element);
+        if(element.tags.indexOf(tag) > -1) {
+          filteredApplications.push(element);
         }
       });
-      this.selectedApplications = this.selectedApplications.filter(item => filteredJobGroups.map(item => item.id).includes(item));
-      this.filteredApplications = filteredJobGroups;
+
+      this.selectedApplications = this.selectedApplications.filter(item =>
+        filteredApplications.map(item => item.id).includes(item)
+      );
+      this.filteredApplications = filteredApplications;
     }
-    this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
+
+    if(this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
+      this.resultSelectionStore.setSelectedApplications(this.selectedApplications);
+    }
   }
 
-  onSelectionChange(){
-    if(this.selectedApplications){
-      this.resultSelectionStore.setSelectedJobGroups(this.selectedApplications);
+  private removeSelection(applications: SelectableApplication[]) {
+    this.isSelected = false;
+    this.filteredApplications = applications;
+    let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
+    this.selectedApplications = this.selectedApplications.filter(item =>
+      applications.map(item => item.id).includes(item)
+    );
+    if(this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
+      this.resultSelectionStore.setSelectedApplications(this.selectedApplications);
+    }
+  }
+
+  onSelectionChange() {
+    if(this.selectedApplications) {
+      this.resultSelectionStore.setSelectedApplications(this.selectedApplications);
     }
   }
 }
