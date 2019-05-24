@@ -4,10 +4,8 @@
 
 git config remote.origin.fetch +refs/heads/*:refs/remotes/origin/*
 git fetch --all
-git add build.gradle
-git commit -m "this is a test for the deployment key"
-git push
 git checkout develop
+git remote -v
 git status
 git merge feature/travisDeployKey
 git commit -m "merge feature branch"
