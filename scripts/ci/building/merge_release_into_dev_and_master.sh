@@ -10,4 +10,5 @@ git merge release
 git push https://iteraspeed:$GITHUB_USER_TOKEN@github.com/iteratec/OpenSpeedMonitor.git
 git checkout master
 git merge release
+git remote set-url origin git@github.com:iteratec/OpenSpeedMonitor.git
 git push https://iteraspeed:$GITHUB_USER_TOKEN@github.com/iteratec/OpenSpeedMonitor.git
