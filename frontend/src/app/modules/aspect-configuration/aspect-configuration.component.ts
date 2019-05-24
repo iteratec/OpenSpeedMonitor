@@ -60,17 +60,17 @@ export class AspectConfigurationComponent implements OnInit {
   private prepareExtensionOfAspects() {
     this.performanceAspects$ = combineLatest(this.applicationService.performanceAspectsForPage$, this.aspectConfService.browserInfos$).pipe(
       map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
-        const extendedAspects = this.extendAspects(aspects, browserInfos);
+        const extendedAspects: ExtendedPerformanceAspect[] = this.extendAspects(aspects, browserInfos);
         return extendedAspects;
       })
     )
   }
 
-  private extendAspects(aspects: PerformanceAspect[], browserInfos: BrowserInfoDto[]) {
+  extendAspects(aspects: PerformanceAspect[], browserInfos: BrowserInfoDto[]): ExtendedPerformanceAspect[] {
     const extendedAspects: ExtendedPerformanceAspect[] = [];
     if (aspects.length > 0 && browserInfos.length > 0) {
       aspects.forEach((aspect: PerformanceAspect) => {
-        const additionalInfos = browserInfos.filter((browserInfo: BrowserInfoDto) => browserInfo.browserId == aspect.browserId)
+        const additionalInfos = browserInfos.filter((browserInfo: BrowserInfoDto) => browserInfo.browserId == aspect.browserId);
         let extension: BrowserInfoDto;
         if (additionalInfos.length == 1) {
           extension = additionalInfos[0];

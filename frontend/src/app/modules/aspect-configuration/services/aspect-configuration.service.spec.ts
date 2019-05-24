@@ -6,7 +6,7 @@ import {Application} from "../../../models/application.model";
 import {HttpRequest} from "@angular/common/http";
 import {BrowserInfoDto} from "../../../models/browser.model";
 
-fdescribe('AspectConfigurationService', () => {
+describe('AspectConfigurationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
