@@ -5,8 +5,8 @@
   </p>
   <ul class="clickable-list">
     <li *ngFor="let aspect of aspectsToShow$ | async">
-      //TODO: Should lead to edit view for clicked metric
-      <a [routerLink]="['/applicationDashboard']">
+      <a
+        [routerLink]="['/aspectConfiguration/edit', (application$ | async)?.id || '', (page$ | async)?.id || '', aspect.browserId, aspectType.name]">
         <div class="aspect-links">
           <i class="fas fa-3x fa-{{aspect.deviceType.icon}} aspect-device-type"></i>
           <span class="aspect-row-top">
