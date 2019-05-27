@@ -1,0 +1,10 @@
+<h1>{{ 'frontend.de.iteratec.osm.performance-aspects' | translate }}: {{(application$ | async)?.name}}
+  - {{(page$ | async)?.name}}</h1>
+<a [routerLink]="['/aspectConfiguration', (application$ | async)?.id || '', (page$ | async)?.id || '']">
+  <i class="fas fa-arrow-left"></i>
+  {{ 'frontend.back.label' | translate }}
+  {{ 'frontend.de.iteratec.osm.performance-aspect.configuration.link-title' | translate }}
+</a>
+<osm-aspect-metrics [aspects]="performanceAspects$ | async"
+                    [aspectType]="aspectType"
+                    class="aspect-inspect"></osm-aspect-metrics>
