@@ -1,9 +1,13 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {ResultSelectionPageLocationConnectivityComponent} from './result-selection-page-location-connectivity.component';
+import {
+  ActiveTab,
+  ResultSelectionPageLocationConnectivityComponent
+} from './result-selection-page-location-connectivity.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
+import {SelectionDataComponent} from "./selection-data/selection-data.component";
 
 describe('ResultSelectionPageLocationConnectivityComponent', () => {
   let component: ResultSelectionPageLocationConnectivityComponent;
@@ -12,7 +16,7 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionPageLocationConnectivityComponent],
+      declarations: [ResultSelectionPageLocationConnectivityComponent, SelectionDataComponent],
       imports: [SharedMocksModule],
       providers: [ResultSelectionService]
     })
@@ -23,70 +27,6 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
     resultSelectionService = TestBed.get(ResultSelectionService);
     fixture = TestBed.createComponent(ResultSelectionPageLocationConnectivityComponent);
     component = fixture.componentInstance;
-
-    resultSelectionService.eventsAndPages$.next([
-      {
-        id: 100,
-        name: "Website1_HP_entry",
-        parent: {
-          id: 1,
-          name: "HP_entry"
-        }
-      },
-      {
-        id: 101,
-        name: "Website1_ADS",
-        parent: {
-          id: 2,
-          name: "ADS"
-        }
-      },
-      {
-        id: 102,
-        name: "Website2_HP_entry",
-        parent: {
-          id: 1,
-          name: "HP_entry"
-        }
-      }
-    ]);
-    resultSelectionService.locationsAndBrowsers$.next([
-      {
-        id: 100,
-        name: "prod-location-1",
-        parent: {
-          id: 1,
-          name: "Chrome"
-        }
-      },
-      {
-        id: 101,
-        name: "prod-location-2",
-        parent: {
-          id: 1,
-          name: "Chrome"
-        }
-      },
-      {
-        id: 102,
-        name: "prod-location-3",
-        parent: {
-          id: 2,
-          name: "Firefox"
-        }
-      }
-    ]);
-    resultSelectionService.connectivities$.next([
-      {
-        id: 1,
-        name: "DSL 6.000",
-      },
-      {
-        id: 2,
-        name: "UMTS",
-      }
-    ]);
-
     fixture.detectChanges();
   });
 
@@ -94,54 +34,34 @@ describe('ResultSelectionPageLocationConnectivityComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should show selectable pages and events', () => {
-    fixture.debugElement.query(By.css('#pageAndEventTab')).nativeElement.click();
-    fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#result-selection-page-selection option')).length).toBe(2);
-    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items.length).toBe(3);
+  it('should have correct selection data components', () => {
+    expect(fixture.debugElement.queryAll(By.directive(SelectionDataComponent)).length).toBe(3);
+    expect(fixture.debugElement.queryAll(By.directive(SelectionDataComponent)).map(debugElement => debugElement.attributes.parentType)).toEqual(["page", "browser", "connectivity"]);
   });
 
-  it('should show selectable browser and locations', () => {
-    fixture.debugElement.query(By.css('#browserAndLocationTab')).nativeElement.click();
+  it('should correctly switch between tabs', () => {
+    expect(fixture.debugElement.query(By.css('#pageAndEventTab')).classes.active).toBe(true);
+    expect(fixture.debugElement.query(By.css('#browserAndLocationTab')).classes.active).toBe(false);
+    expect(fixture.debugElement.query(By.css('#connectivityTab')).classes.active).toBe(false);
+    expect(fixture.debugElement.queryAll(By.css('osm-selection-data[hidden]')).length).toBe(2);
+    expect(fixture.debugElement.queryAll(By.css('osm-selection-data:not([hidden])')).length).toBe(1);
+    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe("page");
+    component.showPageSelection = false;
+    component.activeTab = ActiveTab.BrowserAndLocation;
     fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#result-selection-browser-selection option')).length).toBe(2);
-    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.length).toBe(3);
+    expect(fixture.debugElement.query(By.css('#pageAndEventTab'))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css('#browserAndLocationTab')).classes.active).toBe(true);
+    expect(fixture.debugElement.query(By.css('#connectivityTab')).classes.active).toBe(false);
+    expect(fixture.debugElement.queryAll(By.css('osm-selection-data[hidden]')).length).toBe(1);
+    expect(fixture.debugElement.queryAll(By.css('osm-selection-data:not([hidden])')).length).toBe(1);
+    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe("browser");
+    component.activeTab = ActiveTab.Connectivity;
+    fixture.detectChanges();
+    expect(fixture.debugElement.query(By.css('#pageAndEventTab'))).toBeFalsy();
+    expect(fixture.debugElement.query(By.css('#browserAndLocationTab')).classes.active).toBe(false);
+    expect(fixture.debugElement.query(By.css('#connectivityTab')).classes.active).toBe(true);
+    expect(fixture.debugElement.queryAll(By.css('osm-selection-data[hidden]')).length).toBe(1);
+    expect(fixture.debugElement.queryAll(By.css('osm-selection-data:not([hidden])')).length).toBe(1);
+    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe("connectivity");
   });
-
-  it('should show selectable connectivities', () => {
-    fixture.debugElement.query(By.css('#connectivityTab')).nativeElement.click();
-    fixture.detectChanges();
-    expect(fixture.debugElement.queryAll(By.css('#result-selection-connectivity-selection option')).length).toBe(2);
-  });
-
-  it('should correctly show available items according to selections', () => {
-    fixture.debugElement.query(By.css('#pageAndEventTab')).nativeElement.click();
-    fixture.detectChanges();
-    let selectElement = fixture.debugElement.query(By.css('#result-selection-page-selection')).nativeElement;
-    selectElement.value = selectElement.options[0].value;
-    selectElement.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-    expect(component.selectedPages).toEqual([2]);
-    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items.length).toBe(1);
-    expect(fixture.debugElement.query(By.css('#result-selection-event-selection')).componentInstance.items[0].id).toBe(101);
-
-    fixture.debugElement.query(By.css('#browserAndLocationTab')).nativeElement.click();
-    fixture.detectChanges();
-    selectElement = fixture.debugElement.query(By.css('#result-selection-browser-selection')).nativeElement;
-    selectElement.value = selectElement.options[0].value;
-    selectElement.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-    expect(component.selectedBrowsers).toEqual([1]);
-    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.length).toBe(2);
-    expect(fixture.debugElement.query(By.css('#result-selection-location-selection')).componentInstance.items.map(item => item.id)).toEqual([100, 101]);
-
-    fixture.debugElement.query(By.css('#connectivityTab')).nativeElement.click();
-    fixture.detectChanges();
-    selectElement = fixture.debugElement.query(By.css('#result-selection-connectivity-selection')).nativeElement;
-    selectElement.value = selectElement.options[0].value;
-    selectElement.dispatchEvent(new Event('change'));
-    fixture.detectChanges();
-    expect(component.selectedConnectivities).toEqual([1]);
-  });
-
 });
