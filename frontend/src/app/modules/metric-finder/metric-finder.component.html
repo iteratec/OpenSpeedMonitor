@@ -1,13 +1,6 @@
 
-<osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
+<osm-line-chart [results]="testResults$ | async" [metric]="selectedMetric" (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
 
-<osm-comparable-filmstrips [results]="selected" [highlightedMetric]="metric"></osm-comparable-filmstrips>
+<osm-comparable-filmstrips [results]="selectedResults" [highlightedMetric]="selectedMetric"></osm-comparable-filmstrips>
 
-Metric:
-<select [(ngModel)]="metric">
-  <option [value]="'SPEED_INDEX'">Speed Index</option>
-  <option [value]="'DOC_COMPLETE_TIME'">Document Complete</option>
-  <option [value]="'START_RENDER'">Start Render</option>
-  <option [value]="'_HERO_Image'">Hero Image</option>
-  <option [value]="'VISUALLY_COMPLETE'">Visually Complete</option>
-</select>
+<osm-metric-selection [results]="selectedResults" [(selectedMetric)]="selectedMetric"></osm-metric-selection>

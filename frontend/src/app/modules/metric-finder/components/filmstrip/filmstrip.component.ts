@@ -6,6 +6,7 @@ import {filter, map} from 'rxjs/operators';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 import {FilmstripView, Timing} from '../../models/filmstrip-view.model';
 import {TranslateService} from '@ngx-translate/core';
+import {MetricFinderService} from '../../services/metric-finder.service';
 
 
 @Component({
@@ -33,7 +34,7 @@ export class FilmstripComponent implements OnChanges {
 
   constructor(
     private filmstripService: FilmstripService,
-    private translationService: TranslateService
+    private metricFinderService: MetricFinderService
   ) {
     this.filmStrip$ = combineLatest(
       this.filmstripService.filmStripData$,
@@ -57,21 +58,7 @@ export class FilmstripComponent implements OnChanges {
   }
 
   formatTiming(timing: Timing): string {
-    return this.getMetricName(timing.metric) + ': ' + this.formatTime(timing.time, 3);
-  }
-
-  getMetricName(metric: string): string {
-    const prefixes = {
-      _HERO_: 'Hero ',
-      _UTME_: 'User Timing ',
-      _UTMK_: 'User Timing Measure '
-    };
-    const matchingPrefix = Object.keys(prefixes).find(prefix => metric.startsWith(prefix));
-    if (matchingPrefix) {
-      return prefixes[matchingPrefix] + metric.substr(matchingPrefix.length);
-    } else {
-      return this.translationService.instant('frontend.de.iteratec.isr.measurand.' + metric);
-    }
+    return this.metricFinderService.getMetricName(timing.metric) + ': ' + this.formatTime(timing.time, 3);
   }
 
   positionTimings(event: MouseEvent) {
