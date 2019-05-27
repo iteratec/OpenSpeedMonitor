@@ -1,0 +1,23 @@
+@import "../../../../../styles/colors";
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  background: white;
+  padding: 20px;
+
+  .tag {
+    background: $color-background;
+    color: $color-text-light;
+    border: 0;
+    line-height: 2em;
+    padding: 0 0.75em;
+    margin: 0 .5rem 0.5rem 0;
+    border-radius: 4px;
+
+    &.selected {
+      color: white;
+      background: $color-primary;
+    }
+  }
+}
