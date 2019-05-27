@@ -28,4 +28,18 @@ describe('MetricSelectionComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should have a correct intersect method', () => {
+    const lists = [
+      ['a', 'b', 'c', 'd', 'e',           'x'     ],
+      [     'b', 'c', 'd', 'e', 'f', 'g'          ],
+      ['a',      'c', 'd', 'e', 'f', 'g', 'x'     ],
+      [          'c', 'd'                         ],
+      [          'c', 'd',                     'y']
+    ];
+    const expected = ['c', 'd'];
+    // @ts-ignore
+    expect(component.intersect(lists)).toEqual(expected);
+  });
+
 });

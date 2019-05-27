@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {TestResult} from '../../models/test-result.model';
 import {MetricFinderService} from '../../services/metric-finder.service';
 
@@ -45,9 +45,25 @@ export class MetricSelectionComponent {
   }
 
   private findCommonMetrics(results: TestResult[]): SelectableMetric[] {
-    return ['SPEED_INDEX', '_HERO_IMAGE', 'START_RENDER'].map(id => ({
-      id, name: this.metricFinderService.getMetricName(id)
+    const metricIdLists = results.map(result => Object.keys(result.timings));
+    console.log(metricIdLists);
+    return this.intersect(metricIdLists).map(metricId => ({
+      id: metricId,
+      name: this.metricFinderService.getMetricName(metricId)
     }));
   }
+
+  private intersect(metricLists: string[][]): string[] {
+    if (!metricLists || !metricLists.length) {
+      return [];
+    }
+    const otherLists = metricLists.slice(1);
+    return metricLists[0].reduce((intersection, metric) => {
+      if (!intersection.includes(metric) && otherLists.every(metrics => metrics.includes(metric))) {
+        intersection.push(metric);
+      }
+      return intersection;
+    }, []);
+}
 
 }
