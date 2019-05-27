@@ -8,7 +8,7 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
-import {TestResult} from '../../models/test-result';
+import {TestResult} from '../../models/test-result.model';
 import {mouse, select, selectAll} from 'd3-selection';
 import {line} from 'd3-shape';
 import {ScaleLinear, scaleLinear, scaleTime, ScaleTime} from 'd3-scale';
@@ -248,6 +248,9 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     const timestamp = date.getTime();
     const bisectResults = bisector((testResult: TestResult) => testResult.date).left;
     const resultIndex = bisectResults(this.results, date);
+    if (!this.results[resultIndex]) {
+      return null;
+    }
     if (resultIndex > 0 &&
       timestamp - this.results[resultIndex - 1].date.getTime() < this.results[resultIndex].date.getTime() - timestamp) {
       return this.results[resultIndex - 1];

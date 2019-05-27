@@ -24,16 +24,20 @@ export class TestInfo implements TestInfoDTO {
   }
 }
 
+export declare interface TimingsMap {
+  [metric: string]: number;
+}
+
 export interface TestResultDTO {
   date: string | Date;
   testInfo: TestInfoDTO;
-  timings: {[metric: string]: number};
+  timings: TimingsMap;
 }
 
 export class TestResult implements  TestResultDTO {
   public date: Date;
   public testInfo: TestInfo;
-  public timings: {[metric: string]: number} = {};
+  public timings: TimingsMap = {};
   public readonly id;
 
   constructor(dto: TestResultDTO) {

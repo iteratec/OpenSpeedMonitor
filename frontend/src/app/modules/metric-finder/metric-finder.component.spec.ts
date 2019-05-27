@@ -5,9 +5,10 @@ import {LineChartComponent} from './components/line-chart/line-chart.component';
 import {MetricFinderService} from './services/metric-finder.service';
 import {EMPTY} from 'rxjs';
 import {FormsModule} from '@angular/forms';
-import {FilmstripComponent} from './components/filmstrip-component/filmstrip.component';
+import {FilmstripComponent} from './components/filmstrip/filmstrip.component';
 import {FilmstripService} from './services/filmstrip.service';
 import {FilmstripServiceMock} from './services/filmstrip.service.mock';
+import {ComparableFilmstripsComponent} from './components/comparable-filmstrips/comparable-filmstrips.component';
 
 describe('MetricFinderComponent', () => {
   let component: MetricFinderComponent;
@@ -15,7 +16,7 @@ describe('MetricFinderComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MetricFinderComponent, FilmstripComponent, LineChartComponent],
+      declarations: [MetricFinderComponent, FilmstripComponent, LineChartComponent, ComparableFilmstripsComponent],
       imports: [FormsModule],
       providers: [{
           provide: MetricFinderService,

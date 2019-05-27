@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { MetricFinderService } from './metric-finder.service';
 import {HttpClientTestingModule, HttpTestingController, TestRequest} from '@angular/common/http/testing';
 import {skip} from 'rxjs/operators';
-import {TestInfo, TestResult, TestResultDTO} from '../models/test-result';
+import {TestInfo, TestResult, TestResultDTO} from '../models/test-result.model';
 
 describe('MetricFinderService', () => {
   let httpMock: HttpTestingController;
