@@ -1,5 +1,7 @@
-<h2>{{metricsForPage?.pageName}}
-  <a [routerLink]="['/aspectConfiguration', application.id, metricsForPage?.pageId]"><i class="fas fa-cog"></i></a>
+<h2>
+  {{metricsForPage?.pageName}}
+  <a [routerLink]="['/aspectConfiguration', application.id, metricsForPage?.pageId]"><i
+    class="fas fa-cog icon-right"></i></a>
 </h2>
 <div class="page-metrics">
   <osm-csi-value-medium [csiValue]="pageCsi$ | async" [csiDate]="pageCsiDate$ | async"
