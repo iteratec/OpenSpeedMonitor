@@ -2,9 +2,15 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Application, ApplicationDTO} from "../../../models/application.model";
 import {catchError, map} from "rxjs/operators";
-import {BehaviorSubject, EMPTY} from "rxjs";
+import {BehaviorSubject, combineLatest, EMPTY} from "rxjs";
 import {Page} from "../../../models/page.model";
 import {BrowserInfoDto} from "../../../models/browser.model";
+import {ApplicationService} from "../../../services/application.service";
+import {
+  ExtendedPerformanceAspect,
+  PerformanceAspect,
+  PerformanceAspectType
+} from "../../../models/perfomance-aspect.model";
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +18,14 @@ import {BrowserInfoDto} from "../../../models/browser.model";
 export class AspectConfigurationService {
 
   browserInfos$ = new BehaviorSubject<BrowserInfoDto[]>([]);
+  performanceAspects$ = new BehaviorSubject<ExtendedPerformanceAspect[]>([]);
+  uniqueAspectTypes$ = new BehaviorSubject<PerformanceAspectType[]>([]);
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private applicationService: ApplicationService) {
   }
 
-  loadApplication(applicationId: string) {
-    return this.http.get<ApplicationDTO>(
+  loadApplication(applicationId: string): void {
+    this.http.get<ApplicationDTO>(
       "/applicationDashboard/rest/getApplication",
       {params: {applicationId: applicationId}}).pipe(
       catchError((error) => {
@@ -25,18 +33,22 @@ export class AspectConfigurationService {
         return EMPTY;
       }),
       map(dto => new Application(dto))
-    )
+    ).subscribe((app: Application) => {
+      this.applicationService.selectedApplication$.next(app);
+    })
   }
 
-  loadPage(pageId: string) {
-    return this.http.get<Page>(
+  loadPage(pageId: string): void {
+    this.http.get<Page>(
       '/aspectConfiguration/rest/getPage',
       {params: {pageId: pageId}}).pipe(
       catchError((error) => {
         console.error(error);
         return EMPTY;
       })
-    )
+    ).subscribe((page: Page) => {
+      this.applicationService.selectedPage$.next(page);
+    })
   }
 
   loadBrowserInfos() {
@@ -47,5 +59,52 @@ export class AspectConfigurationService {
         return EMPTY;
       })
     ).subscribe(nextBrowserInfo => this.browserInfos$.next(nextBrowserInfo))
+  }
+
+  prepareExtensionOfAspects() {
+    combineLatest(this.applicationService.performanceAspectsForPage$, this.browserInfos$).pipe(
+      map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
+        const extendedAspects: ExtendedPerformanceAspect[] = this.extendAspects(aspects, browserInfos);
+        return extendedAspects;
+      })
+    ).subscribe((nextExtendedAspects: ExtendedPerformanceAspect[]) => this.performanceAspects$.next(nextExtendedAspects))
+  }
+
+  extendAspects(aspects: PerformanceAspect[], browserInfos: BrowserInfoDto[]): ExtendedPerformanceAspect[] {
+    const extendedAspects: ExtendedPerformanceAspect[] = [];
+    if (aspects.length > 0 && browserInfos.length > 0) {
+      aspects.forEach((aspect: PerformanceAspect) => {
+        const additionalInfos = browserInfos.filter((browserInfo: BrowserInfoDto) => browserInfo.browserId == aspect.browserId);
+        let extension: BrowserInfoDto;
+        if (additionalInfos.length == 1) {
+          extension = additionalInfos[0];
+        } else {
+          extension = {
+            browserId: aspect.browserId,
+            browserName: 'Unknown',
+            operatingSystem: 'Unknown',
+            deviceType: {name: 'Unknown', icon: 'question'}
+          }
+        }
+        extendedAspects.push({...aspect, ...extension})
+      });
+    }
+    return extendedAspects;
+  }
+
+  initAspectTypes() {
+    this.performanceAspects$.pipe(
+      map((extendedAspects: ExtendedPerformanceAspect[]) => {
+        const uniqueAspectTypes = [];
+        const lookupMap = new Map();
+        for (const aspect of extendedAspects) {
+          if (!lookupMap.has(aspect.performanceAspectType.name)) {
+            lookupMap.set(aspect.performanceAspectType.name, true);
+            uniqueAspectTypes.push(aspect.performanceAspectType)
+          }
+        }
+        return uniqueAspectTypes
+      })
+    ).subscribe((uniqueAspectTypes: PerformanceAspectType[]) => this.uniqueAspectTypes$.next(uniqueAspectTypes))
   }
 }
