@@ -10,6 +10,7 @@ import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {MeasurandsComponent} from "./components/measurands/measurands.component";
 import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 import {ResultSelectionPageLocationConnectivityComponent} from "./components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component";
+import {SelectionDataComponent} from "./components/result-selection-page-location-connectivity/selection-data/selection-data.component";
 
 describe('ResultSelectionComponent', () => {
   let component: ResultSelectionComponent;
@@ -22,6 +23,7 @@ describe('ResultSelectionComponent', () => {
         ResultSelectionTimeFrameComponent,
         ResultSelectionApplicationComponent,
         ResultSelectionPageLocationConnectivityComponent,
+        SelectionDataComponent,
         MeasurandsComponent,
         MeasurandSelectComponent
       ],
