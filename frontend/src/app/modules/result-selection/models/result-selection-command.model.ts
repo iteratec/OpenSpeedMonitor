@@ -38,3 +38,12 @@ export enum Caller {
   CsiAggregation,
   EventResult
 }
+
+export enum ResultSelectionCommandParameter {
+  APPLICATIONS = "jobGroupIds",
+  PAGES = "pageIds",
+  MEASURED_EVENTS = "measuredEventIds",
+  BROWSERS = "browserIds",
+  LOCATIONS = "locationIds",
+  CONNECTIVITIES = "selectedConnectivities"
+}

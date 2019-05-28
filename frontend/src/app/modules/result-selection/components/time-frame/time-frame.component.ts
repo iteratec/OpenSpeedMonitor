@@ -54,7 +54,7 @@ export class TimeFrameComponent implements OnInit {
 
     this.selectedDates = [defaultFrom, defaultTo];
 
-    this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
 
     this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[4];
   }
@@ -87,7 +87,7 @@ export class TimeFrameComponent implements OnInit {
       comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
-    this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
   }
 
   updateFromDate(calendar: CalendarType): void {
@@ -104,7 +104,7 @@ export class TimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
-    this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
 
   }
 
@@ -122,7 +122,7 @@ export class TimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeTo.selecteds;
     }
-    this.resultSelectionStore.setSelectedTimeFrame(this.selectedDates);
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
 
   }
 

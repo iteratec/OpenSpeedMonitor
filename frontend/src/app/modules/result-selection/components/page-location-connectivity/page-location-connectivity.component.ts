@@ -7,6 +7,7 @@ import {Connectivity} from "../../../../models/connectivity.model";
 import {Page} from "../../../../models/page.model";
 import {Browser} from "../../../../models/browser.model";
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
+import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
@@ -76,20 +77,24 @@ export class PageLocationConnectivityComponent {
       let filteredItems = items.filter(item => selectedParents.includes(item.parent.id));
       if (children === 'events') {
         this.selectedEvents = filteredItems.filter(item => this.selectedEvents.includes(item.id)).map(item => item.id);
-        this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedPages, ResultSelectionCommandParameter.PAGES);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedEvents, ResultSelectionCommandParameter.MEASURED_EVENTS);
         this.measuredEvents$ = of(this.sortAlphabetically(filteredItems));
       } else if (children === 'locations') {
         this.selectedLocations = filteredItems.filter(item => this.selectedLocations.includes(item.id)).map(item => item.id);
-        this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedBrowsers, ResultSelectionCommandParameter.BROWSERS);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedLocations, ResultSelectionCommandParameter.LOCATIONS);
         this.locations$ = of(this.sortAlphabetically(filteredItems));
       }
     } else {
       if (children === 'events') {
         this.measuredEvents$ = of(this.sortAlphabetically(items));
-        this.resultSelectionStore.setSelectedPagesAndMeasurands(this.selectedPages, this.selectedEvents);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedPages, ResultSelectionCommandParameter.PAGES);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedEvents, ResultSelectionCommandParameter.MEASURED_EVENTS);
       } else if (children === 'locations') {
         this.locations$ = of(this.sortAlphabetically(items));
-        this.resultSelectionStore.setSelectedBrowserAndLocation(this.selectedBrowsers, this.selectedLocations);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedBrowsers, ResultSelectionCommandParameter.BROWSERS);
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedLocations, ResultSelectionCommandParameter.LOCATIONS);
       }
     }
   }

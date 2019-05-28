@@ -1,6 +1,7 @@
 import {Component, ViewEncapsulation,} from '@angular/core';
 import {SelectableApplication} from 'src/app/models/application.model';
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
+import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 
 @Component({
     selector: 'osm-result-selection-application',
@@ -91,7 +92,7 @@ export class ApplicationComponent {
     }
 
     if(this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
-      this.resultSelectionStore.setSelectedApplications(this.selectedApplications);
+      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
     }
   }
 
@@ -103,13 +104,13 @@ export class ApplicationComponent {
       applications.map(item => item.id).includes(item)
     );
     if(this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
-      this.resultSelectionStore.setSelectedApplications(this.selectedApplications);
+      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
     }
   }
 
   onSelectionChange() {
     if(this.selectedApplications) {
-      this.resultSelectionStore.setSelectedApplications(this.selectedApplications);
+      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
     }
   }
 }
