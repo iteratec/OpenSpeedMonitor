@@ -1,6 +1,6 @@
 <div class="tag-list">
   <button *ngFor="let metric of availableMetrics"
-          type="button" class="tag" [class.selected]="metric.id == selectedMetric"
+          type="button" class="btn btn-tag" [class.active]="metric.id == selectedMetric"
           (click)="selectedMetric = metric.id">
     {{ metric.name }}
   </button>
