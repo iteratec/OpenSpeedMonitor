@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Application, ApplicationDTO} from "../../../models/application.model";
 import {catchError, map} from "rxjs/operators";
 import {BehaviorSubject, combineLatest, EMPTY} from "rxjs";
 import {Page} from "../../../models/page.model";
@@ -25,17 +24,7 @@ export class AspectConfigurationService {
   }
 
   loadApplication(applicationId: string): void {
-    this.http.get<ApplicationDTO>(
-      "/applicationDashboard/rest/getApplication",
-      {params: {applicationId: applicationId}}).pipe(
-      catchError((error) => {
-        console.error(error);
-        return EMPTY;
-      }),
-      map(dto => new Application(dto))
-    ).subscribe((app: Application) => {
-      this.applicationService.selectedApplication$.next(app);
-    })
+    this.applicationService.setSelectedApplication(applicationId)
   }
 
   loadPage(pageId: string): void {

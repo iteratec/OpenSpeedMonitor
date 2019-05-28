@@ -47,7 +47,6 @@ export class ApplicationDashboardComponent implements OnDestroy {
     combineLatest(this.route.paramMap, this.applications$)
       .pipe(takeUntil(this.destroyed$))
       .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
-    this.applicationService.loadApplications();
     this.failingJobStatistic$ = this.applicationService.failingJobStatistics$;
   }
 

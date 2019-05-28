@@ -45,6 +45,7 @@ export class ApplicationService {
   selectedApplication$ = new ReplaySubject<Application>(1);
 
   constructor(private http: HttpClient) {
+    this.loadApplications();
     this.getPerfAspectParams()
       .pipe(
         switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams)),
@@ -83,6 +84,15 @@ export class ApplicationService {
         }
       )
     ).subscribe(next => this.failingJobs$.next(next));
+  }
+
+  setSelectedApplication(applicationId) {
+    const app: Application = this.applications$.getValue().data.find((app: Application) => app.id == applicationId)
+    if (app) {
+      this.selectedApplication$.next(app)
+    } else {
+      console.error(`No Application exists for id '${applicationId}'`);
+    }
   }
 
   private reduceFailingJobs(failingJobs) {
