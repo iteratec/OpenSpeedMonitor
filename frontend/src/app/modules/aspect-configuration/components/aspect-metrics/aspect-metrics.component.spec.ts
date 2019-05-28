@@ -32,7 +32,7 @@ describe('AspectMetricsComponent', () => {
     fixture = TestBed.createComponent(AspectMetricsComponent);
     component = fixture.componentInstance;
     component.aspects = [];
-    component.aspectType = {name: '', icon: ''};
+    component.aspectType = {name: 'aspect-type', icon: 'aspect-type-icon'};
     fixture.detectChanges();
   });
 

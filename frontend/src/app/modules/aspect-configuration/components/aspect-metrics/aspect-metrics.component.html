@@ -1,7 +1,7 @@
 <div class="card">
   <p class="performance-aspect-type">
-    {{"frontend.de.iteratec.osm.performance-aspect." + aspectType.name + ".user-centric-question" | translate}}
-    <i class="fas fa-{{aspectType.icon}}"></i>
+    {{"frontend.de.iteratec.osm.performance-aspect." + aspectType?.name + ".user-centric-question" | translate}}
+    <i class="fas fa-{{aspectType?.icon}}"></i>
   </p>
   <ul class="clickable-list">
     <li *ngFor="let aspect of aspectsToShow$ | async">

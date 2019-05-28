@@ -11,7 +11,7 @@ import {Application} from "../../../../models/application.model";
 import {Page} from "../../../../models/page.model";
 import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
 
-fdescribe('EditAspectMetricsComponent', () => {
+describe('EditAspectMetricsComponent', () => {
   let component: EditAspectMetricsComponent;
   let fixture: ComponentFixture<EditAspectMetricsComponent>;
 
