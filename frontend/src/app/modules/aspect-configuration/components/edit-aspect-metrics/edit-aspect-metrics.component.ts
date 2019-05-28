@@ -26,7 +26,6 @@ export class EditAspectMetricsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.aspectConfService.loadBrowserInfos();
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.aspectConfService.loadApplication(params.get('applicationId'));
       this.aspectConfService.loadPage(params.get('pageId'));

@@ -21,6 +21,7 @@ export class AspectConfigurationService {
   uniqueAspectTypes$ = new BehaviorSubject<PerformanceAspectType[]>([]);
 
   constructor(private http: HttpClient, private applicationService: ApplicationService) {
+    this.loadBrowserInfos();
   }
 
   loadApplication(applicationId: string): void {
