@@ -33,7 +33,7 @@ before_install:
     openssl aes-256-cbc
     -K $encrypted_0e6b9eee7eaa_key
     -iv $encrypted_0e6b9eee7eaa_iv
-    -in /scripts/ci/github_deploy_key.enc
+    -in scripts/ci/github_deploy_key.enc
     -out github_deploy_key -d
   - chmod 600 github_deploy_key
   - eval $(ssh-agent -s)
