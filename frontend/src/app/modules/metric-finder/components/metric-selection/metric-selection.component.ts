@@ -5,6 +5,7 @@ import {MetricFinderService} from '../../services/metric-finder.service';
 interface SelectableMetric {
   id: string;
   name: string;
+  isUserTiming: boolean;
 }
 
 @Component({
@@ -47,10 +48,13 @@ export class MetricSelectionComponent {
   private findCommonMetrics(results: TestResult[]): SelectableMetric[] {
     const metricIdLists = results.map(result => Object.keys(result.timings));
     console.log(metricIdLists);
-    return this.intersect(metricIdLists).map(metricId => ({
-      id: metricId,
-      name: this.metricFinderService.getMetricName(metricId)
-    }));
+    return this.intersect(metricIdLists)
+      .map(metricId => ({
+        id: metricId,
+        name: this.metricFinderService.getMetricName(metricId),
+        isUserTiming: metricId.startsWith('_')
+      }))
+      .sort((a, b) => this.compareMetrics(a, b));
   }
 
   private intersect(metricLists: string[][]): string[] {
@@ -64,6 +68,16 @@ export class MetricSelectionComponent {
       }
       return intersection;
     }, []);
-}
+  }
+
+  private compareMetrics(a: SelectableMetric, b: SelectableMetric): number {
+    if (a.isUserTiming && !b.isUserTiming) {
+      return 1;
+    }
+    if (b.isUserTiming && !a.isUserTiming) {
+      return -1;
+    }
+    return a.id.localeCompare(b.id);
+  }
 
 }
