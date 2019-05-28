@@ -203,18 +203,6 @@ export class ApplicationService {
       );
   }
 
-  /**
-   * Just for the moment. If we support one aspect per browser in the UI this should be removed.
-   * @param aspects
-   */
-  filterOneBrowser(aspects: PerformanceAspect[]) {
-    if (aspects.length < 1) {
-      return aspects
-    }
-    const arbitraryBrowserId = aspects[0].browserId;
-    return aspects.filter((aspect: PerformanceAspect) => aspect.browserId == arbitraryBrowserId)
-  }
-
   createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate: PerformanceAspect) {
     this.replacePerformanceAspect(perfAspectToCreateOrUpdate, true);
     const params = {
