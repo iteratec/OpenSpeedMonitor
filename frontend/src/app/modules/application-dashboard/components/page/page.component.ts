@@ -7,6 +7,7 @@ import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {Metrics} from "../../../../enums/metric.enum";
+import {Application} from "../../../../models/application.model";
 
 @Component({
   selector: 'osm-page',
@@ -16,11 +17,11 @@ import {Metrics} from "../../../../enums/metric.enum";
 export class PageComponent {
   @Input() lastDateOfResult: string;
   @Input() metricsForPage: PageMetricsDto;
+  @Input() application: Application;
   pageCsi$: Observable<number>;
   pageCsiDate$: Observable<string>;
   isLoading: boolean = true;
   metrics = Metrics;
-
 
   constructor(private applicationDashboardService: ApplicationService) {
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(

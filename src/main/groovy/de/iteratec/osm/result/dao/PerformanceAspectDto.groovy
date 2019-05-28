@@ -18,7 +18,10 @@ class PerformanceAspectDto {
         this.pageId = aspectAsMap['pageId']
         this.browserId = aspectAsMap['browserId']
         SelectedMeasurand selectedMetric = new SelectedMeasurand(aspectAsMap['metricIdentifier'], CachedView.UNCACHED)
-        this.measurand = new MeasurandDto(id: selectedMetric.optionValue, name: selectedMetric.name)
+        this.measurand = new MeasurandDto(
+                id: selectedMetric.optionValue,
+                name: selectedMetric.name,
+                isUserTiming: !SelectedMeasurand.isMeasurand(selectedMetric.name))
         this.performanceAspectType = new PerformanceAspectTypeDto(
                 name: aspectAsMap['performanceAspectType']?.toString(),
                 icon: aspectAsMap['performanceAspectType']?.icon

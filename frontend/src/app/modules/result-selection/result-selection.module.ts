@@ -13,6 +13,7 @@ import {
 } from 'ng-pick-datetime';
 import {ResultSelectionPageLocationConnectivityComponent} from './components/result-selection-page-location-connectivity/result-selection-page-location-connectivity.component';
 import {NgSelectModule} from "@ng-select/ng-select";
+import {SelectionDataComponent} from './components/result-selection-page-location-connectivity/selection-data/selection-data.component';
 import {ResultSelectionApplicationComponent} from './components/result-selection-application/result-selection-application.component';
 
 export const TIME_FORMAT = {
@@ -35,7 +36,9 @@ export const TIME_FORMAT = {
     ResultSelectionApplicationComponent,
     ResultSelectionPageLocationConnectivityComponent,
     MeasurandSelectComponent,
-    MeasurandsComponent
+    MeasurandsComponent,
+    ResultSelectionPageLocationConnectivityComponent,
+    SelectionDataComponent
   ],
   exports: [MeasurandSelectComponent],
   providers: [

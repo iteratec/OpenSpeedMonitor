@@ -1,4 +1,5 @@
 import {SelectableMeasurand} from "./measurand.model";
+import {BrowserInfoDto} from "./browser.model";
 
 
 export interface PerformanceAspect {
@@ -10,6 +11,8 @@ export interface PerformanceAspect {
   performanceAspectType: PerformanceAspectType
   persistent: boolean
 }
+
+export type ExtendedPerformanceAspect = PerformanceAspect & BrowserInfoDto
 
 export interface PerformanceAspectType {
   name: string

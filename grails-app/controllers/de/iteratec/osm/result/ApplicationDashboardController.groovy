@@ -99,6 +99,16 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
     }
 
+    def getApplication(Long applicationId) {
+        List<Map> allActiveAndRecent = jobGroupService.getAllActiveAndRecentWithResultInformation()
+        Map app = allActiveAndRecent.find { it.id == applicationId }
+        if (app) {
+            ControllerUtils.sendObjectAsJSON(response, app)
+        } else {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "No Application with id '${applicationId}' found.")
+        }
+    }
+
     def getCsiValuesForApplications() {
         List<JobGroup> jobGroups = jobGroupService.getAllActiveAndRecent()
         def csiValues = applicationDashboardService.getTodaysCsiValueForJobGroups(jobGroups)

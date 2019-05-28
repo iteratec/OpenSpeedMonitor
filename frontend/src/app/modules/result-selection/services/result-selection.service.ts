@@ -232,24 +232,21 @@ export class ResultSelectionService {
   updateSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): Observable<MeasuredEvent[]> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get<MeasuredEvent[]>('/resultSelection/getMeasuredEvents', {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 
   updateSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): Observable<Location[]> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get<Location[]>('/resultSelection/getLocations', {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 
   updateSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): Observable<Connectivity[]> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get('/resultSelection/getConnectivityProfiles', {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 

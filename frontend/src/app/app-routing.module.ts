@@ -5,6 +5,10 @@ import {NotFoundComponent} from './not-found.component';
 
 const appRoutes: Routes = [
   {
+    path: 'aspectConfiguration',
+    loadChildren: './modules/aspect-configuration/aspect-configuration.module#AspectConfigurationModule'
+  },
+  {
     path: 'applicationDashboard',
     loadChildren: './modules/application-dashboard/application-dashboard.module#ApplicationDashboardModule'
   },
