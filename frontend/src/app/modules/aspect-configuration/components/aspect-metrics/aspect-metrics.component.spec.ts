@@ -4,6 +4,7 @@ import {AspectMetricsComponent} from './aspect-metrics.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
+import {ApplicationService} from "../../../../services/application.service";
 
 describe('AspectMetricsComponent', () => {
   let component: AspectMetricsComponent;
@@ -20,7 +21,8 @@ describe('AspectMetricsComponent', () => {
         ReactiveFormsModule
       ],
       providers: [
-        AspectMetricsComponent
+        AspectMetricsComponent,
+        ApplicationService
       ]
     })
     .compileComponents();
@@ -37,7 +39,7 @@ describe('AspectMetricsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  it('should ', inject(
+  it('should filter aspects respective asp', inject(
     [AspectMetricsComponent],
     (component: AspectMetricsComponent) => {
       const type1: PerformanceAspectType = {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'};
