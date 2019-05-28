@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
-import {Observable, ReplaySubject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
 
@@ -18,7 +18,7 @@ export class MeasurandsComponent implements OnInit {
   requestSizes$: Observable<MeasurandGroup>;
   percentages$: Observable<MeasurandGroup>;
 
-  measurands: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>[];
+  measurands: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>>[];
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;

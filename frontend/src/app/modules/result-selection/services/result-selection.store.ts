@@ -1,4 +1,8 @@
-import {Caller, ResultSelectionCommand} from "../models/result-selection-command.model";
+import {
+  Caller,
+  ResultSelectionCommand,
+  ResultSelectionCommandParameter
+} from "../models/result-selection-command.model";
 import {BehaviorSubject, ReplaySubject} from "rxjs";
 import {MeasuredEvent} from "../../../models/measured-event.model";
 import {Location} from "../../../models/location.model";
@@ -24,13 +28,13 @@ export class ResultSelectionStore {
   eventsAndPages$: BehaviorSubject<MeasuredEvent[]> = new BehaviorSubject([]);
   locationsAndBrowsers$: BehaviorSubject<Location[]> = new BehaviorSubject([]);
   connectivities$: BehaviorSubject<Connectivity[]> = new BehaviorSubject([]);
-  loadTimes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  userTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  heroTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  requestCounts$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  requestSizes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  percentages$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  resultCount$: ReplaySubject<string> = new ReplaySubject<string>(1);
+  loadTimes$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  userTimings$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  heroTimings$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  requestCounts$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  requestSizes$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  percentages$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
 
   constructor(private resultSelectionService: ResultSelectionService) {
     let defaultFrom = new Date();
@@ -59,7 +63,7 @@ export class ResultSelectionStore {
     this.setResultSelectionCommand({...this.resultSelectionCommand, from: timeFrame[0], to: timeFrame[1]});
   }
 
-  setResultSelectionCommandIds(ids: number[], type: string): void {
+  setResultSelectionCommandIds(ids: number[], type: ResultSelectionCommandParameter): void {
     this.setResultSelectionCommand({...this.resultSelectionCommand, [type]: ids});
   }
 
@@ -68,6 +72,7 @@ export class ResultSelectionStore {
   }
 
   private setResultSelectionCommand(newState: ResultSelectionCommand): void {
+    this.loadResultCount(newState);
     this._resultSelectionCommand$.next(newState);
   }
 
@@ -145,11 +150,11 @@ export class ResultSelectionStore {
 
   private loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
     this.resultSelectionService.fetchResultSelectionData<string>(resultSelectionCommand, URL.RESULT_COUNT)
-      .subscribe(next => this.resultCount$.next(next));
+      .subscribe(next => this.resultCount$.next(+next));
   }
 
-  private getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
-    let subject$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>;
+  private getDefaultSubjectByMeasurandGroup(name: string): BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
+    let subject$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>>;
     switch (name) {
       case "LOAD_TIMES":
         subject$ = this.loadTimes$;
