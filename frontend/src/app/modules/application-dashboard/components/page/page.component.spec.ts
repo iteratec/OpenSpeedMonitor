@@ -6,11 +6,10 @@ import {PageMetricComponent} from "../page-metric/page-metric.component";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {CsiValueMediumComponent} from "../../../shared/components/csi-value/csi-value-medium/csi-value-medium.component";
 import {CsiValueBaseComponent} from "../../../shared/components/csi-value/csi-value-base.component";
-import {PerformanceAspectManagementComponent} from "../performance-aspect-management/performance-aspect-management.component";
-import {PerformanceAspectInspectComponent} from "../performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component";
 import {MeasurandSelectComponent} from "../../../result-selection/components/measurand-select/measurand-select.component";
 import {ResultSelectionModule} from "../../../result-selection/result-selection.module";
 import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
+import {Application} from "../../../../models/application.model";
 
 describe('PageComponent', () => {
 
@@ -24,8 +23,6 @@ describe('PageComponent', () => {
         CsiValueMediumComponent,
         CsiValueBaseComponent,
         PageMetricComponent,
-        PerformanceAspectManagementComponent,
-        PerformanceAspectInspectComponent,
         MeasurandSelectComponent
       ],
       imports: [
@@ -43,6 +40,14 @@ describe('PageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PageComponent);
     component = fixture.componentInstance;
+    component.application = new Application({name: 'app', id: 1})
+    component.metricsForPage = {
+      pageId: 1,
+      pageName: 'page',
+      speedIndex: 2000,
+      docCompleteTimeInMillisecs: 1800,
+      fullyLoadedIncomingBytes: 3000
+    };
     fixture.detectChanges();
   });
 

@@ -8,12 +8,10 @@ import {PageMetricComponent} from './components/page-metric/page-metric.componen
 import {CsiInfoComponent} from "./components/csi-info/csi-info.component";
 import {SharedModule} from "../shared/shared.module";
 import {HttpClientModule} from "@angular/common/http";
-import { ApplicationJobStatusComponent } from './components/application-job-status/application-job-status.component';
+import {ApplicationJobStatusComponent} from './components/application-job-status/application-job-status.component';
 import {GraphiteIntegrationComponent} from "./components/application-job-status/graphite-integration/graphite-integration.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import { PerformanceAspectManagementComponent } from './components/performance-aspect-management/performance-aspect-management.component';
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
-import { PerformanceAspectInspectComponent } from './components/performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component';
 
 const DashboardRoutes: Routes = [
   {path: '', component: ApplicationDashboardComponent},
@@ -38,8 +36,6 @@ const DashboardRoutes: Routes = [
     PageMetricComponent,
     ApplicationJobStatusComponent,
     GraphiteIntegrationComponent,
-    PerformanceAspectManagementComponent,
-    PerformanceAspectInspectComponent,
   ],
   exports: [
     RouterModule

@@ -1,0 +1,13 @@
+a {
+  margin-left: 10px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+
+  osm-aspect-metrics {
+    margin: 10px 0 20px 10px;
+  }
+
+}
