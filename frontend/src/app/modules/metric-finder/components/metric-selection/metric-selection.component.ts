@@ -47,7 +47,6 @@ export class MetricSelectionComponent {
 
   private findCommonMetrics(results: TestResult[]): SelectableMetric[] {
     const metricIdLists = results.map(result => Object.keys(result.timings));
-    console.log(metricIdLists);
     return this.intersect(metricIdLists)
       .map(metricId => ({
         id: metricId,
