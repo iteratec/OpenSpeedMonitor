@@ -4,6 +4,7 @@ import {Observable, of} from "rxjs";
 import {ApplicationService} from "../../../../services/application.service";
 import {Application} from "../../../../models/application.model";
 import {Page} from "../../../../models/page.model";
+import {AspectConfigurationService} from "../../services/aspect-configuration.service";
 
 @Component({
   selector: 'osm-aspect-metrics',
@@ -17,9 +18,9 @@ export class AspectMetricsComponent implements OnInit {
   application$: Observable<Application>;
   page$: Observable<Page>;
 
-  constructor(private applicationService: ApplicationService) {
+  constructor(private applicationService: ApplicationService, private aspectConfService: AspectConfigurationService) {
     this.application$ = applicationService.selectedApplication$;
-    this.page$ = applicationService.selectedPage$;
+    this.page$ = aspectConfService.selectedPage$;
   }
 
   ngOnInit() {

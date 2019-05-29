@@ -8,7 +8,6 @@ import {PageMetricsDto} from "./models/page-metrics.model";
 import {ApplicationCsi, ApplicationCsiById} from "../../models/application-csi.model";
 import {Csi} from "../../models/csi.model";
 import {FailingJobStatistic} from "./models/failing-job-statistic.model";
-import {ResultSelectionService} from "../result-selection/services/result-selection.service";
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -17,7 +16,6 @@ import {ResultSelectionService} from "../result-selection/services/result-select
 })
 export class ApplicationDashboardComponent implements OnDestroy {
   applications$: Observable<Application[]>;
-  selectedApplication: Application;
   destroyed$ = new Subject<void>();
   pages$: Observable<PageMetricsDto[]>;
   applicationCsi$: Observable<ApplicationCsi>;
@@ -25,12 +23,12 @@ export class ApplicationDashboardComponent implements OnDestroy {
   hasConfiguration$: Observable<boolean>;
   isLoading$: Observable<boolean>;
   failingJobStatistic$: Observable<FailingJobStatistic>;
+  selectedApplication$: Observable<Application>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private applicationService: ApplicationService,
-    private resultSelectionService: ResultSelectionService
+    private applicationService: ApplicationService
   ) {
     this.pages$ = this.applicationService.metrics$;
     this.applications$ = applicationService.applications$.pipe(
@@ -48,6 +46,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
       .pipe(takeUntil(this.destroyed$))
       .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
     this.failingJobStatistic$ = this.applicationService.failingJobStatistics$;
+    this.selectedApplication$ = this.applicationService.selectedApplication$;
   }
 
   private handleNavigation(applicationId: string, applications: Application[]) {
@@ -55,11 +54,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
       this.updateApplication(applications[0]);
       return;
     }
-    this.selectedApplication = this.findApplicationById(applications, applicationId);
-    if (this.selectedApplication) {
-      this.applicationService.updateSelectedApplication(this.selectedApplication);
-      this.resultSelectionService.updateApplications([this.selectedApplication]);
-    }
+    this.applicationService.setSelectedApplication(applicationId);
   }
 
   ngOnDestroy() {
@@ -69,10 +64,6 @@ export class ApplicationDashboardComponent implements OnDestroy {
 
   updateApplication(application: Application) {
     this.router.navigate(['/applicationDashboard', application.id]);
-  }
-
-  private findApplicationById(applications: Application[], applicationId: string): Application {
-    return applications.find(application => application.id == Number(applicationId));
   }
 
 }

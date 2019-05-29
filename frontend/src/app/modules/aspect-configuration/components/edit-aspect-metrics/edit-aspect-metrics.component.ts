@@ -21,7 +21,7 @@ export class EditAspectMetricsComponent implements OnInit {
 
   constructor(private route: ActivatedRoute, private applicationService: ApplicationService, private aspectConfService: AspectConfigurationService) {
     this.application$ = applicationService.selectedApplication$;
-    this.page$ = applicationService.selectedPage$;
+    this.page$ = aspectConfService.selectedPage$;
     this.performanceAspects$ = aspectConfService.performanceAspects$
   }
 

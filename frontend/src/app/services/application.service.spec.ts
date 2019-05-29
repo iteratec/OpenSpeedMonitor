@@ -75,7 +75,7 @@ const failingJob: Object = {
   }
 };
 
-describe('ApplicationService', () => {
+fdescribe('ApplicationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -98,6 +98,7 @@ describe('ApplicationService', () => {
       service.loadRecentCsiForApplications();
       httpMock.expectOne("/applicationDashboard/rest/getCsiValuesForApplications").flush(applicationCsiDTOById);
       httpMock.expectOne("/applicationDashboard/rest/getFailingJobs").flush([]);
+      httpMock.expectOne("/applicationDashboard/rest/getApplications");
       const applicationCsiById: ApplicationCsiById = service.applicationCsiById$.getValue();
       expect(applicationCsiById[1].recentCsi().csiDocComplete).toBe(40);
       expect(applicationCsiById[3].recentCsi().csiDocComplete).toBe(20);
@@ -112,7 +113,8 @@ describe('ApplicationService', () => {
         1: new ApplicationCsi(applicationCsiDTOById[1]),
         3: new ApplicationCsi(applicationCsiDTOById[3])
       });
-      service.updateSelectedApplication(new Application({id: 3, name: "Test"}));
+      service.selectedApplication$.next(new Application({id: 3, name: "Test"}));
+      service.setSelectedApplication('3');
       httpMock
         .expectOne(request => request.url == "/applicationDashboard/rest/getCsiValuesForApplication")
         .flush(applicationCsiMultipleValuesDto);
@@ -130,6 +132,7 @@ describe('ApplicationService', () => {
       service.failingJobs$.next(failingJob);
       service.getFailingJobs();
       httpMock.expectOne("/applicationDashboard/rest/getFailingJobs").flush(failingJob);
+      httpMock.expectOne("/applicationDashboard/rest/getApplications");
       service.failingJobs$.subscribe(next => expect(next).toBe(failingJob));
       httpMock.verify();
     }));
