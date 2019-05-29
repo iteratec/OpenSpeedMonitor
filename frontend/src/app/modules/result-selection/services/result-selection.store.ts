@@ -12,6 +12,7 @@ import {ApplicationWithPages, SelectableApplication} from "../../../models/appli
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService, URL} from "./result-selection.service";
+import {Loading} from "../../../models/loading.model";
 
 export enum UiComponent {
   APPLICATION, PAGE_LOCATION_CONNECTIVITY, MEASURAND
@@ -23,24 +24,24 @@ export class ResultSelectionStore {
   to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
 
-  applications$: BehaviorSubject<SelectableApplication[]> = new BehaviorSubject([]);
-  applicationsAndPages$: BehaviorSubject<ApplicationWithPages[]> = new BehaviorSubject([]);
-  eventsAndPages$: BehaviorSubject<MeasuredEvent[]> = new BehaviorSubject([]);
-  locationsAndBrowsers$: BehaviorSubject<Location[]> = new BehaviorSubject([]);
-  connectivities$: BehaviorSubject<Connectivity[]> = new BehaviorSubject([]);
-  loadTimes$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
-  userTimings$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
-  heroTimings$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
-  requestCounts$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
-  requestSizes$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
-  percentages$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> = new BehaviorSubject({isLoading: false, data: {name: "", values: []}});
+  applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({isLoading: false, data: []});
+  applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({isLoading: false, data: []});
+  eventsAndPages$: BehaviorSubject<ResponseWithLoadingState<MeasuredEvent[]>> = new BehaviorSubject({isLoading: false, data: []});
+  locationsAndBrowsers$: BehaviorSubject<ResponseWithLoadingState<Location[]>> = new BehaviorSubject({isLoading: false, data: []});
+  connectivities$: BehaviorSubject<ResponseWithLoadingState<Connectivity[]>> = new BehaviorSubject({isLoading: false, data: []});
+  loadTimes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
+  userTimings$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
+  heroTimings$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
+  requestCounts$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
+  requestSizes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
+  percentages$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
 
   constructor(private resultSelectionService: ResultSelectionService) {
     let defaultFrom = new Date();
     let defaultTo = new Date();
     defaultFrom.setDate(defaultTo.getDate() - 3);
-    this._resultSelectionCommand$ = new BehaviorSubject({from:defaultFrom, to: defaultTo, caller: Caller.EventResult});
+    this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
   }
 
   registerComponent(component: UiComponent): void {
@@ -77,43 +78,50 @@ export class ResultSelectionStore {
   }
 
   private loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
+    this.applications$.next({...this.applications$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableApplication[]>(resultSelectionCommand, URL.APPLICATIONS)
-      .subscribe(next => this.applications$.next(next));
+      .subscribe(next => this.applications$.next({isLoading: false, data: next}));
   }
 
   private loadSelectableApplicationsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
+    this.applicationsAndPages$.next({...this.applicationsAndPages$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<ApplicationWithPages[]>(resultSelectionCommand, URL.APPLICATIONS_AND_PAGES)
-      .subscribe(next => this.applicationsAndPages$.next(next));
+      .subscribe(next => this.applicationsAndPages$.next({isLoading: false, data: next}));
   }
 
   private loadSelectableEventsAndPages(resultSelectionCommand: ResultSelectionCommand): void {
+    this.eventsAndPages$.next({...this.eventsAndPages$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<MeasuredEvent[]>(resultSelectionCommand, URL.EVENTS_AND_PAGES)
-      .subscribe(next => this.eventsAndPages$.next(next));
+      .subscribe(next => this.eventsAndPages$.next({isLoading: false, data: next}));
   }
 
   private loadSelectableLocationsAndBrowsers(resultSelectionCommand: ResultSelectionCommand): void {
+    this.locationsAndBrowsers$.next({...this.locationsAndBrowsers$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<Location[]>(resultSelectionCommand, URL.LOCATIONS_AND_BROWSERS)
-      .subscribe(next => this.locationsAndBrowsers$.next(next));
+      .subscribe(next => this.locationsAndBrowsers$.next({isLoading: false, data: next}));
   }
 
   private loadSelectableConnectivities(resultSelectionCommand: ResultSelectionCommand): void {
+    this.connectivities$.next({...this.connectivities$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<Connectivity[]>(resultSelectionCommand, URL.CONNECTIVITIES)
-      .subscribe(next => this.connectivities$.next(next));
+      .subscribe(next => this.connectivities$.next({isLoading: false, data: next}));
   }
 
   private loadMeasurands(resultSelectionCommand: ResultSelectionCommand): void {
+    this.loadTimes$.next({...this.loadTimes$.getValue(), isLoading: true});
+    this.requestCounts$.next({...this.requestCounts$.getValue(), isLoading: true});
+    this.requestSizes$.next({...this.requestSizes$.getValue(), isLoading: true});
+    this.percentages$.next({...this.percentages$.getValue(), isLoading: true});
     this.resultSelectionService.updateMeasurands(resultSelectionCommand).subscribe((groups: MeasurandGroup[]) => {
       if (groups) {
         groups.forEach((group: MeasurandGroup) => {
-          let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+          let responseWithLoadingState: MeasurandGroup = {
             isLoading: false,
-            data: {
-              name: "frontend.de.iteratec.isr.measurand.group." + group.name,
-              values: group.values.map(measurand => ({
-                name: "frontend.de.iteratec.isr.measurand." + measurand.name,
-                id: measurand.id
-              }))
-            }
+            name: "frontend.de.iteratec.isr.measurand.group." + group.name,
+            values: group.values.map(measurand => ({
+              name: "frontend.de.iteratec.isr.measurand." + measurand.name,
+              id: measurand.id
+            }))
           };
           let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
           if (concerningSubject$) {
@@ -125,24 +133,28 @@ export class ResultSelectionStore {
   }
 
   private loadUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
+    this.userTimings$.next({...this.userTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
       .subscribe(next => {
       const groupName: string = "User Timings";
-      let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+      let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
-        data: {name: groupName, values: next}
+        name: groupName,
+        values: next
       };
       this.userTimings$.next(responseWithLoadingState);
     });
   }
 
   private loadHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
+    this.heroTimings$.next({...this.heroTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
       .subscribe(next => {
       const groupName: string = "Hero Timings";
-      let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+      let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
-        data: {name: groupName, values: next}
+        name: groupName,
+        values: next
       };
       this.heroTimings$.next(responseWithLoadingState);
     });
@@ -153,8 +165,8 @@ export class ResultSelectionStore {
       .subscribe(next => this.resultCount$.next(+next));
   }
 
-  private getDefaultSubjectByMeasurandGroup(name: string): BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
-    let subject$: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>>;
+  private getDefaultSubjectByMeasurandGroup(name: string): BehaviorSubject<MeasurandGroup> | undefined {
+    let subject$: BehaviorSubject<MeasurandGroup>;
     switch (name) {
       case "LOAD_TIMES":
         subject$ = this.loadTimes$;

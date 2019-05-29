@@ -8,6 +8,7 @@ import {Page} from "../../../../models/page.model";
 import {Browser} from "../../../../models/browser.model";
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
 import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
+import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
@@ -15,9 +16,9 @@ import {ResultSelectionCommandParameter} from "../../models/result-selection-com
   styleUrls: ['./page-location-connectivity.component.scss']
 })
 export class PageLocationConnectivityComponent {
-  eventsAndPages$: Observable<MeasuredEvent[]>;
-  locationsAndBrowsers$: Observable<Location[]>;
-  connectivities$: Observable<Connectivity[]>;
+  eventsAndPages$: Observable<ResponseWithLoadingState<MeasuredEvent[]>>;
+  locationsAndBrowsers$: Observable<ResponseWithLoadingState<Location[]>>;
+  connectivities$: Observable<ResponseWithLoadingState<Connectivity[]>>;
 
   pageAndEventSelectionActive: boolean = true;
   browserAndLocationSelectionActive: boolean = false;
@@ -47,18 +48,18 @@ export class PageLocationConnectivityComponent {
     this.connectivities$ = this.resultSelectionStore.connectivities$;
 
     this.eventsAndPages$.subscribe(next => {
-      if (next) {
-        this.measuredEvents$ = of(this.sortAlphabetically(next));
-        let pages: Page[] = next.map(value => value.parent);
+      if (next && next.data) {
+        this.measuredEvents$ = of(this.sortAlphabetically(next.data));
+        let pages: Page[] = next.data.map(value => value.parent);
         let uniquePages: Page[] = this.getUniqueElements(pages);
         this.uniquePages$ = of(this.sortAlphabetically(uniquePages));
       }
     });
 
     this.locationsAndBrowsers$.subscribe(next => {
-      if (next) {
-        this.locations$ = of(this.sortAlphabetically(next));
-        let browsers: Browser[] = next.map(value => value.parent);
+      if (next && next.data) {
+        this.locations$ = of(this.sortAlphabetically(next.data));
+        let browsers: Browser[] = next.data.map(value => value.parent);
         let uniqueBrowsers: Browser[] = this.getUniqueElements(browsers);
         this.uniqueBrowsers$ = of(this.sortAlphabetically(uniqueBrowsers));
       }
@@ -68,9 +69,9 @@ export class PageLocationConnectivityComponent {
   filterSelectableItems(selectedParents: number[], children: String): void {
     let items = [];
     if (this.showMeasuredStepSelection && children === 'events') {
-      items = this.resultSelectionStore.eventsAndPages$.getValue();
+      items = this.resultSelectionStore.eventsAndPages$.getValue().data;
     } else if (this.showLocationSelection && children === 'locations') {
-      items = this.resultSelectionStore.locationsAndBrowsers$.getValue();
+      items = this.resultSelectionStore.locationsAndBrowsers$.getValue().data;
     }
 
     if (selectedParents && selectedParents.length > 0) {

@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
-import {BehaviorSubject, Observable} from "rxjs";
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
+import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {map} from 'rxjs/operators';
 
 @Component({
   selector: 'osm-measurands',
@@ -11,14 +12,10 @@ import {ResultSelectionStore, UiComponent} from "../../services/result-selection
 })
 export class MeasurandsComponent implements OnInit {
 
-  loadTimes$: Observable<MeasurandGroup>;
-  userTimings$: Observable<MeasurandGroup>;
-  heroTimings$: Observable<MeasurandGroup>;
-  requestCounts$: Observable<MeasurandGroup>;
-  requestSizes$: Observable<MeasurandGroup>;
-  percentages$: Observable<MeasurandGroup>;
-
-  measurands: BehaviorSubject<ResponseWithLoadingState<MeasurandGroup>>[];
+  measurands$: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
@@ -26,50 +23,28 @@ export class MeasurandsComponent implements OnInit {
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
 
-    this.measurands = [
-      this.resultSelectionStore.loadTimes$,
-      this.resultSelectionStore.userTimings$,
-      this.resultSelectionStore.heroTimings$,
-      this.resultSelectionStore.requestCounts$,
-      this.resultSelectionStore.requestSizes$,
-      this.resultSelectionStore.percentages$
-    ];
+    this.measurands$.next({
+      ...this.measurands$.getValue(),
+      data: [
+        this.resultSelectionStore.loadTimes$,
+        this.resultSelectionStore.userTimings$,
+        this.resultSelectionStore.heroTimings$,
+        this.resultSelectionStore.requestCounts$,
+        this.resultSelectionStore.requestSizes$,
+        this.resultSelectionStore.percentages$
+      ]
+    });
 
     this.resultSelectionStore.loadTimes$.subscribe(next => {
-      if(next) {
-        this.defaultValue = next.data.values[0];
-        this.selectedMeasurands = [this.defaultValue];
-      }
-    });
-
-    this.resultSelectionStore.userTimings$.subscribe(next => {
-      if(next) {
-        this.measurands = [
-          this.resultSelectionStore.loadTimes$,
-          this.resultSelectionStore.userTimings$,
-          this.resultSelectionStore.heroTimings$,
-          this.resultSelectionStore.requestCounts$,
-          this.resultSelectionStore.requestSizes$,
-          this.resultSelectionStore.percentages$
-        ];
-      }
-    });
-
-    this.resultSelectionStore.heroTimings$.subscribe(next => {
-      if(next) {
-        this.measurands = [
-          this.resultSelectionStore.loadTimes$,
-          this.resultSelectionStore.userTimings$,
-          this.resultSelectionStore.heroTimings$,
-          this.resultSelectionStore.requestCounts$,
-          this.resultSelectionStore.requestSizes$,
-          this.resultSelectionStore.percentages$
-        ];
-      }
+      this.defaultValue = next.values[0];
+      this.selectedMeasurands = [this.defaultValue];
     });
   }
 
   ngOnInit() {
+    this.loadingState().subscribe(next => {
+      this.measurands$.next({...this.measurands$.getValue(), isLoading: next});
+    });
   }
 
   selectMeasurand(index: number, measurand: SelectableMeasurand) {
@@ -86,5 +61,18 @@ export class MeasurandsComponent implements OnInit {
 
   trackByFn(index: number, item: any) {
     return index;
+  }
+
+  private loadingState(): Observable<boolean> {
+    return combineLatest(
+      this.resultSelectionStore.loadTimes$,
+      this.resultSelectionStore.userTimings$,
+      this.resultSelectionStore.heroTimings$,
+      this.resultSelectionStore.requestCounts$,
+      this.resultSelectionStore.requestSizes$,
+      this.resultSelectionStore.percentages$
+    ).pipe(
+        map(next => next.map(item => item.isLoading).some(value => value))
+    )
   }
 }

@@ -29,7 +29,7 @@ describe('PageLocationConnectivityComponent', () => {
     fixture = TestBed.createComponent(PageLocationConnectivityComponent);
     component = fixture.componentInstance;
 
-    resultSelectionStore.eventsAndPages$.next([
+    resultSelectionStore.eventsAndPages$.next({isLoading: false, data: [
       {
         id: 100,
         name: "Website1_HP_entry",
@@ -54,8 +54,8 @@ describe('PageLocationConnectivityComponent', () => {
           name: "HP_entry"
         }
       }
-    ]);
-    resultSelectionStore.locationsAndBrowsers$.next([
+    ]});
+    resultSelectionStore.locationsAndBrowsers$.next({isLoading: false, data: [
       {
         id: 100,
         name: "prod-location-1",
@@ -80,8 +80,8 @@ describe('PageLocationConnectivityComponent', () => {
           name: "Firefox"
         }
       }
-    ]);
-    resultSelectionStore.connectivities$.next([
+    ]});
+    resultSelectionStore.connectivities$.next({isLoading: false, data: [
       {
         id: 1,
         name: "DSL 6.000",
@@ -90,7 +90,7 @@ describe('PageLocationConnectivityComponent', () => {
         id: 2,
         name: "UMTS",
       }
-    ]);
+    ]});
 
     fixture.detectChanges();
   });

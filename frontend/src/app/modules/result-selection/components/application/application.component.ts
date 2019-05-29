@@ -24,7 +24,7 @@ export class ApplicationComponent {
     this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
     this.resultSelectionStore.applications$.subscribe(applications => {
       if(applications) {
-        this.updateApplicationsAndTags(applications);
+        this.updateApplicationsAndTags(applications.data);
       }
     });
   }
@@ -64,7 +64,7 @@ export class ApplicationComponent {
   }
 
   private updateTags(applications: SelectableApplication[]) {
-    if(applications){
+    if(applications) {
       this.selectableTags = applications.map(value => value.tags).reduce((a, b) =>
          a.concat(b), []).filter((v, i, a) => 
          a.indexOf(v) === i);

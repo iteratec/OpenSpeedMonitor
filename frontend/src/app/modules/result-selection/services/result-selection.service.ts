@@ -24,12 +24,12 @@ export enum URL {
 
 @Injectable()
 export class ResultSelectionService {
-  loadTimes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  userTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  heroTimings$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  requestCounts$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  requestSizes$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
-  percentages$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> = new ReplaySubject(1);
+  loadTimes$: ReplaySubject<MeasurandGroup> = new ReplaySubject(1);
+  userTimings$: ReplaySubject<MeasurandGroup> = new ReplaySubject(1);
+  heroTimings$: ReplaySubject<MeasurandGroup> = new ReplaySubject(1);
+  requestCounts$: ReplaySubject<MeasurandGroup> = new ReplaySubject(1);
+  requestSizes$: ReplaySubject<MeasurandGroup> = new ReplaySubject(1);
+  percentages$: ReplaySubject<MeasurandGroup> = new ReplaySubject(1);
 
   selectedApplications$: ReplaySubject<Application[]> = new ReplaySubject<Application[]>(1);
   selectedPages$: ReplaySubject<Page[]> = new ReplaySubject<Page[]>(1);
@@ -78,14 +78,14 @@ export class ResultSelectionService {
     }
   }
 
-  private getUserTimings(params): Observable<ResponseWithLoadingState<MeasurandGroup>> {
+  private getUserTimings(params): Observable<MeasurandGroup> {
     const userTimingsUrl: string = '/resultSelection/getUserTimings';
     const groupName: string = "USER_TIMINGS";
     this.setToLoading(this.userTimings$, groupName);
     return this.getSelectableMeasurands(userTimingsUrl, params, groupName);
   }
 
-  private getHeroTimings(params): Observable<ResponseWithLoadingState<MeasurandGroup>> {
+  private getHeroTimings(params): Observable<MeasurandGroup> {
     const heroTimingsUrl: string = '/resultSelection/getHeroTimings';
     const groupName: string = "HERO_TIMINGS";
     this.setToLoading(this.heroTimings$, groupName);
@@ -102,15 +102,13 @@ export class ResultSelectionService {
       handleError()
     ).subscribe((groups: MeasurandGroup[]) => {
       groups.forEach((group: MeasurandGroup) => {
-        let responseWithLoadingState: ResponseWithLoadingState<MeasurandGroup> = {
+        let responseWithLoadingState: MeasurandGroup = {
           isLoading: false,
-          data: {
-            name: "frontend.de.iteratec.isr.measurand.group." + group.name,
-            values: group.values.map(measurand => ({
-              name: "frontend.de.iteratec.isr.measurand." + measurand.name,
-              id: measurand.id
-            }))
-          }
+          name: "frontend.de.iteratec.isr.measurand.group." + group.name,
+          values: group.values.map(measurand => ({
+            name: "frontend.de.iteratec.isr.measurand." + measurand.name,
+            id: measurand.id
+          }))
         };
         let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
         if (concerningSubject$) {
@@ -128,8 +126,8 @@ export class ResultSelectionService {
     )
   }
 
-   getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<ResponseWithLoadingState<MeasurandGroup>> | undefined {
-    let subject$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>;
+   getDefaultSubjectByMeasurandGroup(name: string): ReplaySubject<MeasurandGroup> | undefined {
+    let subject$: ReplaySubject<MeasurandGroup>;
     switch (name) {
       case "LOAD_TIMES":
         subject$ = this.loadTimes$;
@@ -147,16 +145,16 @@ export class ResultSelectionService {
     return subject$;
   }
 
-  private setToLoading(subject$: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>, groupName: string) {
-    subject$.next({isLoading: true, data: {name: groupName, values: []}});
+  private setToLoading(subject$: ReplaySubject<MeasurandGroup>, groupName: string) {
+    subject$.next({isLoading: true, name: groupName, values: []});
   }
 
-  private getSelectableMeasurands(url: string, params: any, groupName: string): Observable<ResponseWithLoadingState<MeasurandGroup>> {
+  private getSelectableMeasurands(url: string, params: any, groupName: string): Observable<MeasurandGroup> {
     return this.http.get<SelectableMeasurand[]>(url, {params}).pipe(
       handleError(),
       map(dtos => ({
         isLoading: false,
-        data: {name: "frontend.de.iteratec.isr.measurand.group." + groupName, values: dtos}
+        name: "frontend.de.iteratec.isr.measurand.group." + groupName, values: dtos
       })),
     )
   }
