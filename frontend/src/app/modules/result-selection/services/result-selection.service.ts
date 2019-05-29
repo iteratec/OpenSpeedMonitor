@@ -162,8 +162,7 @@ export class ResultSelectionService {
   fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get<T>(url, {params: params}).pipe(
-      handleError(),
-      startWith(null)
+      handleError()
     )
   }
 
@@ -190,7 +189,7 @@ export class ResultSelectionService {
 
 function handleError(): OperatorFunction<any, any> {
   return catchError((error) => {
-    console.log(error);
+    console.error(error);
     return EMPTY;
   });
 }
