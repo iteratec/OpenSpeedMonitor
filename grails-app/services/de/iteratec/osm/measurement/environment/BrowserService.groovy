@@ -54,7 +54,7 @@ class BrowserService {
     }
 
     List<BrowserInfoDto> getBrowserInfos() {
-        return Location.list().groupBy {
+        return Location.findAllByActiveAndOperatingSystemNotEqualAndDeviceTypeNotEqual(true, OperatingSystem.UNKNOWN, DeviceType.UNDEFINED).groupBy {
             it.browser
         }.findResults { Browser browser, List<Location> locationsOfBrowser ->
             List<OperatingSystem> operatingSystemsOfBrowser = locationsOfBrowser*.operatingSystem.unique(false)
