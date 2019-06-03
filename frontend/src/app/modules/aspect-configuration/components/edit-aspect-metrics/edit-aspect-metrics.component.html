@@ -5,6 +5,14 @@
   {{ 'frontend.back.label' | translate }}
   {{ 'frontend.de.iteratec.osm.performance-aspect.configuration.link-title' | translate }}
 </a>
-<osm-aspect-metrics [aspects]="performanceAspects$ | async"
-                    [aspectType]="aspectType"
-                    class="aspect-inspect"></osm-aspect-metrics>
+
+<div class="grid-container">
+  <div class="card">
+    <osm-aspect-metrics [aspects]="performanceAspects$ | async"
+                        [aspectType]="aspectType$ | async"
+                        class="aspect-inspect"></osm-aspect-metrics>
+  </div>
+  <div class="card">
+    <osm-metric-finder></osm-metric-finder>
+  </div>
+</div>
