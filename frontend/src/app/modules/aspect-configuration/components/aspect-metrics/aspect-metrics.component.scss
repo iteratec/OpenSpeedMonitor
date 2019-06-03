@@ -35,7 +35,7 @@ i.aspect-device-type {
 
 .aspect-links {
   display: grid;
-  grid-template-columns: 5fr 30fr 20fr;
+  grid-template-columns: 8fr 30fr 20fr;
   grid-template-rows: 1fr 1fr;
   grid-template-areas: "icon browser measurand" "icon os measurand";
   width: 100%;
