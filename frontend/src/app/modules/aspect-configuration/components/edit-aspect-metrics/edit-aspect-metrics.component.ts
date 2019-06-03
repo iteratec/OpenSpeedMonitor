@@ -20,7 +20,7 @@ export class EditAspectMetricsComponent implements OnInit {
   page$: Observable<Page>;
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
   aspectType$ = new ReplaySubject<PerformanceAspectType>(1);
-  browserId$ = new ReplaySubject<number>(1)
+  browserId$ = new ReplaySubject<number>(1);
 
   constructor(
     private route: ActivatedRoute,

@@ -4,6 +4,6 @@ a {
 
 .grid-container {
   display: grid;
-  grid-template-columns: 1fr 3fr;
+  grid-template-columns: 1fr minmax(300px, 3fr);
   margin: 10px 0 0 0;
 }

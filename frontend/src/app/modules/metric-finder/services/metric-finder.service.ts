@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {TestResult, TestResultDTO} from '../models/test-result.model';
 import {BehaviorSubject} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
@@ -17,8 +17,8 @@ export class MetricFinderService {
 
   public loadTestData(): void {
     const now = Date.now();
-    const dayInMillisecs = 1000 * 60 * 60 * 24;
-    this.loadData(new Date(now - 38 * dayInMillisecs), new Date(now), 94, 76, 4);
+    const dayInMillisecs = 1000 * 60 * 60 * 24 * 14;
+    this.loadData(new Date(now - 38 * dayInMillisecs), new Date(now), 48, 1, 18);
   }
 
   public loadData(from: Date, to: Date, application: number, page: number, browser: number): void {
