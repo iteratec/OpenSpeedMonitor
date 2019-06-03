@@ -61,12 +61,13 @@ export class AspectConfigurationService {
   }
 
   prepareExtensionOfAspects() {
-    combineLatest(this.performanceAspectsForPage$, this.browserInfos$).pipe(
-      map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
-        const extendedAspects: ExtendedPerformanceAspect[] = this.extendAspects(aspects, browserInfos);
-        return extendedAspects;
-      })
-    ).subscribe((nextExtendedAspects: ExtendedPerformanceAspect[]) => this.performanceAspects$.next(nextExtendedAspects))
+    combineLatest(this.performanceAspectsForPage$, this.browserInfos$)
+      .pipe(
+        map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
+          const extendedAspects: ExtendedPerformanceAspect[] = this.extendAspects(aspects, browserInfos);
+          return extendedAspects;
+        })
+      ).subscribe((nextExtendedAspects: ExtendedPerformanceAspect[]) => this.extendedAspects$.next(nextExtendedAspects))
   }
 
   extendAspects(aspects: PerformanceAspect[], browserInfos: BrowserInfoDto[]): ExtendedPerformanceAspect[] {

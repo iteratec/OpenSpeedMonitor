@@ -9,7 +9,7 @@ import {FilmstripComponent} from './components/filmstrip/filmstrip.component';
 import {FilmstripService} from './services/filmstrip.service';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import { ComparableFilmstripsComponent } from './components/comparable-filmstrips/comparable-filmstrips.component';
+import {ComparableFilmstripsComponent} from './components/comparable-filmstrips/comparable-filmstrips.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +29,9 @@ import { ComparableFilmstripsComponent } from './components/comparable-filmstrip
     MetricFinderService,
     FilmstripService
   ],
+  exports: [
+    MetricFinderComponent
+  ]
 })
 export class MetricFinderModule {
 }
