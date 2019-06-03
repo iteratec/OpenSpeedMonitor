@@ -201,7 +201,7 @@ describe('AspectConfigurationService', () => {
           operatingSystem: 'Android',
           deviceType: {name: 'Smartphone', icon: 'mobile'}
         }];
-      service.performanceAspects$.next(aspectsOfTwoDifferentTypes);
+      service.extendedAspects$.next(aspectsOfTwoDifferentTypes);
       service.initAspectTypes();
       service.uniqueAspectTypes$.subscribe((aspectTypes: PerformanceAspectType[]) => {
         expect(aspectTypes.length).toBe(2);

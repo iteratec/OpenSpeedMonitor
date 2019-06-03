@@ -19,7 +19,7 @@ import {LocationDto} from "../../application-dashboard/models/location.model";
 export class AspectConfigurationService {
 
   browserInfos$ = new BehaviorSubject<BrowserInfoDto[]>([]);
-  performanceAspects$ = new BehaviorSubject<ExtendedPerformanceAspect[]>([]);
+  extendedAspects$ = new BehaviorSubject<ExtendedPerformanceAspect[]>([]);
   uniqueAspectTypes$ = new BehaviorSubject<PerformanceAspectType[]>([]);
   performanceAspectsForPage$: BehaviorSubject<PerformanceAspect[]> = new BehaviorSubject([]);
   selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
@@ -92,7 +92,7 @@ export class AspectConfigurationService {
   }
 
   initAspectTypes() {
-    this.performanceAspects$.pipe(
+    this.extendedAspects$.pipe(
       map((extendedAspects: ExtendedPerformanceAspect[]) => {
         const uniqueAspectTypes = [];
         const lookupMap = new Map();
