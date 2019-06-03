@@ -10,13 +10,15 @@ import {FilmstripService} from './services/filmstrip.service';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
 import {ComparableFilmstripsComponent} from './components/comparable-filmstrips/comparable-filmstrips.component';
+import { MetricSelectionComponent } from './components/metric-selection/metric-selection.component';
 
 @NgModule({
   declarations: [
     MetricFinderComponent,
     LineChartComponent,
     FilmstripComponent,
-    ComparableFilmstripsComponent
+    ComparableFilmstripsComponent,
+    MetricSelectionComponent
   ],
   imports: [
     RouterModule.forChild([{path: '', component: MetricFinderComponent}]),
