@@ -17,6 +17,7 @@ export class AspectMetricsComponent implements OnInit {
   aspectsToShow$: Observable<ExtendedPerformanceAspect[]>;
   application$: Observable<Application>;
   page$: Observable<Page>;
+  @Input() browserId: number;
 
   constructor(private applicationService: ApplicationService, private aspectConfService: AspectConfigurationService) {
     this.application$ = applicationService.selectedApplication$;

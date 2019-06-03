@@ -10,6 +10,7 @@
   <div class="card">
     <osm-aspect-metrics [aspects]="performanceAspects$ | async"
                         [aspectType]="aspectType$ | async"
+                        [browserId]="browserId$ | async"
                         class="aspect-inspect"></osm-aspect-metrics>
   </div>
   <div class="card">

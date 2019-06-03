@@ -3,7 +3,8 @@
   <i class="fas fa-{{aspectType?.icon}}"></i>
 </p>
 <ul class="clickable-list">
-  <li *ngFor="let aspect of aspectsToShow$ | async">
+  <li *ngFor="let aspect of aspectsToShow$ | async"
+      [class.selected-list-item]="aspect.browserId == browserId">
     <a
       [routerLink]="['/aspectConfiguration/edit', (application$ | async)?.id || '', (page$ | async)?.id || '', aspect.browserId, aspectType.name]">
       <div class="aspect-links">
