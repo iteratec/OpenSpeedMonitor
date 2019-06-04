@@ -1,19 +1,25 @@
 package de.iteratec.osm.result
 
 enum DeviceType {
-    DESKTOP("Desktop"),
-    TABLET("Tablet"),
-    SMARTPHONE("Smartphone"),
-    UNDEFINED("Undefined")
+    DESKTOP("Desktop", "desktop"),
+    TABLET("Tablet", "tablet-alt"),
+    SMARTPHONE("Smartphone", "mobile-alt"),
+    UNDEFINED("Undefined", "question")
 
     private String label
+    private String icon
 
-    private DeviceType(String value) {
+    private DeviceType(String value, String icon) {
         this.label = value
+        this.icon = icon
     }
 
     String getDeviceTypeLabel(){
         return label
+    }
+
+    String getDeviceTypeIcon() {
+        return icon
     }
 
     /**
@@ -22,7 +28,7 @@ enum DeviceType {
      */
     static DeviceType guessDeviceType(String label) {
         switch (label) {
-            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc).*/ :
+            case ~/(?i).*(-Win|IE\\s*[1-9]*|firefox|nuc|desktop|hetzner|netlab).*/ :
                 return DeviceType.DESKTOP
             case ~/(?i).*(Pad|Tab|Note|Xoom|Book|Tablet).*/ :
                 return DeviceType.TABLET

@@ -14,6 +14,7 @@ import {
 import {PageLocationConnectivityComponent} from './components/page-location-connectivity/page-location-connectivity.component';
 import {NgSelectModule} from "@ng-select/ng-select";
 import {ApplicationComponent} from './components/application/application.component';
+import {SelectionDataComponent} from './components/result-selection-page-location-connectivity/selection-data/selection-data.component';
 import {ResultSelectionStore} from "./services/result-selection.store";
 
 export const TIME_FORMAT = {
@@ -34,9 +35,10 @@ export const TIME_FORMAT = {
     ResultSelectionComponent,
     TimeFrameComponent,
     ApplicationComponent,
-    PageLocationConnectivityComponent,
     MeasurandSelectComponent,
-    MeasurandsComponent
+    MeasurandsComponent,
+    ResultSelectionPageLocationConnectivityComponent,
+    SelectionDataComponent
   ],
   exports: [MeasurandSelectComponent],
   providers: [

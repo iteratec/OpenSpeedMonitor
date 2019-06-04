@@ -1,6 +1,6 @@
-import { Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {Observable} from 'rxjs';
-import {TestResult} from './models/test-result';
+import {TestResult} from './models/test-result.model';
 import {MetricFinderService} from './services/metric-finder.service';
 
 @Component({
@@ -10,12 +10,15 @@ import {MetricFinderService} from './services/metric-finder.service';
 })
 export class MetricFinderComponent {
   public testResults$: Observable<TestResult[]>;
-  public selected: TestResult[] = [];
-  public metric = 'speedIndex';
+  public selectedResults: TestResult[] = [];
+  public selectedMetric = 'SPEED_INDEX';
 
   constructor(private metricFinderService: MetricFinderService) {
     this.testResults$ = metricFinderService.testResults$;
     metricFinderService.loadTestData();
   }
 
+  setSelectedResults(results: TestResult[]) {
+    this.selectedResults = [...results].sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
 }

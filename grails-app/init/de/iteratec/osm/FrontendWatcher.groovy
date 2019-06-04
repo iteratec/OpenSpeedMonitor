@@ -28,6 +28,10 @@ class FrontendWatcher {
         String nodeLocation = new File(nodeExecLocation).getParent()
 
         if (location && nodeLocation) {
+
+            String frontendDistFolder = Paths.get("${location}/frontend/dist")
+            new File(frontendDistFolder).mkdirs()
+
             Thread.start {
                 String nodeModulesBin = Paths.get("${location}", "frontend", "node_modules", ".bin").toString()
 

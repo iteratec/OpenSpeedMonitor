@@ -304,14 +304,13 @@ clean.delete << file('grails-app/assets/javascripts/node_modules')
 clean.delete << file('grails-app/assets/javascripts/frontend')
 clean.delete << file('grails-app/assets/stylesheets/node_modules')
 clean.delete << file('grails-app/assets/stylesheets/frontend')
-clean.delete << file('grails-app/assets/other/fronted')
+clean.delete << file('grails-app/assets/other/frontend')
 clean.delete << file('node_modules')
 clean.delete << file('grails-app/assets/javascripts/bower_components')
 clean.delete << file('grails-app/assets/stylesheets/bower_components')
 // Cleans old npm directory inside .gradle as these are not needed anymore because the build directory is used
 clean.delete << file('.gradle/npm')
-
-
+clean.delete << file('frontend/dist')
 
 sourceSets {
     main {

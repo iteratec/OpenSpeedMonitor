@@ -11,7 +11,6 @@ import {map} from 'rxjs/operators';
   styleUrls: ['./measurands.component.scss']
 })
 export class MeasurandsComponent implements OnInit {
-
   measurands$: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>> = new BehaviorSubject({
     isLoading: false,
     data: []
@@ -22,7 +21,6 @@ export class MeasurandsComponent implements OnInit {
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
-
     this.measurands$.next({
       ...this.measurands$.getValue(),
       data: [
@@ -33,8 +31,6 @@ export class MeasurandsComponent implements OnInit {
         this.resultSelectionStore.requestSizes$,
         this.resultSelectionStore.percentages$
       ]
-    });
-
     this.resultSelectionStore.loadTimes$.subscribe(next => {
       this.defaultValue = next.values[0];
       this.selectedMeasurands = [this.defaultValue];

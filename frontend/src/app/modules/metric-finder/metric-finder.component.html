@@ -1,11 +1,11 @@
 
-<osm-line-chart [results]="testResults$ | async" [metric]="metric" (resultSelectionChange)="selected = $event"></osm-line-chart>
+<div class="card">
+  <osm-line-chart [results]="testResults$ | async" [metric]="selectedMetric" (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
 
-Metric:
-<select [(ngModel)]="metric">
-  <option [value]="'speedIndex'">Speed Index</option>
-  <option [value]="'docCompleteTimeInMillisecs'">Document Complete</option>
-  <option [value]="'startRenderInMillisecs'">Start Render</option>
+  <osm-comparable-filmstrips [results]="selectedResults" [highlightedMetric]="selectedMetric"></osm-comparable-filmstrips>
+
+  <osm-metric-selection [results]="selectedResults" [(selectedMetric)]="selectedMetric"></osm-metric-selection>
+</div>
   <option [value]="'Image'">Hero Image</option>
   <option [value]="'visuallyCompleteInMillisecs'">Visually Complete</option>
 </select>
