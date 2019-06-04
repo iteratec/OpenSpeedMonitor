@@ -101,7 +101,7 @@ export class ApplicationService {
 
   loadApplications() {
     this.http.get<ApplicationDTO[]>("/applicationDashboard/rest/getApplications").pipe(
-      handleError(),
+      this.handleError(),
       map(dtos => dtos.map(dto => new Application(dto))),
       map(applications => ({
         isLoading: false,
@@ -117,7 +117,7 @@ export class ApplicationService {
   loadRecentCsiForApplications() {
     this.http.get<ApplicationCsiDTOById>("/applicationDashboard/rest/getCsiValuesForApplications").pipe(
       map(dto => this.mergeApplicationCsiById(this.applicationCsiById$.getValue(), dto)),
-      handleError(),
+      this.handleError(),
       startWith({...this.applicationCsiById$.getValue(), isLoading: true})
     ).subscribe(next => this.applicationCsiById$.next(next));
   }
@@ -152,7 +152,7 @@ export class ApplicationService {
     this.metrics$.next(null);
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
-      handleError()
+      this.handleError()
     )
   }
 
@@ -160,7 +160,7 @@ export class ApplicationService {
     const params = this.createParams(applicationDto.id);
     return this.http.get<ApplicationCsiDTO>('/applicationDashboard/rest/getCsiValuesForApplication', {params}).pipe(
       map(dto => this.mergeApplicationCsiById(this.applicationCsiById$.getValue(), {[applicationDto.id]: dto})),
-      handleError(),
+      this.handleError(),
       startWith({
         ...this.applicationCsiById$.getValue(),
         isLoading: true
@@ -173,13 +173,13 @@ export class ApplicationService {
     const params = this.createParams(applicationDto.id);
     return this.http.get<PageCsiDto[]>('/applicationDashboard/rest/getCsiValuesForPages', {params: params}).pipe(
       map(dto => <ResponseWithLoadingState<PageCsiDto[]>>{isLoading: false, data: dto}),
-      handleError()
+      this.handleError()
     );
   }
 
   createCsiConfiguration(applicationDto: ApplicationDTO) {
     return this.http.post('/applicationDashboard/rest/createCsiConfiguration', {applicationId: applicationDto.id})
-      .pipe(handleError())
+      .pipe(this.handleError())
       .subscribe((res: any) => {
         window.location.href = '/csiConfiguration/configurations/' + res.csiConfigurationId
       });
@@ -218,7 +218,7 @@ export class ApplicationService {
       applicationId: application.id,
       graphiteServerIds: graphiteServerIds
     })
-      .pipe(handleError());
+      .pipe(this.handleError());
   }
 
   private sendRemoveJobHealthGraphiteServersRequest(application: Application, graphiteServers: GraphiteServer[]) {
@@ -227,7 +227,7 @@ export class ApplicationService {
       applicationId: application.id,
       graphiteServerIds: graphiteServerIds
     })
-      .pipe(handleError());
+      .pipe(this.handleError());
   }
 
   private sortApplicationsByName(applications: Application[]): Application[] {
@@ -257,7 +257,7 @@ export class ApplicationService {
   updateFailingJobStatistics(application: Application): Observable<FailingJobStatistic> {
     const params = this.createParams(application.id);
     return this.http.get<FailingJobStatistic>('/applicationDashboard/rest/getFailingJobStatistics', {params: params}).pipe(
-      handleError(),
+      this.handleError(),
       startWith(null)
     )
   }
@@ -265,7 +265,7 @@ export class ApplicationService {
   getFailingJobs(): Observable<FailingJob[]> {
     return this.http.get<FailingJobDTO[]>('/applicationDashboard/rest/getFailingJobs').pipe(
       map(failingJobs => failingJobs.map(dto => new FailingJob(dto))),
-      handleError(),
+      this.handleError(),
       startWith(null)
     );
   }
@@ -273,7 +273,7 @@ export class ApplicationService {
   updateActiveJobHealthGraphiteServers(application: Application): Observable<GraphiteServer[]> {
     const params = this.createParams(application.id);
     return this.http.get<GraphiteServer[]>('/applicationDashboard/rest/getActiveJobHealthGraphiteServers', {params: params}).pipe(
-      handleError(),
+      this.handleError(),
       startWith(null)
     )
   }
@@ -281,7 +281,7 @@ export class ApplicationService {
   updateAvailableGraphiteServers(application: Application): Observable<GraphiteServer[]> {
     const params = this.createParams(application.id);
     return this.http.get<GraphiteServer[]>('/applicationDashboard/rest/getAvailableGraphiteServers', {params: params}).pipe(
-      handleError(),
+      this.handleError(),
       startWith(null)
     )
   }
@@ -293,15 +293,15 @@ export class ApplicationService {
     params = params.set("protocol", server.protocol);
     params = params.set("webAppAddress", server.webAppAddress.toString());
     return this.http.post<GraphiteServerDTO>('/applicationDashboard/rest/createGraphiteServer', params).pipe(
-      handleError(),
+      this.handleError(),
       startWith(null)
     )
   }
-}
 
-function handleError(): OperatorFunction<any, any> {
-  return catchError((error) => {
-    console.error(error);
-    return EMPTY;
-  });
+  private handleError(): OperatorFunction<any, any> {
+    return catchError((error) => {
+      console.error(error);
+      return EMPTY;
+    });
+  }
 }
