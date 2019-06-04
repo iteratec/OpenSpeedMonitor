@@ -5,7 +5,6 @@ import {MeasuredEvent} from "../../../../models/measured-event.model";
 import {Location} from "../../../../models/location.model";
 import {Connectivity} from "../../../../models/connectivity.model";
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
-import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 
 @Component({
@@ -13,7 +12,7 @@ import {ResponseWithLoadingState} from "../../../../models/response-with-loading
   templateUrl: './page-location-connectivity.component.html',
   styleUrls: ['./page-location-connectivity.component.scss']
 })
-export class ResultSelectionPageLocationConnectivityComponent implements OnInit {
+export class PageLocationConnectivityComponent implements OnInit {
   eventsAndPages$: Observable<ResponseWithLoadingState<MeasuredEvent[]>>;
   locationsAndBrowsers$: Observable<ResponseWithLoadingState<Location[]>>;
   connectivities$: Observable<ResponseWithLoadingState<Connectivity[]>>;
@@ -36,15 +35,7 @@ export class ResultSelectionPageLocationConnectivityComponent implements OnInit 
 
   ngOnInit(): void {
     if (this.showPageSelection) {
-      this.activeTab = ActiveTab.PageAndEvent
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedPages, ResultSelectionCommandParameter.PAGES);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedEvents, ResultSelectionCommandParameter.MEASURED_EVENTS);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedBrowsers, ResultSelectionCommandParameter.BROWSERS);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedLocations, ResultSelectionCommandParameter.LOCATIONS);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedPages, ResultSelectionCommandParameter.PAGES);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedEvents, ResultSelectionCommandParameter.MEASURED_EVENTS);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedBrowsers, ResultSelectionCommandParameter.BROWSERS);
-        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedLocations, ResultSelectionCommandParameter.LOCATIONS);
+      this.activeTab = ActiveTab.PageAndEvent;
     }
     else if (!this.showPageSelection && this.showBrowserSelection) {
       this.activeTab = ActiveTab.BrowserAndLocation

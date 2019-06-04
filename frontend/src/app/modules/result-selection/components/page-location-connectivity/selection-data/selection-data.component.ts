@@ -6,6 +6,7 @@ import {map} from "rxjs/operators";
 import {MeasuredEvent} from "../../../../../models/measured-event.model";
 import {Browser} from "../../../../../models/browser.model";
 import {Connectivity} from "../../../../../models/connectivity.model";
+import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-selection-data',
@@ -13,7 +14,7 @@ import {Connectivity} from "../../../../../models/connectivity.model";
   styleUrls: ['./selection-data.component.scss']
 })
 export class SelectionDataComponent implements OnInit {
-  @Input() parentChildData$: Observable<(Location | MeasuredEvent)[]>;
+  @Input() parentChildData$: Observable<ResponseWithLoadingState<(Location | MeasuredEvent)[]>>;
   childData$: Observable<(Location | MeasuredEvent)[]>;
   uniqueParents$: Observable<(Browser | Page | Connectivity)[]>;
 
@@ -30,23 +31,23 @@ export class SelectionDataComponent implements OnInit {
 
   ngOnInit(): void {
     this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
-      map(([parentChildData, selectedParents]) => {
+      map(([parentChildData, selectedParents]: [ResponseWithLoadingState<(Location | MeasuredEvent)[]>, number[]]) => {
         if (selectedParents && selectedParents.length) {
-          parentChildData = parentChildData.filter(item => selectedParents.includes(item.parent.id));
-          this.childSelection = parentChildData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
+          parentChildData.data = parentChildData.data.filter(item => selectedParents.includes(item.parent.id));
+          this.childSelection = parentChildData.data.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
         }
-        return this.sortAlphabetically(parentChildData);
+        return this.sortAlphabetically(parentChildData.data);
       })
     );
 
     this.uniqueParents$ = this.parentChildData$.pipe(
-      map(next => {
+      map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
         if (this.parentType !== 'connectivity') {
-          let parents: (Browser | Page)[] = next.map(value => value.parent);
+          let parents: (Browser | Page)[] = next.data.map(value => value.parent);
           let uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
           return this.sortAlphabetically(uniqueParents);
         } else {
-          return this.sortAlphabetically(next);
+          return this.sortAlphabetically(next.data);
         }
       })
     )

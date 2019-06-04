@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {ResultSelectionComponent} from './result-selection.component';
 import {TimeFrameComponent} from "./components/time-frame/time-frame.component";
-import { ApplicationComponent } from './components/application/application.component';
+import {ApplicationComponent} from './components/application/application.component';
 import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {ResultSelectionService} from "./services/result-selection.service";
 import {OsmLangService} from "../../services/osm-lang.service";
@@ -11,7 +11,7 @@ import {MeasurandsComponent} from "./components/measurands/measurands.component"
 import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
 import {PageLocationConnectivityComponent} from "./components/page-location-connectivity/page-location-connectivity.component";
 import {ResultSelectionStore} from "./services/result-selection.store";
-import {SelectionDataComponent} from "./components/result-selection-page-location-connectivity/selection-data/selection-data.component";
+import {SelectionDataComponent} from "./components/page-location-connectivity/selection-data/selection-data.component";
 
 describe('ResultSelectionComponent', () => {
   let component: ResultSelectionComponent;

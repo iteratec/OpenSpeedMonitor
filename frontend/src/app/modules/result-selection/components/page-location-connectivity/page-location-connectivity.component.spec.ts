@@ -1,13 +1,11 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {
-  ActiveTab,
-  ResultSelectionPageLocationConnectivityComponent
-} from './result-selection-page-location-connectivity.component';
+import {ActiveTab, PageLocationConnectivityComponent} from './page-location-connectivity.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
 import {ResultSelectionStore} from "../../services/result-selection.store";
+import {SelectionDataComponent} from "./selection-data/selection-data.component";
 
 describe('PageLocationConnectivityComponent', () => {
   let component: PageLocationConnectivityComponent;
@@ -17,7 +15,7 @@ describe('PageLocationConnectivityComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionPageLocationConnectivityComponent, SelectionDataComponent],
+      declarations: [PageLocationConnectivityComponent, SelectionDataComponent],
       imports: [SharedMocksModule],
       providers: [
         ResultSelectionService,
@@ -31,9 +29,8 @@ describe('PageLocationConnectivityComponent', () => {
     resultSelectionStore = TestBed.get(ResultSelectionStore);
     fixture = TestBed.createComponent(PageLocationConnectivityComponent);
     component = fixture.componentInstance;
-    resultSelectionStore.eventsAndPages$.next({isLoading: false, data: [
-    ]});
-    resultSelectionStore.locationsAndBrowsers$.next({isLoading: false, data: [
+    resultSelectionStore.eventsAndPages$.next({isLoading: false, data: []});
+    resultSelectionStore.locationsAndBrowsers$.next({isLoading: false, data: []});
     fixture.detectChanges();
   });
 

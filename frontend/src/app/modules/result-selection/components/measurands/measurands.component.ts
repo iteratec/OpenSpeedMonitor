@@ -31,6 +31,7 @@ export class MeasurandsComponent implements OnInit {
         this.resultSelectionStore.requestSizes$,
         this.resultSelectionStore.percentages$
       ]
+    });
     this.resultSelectionStore.loadTimes$.subscribe(next => {
       this.defaultValue = next.values[0];
       this.selectedMeasurands = [this.defaultValue];

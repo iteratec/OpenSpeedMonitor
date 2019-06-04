@@ -2,8 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, OperatorFunction, ReplaySubject} from "rxjs";
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
-import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
-import {catchError, map, switchMap, startWith} from "rxjs/operators";
+import {catchError, map, startWith, switchMap} from "rxjs/operators";
 import {Application} from "../../../models/application.model";
 import {Page} from "../../../models/page.model";
 import {Caller, ResultSelectionCommand} from "../models/result-selection-command.model";
@@ -99,7 +98,7 @@ export class ResultSelectionService {
     this.setToLoading(this.percentages$, "PERCENTAGES");
     const url: string = '/resultSelection/getMeasurands';
     return this.http.get<MeasurandGroup[]>(url).pipe(
-      handleError()
+      this.handleError()
     ).subscribe((groups: MeasurandGroup[]) => {
       groups.forEach((group: MeasurandGroup) => {
         let responseWithLoadingState: MeasurandGroup = {
@@ -121,7 +120,7 @@ export class ResultSelectionService {
   updateMeasurands(resultSelectionCommand: ResultSelectionCommand): Observable<MeasurandGroup[]> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get('/resultSelection/getMeasurands', {params: params}).pipe(
-      handleError(),
+      this.handleError(),
       startWith(null)
     )
   }
@@ -151,7 +150,7 @@ export class ResultSelectionService {
 
   private getSelectableMeasurands(url: string, params: any, groupName: string): Observable<MeasurandGroup> {
     return this.http.get<SelectableMeasurand[]>(url, {params}).pipe(
-      handleError(),
+      this.handleError(),
       map(dtos => ({
         isLoading: false,
         name: "frontend.de.iteratec.isr.measurand.group." + groupName, values: dtos
@@ -162,7 +161,7 @@ export class ResultSelectionService {
   fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
     const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
     return this.http.get<T>(url, {params: params}).pipe(
-      handleError()
+      this.handleError()
     )
   }
 
@@ -184,12 +183,11 @@ export class ResultSelectionService {
     return params;
   }
 
-}
+  private handleError(): OperatorFunction<any, any> {
+    return catchError((error) => {
+      console.error(error);
+      return EMPTY;
+    });
+  }
 
-
-function handleError(): OperatorFunction<any, any> {
-  return catchError((error) => {
-    console.error(error);
-    return EMPTY;
-  });
 }
