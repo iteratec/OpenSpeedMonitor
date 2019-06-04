@@ -74,12 +74,6 @@ export class ApplicationService {
       filter((applications: ResponseWithLoadingState<Application[]>) => !applications.isLoading && !!applications.data),
       map((applications: ResponseWithLoadingState<Application[]>) => applications.data)
     ).subscribe((applications: Application[]) => this.setApp(applications, applicationId));
-    // const app: Application = this.applications$.getValue().data.find((app: Application) => app.id == applicationId)
-    // if (app) {
-    //   this.selectedApplication$.next(app)
-    // } else {
-    //   console.error(`No Application exists for id '${applicationId}'`);
-    // }
   }
 
   private setApp(apps: Application[], appId: string) {

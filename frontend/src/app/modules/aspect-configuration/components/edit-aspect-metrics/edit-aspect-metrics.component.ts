@@ -1,12 +1,12 @@
 import {Component, OnInit} from '@angular/core';
-import {combineLatest, Observable, ReplaySubject} from "rxjs";
+import {Observable, ReplaySubject} from "rxjs";
 import {Application} from "../../../../models/application.model";
 import {Page} from "../../../../models/page.model";
 import {ApplicationService} from "../../../../services/application.service";
 import {ActivatedRoute, ParamMap} from "@angular/router";
 import {AspectConfigurationService} from "../../services/aspect-configuration.service";
 import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
-import {filter, map} from "rxjs/operators";
+import {distinctUntilChanged, filter, map, withLatestFrom} from "rxjs/operators";
 import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
 
 @Component({
@@ -31,13 +31,9 @@ export class EditAspectMetricsComponent implements OnInit {
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
     this.performanceAspects$ = aspectConfService.extendedAspects$;
-    combineLatest(this.application$, this.page$, this.browserId$).subscribe(([app, page, browserId]: [Application, Page, number]) => {
-      const now = new Date();
-      const twoWeeksAgo = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 14);
-      this.metricFinderService.loadData(twoWeeksAgo, now, app.id, page.id, browserId);
-    })
-  }
+    this.initMetricFinderDataLoading();
 
+  }
 
   ngOnInit() {
     this.route.paramMap.subscribe((params: ParamMap) => {
@@ -51,6 +47,19 @@ export class EditAspectMetricsComponent implements OnInit {
         map((types: PerformanceAspectType[]) => types.find((type: PerformanceAspectType) => type.name == params.get('aspectType')))
       ).subscribe((type: PerformanceAspectType) => this.aspectType$.next(type));
     });
+    this.aspectConfService.initAspectTypes();
+  }
+
+  private initMetricFinderDataLoading() {
+    this.browserId$.pipe(
+      distinctUntilChanged(),
+      withLatestFrom(this.application$, this.page$)
+    ).subscribe(([browserId, app, page]: [number, Application, Page]) => {
+      const now = new Date();
+      const from = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7);
+      console.log(`from=${from}|to=${now}|app=${app.id}|page=${page.id}|browser=${browserId}`);
+      this.metricFinderService.loadData(from, now, app.id, page.id, browserId);
+    })
   }
 
 }
