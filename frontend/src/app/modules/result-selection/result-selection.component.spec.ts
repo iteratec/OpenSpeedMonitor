@@ -8,7 +8,7 @@ import {ResultSelectionService} from "./services/result-selection.service";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {MeasurandsComponent} from "./components/measurands/measurands.component";
-import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
+import {MeasurandSelectComponent} from "./components/measurands/measurand-select/measurand-select.component";
 import {PageLocationConnectivityComponent} from "./components/page-location-connectivity/page-location-connectivity.component";
 import {ResultSelectionStore} from "./services/result-selection.store";
 import {SelectionDataComponent} from "./components/page-location-connectivity/selection-data/selection-data.component";

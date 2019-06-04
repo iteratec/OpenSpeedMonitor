@@ -32,12 +32,19 @@ describe('PageLocationConnectivityComponent', () => {
     component = fixture.componentInstance;
     resultSelectionStore.eventsAndPages$.next({isLoading: false, data: []});
     resultSelectionStore.locationsAndBrowsers$.next({isLoading: false, data: []});
-    // fixture.debugElement.query(By.css('osm-selection-data')).componentInstance.parentType
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should have correct selection data components', () => {
+    expect(fixture.debugElement.queryAll(By.directive(SelectionDataComponent)).length).toBe(3);
+    expect(fixture.debugElement.queryAll(By.directive(SelectionDataComponent)).map(debugElement =>
+      debugElement.attributes['ng-reflect-parent-type']
+    ))
+      .toEqual([ResultSelectionCommandParameter.PAGES, ResultSelectionCommandParameter.BROWSERS, ResultSelectionCommandParameter.CONNECTIVITIES]);
   });
 
   it('should correctly switch between tabs', () => {

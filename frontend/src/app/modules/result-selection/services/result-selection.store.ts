@@ -3,16 +3,16 @@ import {
   ResultSelectionCommand,
   ResultSelectionCommandParameter
 } from "../models/result-selection-command.model";
-import {BehaviorSubject, ReplaySubject} from "rxjs";
+import {BehaviorSubject} from "rxjs";
 import {MeasuredEvent} from "../../../models/measured-event.model";
 import {Location} from "../../../models/location.model";
 import {Connectivity} from "../../../models/connectivity.model";
 import {Injectable} from "@angular/core";
+import {URL} from "../../../enums/url.enum";
 import {ApplicationWithPages, SelectableApplication} from "../../../models/application.model";
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
-import {ResultSelectionService, URL} from "./result-selection.service";
-import {Loading} from "../../../models/loading.model";
+import {ResultSelectionService} from "./result-selection.service";
 
 export enum UiComponent {
   APPLICATION, PAGE_LOCATION_CONNECTIVITY, MEASURAND
@@ -112,7 +112,8 @@ export class ResultSelectionStore {
     this.requestCounts$.next({...this.requestCounts$.getValue(), isLoading: true});
     this.requestSizes$.next({...this.requestSizes$.getValue(), isLoading: true});
     this.percentages$.next({...this.percentages$.getValue(), isLoading: true});
-    this.resultSelectionService.updateMeasurands(resultSelectionCommand).subscribe((groups: MeasurandGroup[]) => {
+    this.resultSelectionService.fetchResultSelectionData<MeasurandGroup[]>(resultSelectionCommand, URL.MEASURANDS)
+      .subscribe((groups: MeasurandGroup[]) => {
       if (groups) {
         groups.forEach((group: MeasurandGroup) => {
           let responseWithLoadingState: MeasurandGroup = {

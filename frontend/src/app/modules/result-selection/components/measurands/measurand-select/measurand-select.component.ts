@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {MeasurandGroup, SelectableMeasurand} from "../../../../../models/measurand.model";
+import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-measurand-select',

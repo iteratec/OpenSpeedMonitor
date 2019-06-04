@@ -16,8 +16,8 @@
       :</strong>
   </label>
   <ng-select id="result-selection-child-selection"
-             [items]="childData$ | async" [(ngModel)]="childSelection"
-             [multiple]="true" [closeOnSelect]="false" bindValue="id" bindLabel="name" [groupBy]="'parent.id'"
+             [items]="childData$ | async" [(ngModel)]="childSelection" (ngModelChange)="updateResultSelectionCommand()"
+             [multiple]="true" [closeOnSelect]="true" bindValue="id" bindLabel="name" [groupBy]="'parent.id'"
              placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
   </ng-select>
   <div class="checkbox-inline" (click)="selectAllChildrenCheckbox.checked = true; childSelection = []">

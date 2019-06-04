@@ -55,12 +55,15 @@ export class SelectionDataComponent implements OnInit {
         }
       })
     );
-
   }
 
   filterSelectableItems(selectedParents: number[]): void {
     this.parentSelection$.next(selectedParents);
     this.resultSelectionStore.setResultSelectionCommandIds(selectedParents, this.parentType);
+  }
+
+  updateResultSelectionCommand(): void {
+    this.resultSelectionStore.setResultSelectionCommandIds(this.childSelection, this.childType);
   }
 
   determineOpacity(selectionLength: number, parentSelectionOptional: boolean): number {

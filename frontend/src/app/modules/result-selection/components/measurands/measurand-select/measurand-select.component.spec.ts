@@ -1,12 +1,12 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {MeasurandSelectComponent} from './measurand-select.component';
-import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
-import {ResultSelectionService} from "../../services/result-selection.service";
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {MeasurandGroup} from "../../../../models/measurand.model";
+import {SharedMocksModule} from "../../../../../testing/shared-mocks.module";
+import {ResultSelectionService} from "../../../services/result-selection.service";
+import {ResultSelectionStore} from "../../../services/result-selection.store";
+import {MeasurandGroup} from "../../../../../models/measurand.model";
 import {BehaviorSubject} from "rxjs";
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 
 describe('MeasurandSelectComponent', () => {
   let component: MeasurandSelectComponent;

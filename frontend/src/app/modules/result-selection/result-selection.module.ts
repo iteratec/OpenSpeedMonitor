@@ -1,7 +1,7 @@
 import {NgModule} from '@angular/core';
 import {ResultSelectionComponent} from './result-selection.component';
 import {ResultSelectionService} from "./services/result-selection.service";
-import {MeasurandSelectComponent} from "./components/measurand-select/measurand-select.component";
+import {MeasurandSelectComponent} from "./components/measurands/measurand-select/measurand-select.component";
 import {SharedModule} from "../shared/shared.module";
 import {TimeFrameComponent} from './components/time-frame/time-frame.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
