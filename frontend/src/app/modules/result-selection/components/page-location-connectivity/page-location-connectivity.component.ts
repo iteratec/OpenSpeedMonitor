@@ -6,6 +6,7 @@ import {Location} from "../../../../models/location.model";
 import {Connectivity} from "../../../../models/connectivity.model";
 import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
@@ -19,6 +20,7 @@ export class PageLocationConnectivityComponent implements OnInit {
 
   ActiveTab: typeof ActiveTab = ActiveTab;
   activeTab: ActiveTab;
+  ResultSelectionCommandParameter = ResultSelectionCommandParameter;
 
   @Input() showMeasuredStepSelection: boolean = true;
   @Input() showLocationSelection: boolean = true;

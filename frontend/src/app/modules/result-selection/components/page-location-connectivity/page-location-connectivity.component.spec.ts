@@ -6,6 +6,7 @@ import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {SelectionDataComponent} from "./selection-data/selection-data.component";
+import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 
 describe('PageLocationConnectivityComponent', () => {
   let component: PageLocationConnectivityComponent;
@@ -31,16 +32,12 @@ describe('PageLocationConnectivityComponent', () => {
     component = fixture.componentInstance;
     resultSelectionStore.eventsAndPages$.next({isLoading: false, data: []});
     resultSelectionStore.locationsAndBrowsers$.next({isLoading: false, data: []});
+    // fixture.debugElement.query(By.css('osm-selection-data')).componentInstance.parentType
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should have correct selection data components', () => {
-    expect(fixture.debugElement.queryAll(By.directive(SelectionDataComponent)).length).toBe(3);
-    expect(fixture.debugElement.queryAll(By.directive(SelectionDataComponent)).map(debugElement => debugElement.attributes.parentType)).toEqual(["page", "browser", "connectivity"]);
   });
 
   it('should correctly switch between tabs', () => {
@@ -49,7 +46,7 @@ describe('PageLocationConnectivityComponent', () => {
     expect(fixture.debugElement.query(By.css('#connectivityTab')).classes.active).toBe(false);
     expect(fixture.debugElement.queryAll(By.css('osm-selection-data[hidden]')).length).toBe(2);
     expect(fixture.debugElement.queryAll(By.css('osm-selection-data:not([hidden])')).length).toBe(1);
-    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe("page");
+    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe(ResultSelectionCommandParameter.PAGES);
     component.showPageSelection = false;
     component.activeTab = ActiveTab.BrowserAndLocation;
     fixture.detectChanges();
@@ -58,7 +55,7 @@ describe('PageLocationConnectivityComponent', () => {
     expect(fixture.debugElement.query(By.css('#connectivityTab')).classes.active).toBe(false);
     expect(fixture.debugElement.queryAll(By.css('osm-selection-data[hidden]')).length).toBe(1);
     expect(fixture.debugElement.queryAll(By.css('osm-selection-data:not([hidden])')).length).toBe(1);
-    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe("browser");
+    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe(ResultSelectionCommandParameter.BROWSERS);
     component.activeTab = ActiveTab.Connectivity;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#pageAndEventTab'))).toBeFalsy();
@@ -66,6 +63,6 @@ describe('PageLocationConnectivityComponent', () => {
     expect(fixture.debugElement.query(By.css('#connectivityTab')).classes.active).toBe(true);
     expect(fixture.debugElement.queryAll(By.css('osm-selection-data[hidden]')).length).toBe(1);
     expect(fixture.debugElement.queryAll(By.css('osm-selection-data:not([hidden])')).length).toBe(1);
-    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe("connectivity");
+    expect(fixture.debugElement.query(By.css('osm-selection-data:not([hidden])')).componentInstance.parentType).toBe(ResultSelectionCommandParameter.CONNECTIVITIES);
   });
 });

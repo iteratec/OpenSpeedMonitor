@@ -7,6 +7,8 @@ import {MeasuredEvent} from "../../../../../models/measured-event.model";
 import {Browser} from "../../../../../models/browser.model";
 import {Connectivity} from "../../../../../models/connectivity.model";
 import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
+import {ResultSelectionStore} from "../../../services/result-selection.store";
+import {ResultSelectionCommandParameter} from "../../../models/result-selection-command.model";
 
 @Component({
   selector: 'osm-selection-data',
@@ -18,8 +20,8 @@ export class SelectionDataComponent implements OnInit {
   childData$: Observable<(Location | MeasuredEvent)[]>;
   uniqueParents$: Observable<(Browser | Page | Connectivity)[]>;
 
-  @Input() childType: string;
-  @Input() parentType: string;
+  @Input() childType: ResultSelectionCommandParameter;
+  @Input() parentType: ResultSelectionCommandParameter;
   @Input() showChildSelection: boolean = true;
   @Input() parentSelectionOptional: boolean = true;
 
@@ -27,9 +29,11 @@ export class SelectionDataComponent implements OnInit {
   parentSelection: number[] = [];
   childSelection: number[] = [];
 
-  constructor() { }
+  constructor(private resultSelectionStore: ResultSelectionStore) {
+  }
 
   ngOnInit(): void {
+
     this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
       map(([parentChildData, selectedParents]: [ResponseWithLoadingState<(Location | MeasuredEvent)[]>, number[]]) => {
         if (selectedParents && selectedParents.length) {
@@ -42,7 +46,7 @@ export class SelectionDataComponent implements OnInit {
 
     this.uniqueParents$ = this.parentChildData$.pipe(
       map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
-        if (this.parentType !== 'connectivity') {
+        if (this.parentType !== ResultSelectionCommandParameter.CONNECTIVITIES) {
           let parents: (Browser | Page)[] = next.data.map(value => value.parent);
           let uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
           return this.sortAlphabetically(uniqueParents);
@@ -50,11 +54,13 @@ export class SelectionDataComponent implements OnInit {
           return this.sortAlphabetically(next.data);
         }
       })
-    )
+    );
+
   }
 
   filterSelectableItems(selectedParents: number[]): void {
     this.parentSelection$.next(selectedParents);
+    this.resultSelectionStore.setResultSelectionCommandIds(selectedParents, this.parentType);
   }
 
   determineOpacity(selectionLength: number, parentSelectionOptional: boolean): number {
