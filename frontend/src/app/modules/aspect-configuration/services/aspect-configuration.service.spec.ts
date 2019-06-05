@@ -6,11 +6,7 @@ import {Application} from "../../../models/application.model";
 import {HttpRequest} from "@angular/common/http";
 import {BrowserInfoDto} from "../../../models/browser.model";
 import {ApplicationService} from "../../../services/application.service";
-import {
-  ExtendedPerformanceAspect,
-  PerformanceAspect,
-  PerformanceAspectType
-} from "../../../models/perfomance-aspect.model";
+import {ExtendedPerformanceAspect, PerformanceAspect} from "../../../models/perfomance-aspect.model";
 import {BehaviorSubject, ReplaySubject} from "rxjs";
 import {Page} from "../../../models/page.model";
 
@@ -146,68 +142,6 @@ describe('AspectConfigurationService', () => {
       expect(info2.operatingSystem).toBe("Android");
       expect(info2.deviceType).toEqual({name: 'Galaxy Tab A', icon: 'tablet'});
     }))
-
-  it('should provide unique AspectTypes correctly according to given PerformanceAspects', inject(
-    [AspectConfigurationService],
-    (service: AspectConfigurationService) => {
-      const type1: PerformanceAspectType = {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'};
-      const type2: PerformanceAspectType = {name: 'PAGE_SHOWS_USEFUL_CONTENT', icon: 'hourglass'};
-      const aspectsOfTwoDifferentTypes = [
-        {
-          id: 1,
-          pageId: 1,
-          jobGroupId: 1,
-          browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-          performanceAspectType: type1,
-          persistent: true,
-          browserName: 'browser1',
-          operatingSystem: 'Android',
-          deviceType: {name: 'Smartphone', icon: 'mobile'}
-        },
-        {
-          id: 1,
-          pageId: 2,
-          jobGroupId: 1,
-          browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-          performanceAspectType: type1,
-          persistent: true,
-          browserName: 'browser1',
-          operatingSystem: 'Android',
-          deviceType: {name: 'Smartphone', icon: 'mobile'}
-        },
-        {
-          id: 1,
-          pageId: 3,
-          jobGroupId: 1,
-          browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-          performanceAspectType: type1,
-          persistent: true,
-          browserName: 'browser1',
-          operatingSystem: 'Android',
-          deviceType: {name: 'Smartphone', icon: 'mobile'}
-        },
-        {
-          id: 1,
-          pageId: 4,
-          jobGroupId: 1,
-          browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-          performanceAspectType: type2,
-          persistent: true,
-          browserName: 'browser1',
-          operatingSystem: 'Android',
-          deviceType: {name: 'Smartphone', icon: 'mobile'}
-        }];
-      service.extendedAspects$.next(aspectsOfTwoDifferentTypes);
-      service.uniqueAspectTypes$.subscribe((aspectTypes: PerformanceAspectType[]) => {
-        expect(aspectTypes.length).toBe(2);
-        expect(aspectTypes.filter((type: PerformanceAspectType) => type == type1).length).toBe(1);
-        expect(aspectTypes.filter((type: PerformanceAspectType) => type == type2).length).toBe(1);
-      })
-    }));
 
   describe('aspect extension', () => {
     it('should not provide any extended aspects if just BrowserInfos and no PerformanceAspects exist', inject(

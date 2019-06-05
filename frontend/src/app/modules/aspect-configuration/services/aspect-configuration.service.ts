@@ -18,14 +18,17 @@ import {LocationDto} from "../../application-dashboard/models/location.model";
 })
 export class AspectConfigurationService {
 
+  performanceAspectsForPage$ = new BehaviorSubject<PerformanceAspect[]>([]);
   browserInfos$ = new BehaviorSubject<BrowserInfoDto[]>([]);
   extendedAspects$ = new BehaviorSubject<ExtendedPerformanceAspect[]>([]);
-  uniqueAspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
-  performanceAspectsForPage$: BehaviorSubject<PerformanceAspect[]> = new BehaviorSubject([]);
-  selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
+
+  selectedPage$ = new ReplaySubject<Page>(1);
+
+  aspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
+  selectedAspectType$ = new ReplaySubject<PerformanceAspectType>(1);
 
   constructor(private http: HttpClient, private applicationService: ApplicationService) {
-    this.initAspectTypes();
+    this.loadAspectTypes();
     this.prepareExtensionOfAspects();
     this.loadBrowserInfos();
     this.getPerfAspectParams()
@@ -97,22 +100,20 @@ export class AspectConfigurationService {
     return extendedAspects;
   }
 
-  private initAspectTypes() {
-    this.extendedAspects$.pipe(
-      map((extendedAspects: ExtendedPerformanceAspect[]) => {
-        const uniqueAspectTypes = [];
-        const lookupMap = new Map();
-        for (const aspect of extendedAspects) {
-          if (!lookupMap.has(aspect.performanceAspectType.name)) {
-            lookupMap.set(aspect.performanceAspectType.name, true);
-            uniqueAspectTypes.push(aspect.performanceAspectType)
-          }
-        }
-        return uniqueAspectTypes
+  private loadAspectTypes() {
+    this.http.get<PerformanceAspectType[]>("/aspectConfiguration/rest/getAspectTypes").pipe(
+      catchError((error) => {
+        console.error(error);
+        return EMPTY;
+      })).subscribe((types: PerformanceAspectType[]) => this.aspectTypes$.next(types));
+  }
+
+  public initSelectedAspectType(typeName: string) {
+    this.aspectTypes$.pipe(
+      map((types: PerformanceAspectType[]) => {
+        return types.find((type: PerformanceAspectType) => type.name == typeName)
       })
-    ).subscribe((uniqueAspectTypes: PerformanceAspectType[]) => {
-      this.uniqueAspectTypes$.next(uniqueAspectTypes)
-    })
+    ).subscribe((type: PerformanceAspectType) => this.selectedAspectType$.next(type));
   }
 
   private getPerfAspectParams(): Observable<any> {
@@ -166,7 +167,6 @@ export class AspectConfigurationService {
       performanceAspectType: perfAspectToCreateOrUpdate.performanceAspectType.name,
       metricIdentifier: perfAspectToCreateOrUpdate.measurand.id
     };
-    console.log(`to post: ${JSON.stringify(params)}`)
     this.http.post<PerformanceAspect>('/applicationDashboard/rest/createOrUpdatePerformanceAspect', params)
       .pipe(
         catchError((error) => {

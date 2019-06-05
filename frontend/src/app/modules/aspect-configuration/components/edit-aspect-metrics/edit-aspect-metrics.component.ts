@@ -6,7 +6,7 @@ import {ApplicationService} from "../../../../services/application.service";
 import {ActivatedRoute, ParamMap} from "@angular/router";
 import {AspectConfigurationService} from "../../services/aspect-configuration.service";
 import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
-import {distinctUntilChanged, filter, map, withLatestFrom} from "rxjs/operators";
+import {distinctUntilChanged, withLatestFrom} from "rxjs/operators";
 import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
 import {MetricFinderComponent} from "../../../metric-finder/metric-finder.component";
 import {AspectMetricsComponent} from "../aspect-metrics/aspect-metrics.component";
@@ -26,9 +26,10 @@ export class EditAspectMetricsComponent implements OnInit {
 
   application$: Observable<Application>;
   page$: Observable<Page>;
+  browserId$ = new ReplaySubject<number>(1);
+
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
   aspectType$: Observable<PerformanceAspectType>;
-  browserId$ = new ReplaySubject<number>(1);
 
   constructor(
     private route: ActivatedRoute,
@@ -39,28 +40,17 @@ export class EditAspectMetricsComponent implements OnInit {
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
     this.performanceAspects$ = aspectConfService.extendedAspects$;
+    this.aspectType$ = aspectConfService.selectedAspectType$;
     this.initMetricFinderDataLoading();
-
   }
 
   ngOnInit() {
     this.route.paramMap.subscribe((params: ParamMap) => {
-      this.initAspectType(params);
-      this.browserId$.next(Number(params.get('browserId')));
       this.aspectConfService.loadApplication(params.get('applicationId'));
       this.aspectConfService.loadPage(params.get('pageId'));
-    });
-  }
-
-  private initAspectType(params: ParamMap) {
-    this.aspectType$ = this.aspectConfService.uniqueAspectTypes$.pipe(
-      filter((types: PerformanceAspectType[]) => types.length > 0),
-      map((types: PerformanceAspectType[]) => {
-        return types.find((type: PerformanceAspectType) => type.name == params.get('aspectType'))
-      })
-    );
-    this.aspectType$.subscribe((type: PerformanceAspectType) => {
-      console.log(`type=${JSON.stringify(type)}`)
+      this.browserId$.next(Number(params.get('browserId')));
+      this.aspectConfService.initSelectedAspectType(params.get('aspectType'));
+      this.loadChartData(Number(params.get('applicationId')), Number(params.get('pageId')), Number(params.get('browserId')));
     });
   }
 
@@ -69,11 +59,14 @@ export class EditAspectMetricsComponent implements OnInit {
       distinctUntilChanged(),
       withLatestFrom(this.application$, this.page$)
     ).subscribe(([browserId, app, page]: [number, Application, Page]) => {
-      const now = new Date();
-      const from = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7);
-      console.log(`from=${from}|to=${now}|app=${app.id}|page=${page.id}|browser=${browserId}`);
-      this.metricFinderService.loadData(from, now, app.id, page.id, browserId);
+      this.loadChartData(app.id, page.id, browserId);
     })
+  }
+
+  private loadChartData(appId: number, pageId: number, browserId: number) {
+    const now = new Date();
+    const from = new Date(now.getTime() - 1000 * 60 * 60 * 24 * 7);
+    this.metricFinderService.loadData(from, now, appId, pageId, browserId);
   }
 
   persistAspect() {

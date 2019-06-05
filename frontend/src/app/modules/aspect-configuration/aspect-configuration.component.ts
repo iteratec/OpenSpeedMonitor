@@ -24,7 +24,7 @@ export class AspectConfigurationComponent implements OnInit {
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
     this.performanceAspects$ = aspectConfService.extendedAspects$;
-    this.aspectTypes$ = aspectConfService.uniqueAspectTypes$;
+    this.aspectTypes$ = aspectConfService.aspectTypes$;
   }
 
   ngOnInit() {
