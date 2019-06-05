@@ -60,6 +60,7 @@ export class EditAspectMetricsComponent implements OnInit {
       withLatestFrom(this.application$, this.page$)
     ).subscribe(([browserId, app, page]: [number, Application, Page]) => {
       this.loadChartData(app.id, page.id, browserId);
+      this.metricFinderCmp.clearResults();
     })
   }
 
