@@ -1,4 +1,4 @@
-<p class="performance-aspect-type">
+<p class="performance-aspect-type" *ngIf="aspectType">
   {{"frontend.de.iteratec.osm.performance-aspect." + aspectType?.name + ".user-centric-question" | translate}}
   <i class="fas fa-{{aspectType?.icon}}"></i>
 </p>
@@ -6,7 +6,7 @@
   <li *ngFor="let aspect of aspectsToShow$ | async"
       [class.selected-list-item]="aspect.browserId == browserId">
     <a
-      [routerLink]="['/aspectConfiguration/edit', (application$ | async)?.id || '', (page$ | async)?.id || '', aspect.browserId, aspectType.name]">
+      [routerLink]="['/aspectConfiguration/edit', application.id, page.id, aspect.browserId, aspectType.name]">
       <div class="aspect-links">
         <i class="fas fa-3x fa-{{aspect.deviceType.icon}} aspect-device-type"></i>
         <span class="aspect-row-top">

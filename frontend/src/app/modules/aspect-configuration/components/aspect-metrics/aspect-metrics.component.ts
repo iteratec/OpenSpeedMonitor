@@ -1,10 +1,14 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
-import {Observable, of} from "rxjs";
-import {ApplicationService} from "../../../../services/application.service";
+import {
+  ExtendedPerformanceAspect,
+  PerformanceAspect,
+  PerformanceAspectType
+} from "../../../../models/perfomance-aspect.model";
+import {Observable} from "rxjs";
 import {Application} from "../../../../models/application.model";
 import {Page} from "../../../../models/page.model";
 import {AspectConfigurationService} from "../../services/aspect-configuration.service";
+import {filter, map} from "rxjs/operators";
 
 @Component({
   selector: 'osm-aspect-metrics',
@@ -12,20 +16,41 @@ import {AspectConfigurationService} from "../../services/aspect-configuration.se
   styleUrls: ['./aspect-metrics.component.scss']
 })
 export class AspectMetricsComponent implements OnInit {
-  @Input() aspects: ExtendedPerformanceAspect[];
+
   @Input() aspectType: PerformanceAspectType;
-  aspectsToShow$: Observable<ExtendedPerformanceAspect[]>;
-  application$: Observable<Application>;
-  page$: Observable<Page>;
+  @Input() application: Application;
+  @Input() page: Page;
   @Input() browserId: number;
 
-  constructor(private applicationService: ApplicationService, private aspectConfService: AspectConfigurationService) {
-    this.application$ = applicationService.selectedApplication$;
-    this.page$ = aspectConfService.selectedPage$;
+  aspectsToShow$: Observable<ExtendedPerformanceAspect[]>;
+
+  constructor(private aspectConfService: AspectConfigurationService) {
   }
 
   ngOnInit() {
-    this.aspectsToShow$ = of(this.aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == this.aspectType.name));
+    // combineLatest(this.aspectConfService.extendedAspects$, this.aspectConfService.uniqueAspectTypes$).pipe(
+    //   filter(([aspects, types]: [ExtendedPerformanceAspect[], PerformanceAspectType[]]) => types.length > 0),
+    //   map(([aspects, types]: [ExtendedPerformanceAspect[], PerformanceAspectType[]]) => aspects)
+    // ).subscribe((aspects: ExtendedPerformanceAspect[]) => console.log(`############## aspects=${JSON.stringify(aspects)}\nthis.aspectType=${JSON.stringify(this.aspectType)}\nthis.application=${JSON.stringify(this.application)}\nthis.page=${JSON.stringify(this.page)}\nthis.browserId=${JSON.stringify(this.browserId)}`));
+
+    this.aspectsToShow$ = this.aspectConfService.extendedAspects$.pipe(
+      filter((aspects: ExtendedPerformanceAspect[]) => {
+        console.log(`aspects=${JSON.stringify(aspects)}\nthis.aspectType=${JSON.stringify(this.aspectType)}\nthis.application=${JSON.stringify(this.application)}\nthis.page=${JSON.stringify(this.page)}\nthis.browserId=${JSON.stringify(this.browserId)}`);
+        return aspects.length > 0 && typeof this.aspectType !== 'undefined' && this.aspectType != null
+      }),
+      map((aspects: ExtendedPerformanceAspect[]) => {
+        return aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == this.aspectType.name)
+      })
+    );
+    this.aspectsToShow$.subscribe((aspects: ExtendedPerformanceAspect[]) => console.log(`aspectsToShow=${JSON.stringify(aspects)}`))
+  }
+
+  getSelectedAspect(): PerformanceAspect {
+    const matchingAspect: PerformanceAspect = this.aspectConfService.extendedAspects$.getValue().find((aspect: PerformanceAspect) => {
+      return aspect.applicationId == this.application.id && aspect.pageId == this.page.id &&
+        aspect.browserId == this.browserId && aspect.performanceAspectType.name == this.aspectType.name
+    });
+    return matchingAspect;
   }
 
 }

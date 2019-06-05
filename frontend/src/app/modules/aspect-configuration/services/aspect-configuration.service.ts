@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, mergeMap, startWith, switchMap} from "rxjs/operators";
+import {catchError, map, mergeMap, switchMap, withLatestFrom} from "rxjs/operators";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, ReplaySubject} from "rxjs";
 import {Page} from "../../../models/page.model";
 import {BrowserInfoDto} from "../../../models/browser.model";
@@ -20,17 +20,20 @@ export class AspectConfigurationService {
 
   browserInfos$ = new BehaviorSubject<BrowserInfoDto[]>([]);
   extendedAspects$ = new BehaviorSubject<ExtendedPerformanceAspect[]>([]);
-  uniqueAspectTypes$ = new BehaviorSubject<PerformanceAspectType[]>([]);
+  uniqueAspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
   performanceAspectsForPage$: BehaviorSubject<PerformanceAspect[]> = new BehaviorSubject([]);
   selectedPage$: ReplaySubject<Page> = new ReplaySubject<Page>(1);
 
   constructor(private http: HttpClient, private applicationService: ApplicationService) {
+    this.initAspectTypes();
+    this.prepareExtensionOfAspects();
     this.loadBrowserInfos();
     this.getPerfAspectParams()
       .pipe(
-        switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams)),
-        startWith([])
-      ).subscribe(nextAspects => this.performanceAspectsForPage$.next(nextAspects));
+        switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams))
+      ).subscribe(nextAspects => {
+      this.performanceAspectsForPage$.next(nextAspects)
+    });
   }
 
   loadApplication(applicationId: string): void {
@@ -61,13 +64,15 @@ export class AspectConfigurationService {
   }
 
   prepareExtensionOfAspects() {
-    combineLatest(this.performanceAspectsForPage$, this.browserInfos$)
-      .pipe(
-        map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
-          const extendedAspects: ExtendedPerformanceAspect[] = this.extendAspects(aspects, browserInfos);
-          return extendedAspects;
-        })
-      ).subscribe((nextExtendedAspects: ExtendedPerformanceAspect[]) => this.extendedAspects$.next(nextExtendedAspects))
+    this.performanceAspectsForPage$.pipe(
+      withLatestFrom(this.browserInfos$),
+      map(([aspects, browserInfos]: [PerformanceAspect[], BrowserInfoDto[]]) => {
+        const extendedAspects: ExtendedPerformanceAspect[] = this.extendAspects(aspects, browserInfos);
+        return extendedAspects;
+      })
+    ).subscribe((nextExtendedAspects: ExtendedPerformanceAspect[]) => {
+      this.extendedAspects$.next(nextExtendedAspects)
+    });
   }
 
   extendAspects(aspects: PerformanceAspect[], browserInfos: BrowserInfoDto[]): ExtendedPerformanceAspect[] {
@@ -92,7 +97,7 @@ export class AspectConfigurationService {
     return extendedAspects;
   }
 
-  initAspectTypes() {
+  private initAspectTypes() {
     this.extendedAspects$.pipe(
       map((extendedAspects: ExtendedPerformanceAspect[]) => {
         const uniqueAspectTypes = [];
@@ -105,7 +110,9 @@ export class AspectConfigurationService {
         }
         return uniqueAspectTypes
       })
-    ).subscribe((uniqueAspectTypes: PerformanceAspectType[]) => this.uniqueAspectTypes$.next(uniqueAspectTypes))
+    ).subscribe((uniqueAspectTypes: PerformanceAspectType[]) => {
+      this.uniqueAspectTypes$.next(uniqueAspectTypes)
+    })
   }
 
   private getPerfAspectParams(): Observable<any> {
@@ -154,9 +161,9 @@ export class AspectConfigurationService {
     const params = {
       performanceAspectId: perfAspectToCreateOrUpdate.id,
       pageId: perfAspectToCreateOrUpdate.pageId,
-      applicationId: perfAspectToCreateOrUpdate.jobGroupId,
+      applicationId: perfAspectToCreateOrUpdate.applicationId,
       browserId: perfAspectToCreateOrUpdate.browserId,
-      performanceAspectType: perfAspectToCreateOrUpdate.performanceAspectType,
+      performanceAspectType: perfAspectToCreateOrUpdate.performanceAspectType.name,
       metricIdentifier: perfAspectToCreateOrUpdate.measurand.id
     };
     console.log(`to post: ${JSON.stringify(params)}`)
@@ -176,7 +183,7 @@ export class AspectConfigurationService {
       return exAspect.id == perfAspectToReplace.id &&
         exAspect.performanceAspectType == perfAspectToReplace.performanceAspectType &&
         exAspect.pageId == perfAspectToReplace.pageId &&
-        exAspect.jobGroupId == perfAspectToReplace.jobGroupId
+        exAspect.applicationId == perfAspectToReplace.applicationId
     });
     if (existingAspect) {
       prevValue = this.performanceAspectsForPage$.getValue();

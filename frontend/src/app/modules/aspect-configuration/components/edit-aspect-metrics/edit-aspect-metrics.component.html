@@ -8,13 +8,15 @@
 
 <div class="grid-container">
   <div class="card">
-    <osm-aspect-metrics [aspects]="performanceAspects$ | async"
+    <osm-aspect-metrics [application]="application$ | async"
+                        [page]="page$ | async"
                         [aspectType]="aspectType$ | async"
                         [browserId]="browserId$ | async"
                         class="aspect-inspect"></osm-aspect-metrics>
   </div>
   <div class="card">
     <osm-metric-finder></osm-metric-finder>
-    <button class="btn btn-primary" [disabled]="">{{'frontend.default.button.save' | translate}}</button>
+    <button class="btn btn-primary btn-aspect-config"
+            [disabled]="" (click)="persistAspect()">{{'frontend.default.button.save' | translate}}</button>
   </div>
 </div>

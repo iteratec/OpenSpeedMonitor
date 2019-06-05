@@ -202,7 +202,6 @@ describe('AspectConfigurationService', () => {
           deviceType: {name: 'Smartphone', icon: 'mobile'}
         }];
       service.extendedAspects$.next(aspectsOfTwoDifferentTypes);
-      service.initAspectTypes();
       service.uniqueAspectTypes$.subscribe((aspectTypes: PerformanceAspectType[]) => {
         expect(aspectTypes.length).toBe(2);
         expect(aspectTypes.filter((type: PerformanceAspectType) => type == type1).length).toBe(1);
@@ -229,7 +228,7 @@ describe('AspectConfigurationService', () => {
         const aspects: PerformanceAspect[] = [{
           id: 1,
           pageId: 1,
-          jobGroupId: 1,
+          applicationId: 1,
           browserId: 1,
           measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
           performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'},
@@ -247,7 +246,7 @@ describe('AspectConfigurationService', () => {
           {
             id: 1,
             pageId: 1,
-            jobGroupId: 1,
+            applicationId: 1,
             browserId: idOfExtended,
             measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
             performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'},
@@ -256,7 +255,7 @@ describe('AspectConfigurationService', () => {
           {
             id: 1,
             pageId: 1,
-            jobGroupId: 1,
+            applicationId: 1,
             browserId: idOfNotExtended,
             measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
             performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'},
