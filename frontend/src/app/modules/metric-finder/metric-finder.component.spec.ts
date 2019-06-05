@@ -49,6 +49,5 @@ describe('MetricFinderComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(metricService.loadTestData).toHaveBeenCalled();
   });
 });

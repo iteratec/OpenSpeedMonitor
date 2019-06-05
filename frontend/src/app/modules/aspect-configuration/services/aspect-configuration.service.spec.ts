@@ -21,7 +21,9 @@ describe('AspectConfigurationService', () => {
           useValue: {
             selectedApplication$: new ReplaySubject<Application>(1),
             selectedPage$: new ReplaySubject<Page>(1),
-            performanceAspectsForPage$: new BehaviorSubject<PerformanceAspect[]>([])
+            performanceAspectsForPage$: new BehaviorSubject<PerformanceAspect[]>([]),
+            setSelectedApplication: (applicationId: string) => {
+            }
           }
         }
       ],
@@ -52,8 +54,10 @@ describe('AspectConfigurationService', () => {
       });
 
       service.loadApplication("1");
+
+      httpMock.expectOne("/aspectConfiguration/rest/getAspectTypes");
       const req = httpMock.expectOne((req: HttpRequest<any>) => {
-        expect(req.url).toBe("/applicationDashboard/rest/getApplication");
+        expect(req.url).toBe("/applicationDashboard/rest/getApplications");
         return true;
       });
       expect(req.request.method).toEqual('GET');
@@ -82,8 +86,9 @@ describe('AspectConfigurationService', () => {
 
       service.loadApplication("1");
 
+      httpMock.expectOne("/aspectConfiguration/rest/getAspectTypes");
       const req = httpMock.expectOne((req: HttpRequest<any>) => {
-        expect(req.url).toBe("/applicationDashboard/rest/getApplication");
+        expect(req.url).toBe("/applicationDashboard/rest/getApplications");
         return true;
       });
       expect(req.request.method).toEqual('GET');
@@ -117,15 +122,12 @@ describe('AspectConfigurationService', () => {
         }
       ];
 
-      service.loadBrowserInfos();
-      // const requests: TestRequest[] = httpMock.match("/aspectConfiguration/rest/getBrowserInformations");
+      httpMock.expectOne("/aspectConfiguration/rest/getAspectTypes");
       const req = httpMock.expectOne((req: HttpRequest<any>) => {
         console.log('req.url=' + req.urlWithParams);
         expect(req.url).toBe("/aspectConfiguration/rest/getBrowserInformations");
         return true;
       });
-      // requests.forEach((req: TestRequest) => {
-      // });
       expect(req.request.method).toEqual('GET');
       req.flush(browserInfos);
 

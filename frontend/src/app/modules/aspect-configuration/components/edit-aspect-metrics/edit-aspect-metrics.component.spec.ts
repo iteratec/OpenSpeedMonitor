@@ -10,6 +10,13 @@ import {BehaviorSubject, ReplaySubject} from "rxjs";
 import {Application} from "../../../../models/application.model";
 import {Page} from "../../../../models/page.model";
 import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
+import {MetricFinderComponent} from "../../../metric-finder/metric-finder.component";
+import {LineChartComponent} from "../../../metric-finder/components/line-chart/line-chart.component";
+import {ComparableFilmstripsComponent} from "../../../metric-finder/components/comparable-filmstrips/comparable-filmstrips.component";
+import {MetricSelectionComponent} from "../../../metric-finder/components/metric-selection/metric-selection.component";
+import {FilmstripComponent} from "../../../metric-finder/components/filmstrip/filmstrip.component";
+import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
+import {FilmstripService} from "../../../metric-finder/services/filmstrip.service";
 
 describe('EditAspectMetricsComponent', () => {
   let component: EditAspectMetricsComponent;
@@ -19,7 +26,12 @@ describe('EditAspectMetricsComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         EditAspectMetricsComponent,
-        AspectMetricsComponent
+        AspectMetricsComponent,
+        MetricFinderComponent,
+        LineChartComponent,
+        ComparableFilmstripsComponent,
+        FilmstripComponent,
+        MetricSelectionComponent
       ],
       providers: [
         EditAspectMetricsComponent,
@@ -31,7 +43,9 @@ describe('EditAspectMetricsComponent', () => {
             performanceAspectsForPage$: new BehaviorSubject<PerformanceAspect[]>([])
           }
         },
-        AspectConfigurationService
+        AspectConfigurationService,
+        MetricFinderService,
+        FilmstripService
       ],
       imports: [
         SharedMocksModule,
@@ -45,7 +59,6 @@ describe('EditAspectMetricsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(EditAspectMetricsComponent);
     component = fixture.componentInstance;
-    component.aspectType = {name: 'aspect', icon: 'aspect-icon'};
     fixture.detectChanges();
   });
 

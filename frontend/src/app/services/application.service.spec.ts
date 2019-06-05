@@ -75,7 +75,7 @@ const failingJob: Object = {
   }
 };
 
-fdescribe('ApplicationService', () => {
+describe('ApplicationService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
