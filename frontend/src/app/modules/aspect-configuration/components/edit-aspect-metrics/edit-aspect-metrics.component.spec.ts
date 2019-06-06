@@ -40,7 +40,9 @@ describe('EditAspectMetricsComponent', () => {
           useValue: {
             selectedApplication$: new ReplaySubject<Application>(1),
             selectedPage$: new ReplaySubject<Page>(1),
-            performanceAspectsForPage$: new BehaviorSubject<PerformanceAspect[]>([])
+            performanceAspectsForPage$: new BehaviorSubject<PerformanceAspect[]>([]),
+            setSelectedApplication: (applicationId: string) => {
+            }
           }
         },
         AspectConfigurationService,

@@ -7,6 +7,7 @@ import {ThresholdRowComponent} from '../threshold-row/threshold-row.component';
 import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
 import {SharedModule} from '../../../shared/shared.module';
 import {ThresholdRestService} from '../../services/threshold-rest.service';
+import {ApplicationService} from "../../../../services/application.service";
 
 describe('ThresholdGroupComponent', () => {
   let component: ThresholdGroupComponent;
@@ -16,7 +17,15 @@ describe('ThresholdGroupComponent', () => {
     TestBed.configureTestingModule({
       imports: [SharedModule, SharedMocksModule],
       declarations: [ThresholdGroupComponent, ThresholdComponent, ThresholdRowComponent],
-      providers: [MeasurandService, ThresholdRestService]
+      providers: [
+        MeasurandService,
+        ThresholdRestService,
+        {
+          provide: ApplicationService,
+          useValue: jasmine.createSpyObj('ApplicationService',
+            ['getFailingJobs'])
+        }
+      ]
     })
       .compileComponents();
   }));

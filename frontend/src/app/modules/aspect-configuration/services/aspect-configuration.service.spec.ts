@@ -38,70 +38,14 @@ describe('AspectConfigurationService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should be able to load application by id', inject(
+  it('should bei able to get an app by id', inject(
     [HttpTestingController, AspectConfigurationService, ApplicationService],
     (httpMock: HttpTestingController, service: AspectConfigurationService, applicationService: ApplicationService) => {
-
-      const appId = 1;
-      const appName = "test-app";
-
-      applicationService.selectedApplication$.subscribe((app: Application) => {
-        expect(app.id).toBe(appId);
-        expect(app.name).toBe(appName);
-        expect(app.pageCount).toBeNull();
-        expect(app.dateOfLastResults).toBeNull();
-        expect(app.csiConfigurationId).toBeNull();
-      });
-
-      service.loadApplication("1");
-
-      httpMock.expectOne("/aspectConfiguration/rest/getAspectTypes");
-      const req = httpMock.expectOne((req: HttpRequest<any>) => {
-        expect(req.url).toBe("/applicationDashboard/rest/getApplications");
-        return true;
-      });
-      expect(req.request.method).toEqual('GET');
-      req.flush({id: appId, name: appName});
-      httpMock.verify();
-    }
-  ));
-
-  it('should be able to load application by id and extracting all information from dto', inject(
-    [HttpTestingController, AspectConfigurationService, ApplicationService],
-    (httpMock: HttpTestingController, service: AspectConfigurationService, applicationService: ApplicationService) => {
-
-      const appId = 1;
-      const appName = "test-app";
-      const expectedDate = new Date();
-      const pageCount = 5;
-      const csiConfId = 53;
-
-      applicationService.selectedApplication$.subscribe((app: Application) => {
-        expect(app.id).toBe(appId);
-        expect(app.name).toBe(appName);
-        expect(app.pageCount).toBe(pageCount);
-        expect(app.dateOfLastResults).toEqual(expectedDate);
-        expect(app.csiConfigurationId).toBe(csiConfId)
-      });
-
-      service.loadApplication("1");
-
-      httpMock.expectOne("/aspectConfiguration/rest/getAspectTypes");
-      const req = httpMock.expectOne((req: HttpRequest<any>) => {
-        expect(req.url).toBe("/applicationDashboard/rest/getApplications");
-        return true;
-      });
-      expect(req.request.method).toEqual('GET');
-      req.flush({
-        id: appId,
-        name: appName,
-        pageCount: pageCount,
-        dateOfLastResults: expectedDate,
-        csiConfigurationId: csiConfId
-      });
-      httpMock.verify();
-    }
-  ));
+      const appId = '1';
+      spyOn(applicationService, 'setSelectedApplication');
+      service.loadApplication(appId);
+      expect(applicationService.setSelectedApplication).toHaveBeenCalledWith(appId);
+    }));
 
   it('should provide loaded BrowserInfoDtos in an observable', inject(
     [HttpTestingController, AspectConfigurationService],
@@ -124,7 +68,6 @@ describe('AspectConfigurationService', () => {
 
       httpMock.expectOne("/aspectConfiguration/rest/getAspectTypes");
       const req = httpMock.expectOne((req: HttpRequest<any>) => {
-        console.log('req.url=' + req.urlWithParams);
         expect(req.url).toBe("/aspectConfiguration/rest/getBrowserInformations");
         return true;
       });
