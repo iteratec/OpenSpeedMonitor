@@ -89,7 +89,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
     void "Get extended Browser informations for Browser #browserName"() {
         given: "A browser with an associated Location with information"
         Browser b = Browser.build(name: "Chrome")
-        Location.build(browser: b, operatingSystem: os, deviceType: dt)
+        Location.build(browser: b, active: true, operatingSystem: os, deviceType: dt)
 
         when: "Getting Browser infos and look up for the created browser"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()
@@ -113,12 +113,13 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
     void "Get extended Browser informations for Browser with inconclusive location informations"() {
         given: "Two browsers with conclusive and one with inconclusive location information"
         Browser chrome = Browser.build(name: "Chrome")
-        Location.build(browser: chrome, operatingSystem: OperatingSystem.WINDOWS, deviceType: DeviceType.DESKTOP)
-        Location.build(browser: chrome, operatingSystem: OperatingSystem.ANDROID, deviceType: DeviceType.SMARTPHONE)
+        Location.build(browser: chrome, active: true, operatingSystem: OperatingSystem.WINDOWS, deviceType: DeviceType.DESKTOP)
+        Location.build(browser: chrome, active: true, operatingSystem: OperatingSystem.ANDROID, deviceType: DeviceType.SMARTPHONE)
         Browser firefox = Browser.build(name: "Firefox")
-        Location.build(browser: firefox, operatingSystem: OperatingSystem.WINDOWS, deviceType: DeviceType.DESKTOP)
+        Location.build(browser: firefox, active: true, operatingSystem: OperatingSystem.WINDOWS, deviceType: DeviceType.DESKTOP)
         Browser androidSmartphone = Browser.build(name: "Galaxy S8")
-        Location.build(browser: androidSmartphone, operatingSystem: OperatingSystem.ANDROID, deviceType: DeviceType.SMARTPHONE)
+        Location.build(browser: androidSmartphone, active: true, operatingSystem: OperatingSystem.ANDROID, deviceType: DeviceType.SMARTPHONE)
+        Location.list().each { it.active = true; it.save(flush: true) }
 
         when: "Getting Browser infos and look up for the created browsers"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()
