@@ -17,8 +17,7 @@ import {
   map,
   mergeMap,
   startWith,
-  switchMap,
-  withLatestFrom
+  switchMap, withLatestFrom
 } from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {Csi, CsiDTO} from "../models/csi.model";
@@ -31,7 +30,7 @@ import {LocationDto} from "../modules/application-dashboard/models/location.mode
 
 @Injectable()
 export class ApplicationService {
-  metrics$: BehaviorSubject<PageMetricsDto[]> = new BehaviorSubject<PageMetricsDto[]>([]);
+  aspectMetrics$: BehaviorSubject<PageMetricsDto[]> = new BehaviorSubject<PageMetricsDto[]>([]);
   applicationCsiById$: BehaviorSubject<ApplicationCsiById> = new BehaviorSubject({isLoading: false});
   pageCsis$: ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>> = new ReplaySubject(1);
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
@@ -52,8 +51,8 @@ export class ApplicationService {
       ).subscribe(nextAspects => this.performanceAspectsForPage$.next(nextAspects));
 
     this.selectedApplication$.pipe(
-      switchMap((application: Application) => this.updateMetricsForPages(application))
-    ).subscribe(this.metrics$);
+      switchMap((application: Application) => this.updateAspectMetricsForPages(application))
+    ).subscribe(this.aspectMetrics$);
 
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateCsiForApplication(application)),
@@ -237,11 +236,11 @@ export class ApplicationService {
     }
   }
 
-  private updateMetricsForPages(applicationDto: Application): Observable<PageMetricsDto[]> {
+  private updateAspectMetricsForPages(application: Application): Observable<PageMetricsDto[]> {
     this.pageCsis$.next({data: [], isLoading: true});
-    this.metrics$.next(null);
-    const params = this.createParams(applicationDto.id);
-    return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
+    this.aspectMetrics$.next(null);
+    const params = this.createParams(application.id);
+    return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getAspectMetricsForApplication', {params}).pipe(
       handleError()
     )
   }

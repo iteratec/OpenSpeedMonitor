@@ -32,7 +32,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     private applicationService: ApplicationService,
     private resultSelectionService: ResultSelectionService
   ) {
-    this.pages$ = this.applicationService.metrics$;
+    this.pages$ = this.applicationService.aspectMetrics$;
     this.applications$ = applicationService.applications$.pipe(
       filter(response => !response.isLoading && !!response.data),
       map(response => response.data)

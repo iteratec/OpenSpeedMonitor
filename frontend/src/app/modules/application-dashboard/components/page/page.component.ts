@@ -6,7 +6,7 @@ import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {Metrics} from "../../../../enums/metric.enum";
+import {AspectMetrics} from "../../../../enums/aspect-metric.enum";
 import {Application} from "../../../../models/application.model";
 
 @Component({
@@ -21,9 +21,10 @@ export class PageComponent {
   pageCsi$: Observable<number>;
   pageCsiDate$: Observable<string>;
   isLoading: boolean = true;
-  metrics = Metrics;
+  aspectMetrics = AspectMetrics;
 
   constructor(private applicationDashboardService: ApplicationService) {
+
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
         this.isLoading = next.isLoading;

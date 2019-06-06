@@ -5,7 +5,7 @@ import {ApplicationService} from "../../../../services/application.service";
 import {By} from "@angular/platform-browser";
 import {Unit} from "../../../../enums/unit.enum";
 import {DebugElement} from "@angular/core";
-import {Metric} from "../../../../enums/metric.enum";
+import {AspectMetric} from "../../../../enums/aspect-metric.enum";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 
 describe('PageMetricComponent', () => {
@@ -38,7 +38,7 @@ describe('PageMetricComponent', () => {
   });
   it("should show the value if the value is available", () => {
     const value: string = "2.34";
-    const metric: Metric = new Metric("SpeedIndex", Unit.SECONDS, 'far fa-eye');
+    const metric: AspectMetric = new AspectMetric("PAGE_CONSTRUCTION_STARTED", "Is it happening", Unit.SECONDS, 'far fa-eye');
     component.value = value;
     component.metric = metric;
 
@@ -52,7 +52,7 @@ describe('PageMetricComponent', () => {
   });
   it("should be 'n/a' and without unit if the value is empty", () => {
     const value: string = "";
-    const metric: Metric = new Metric("SpeedIndex", Unit.SECONDS, 'far fa-eye');
+    const metric: AspectMetric = new AspectMetric("PAGE_CONSTRUCTION_STARTED", "Is it happening", Unit.SECONDS, 'far fa-eye');
     component.value = value;
     component.metric = metric;
 

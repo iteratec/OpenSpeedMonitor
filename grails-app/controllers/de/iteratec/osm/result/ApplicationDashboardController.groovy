@@ -42,12 +42,11 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pageCsiDtos)
     }
 
-    def getMetricsForApplication(DefaultApplicationCommand command) {
+    def getAspectMetricsForApplication(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
 
-        List<Map> activePagesAndMetrics = applicationDashboardService.getAllActivePagesAndMetrics(jobGroupId)
-
-        return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
+        List<Map> activePagesAndAspectMetrics = applicationDashboardService.getAllActivePagesAndAspectMetrics(jobGroupId)
+        return ControllerUtils.sendObjectAsJSON(response, activePagesAndAspectMetrics)
     }
 
     def getPerformanceAspectsForApplication(PerformanceAspectManagementRequestCommand command) {

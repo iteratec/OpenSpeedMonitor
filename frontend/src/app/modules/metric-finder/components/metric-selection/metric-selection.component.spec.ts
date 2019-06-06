@@ -50,7 +50,7 @@ describe('MetricSelectionComponent', () => {
     expect(component.intersect(lists)).toEqual(expected);
   });
 
-  it('should determine available metrics from results', () => {
+  it('should determine available aspectMetrics from results', () => {
     const metricService: MetricFinderService = TestBed.get(MetricFinderService);
     const now = Date.now();
     component.results = [

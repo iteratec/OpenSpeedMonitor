@@ -40,13 +40,13 @@ describe('PageComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(PageComponent);
     component = fixture.componentInstance;
-    component.application = new Application({name: 'app', id: 1})
+    component.application = new Application({name: 'app', id: 1});
     component.metricsForPage = {
       pageId: 1,
       pageName: 'page',
-      speedIndex: 2000,
-      docCompleteTimeInMillisecs: 1800,
-      fullyLoadedIncomingBytes: 3000
+      PAGE_CONSTRUCTION_STARTED: 2000,
+      PAGE_SHOWS_USEFUL_CONTENT: 1800,
+      PAGE_IS_USABLE: 3000
     };
     fixture.detectChanges();
   });
