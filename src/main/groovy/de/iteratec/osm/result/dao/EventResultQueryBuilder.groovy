@@ -167,6 +167,15 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withPerformanceAspects(List<PerformanceAspectType> aspectTypes) {
         this.aspectUtil.setAspectTypes(aspectTypes)
+
+        if (!measurandQueryExecutor.selectedMeasurands) {
+            measurandQueryExecutor.setMeasurands([])
+        }
+
+        if (!userTimingQueryExecutor.selectedMeasurands) {
+            userTimingQueryExecutor.setUserTimings([])
+        }
+
         return this
     }
 

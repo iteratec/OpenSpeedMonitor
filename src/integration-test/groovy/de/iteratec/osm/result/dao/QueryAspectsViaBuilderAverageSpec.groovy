@@ -143,6 +143,42 @@ class QueryAspectsViaBuilderAverageSpec extends NonTransactionalIntegrationSpec 
         result.PAGE_SHOWS_USEFUL_CONTENT == (10*600+10*visCompleteAsDefault)/20
     }
 
+    void "avg of aspect metric for one aspects with NO selected measurand, results in one metric, grouped by jobgroup + page"() {
+        given: "Ten EventResults with different aspect metrics and matching Aspects in db."
+        persistAspect(PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT, firstContentfulPaint, page1, browser1)
+        int firstContentfulPaintValue = 300
+        10.times {
+            LinkedHashMap<String, Integer> metrics = [
+                    startRenderInMillisecs            : 300,
+                    firstContentfulPaint              : firstContentfulPaintValue,
+                    docCompleteTimeInMillisecs        : 1200,
+                    docCompleteRequests               : 35,
+                    visuallyCompleteInMillisecs       : 500,
+                    consistentlyInteractiveInMillisecs: 600
+            ]
+            persistEventResult(metrics, page1, browser1)
+        }
+
+        when: "the builder is given the aspect type of matching aspect and no measurand"
+        EventResultQueryBuilder builder = new EventResultQueryBuilder()
+        List<EventResultProjection> results = builder
+                .withJobGroupIn([jobGroup])
+                .withPageIn([page1])
+                .withPerformanceAspects([PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT])
+                .getAverageData()
+
+        then: "avg of EventResults got calculated correctly for aspect metric"
+        results.size() == 1
+        EventResultProjection result = results[0]
+        result.PAGE_SHOWS_USEFUL_CONTENT == (10*firstContentfulPaintValue)/10
+        !result.startRenderInMillisecs
+        !result.firstContentfulPaint
+        !result.docCompleteTimeInMillisecs
+        !result.docCompleteRequests
+        !result.visuallyCompleteInMillisecs
+        !result.consistentlyInteractiveInMillisecs
+    }
+
     private void persistEventResult(Map<String, Integer> measurands, Page page = page1, Browser browser = browser1) {
         EventResult result = EventResult.build(
                 jobGroup: jobGroup,
