@@ -44,7 +44,11 @@ export class ApplicationComponent {
 
   selectTag(tag: string): void {
     this.filterApplicationsByTag(tag);
-    this.selectedTag = tag;
+    if(this.isTagSelected()) {
+      this.selectedTag = tag;
+    } else {
+      this.selectedTag = '';
+    }
   }
 
   isTagSelected(): boolean {
