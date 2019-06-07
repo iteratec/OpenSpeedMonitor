@@ -40,6 +40,7 @@ export class ApplicationComponent {
       }
     } else {
       this.updateTags(applications);
+      this.removeSelection(applications)
     }
   }
 
