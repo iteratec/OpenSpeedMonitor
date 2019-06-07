@@ -153,6 +153,42 @@ class QueryAspectsViaBuilderPercentileSpec extends NonTransactionalIntegrationSp
         result.PAGE_SHOWS_USEFUL_CONTENT == 600
     }
 
+    void "75 percentile of aspect metric for one aspects with NO selected measurand, results in one metric, grouped by jobgroup + page"() {
+        given: "100 EventResults, each with some metrics and a matching Aspect in db."
+        persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint)
+        int resultCounter = 0
+        100.times {
+            persistEventResult([
+                    startRenderInMillisecs            : 300 + resultCounter,
+                    firstContentfulPaint              : 400 + resultCounter,
+                    docCompleteTimeInMillisecs        : 1200 + resultCounter,
+                    docCompleteRequests               : 35 + resultCounter,
+                    visuallyCompleteInMillisecs       : 500 + resultCounter,
+                    consistentlyInteractiveInMillisecs: 600 + resultCounter
+            ])
+            resultCounter++
+        }
+
+        when: "the builder is given the aspect type of matching aspect and no measurand"
+        EventResultQueryBuilder builder = new EventResultQueryBuilder()
+        List<EventResultProjection> results = builder
+                .withJobGroupIn([jobGroup])
+                .withPageIn([page1])
+                .withPerformanceAspects([PerformanceAspectType.PAGE_CONSTRUCTION_STARTED])
+                .getPercentile(75)
+
+        then: "median of EventResults got calculated correctly for aspect metric"
+        results.size() == 1
+        EventResultProjection result = results[0]
+        result.PAGE_CONSTRUCTION_STARTED == 475
+        !result.startRenderInMillisecs
+        !result.firstContentfulPaint
+        !result.docCompleteTimeInMillisecs
+        !result.docCompleteRequests
+        !result.visuallyCompleteInMillisecs
+        !result.consistentlyInteractiveInMillisecs
+    }
+
     private void persistEventResult(Map<String, Integer> measurands, Page page = page1, Browser browser = browser1) {
         EventResult result = EventResult.build(
                 jobGroup: jobGroup,
