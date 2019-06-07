@@ -4,9 +4,10 @@ import {Observable} from "rxjs";
 import {MeasuredEvent} from "../../../../models/measured-event.model";
 import {Location} from "../../../../models/location.model";
 import {Connectivity} from "../../../../models/connectivity.model";
-import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
+import {UiComponent} from "../../../../enums/ui-component.enum";
 
 @Component({
   selector: 'osm-result-selection-page-location-connectivity',
@@ -29,7 +30,9 @@ export class PageLocationConnectivityComponent implements OnInit {
   @Input() showConnectivitySelection: boolean = true;
 
   constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.registerComponent(UiComponent.PAGE_LOCATION_CONNECTIVITY);
+    this.resultSelectionStore.registerComponent(UiComponent.PAGE);
+    this.resultSelectionStore.registerComponent(UiComponent.LOCATION);
+    this.resultSelectionStore.registerComponent(UiComponent.CONNECTIVITY);
     this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;
     this.locationsAndBrowsers$ = this.resultSelectionStore.locationsAndBrowsers$;
     this.connectivities$ = this.resultSelectionStore.connectivities$;

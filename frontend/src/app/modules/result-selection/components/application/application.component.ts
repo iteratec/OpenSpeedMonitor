@@ -1,7 +1,8 @@
 import {Component, ViewEncapsulation,} from '@angular/core';
 import {SelectableApplication} from 'src/app/models/application.model';
-import {ResultSelectionStore, UiComponent} from "../../services/result-selection.store";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
+import {UiComponent} from "../../../../enums/ui-component.enum";
 
 @Component({
     selector: 'osm-result-selection-application',

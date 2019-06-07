@@ -13,10 +13,7 @@ import {ApplicationWithPages, SelectableApplication} from "../../../models/appli
 import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
-
-export enum UiComponent {
-  APPLICATION, PAGE_LOCATION_CONNECTIVITY, MEASURAND
-}
+import {UiComponent} from "../../../enums/ui-component.enum";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -45,15 +42,20 @@ export class ResultSelectionStore {
   }
 
   registerComponent(component: UiComponent): void {
+    if(component === UiComponent.MEASURAND) {
+      this.loadMeasurands(this._resultSelectionCommand$.getValue());
+    }
+
     this._resultSelectionCommand$.subscribe(state => {
       if(component === UiComponent.APPLICATION) {
         this.loadSelectableApplications(state);
-      } else if(component === UiComponent.PAGE_LOCATION_CONNECTIVITY) {
+      } else if(component === UiComponent.PAGE) {
         this.loadSelectableEventsAndPages(state);
+      } else if(component === UiComponent.LOCATION) {
         this.loadSelectableLocationsAndBrowsers(state);
+      } else if(component === UiComponent.CONNECTIVITY) {
         this.loadSelectableConnectivities(state);
       } else if(component === UiComponent.MEASURAND) {
-        this.loadMeasurands(state);
         this.loadUserTimings(state);
         this.loadHeroTimings(state);
       }

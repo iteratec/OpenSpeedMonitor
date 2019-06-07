@@ -33,14 +33,14 @@ export class SelectionDataComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
       map(([parentChildData, selectedParents]: [ResponseWithLoadingState<(Location | MeasuredEvent)[]>, number[]]) => {
+        let selectableData: (Location | MeasuredEvent)[] = parentChildData.data;
         if (selectedParents && selectedParents.length) {
-          parentChildData.data = parentChildData.data.filter(item => selectedParents.includes(item.parent.id));
-          this.childSelection = parentChildData.data.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
+          selectableData = selectableData.filter(item => selectedParents.includes(item.parent.id));
+          this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
         }
-        return this.sortAlphabetically(parentChildData.data);
+        return this.sortAlphabetically(selectableData);
       })
     );
 
@@ -67,9 +67,7 @@ export class SelectionDataComponent implements OnInit {
   }
 
   determineOpacity(selectionLength: number, parentSelectionOptional: boolean): number {
-    if (!parentSelectionOptional) {
-      return 1;
-    } else if (selectionLength > 0) {
+    if (!parentSelectionOptional || selectionLength > 0) {
       return 1;
     } else {
       return 0.5;
