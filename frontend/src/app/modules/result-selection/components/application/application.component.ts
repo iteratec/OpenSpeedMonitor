@@ -20,9 +20,7 @@ export class ApplicationComponent {
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
     this.resultSelectionStore.applications$.subscribe(applications => {
-      if(applications) {
-        this.updateApplicationsAndTags(applications.data);
-      }
+      this.updateApplicationsAndTags(applications.data);
     });
   }
 
@@ -32,7 +30,7 @@ export class ApplicationComponent {
         return a.name.localeCompare(b.name);
       });
       this.applications = applications;
-      this.updateTags(this.applications);
+      this.updateTags(applications);
 
       if (this.isTagSelected && (this.selectableTags.indexOf(this.selectedTag) > -1)) {
         this.filterApplicationsByTag(this.selectedTag);
@@ -68,7 +66,7 @@ export class ApplicationComponent {
       let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
       let numberOfSelectedApplications = 0;
       if (this.applications) {
-        this.filteredApplications = this.applications.filter((app: SelectableApplication) => app.tags.indexOf(this.selectedTag) > -1);
+        this.filteredApplications = this.applications.filter((app: SelectableApplication) => app.tags.indexOf(tag) > -1);
         this.selectedApplications = this.selectedApplications.filter((selectedAppId: number) =>
           this.filteredApplications.map(item => item.id).includes(selectedAppId)
         );

@@ -58,7 +58,7 @@ describe('ApplicationComponent', () => {
 
   });
 
-  it('should correctly show the job groups accordings to the selected tag',() => {
+  it('should correctly show the job groups according to the selected tag',() => {
     component.updateApplicationsAndTags(applications);
     let tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
 
