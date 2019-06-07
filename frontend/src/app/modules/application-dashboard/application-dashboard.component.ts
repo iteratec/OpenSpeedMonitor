@@ -59,7 +59,6 @@ export class ApplicationDashboardComponent implements OnDestroy {
     this.selectedApplication = this.findApplicationById(applications, applicationId);
     if (this.selectedApplication) {
       this.applicationService.updateSelectedApplication(this.selectedApplication);
-      this.resultSelectionService.updateApplications([this.selectedApplication]);
     }
   }
 

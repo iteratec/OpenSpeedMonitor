@@ -64,16 +64,16 @@ describe('ApplicationComponent', () => {
 
     expect(component.filteredApplications).toEqual(component.applications);
 
-    component.filterByTag(component.selectableTags[0]);
+    component.selectTag(component.selectableTags[0]);
     expect(component.filteredApplications).toEqual(tagApplicationsMapping[0]);
 
-    component.filterByTag(component.selectableTags[1]);
+    component.selectTag(component.selectableTags[1]);
     expect(component.filteredApplications).toEqual(tagApplicationsMapping[1]);
 
-    component.filterByTag(component.selectableTags[2]);
+    component.selectTag(component.selectableTags[2]);
     expect(component.filteredApplications).toEqual(tagApplicationsMapping[2]);
 
-    component.filterByTag(component.selectableTags[2]);
+    component.selectTag(component.selectableTags[2]);
     expect(component.filteredApplications).toEqual(component.applications);
   });
 

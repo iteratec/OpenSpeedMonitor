@@ -17,9 +17,6 @@ export class ApplicationComponent {
   selectableTags: string[];
   selectedTag: string = '';
 
-  isEmpty = true;
-  isSelected = false;
-
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
     this.resultSelectionStore.applications$.subscribe(applications => {
@@ -29,38 +26,31 @@ export class ApplicationComponent {
     });
   }
 
-  filterByTag(tag: string): void {
-    if(!this.isSelected) {
-      this.isSelected = true;
-      this.selectedTag = tag;
-      this.setFilteredApplications(this.selectedTag);
-    } else if(tag !== this.selectedTag) {
-      this.selectedTag = tag;
-      this.setFilteredApplications(this.selectedTag);
-    } else {
-      this.isSelected = false;
-      this.filteredApplications = this.applications;
-    }
-  }
-
   updateApplicationsAndTags(applications: SelectableApplication[]): void {
     if(applications != null && applications.length > 0) {
-      this.isEmpty = false;
       applications.sort((a, b) => {
         return a.name.localeCompare(b.name);
       });
       this.applications = applications;
       this.updateTags(this.applications);
 
-      if (this.isSelected && (this.selectableTags.indexOf(this.selectedTag) > -1)) {
-        this.setFilteredApplications(this.selectedTag);
+      if (this.isTagSelected && (this.selectableTags.indexOf(this.selectedTag) > -1)) {
+        this.filterApplicationsByTag(this.selectedTag);
       } else {
         this.removeSelection(applications);
       }
     } else {
-      this.isEmpty = true;
       this.updateTags(applications);
     }
+  }
+
+  selectTag(tag: string): void {
+    this.filterApplicationsByTag(tag);
+    this.selectedTag = tag;
+  }
+
+  isTagSelected(): boolean {
+    return this.applications.length != this.filteredApplications.length;
   }
 
   private updateTags(applications: SelectableApplication[]) {
@@ -73,31 +63,25 @@ export class ApplicationComponent {
     }
   }
 
-  private setFilteredApplications(tag: string): void {
-    let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
-    let numberOfSelectedApplications = 0;
-
-    if(this.applications) {
-      let filteredApplications = [];
-      this.applications.forEach(element => {
-        if(element.tags.indexOf(tag) > -1) {
-          filteredApplications.push(element);
-        }
-      });
-
-      this.selectedApplications = this.selectedApplications.filter(item =>
-        filteredApplications.map(item => item.id).includes(item)
-      );
-      this.filteredApplications = filteredApplications;
-    }
-
-    if(this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
-      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
+  private filterApplicationsByTag(tag: string): void {
+    if (tag !== this.selectedTag) {
+      let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
+      let numberOfSelectedApplications = 0;
+      if (this.applications) {
+        this.filteredApplications = this.applications.filter((app: SelectableApplication) => app.tags.indexOf(this.selectedTag) > -1);
+        this.selectedApplications = this.selectedApplications.filter((selectedAppId: number) =>
+          this.filteredApplications.map(item => item.id).includes(selectedAppId)
+        );
+      }
+      if (this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
+      }
+    } else {
+      this.filteredApplications = this.applications;
     }
   }
 
   private removeSelection(applications: SelectableApplication[]) {
-    this.isSelected = false;
     this.filteredApplications = applications;
     let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
     this.selectedApplications = this.selectedApplications.filter(item =>

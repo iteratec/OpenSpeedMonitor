@@ -9,15 +9,7 @@ import {Caller, ResultSelectionCommand} from "../models/result-selection-command
 
 @Injectable()
 export class ResultSelectionService {
-  selectedApplications$: ReplaySubject<Application[]> = new ReplaySubject<Application[]>(1);
-  selectedPages$: ReplaySubject<Page[]> = new ReplaySubject<Page[]>(1);
-
   constructor(private http: HttpClient) {
-  }
-
-  updateApplications(applications: Application[]) {
-    this.selectedApplications$.next(applications);
-    this.selectedPages$.next([]);
   }
 
   fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
