@@ -132,7 +132,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         waitFor {
             !$("#warning-no-job-group").displayed
         }
-        waitFor {
+        waitFor(10) {
             $("#warning-no-page").displayed
         }
         waitFor {
@@ -157,7 +157,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         waitFor {
             !$("#warning-no-job-group").displayed
         }
-        waitFor {
+        waitFor(10) {
             !$("#warning-no-data").displayed
         }
         waitFor {
