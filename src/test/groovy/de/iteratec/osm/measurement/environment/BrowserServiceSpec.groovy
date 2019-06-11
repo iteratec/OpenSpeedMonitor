@@ -89,7 +89,9 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
     void "Get extended Browser informations for Browser #browserName"() {
         given: "A browser with an associated Location with information"
         Browser b = Browser.build(name: "Chrome")
-        Location.build(browser: b, active: true, operatingSystem: os, deviceType: dt)
+        Location loc = Location.build(browser: b, active: true, operatingSystem: os, deviceType: dt)
+        loc.active = true
+        loc.save(flush: true)
 
         when: "Getting Browser infos and look up for the created browser"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()
