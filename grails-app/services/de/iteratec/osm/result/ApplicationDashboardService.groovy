@@ -113,7 +113,9 @@ class ApplicationDashboardService {
     private void addDefaultsForMissing(List<PerformanceAspectDto> performanceAspects, Page page, JobGroup jobGroup, List<Browser> browsers) {
         PerformanceAspectType.values().each { PerformanceAspectType type ->
             browsers.each { browser ->
-                if (!performanceAspects.any { it.performanceAspectType == type && it.browserId == browser.id }) {
+                if (!performanceAspects.any {
+                    it.performanceAspectType.name == type.name() && it.browserId == browser.id
+                }) {
                     performanceAspects.add(
                             new PerformanceAspectDto([
                                     id                   : null,

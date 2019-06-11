@@ -1,28 +1,27 @@
-<div class="card">
-  <p class="performance-aspect-type">
-    {{"frontend.de.iteratec.osm.performance-aspect." + aspectType.name + ".user-centric-question" | translate}}
-    <i class="fas fa-{{aspectType.icon}}"></i>
-  </p>
-  <ul class="clickable-list">
-    <li *ngFor="let aspect of aspectsToShow$ | async">
-      //TODO: Should lead to edit view for clicked metric
-      <a [routerLink]="['/applicationDashboard']">
-        <div class="aspect-links">
-          <i class="fas fa-3x fa-{{aspect.deviceType.icon}} aspect-device-type"></i>
-          <span class="aspect-row-top">
+<p class="performance-aspect-type" *ngIf="actualType">
+  {{"frontend.de.iteratec.osm.performance-aspect." + actualType?.name + ".user-centric-question" | translate}}
+  <i class="fas fa-{{actualType?.icon}}"></i>
+</p>
+<ul class="clickable-list">
+  <li *ngFor="let aspect of aspectsToShow$ | async"
+      [class.selected-list-item]="aspect.browserId == browserId">
+    <a
+      [routerLink]="['/aspectConfiguration/edit', application.id, page.id, aspect.browserId, actualType.name]">
+      <div class="aspect-links">
+        <i class="fas fa-3x fa-{{aspect.deviceType.icon}} aspect-device-type"></i>
+        <span class="aspect-row-top">
           {{aspect.browserName}}
         </span>
-          <span class="aspect-row-bottom">
+        <span class="aspect-row-bottom">
           {{aspect.operatingSystem}}
         </span>
-          <span class="aspect-right"
-                [ngClass]="{'persistent-aspect': aspect.persistent, 'non-persistent-aspect': !aspect.persistent}">
+        <span class="aspect-right"
+              [ngClass]="{'persistent-aspect': aspect.persistent, 'non-persistent-aspect': !aspect.persistent}">
             <div *ngIf="aspect.measurand.isUserTiming; then userTiming else measurand"></div>
 <ng-template #userTiming>{{aspect.measurand.name}}</ng-template>
 <ng-template #measurand>{{"frontend.de.iteratec.isr.measurand." + aspect.measurand.name | translate}}</ng-template>
         </span>
-        </div>
-      </a>
-    </li>
-  </ul>
-</div>
+      </div>
+    </a>
+  </li>
+</ul>

@@ -50,4 +50,8 @@ export class ComparableFilmstripsComponent implements OnChanges{
       scrollElement.scrollLeft = highlightedImage.offsetLeft - scrollElement.offsetWidth / 2 + thumbnailWidth / 2;
     }
   }
+
+  clearResults() {
+    this.results = [];
+  }
 }

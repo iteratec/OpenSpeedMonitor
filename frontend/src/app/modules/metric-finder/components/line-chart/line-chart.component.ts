@@ -1,9 +1,11 @@
 import {
   AfterContentInit,
   Component,
-  ElementRef, EventEmitter,
+  ElementRef,
+  EventEmitter,
   Input,
-  OnChanges, Output,
+  OnChanges,
+  Output,
   SimpleChanges,
   ViewChild,
   ViewEncapsulation
@@ -261,5 +263,13 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
 
   private formatValue(value: number): string {
     return format(',')(value) + 'ms';
+  }
+
+  public clearSelection() {
+    this.selectedResults = [];
+  }
+
+  public clearResults() {
+    this.results = [];
   }
 }
