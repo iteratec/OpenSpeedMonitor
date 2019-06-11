@@ -41,7 +41,6 @@ describe('MetricFinderComponent', () => {
 
   beforeEach(() => {
     metricService = TestBed.get(MetricFinderService);
-    metricService.loadTestData = jasmine.createSpy('loadTestData');
     fixture = TestBed.createComponent(MetricFinderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -49,6 +48,5 @@ describe('MetricFinderComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-    expect(metricService.loadTestData).toHaveBeenCalled();
   });
 });
