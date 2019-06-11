@@ -15,12 +15,6 @@ export class MetricFinderService {
   ) {
   }
 
-  public loadTestData(): void {
-    const now = Date.now();
-    const dayInMillisecs = 1000 * 60 * 60 * 24 * 14;
-    this.loadData(new Date(now - 38 * dayInMillisecs), new Date(now), 48, 1, 18);
-  }
-
   public loadData(from: Date, to: Date, application: number, page: number, browser: number): void {
     const params = {
       from: from.toISOString(),

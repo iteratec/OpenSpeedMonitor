@@ -12,6 +12,7 @@ import {
 } from "../../../models/perfomance-aspect.model";
 import {Application} from "../../../models/application.model";
 import {LocationDto} from "../../application-dashboard/models/location.model";
+import {PerformanceAspectService} from "../../../services/performance-aspect.service";
 
 @Injectable({
   providedIn: 'root'
@@ -23,12 +24,9 @@ export class AspectConfigurationService {
   extendedAspects$ = new BehaviorSubject<ExtendedPerformanceAspect[]>([]);
 
   selectedPage$ = new ReplaySubject<Page>(1);
-
-  aspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
   selectedAspectType$ = new ReplaySubject<PerformanceAspectType>(1);
 
-  constructor(private http: HttpClient, private applicationService: ApplicationService) {
-    this.loadAspectTypes();
+  constructor(private http: HttpClient, private applicationService: ApplicationService, private perfAspectService: PerformanceAspectService) {
     this.prepareExtensionOfAspects();
     this.loadBrowserInfos();
     this.getPerfAspectParams()
@@ -100,16 +98,8 @@ export class AspectConfigurationService {
     return extendedAspects;
   }
 
-  private loadAspectTypes() {
-    this.http.get<PerformanceAspectType[]>("/aspectConfiguration/rest/getAspectTypes").pipe(
-      catchError((error) => {
-        console.error(error);
-        return EMPTY;
-      })).subscribe((types: PerformanceAspectType[]) => this.aspectTypes$.next(types));
-  }
-
   public initSelectedAspectType(typeName: string) {
-    this.aspectTypes$.pipe(
+    this.perfAspectService.aspectTypes$.pipe(
       map((types: PerformanceAspectType[]) => {
         return types.find((type: PerformanceAspectType) => type.name == typeName)
       })

@@ -6,6 +6,7 @@ import {Observable} from "rxjs";
 import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../models/perfomance-aspect.model";
 import {Application} from "../../models/application.model";
 import {AspectConfigurationService} from "./services/aspect-configuration.service";
+import {PerformanceAspectService} from "../../services/performance-aspect.service";
 
 @Component({
   selector: 'osm-aspect-configuration',
@@ -20,11 +21,15 @@ export class AspectConfigurationComponent implements OnInit {
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
   aspectTypes$: Observable<PerformanceAspectType[]>;
 
-  constructor(private route: ActivatedRoute, private applicationService: ApplicationService, private aspectConfService: AspectConfigurationService) {
+  constructor(
+    private route: ActivatedRoute,
+    private applicationService: ApplicationService,
+    private aspectConfService: AspectConfigurationService,
+    private perfAspectService: PerformanceAspectService) {
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
     this.performanceAspects$ = aspectConfService.extendedAspects$;
-    this.aspectTypes$ = aspectConfService.aspectTypes$;
+    this.aspectTypes$ = perfAspectService.aspectTypes$;
   }
 
   ngOnInit() {
