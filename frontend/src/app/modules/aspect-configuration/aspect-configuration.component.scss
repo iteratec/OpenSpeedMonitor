@@ -1,10 +1,11 @@
 a {
-  margin-left: 10px;
+  margin: 0 10px 20px 0;
 }
 
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(460px, 1fr));
+  margin: 10px 0 0 0;
 
   osm-aspect-metrics {
     margin: 10px 0 20px 10px;

@@ -4,6 +4,8 @@ import {AspectMetricsComponent} from './aspect-metrics.component';
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
+import {ApplicationService} from "../../../../services/application.service";
+import {AspectConfigurationService} from "../../services/aspect-configuration.service";
 
 describe('AspectMetricsComponent', () => {
   let component: AspectMetricsComponent;
@@ -20,7 +22,9 @@ describe('AspectMetricsComponent', () => {
         ReactiveFormsModule
       ],
       providers: [
-        AspectMetricsComponent
+        AspectMetricsComponent,
+        ApplicationService,
+        AspectConfigurationService
       ]
     })
     .compileComponents();
@@ -29,24 +33,23 @@ describe('AspectMetricsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AspectMetricsComponent);
     component = fixture.componentInstance;
-    component.aspects = [];
-    component.aspectType = {name: '', icon: ''};
+    component.actualType = {name: 'aspect-type', icon: 'aspect-type-icon'};
     fixture.detectChanges();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-  it('should ', inject(
-    [AspectMetricsComponent],
-    (component: AspectMetricsComponent) => {
+  it('should filter aspects respective asp', inject(
+    [AspectMetricsComponent, AspectConfigurationService],
+    (component: AspectMetricsComponent, aspectConfService: AspectConfigurationService) => {
       const type1: PerformanceAspectType = {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'};
       const type2: PerformanceAspectType = {name: 'PAGE_SHOWS_USEFUL_CONTENT', icon: 'hourglass'};
-      const aspectsOfTwoDifferentTypes = [
+      const aspectsOfTwoDifferentTypes: ExtendedPerformanceAspect[] = [
         {
           id: 1,
           pageId: 1,
-          jobGroupId: 1,
+          applicationId: 1,
           browserId: 1,
           measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
           performanceAspectType: type1,
@@ -58,7 +61,7 @@ describe('AspectMetricsComponent', () => {
         {
           id: 1,
           pageId: 4,
-          jobGroupId: 1,
+          applicationId: 1,
           browserId: 1,
           measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
           performanceAspectType: type2,
@@ -67,9 +70,9 @@ describe('AspectMetricsComponent', () => {
           operatingSystem: 'Android',
           deviceType: {name: 'Smartphone', icon: 'mobile'}
         }];
-      component.aspects = aspectsOfTwoDifferentTypes;
-      component.aspectType = type1;
+      component.actualType = type1;
       component.ngOnInit();
+      aspectConfService.extendedAspects$.next(aspectsOfTwoDifferentTypes);
       component.aspectsToShow$.subscribe((aspects: ExtendedPerformanceAspect[]) => {
         expect(aspects.length).toBe(1);
         expect(aspects[0].performanceAspectType).toBe(type1);

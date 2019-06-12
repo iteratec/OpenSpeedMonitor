@@ -16,6 +16,7 @@ import {GraphiteIntegrationComponent} from "./components/application-job-status/
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MeasurandSelectComponent} from "../result-selection/components/measurands/measurand-select/measurand-select.component";
 import {ResultSelectionService} from "../result-selection/services/result-selection.service";
+import {GrailsBridgeService} from "../../services/grails-bridge.service";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -44,7 +45,8 @@ describe('ApplicationDashboardComponent', () => {
       ],
       providers: [
         ApplicationService,
-        ResultSelectionService
+        ResultSelectionService,
+        GrailsBridgeService
       ]
     })
       .compileComponents();

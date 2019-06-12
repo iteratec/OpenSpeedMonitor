@@ -9,7 +9,7 @@ import {FilmstripComponent} from './components/filmstrip/filmstrip.component';
 import {FilmstripService} from './services/filmstrip.service';
 import {CommonModule} from '@angular/common';
 import {TranslateModule} from '@ngx-translate/core';
-import { ComparableFilmstripsComponent } from './components/comparable-filmstrips/comparable-filmstrips.component';
+import {ComparableFilmstripsComponent} from './components/comparable-filmstrips/comparable-filmstrips.component';
 import { MetricSelectionComponent } from './components/metric-selection/metric-selection.component';
 
 @NgModule({
@@ -31,6 +31,9 @@ import { MetricSelectionComponent } from './components/metric-selection/metric-s
     MetricFinderService,
     FilmstripService
   ],
+  exports: [
+    MetricFinderComponent
+  ]
 })
 export class MetricFinderModule {
 }

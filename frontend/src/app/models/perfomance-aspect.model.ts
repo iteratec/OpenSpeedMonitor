@@ -5,7 +5,7 @@ import {BrowserInfoDto} from "./browser.model";
 export interface PerformanceAspect {
   id: number
   pageId: number
-  jobGroupId: number
+  applicationId: number
   browserId: number
   measurand: SelectableMeasurand
   performanceAspectType: PerformanceAspectType
