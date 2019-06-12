@@ -10,7 +10,16 @@ import {
   ApplicationCsiDTOById
 } from "../models/application-csi.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+  catchError,
+  distinctUntilKeyChanged,
+  filter,
+  map,
+  startWith,
+  switchMap,
+  tap,
+  withLatestFrom
+} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";

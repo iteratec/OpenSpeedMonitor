@@ -30,7 +30,7 @@ class AspectConfigurationController {
     @RestAction
     def getAspectTypes() {
         List<PerformanceAspectTypeDto> types = PerformanceAspectType.values().collect {
-            new PerformanceAspectTypeDto(name: it.toString(), icon: it.icon)
+            new PerformanceAspectTypeDto(name: it.toString(), icon: it.icon, unit: it.unit.label)
         }
         ControllerUtils.sendObjectAsJSON(response, types)
     }

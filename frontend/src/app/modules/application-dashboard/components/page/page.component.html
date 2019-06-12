@@ -8,10 +8,11 @@
                         [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value-medium>
   <div class="metric-list">
     <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.PAGE_CONSTRUCTION_STARTED))"
-                     [metric]="aspectMetrics.PAGE_CONSTRUCTION_STARTED"></osm-page-metric>
+                     [metric]="findCorrectPerformanceAspectType(PerformanceAspectTypes.PAGE_CONSTRUCTION_STARTED)"></osm-page-metric>
     <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.PAGE_SHOWS_USEFUL_CONTENT))"
-                     [metric]="aspectMetrics.PAGE_SHOWS_USEFUL_CONTENT"></osm-page-metric>
+                     [metric]="findCorrectPerformanceAspectType(PerformanceAspectTypes.PAGE_SHOWS_USEFUL_CONTENT)"></osm-page-metric>
     <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.PAGE_IS_USABLE))"
-                     [metric]="aspectMetrics.CONSISTENTLY_INTERACTIVE"></osm-page-metric>
+                     [metric]="findCorrectPerformanceAspectType(PerformanceAspectTypes.PAGE_IS_USABLE)"></osm-page-metric>
   </div>
+
 </div>

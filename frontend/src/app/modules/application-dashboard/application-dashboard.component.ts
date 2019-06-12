@@ -8,6 +8,8 @@ import {PageMetricsDto} from "./models/page-metrics.model";
 import {ApplicationCsi, ApplicationCsiById} from "../../models/application-csi.model";
 import {Csi} from "../../models/csi.model";
 import {FailingJobStatistic} from "./models/failing-job-statistic.model";
+import {PerformanceAspectService} from "../../services/performance-aspect.service";
+import {PerformanceAspectType} from "../../models/perfomance-aspect.model";
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -24,11 +26,13 @@ export class ApplicationDashboardComponent implements OnDestroy {
   isLoading$: Observable<boolean>;
   failingJobStatistic$: Observable<FailingJobStatistic>;
   selectedApplication$: Observable<Application>;
+  aspectTypes$: Observable<PerformanceAspectType[]>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private applicationService: ApplicationService
+    private applicationService: ApplicationService,
+    private performanceAspectService: PerformanceAspectService
   ) {
     this.pages$ = this.applicationService.aspectMetrics$;
     this.applications$ = applicationService.applications$.pipe(
@@ -47,6 +51,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
       .subscribe(([navParams, applications]) => this.handleNavigation(navParams.get('applicationId'), applications));
     this.failingJobStatistic$ = this.applicationService.failingJobStatistics$;
     this.selectedApplication$ = this.applicationService.selectedApplication$;
+    this.aspectTypes$ = this.performanceAspectService.aspectTypes$;
   }
 
   private handleNavigation(applicationId: string, applications: Application[]) {

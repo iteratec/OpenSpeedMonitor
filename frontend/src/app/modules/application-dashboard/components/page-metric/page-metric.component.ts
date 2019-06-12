@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {AspectMetric} from "../../../../enums/aspect-metric.enum";
+import {Unit} from "../../../../enums/unit.enum";
+import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 
 @Component({
   selector: 'osm-page-metric',
@@ -8,10 +9,18 @@ import {AspectMetric} from "../../../../enums/aspect-metric.enum";
 })
 
 export class PageMetricComponent {
-  @Input() metric: AspectMetric;
+  @Input() metric: PerformanceAspectType;
   @Input() value: string;
+
+  Unit: typeof Unit = Unit;
 
   public isAvailable(): boolean {
     return this.value !== '';
+  }
+
+  determineUnit(unit: string): string {
+    if (unit === 'ms') {
+      return Unit.SECONDS
+    }
   }
 }

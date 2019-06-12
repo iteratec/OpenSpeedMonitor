@@ -110,7 +110,7 @@ describe('AspectConfigurationService', () => {
           applicationId: 1,
           browserId: 1,
           measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-          performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'},
+          performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
           persistent: true,
         }];
         const extendedAspects: ExtendedPerformanceAspect[] = service.extendAspects(aspects, []);
@@ -128,7 +128,7 @@ describe('AspectConfigurationService', () => {
             applicationId: 1,
             browserId: idOfExtended,
             measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-            performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'},
+            performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
             persistent: true,
           },
           {
@@ -137,7 +137,7 @@ describe('AspectConfigurationService', () => {
             applicationId: 1,
             browserId: idOfNotExtended,
             measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-            performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'},
+            performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
             persistent: true,
           }
         ];
