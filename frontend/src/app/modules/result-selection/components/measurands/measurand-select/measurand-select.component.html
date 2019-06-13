@@ -1,0 +1,12 @@
+<select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()"
+        [compareWith]="compareMeasurands">
+  <ng-container *ngFor="let group$ of selectableMeasurandGroups.getValue().data">
+    <optgroup *ngIf="group$.getValue().values && group$.getValue().values.length > 0"
+              label="{{group$.getValue().name | translate}}">
+      <option *ngFor="let selectableMeasurand of group$.getValue().values"
+              [ngValue]="selectableMeasurand">
+        {{selectableMeasurand.name | translate}}
+      </option>
+    </optgroup>
+  </ng-container>
+</select>

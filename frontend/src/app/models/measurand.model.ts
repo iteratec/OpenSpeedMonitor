@@ -1,3 +1,4 @@
+import {Loading} from "./loading.model";
 
 export interface SelectableMeasurand {
   name: string
@@ -5,7 +6,7 @@ export interface SelectableMeasurand {
   isUserTiming?: boolean
 }
 
-export  interface MeasurandGroup {
+export interface MeasurandGroup extends  Loading {
   name: string,
   values: SelectableMeasurand[]
 }

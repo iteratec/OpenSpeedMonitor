@@ -1,19 +1,17 @@
 import {Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {ResultSelectionCommand} from "../../models/result-selection-command.model";
-import {Chart} from "../../models/chart.model";
-import {ResultSelectionService} from "../../services/result-selection.service";
 import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
 import {fromEvent, merge, Observable, Subscription} from "rxjs";
 import {filter} from "rxjs/operators";
 import {OsmLangService} from "../../../../services/osm-lang.service";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-result-selection-time-frame',
-  templateUrl: './result-selection-time-frame.component.html',
-  styleUrls: ['./result-selection-time-frame.component.scss'],
+  templateUrl: './time-frame.component.html',
+  styleUrls: ['./time-frame.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ResultSelectionTimeFrameComponent implements OnInit {
+export class TimeFrameComponent implements OnInit {
 
   @Input() currentChart: string;
   @Input() enableAggregation: boolean = true;
@@ -41,7 +39,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
   CalendarType: typeof CalendarType = CalendarType;
 
-  constructor(private resultSelectionService: ResultSelectionService, private dateTimeAdapter: DateTimeAdapter<any>, private osmLangService: OsmLangService) {
+  constructor(private resultSelectionStore: ResultSelectionStore, private dateTimeAdapter: DateTimeAdapter<any>, private osmLangService: OsmLangService) {
     if (osmLangService.getOsmLang() == 'en') {
       dateTimeAdapter.setLocale('en-GB');
     } else {
@@ -56,12 +54,8 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
 
     this.selectedDates = [defaultFrom, defaultTo];
 
-    let defaultResultSelectionCommand = new ResultSelectionCommand({
-      from: defaultFrom,
-      to: defaultTo
-    });
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
 
-    this.resultSelectionService.loadSelectableData(defaultResultSelectionCommand, Chart[this.currentChart]);
     this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[4];
   }
 
@@ -93,7 +87,7 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       comparativeFrom.setMilliseconds(comparativeTo.getMilliseconds() - timeFrameInMilliseconds);
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
-    this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
   }
 
   updateFromDate(calendar: CalendarType): void {
@@ -110,7 +104,8 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
-    this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
+
   }
 
   updateToDate(calendar: CalendarType): void {
@@ -127,7 +122,8 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       }
       this.selectedDates = this.dateTimeTo.selecteds;
     }
-    this.loadSelectableData({from: this.selectedDates[0], to: this.selectedDates[1]});
+    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
+
   }
 
   observeCalendarClicks(calendar: CalendarType): void {
@@ -163,10 +159,6 @@ export class ResultSelectionTimeFrameComponent implements OnInit {
       return
     }
     this.comparativeSelectionActive = !this.comparativeSelectionActive;
-  }
-
-  private loadSelectableData(resultSelectionCommand: ResultSelectionCommand): void {
-    this.resultSelectionService.loadSelectableData(resultSelectionCommand, Chart[this.currentChart]);
   }
 }
 
