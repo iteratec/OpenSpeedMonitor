@@ -10,7 +10,16 @@ import {
   ApplicationCsiDTOById
 } from "../models/application-csi.model";
 import {Application, ApplicationDTO} from "../models/application.model";
-import {catchError, distinctUntilKeyChanged, filter, map, startWith, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+  catchError,
+  distinctUntilKeyChanged,
+  filter,
+  map,
+  startWith,
+  switchMap,
+  tap,
+  withLatestFrom
+} from "rxjs/operators";
 import {ResponseWithLoadingState} from "../models/response-with-loading-state.model";
 import {FailingJobStatistic} from "../modules/application-dashboard/models/failing-job-statistic.model";
 import {GraphiteServer, GraphiteServerDTO} from "../modules/application-dashboard/models/graphite-server.model";
@@ -19,11 +28,10 @@ import {Csi, CsiDTO} from "../models/csi.model";
 
 @Injectable()
 export class ApplicationService {
+  aspectMetrics$: BehaviorSubject<PageMetricsDto[]> = new BehaviorSubject<PageMetricsDto[]>([]);
 
   applications$ = new BehaviorSubject<ResponseWithLoadingState<Application[]>>({isLoading: false, data: null});
   selectedApplication$ = new ReplaySubject<Application>(1);
-
-  metrics$ = new BehaviorSubject<PageMetricsDto[]>([]);
   applicationCsiById$ = new BehaviorSubject<ApplicationCsiById>({isLoading: false});
   pageCsis$ = new ReplaySubject<ResponseWithLoadingState<PageCsiDto[]>>(1);
   failingJobStatistics$ = new ReplaySubject<FailingJobStatistic>(1);
@@ -36,8 +44,8 @@ export class ApplicationService {
     this.loadApplications();
 
     this.selectedApplication$.pipe(
-      switchMap((application: Application) => this.updateMetricsForPages(application))
-    ).subscribe(this.metrics$);
+      switchMap((application: Application) => this.updateAspectMetricsForPages(application))
+    ).subscribe(this.aspectMetrics$);
 
     this.selectedApplication$.pipe(
       switchMap((application: Application) => this.updateCsiForApplication(application)),
@@ -147,11 +155,11 @@ export class ApplicationService {
     );
   }
 
-  private updateMetricsForPages(applicationDto: Application): Observable<PageMetricsDto[]> {
+  private updateAspectMetricsForPages(application: Application): Observable<PageMetricsDto[]> {
     this.pageCsis$.next({data: [], isLoading: true});
-    this.metrics$.next(null);
-    const params = this.createParams(applicationDto.id);
-    return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getMetricsForApplication', {params}).pipe(
+    this.aspectMetrics$.next(null);
+    const params = this.createParams(application.id);
+    return this.http.get<PageMetricsDto[]>('/applicationDashboard/rest/getAspectMetricsForApplication', {params}).pipe(
       this.handleError()
     )
   }

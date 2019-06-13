@@ -31,7 +31,7 @@
                               [selectedApplication]="selectedApplication$ | async"
                               class="card"></osm-application-job-status>
 
-  <osm-page *ngFor="let metric of pages$ | async" [metricsForPage]="metric"
+  <osm-page *ngFor="let metric of pages$ | async" [metricsForPage]="metric" [aspectTypes]="aspectTypes$ | async"
             [lastDateOfResult]="(selectedApplication$ | async)?.dateOfLastResults"
             [application]="selectedApplication$ | async"
             class="card"></osm-page>

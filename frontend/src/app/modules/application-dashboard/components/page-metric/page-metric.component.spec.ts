@@ -5,8 +5,8 @@ import {ApplicationService} from "../../../../services/application.service";
 import {By} from "@angular/platform-browser";
 import {Unit} from "../../../../enums/unit.enum";
 import {DebugElement} from "@angular/core";
-import {Metric} from "../../../../enums/metric.enum";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
+import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 
 describe('PageMetricComponent', () => {
   let component: PageMetricComponent;
@@ -38,7 +38,11 @@ describe('PageMetricComponent', () => {
   });
   it("should show the value if the value is available", () => {
     const value: string = "2.34";
-    const metric: Metric = new Metric("SpeedIndex", Unit.SECONDS, 'far fa-eye');
+    const metric: PerformanceAspectType = {
+      name: 'PAGE_CONSTRUCTION_STARTED',
+      icon: 'fas fa-eye',
+      unit: 'ms'
+    };
     component.value = value;
     component.metric = metric;
 
@@ -52,7 +56,11 @@ describe('PageMetricComponent', () => {
   });
   it("should be 'n/a' and without unit if the value is empty", () => {
     const value: string = "";
-    const metric: Metric = new Metric("SpeedIndex", Unit.SECONDS, 'far fa-eye');
+    const metric: PerformanceAspectType = {
+      name: 'PAGE_CONSTRUCTION_STARTED',
+      icon: 'fas fa-eye',
+      unit: 'ms'
+    };
     component.value = value;
     component.metric = metric;
 
