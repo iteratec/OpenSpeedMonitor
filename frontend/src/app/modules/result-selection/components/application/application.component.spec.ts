@@ -1,15 +1,16 @@
 import { async, ComponentFixture, TestBed} from '@angular/core/testing';
-import { ResultSelectionApplicationComponent } from './result-selection-application.component';
+import { ApplicationComponent } from './application.component';
 import { SelectableApplication } from 'src/app/models/application.model';
-import { ResultSelectionService } from '../../services/result-selection.service';
 import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
 import { OsmLangService } from 'src/app/services/osm-lang.service';
 import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
 import { By } from '@angular/platform-browser';
+import {ResultSelectionStore} from "../../services/result-selection.store";
+import {ResultSelectionService} from "../../services/result-selection.service";
 
-describe('ResultSelectionApplicationComponent', () => {
-  let component: ResultSelectionApplicationComponent;
-  let fixture: ComponentFixture<ResultSelectionApplicationComponent>;
+describe('ApplicationComponent', () => {
+  let component: ApplicationComponent;
+  let fixture: ComponentFixture<ApplicationComponent>;
   const applications = [new SelectableApplication({
     id: 3,
     name: 'test_Application',
@@ -23,19 +24,20 @@ describe('ResultSelectionApplicationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResultSelectionApplicationComponent],
+      declarations: [ApplicationComponent],
       imports: [SharedMocksModule],
-      providers: [        
-        ResultSelectionService,
+      providers: [
+        ResultSelectionStore,
         OsmLangService,
-        GrailsBridgeService
+        GrailsBridgeService,
+        ResultSelectionService
       ]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ResultSelectionApplicationComponent);
+    fixture = TestBed.createComponent(ApplicationComponent);
     
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -56,22 +58,22 @@ describe('ResultSelectionApplicationComponent', () => {
 
   });
 
-  it('should correctly show the job groups accordings to the selected tag',() => {
+  it('should correctly show the job groups according to the selected tag',() => {
     component.updateApplicationsAndTags(applications);
     let tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
 
     expect(component.filteredApplications).toEqual(component.applications);
 
-    component.filterByTag(component.selectableTags[0]);
+    component.selectTag(component.selectableTags[0]);
     expect(component.filteredApplications).toEqual(tagApplicationsMapping[0]);
 
-    component.filterByTag(component.selectableTags[1]);
+    component.selectTag(component.selectableTags[1]);
     expect(component.filteredApplications).toEqual(tagApplicationsMapping[1]);
 
-    component.filterByTag(component.selectableTags[2]);
+    component.selectTag(component.selectableTags[2]);
     expect(component.filteredApplications).toEqual(tagApplicationsMapping[2]);
 
-    component.filterByTag(component.selectableTags[2]);
+    component.selectTag(component.selectableTags[2]);
     expect(component.filteredApplications).toEqual(component.applications);
   });
 

@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {ReplaySubject} from "rxjs";
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
+import {BehaviorSubject} from "rxjs";
+import {MeasurandGroup, SelectableMeasurand} from "../../../../../models/measurand.model";
+import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-measurand-select',
@@ -12,7 +12,7 @@ export class MeasurandSelectComponent implements OnInit {
   @Input() selectedMeasurand: SelectableMeasurand;
   @Output() onSelect: EventEmitter<SelectableMeasurand> = new EventEmitter<SelectableMeasurand>();
 
-  @Input() selectableMeasurandGroups: ReplaySubject<ResponseWithLoadingState<MeasurandGroup>>[];
+  @Input() selectableMeasurandGroups: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>>;
 
   ngOnInit() {
   }

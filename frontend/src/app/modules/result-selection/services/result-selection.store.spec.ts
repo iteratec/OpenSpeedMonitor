@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 
-import { ResultSelectionService } from './result-selection.service';
+import { ResultSelectionStore } from './result-selection.store';
 import {HttpClientTestingModule} from "@angular/common/http/testing";
-import {ResultSelectionStore} from "./result-selection.store";
+import {ResultSelectionService} from "./result-selection.service";
 
 describe('ResultSelectionStore', () => {
   beforeEach(() => TestBed.configureTestingModule({
     providers: [
-      ResultSelectionService,
-      ResultSelectionStore
+      ResultSelectionStore,
+      ResultSelectionService
     ],
     imports: [
       HttpClientTestingModule
@@ -16,7 +16,7 @@ describe('ResultSelectionStore', () => {
   }));
 
   it('should be created', () => {
-    const service: ResultSelectionService = TestBed.get(ResultSelectionService);
+    const service: ResultSelectionStore = TestBed.get(ResultSelectionStore);
     expect(service).toBeTruthy();
   });
 });

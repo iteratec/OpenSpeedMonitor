@@ -6,6 +6,9 @@ import {map} from "rxjs/operators";
 import {MeasuredEvent} from "../../../../../models/measured-event.model";
 import {Browser} from "../../../../../models/browser.model";
 import {Connectivity} from "../../../../../models/connectivity.model";
+import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
+import {ResultSelectionStore} from "../../../services/result-selection.store";
+import {ResultSelectionCommandParameter} from "../../../models/result-selection-command.model";
 
 @Component({
   selector: 'osm-selection-data',
@@ -13,12 +16,12 @@ import {Connectivity} from "../../../../../models/connectivity.model";
   styleUrls: ['./selection-data.component.scss']
 })
 export class SelectionDataComponent implements OnInit {
-  @Input() parentChildData$: Observable<(Location | MeasuredEvent)[]>;
+  @Input() parentChildData$: Observable<ResponseWithLoadingState<(Location | MeasuredEvent)[]>>;
   childData$: Observable<(Location | MeasuredEvent)[]>;
   uniqueParents$: Observable<(Browser | Page | Connectivity)[]>;
 
-  @Input() childType: string;
-  @Input() parentType: string;
+  @Input() childType: ResultSelectionCommandParameter;
+  @Input() parentType: ResultSelectionCommandParameter;
   @Input() showChildSelection: boolean = true;
   @Input() parentSelectionOptional: boolean = true;
 
@@ -26,40 +29,45 @@ export class SelectionDataComponent implements OnInit {
   parentSelection: number[] = [];
   childSelection: number[] = [];
 
-  constructor() { }
+  constructor(private resultSelectionStore: ResultSelectionStore) {
+  }
 
   ngOnInit(): void {
     this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
-      map(([parentChildData, selectedParents]) => {
+      map(([parentChildData, selectedParents]: [ResponseWithLoadingState<(Location | MeasuredEvent)[]>, number[]]) => {
+        let selectableData: (Location | MeasuredEvent)[] = parentChildData.data;
         if (selectedParents && selectedParents.length) {
-          parentChildData = parentChildData.filter(item => selectedParents.includes(item.parent.id));
-          this.childSelection = parentChildData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
+          selectableData = selectableData.filter(item => selectedParents.includes(item.parent.id));
+          this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
         }
-        return this.sortAlphabetically(parentChildData);
+        return this.sortAlphabetically(selectableData);
       })
     );
 
     this.uniqueParents$ = this.parentChildData$.pipe(
-      map(next => {
-        if (this.parentType !== 'connectivity') {
-          let parents: (Browser | Page)[] = next.map(value => value.parent);
+      map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
+        if (this.parentType !== ResultSelectionCommandParameter.CONNECTIVITIES) {
+          let parents: (Browser | Page)[] = next.data.map(value => value.parent);
           let uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
           return this.sortAlphabetically(uniqueParents);
         } else {
-          return this.sortAlphabetically(next);
+          return this.sortAlphabetically(next.data);
         }
       })
-    )
+    );
   }
 
   filterSelectableItems(selectedParents: number[]): void {
     this.parentSelection$.next(selectedParents);
+    this.resultSelectionStore.setResultSelectionCommandIds(selectedParents, this.parentType);
+  }
+
+  updateResultSelectionCommand(): void {
+    this.resultSelectionStore.setResultSelectionCommandIds(this.childSelection, this.childType);
   }
 
   determineOpacity(selectionLength: number, parentSelectionOptional: boolean): number {
-    if (!parentSelectionOptional) {
-      return 1;
-    } else if (selectionLength > 0) {
+    if (!parentSelectionOptional || selectionLength > 0) {
       return 1;
     } else {
       return 0.5;
