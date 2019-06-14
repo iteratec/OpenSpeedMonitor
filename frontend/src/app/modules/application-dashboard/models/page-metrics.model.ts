@@ -1,7 +1,7 @@
 export interface PageMetricsDto {
   pageId: number;
   pageName: string;
-  speedIndex: number;
-  docCompleteTimeInMillisecs: number;
-  fullyLoadedIncomingBytes: number;
+  PAGE_CONSTRUCTION_STARTED: number;
+  PAGE_IS_USABLE: number;
+  PAGE_SHOWS_USEFUL_CONTENT: number;
 }

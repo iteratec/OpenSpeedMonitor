@@ -165,6 +165,39 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         result.PAGE_SHOWS_USEFUL_CONTENT == 500
     }
 
+    void "query builder gets metric of selected aspect type when NO measurand is selected"() {
+        given: "an EventResult with some metrics and one matching aspect in db"
+        persistAspect(PerformanceAspectType.PAGE_IS_USABLE, consistentlyInteractiveInMillisecs)
+        persistEventResult([
+                startRenderInMillisecs            : 300,
+                firstContentfulPaint              : 400,
+                docCompleteTimeInMillisecs        : 1200,
+                docCompleteRequests               : 35,
+                visuallyCompleteInMillisecs       : 500,
+                consistentlyInteractiveInMillisecs: 600
+        ])
+
+        when: "the builder is given the correct aspect type and no measurand"
+        EventResultQueryBuilder builder = new EventResultQueryBuilder()
+        List<EventResultProjection> results = builder
+                .withJobGroupIn([jobGroup])
+                .withPageIn([page])
+                .withBrowserIdsIn([browser.ident()])
+                .withPerformanceAspects([PerformanceAspectType.PAGE_IS_USABLE])
+                .getRawData()
+
+        then: "the found EventResult contains aspect metric and corresponding metric"
+        results.size() == 1
+        EventResultProjection result = results[0]
+        result.PAGE_IS_USABLE == 600
+        result.consistentlyInteractiveInMillisecs == 600
+        !result.startRenderInMillisecs
+        !result.firstContentfulPaint
+        !result.docCompleteTimeInMillisecs
+        !result.docCompleteRequests
+        !result.visuallyCompleteInMillisecs
+    }
+
     private void persistEventResult(Map<String, Integer> measurands) {
         EventResult result = EventResult.build(
                 jobGroup: jobGroup,

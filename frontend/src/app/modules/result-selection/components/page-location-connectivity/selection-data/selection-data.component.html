@@ -1,0 +1,35 @@
+<div class="form-group">
+  <select id="result-selection-parent-selection" class="form-control" multiple="multiple" [(ngModel)]="parentSelection"
+          (ngModelChange)="filterSelectableItems(parentSelection)" [style.opacity]="determineOpacity(parentSelection.length, parentSelectionOptional)">
+    <ng-container *ngIf="(uniqueParents$ | async)?.length > 0; else noResults">
+      <option *ngFor="let parent of uniqueParents$ | async" [value]="parent.id">{{parent.name}}</option>
+    </ng-container>
+    <ng-template #noResults>
+      <option disabled="disabled">
+        {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.noResults' | translate }}
+      </option>
+    </ng-template>
+  </select>
+  <div *ngIf="parentSelectionOptional" class="checkbox-inline" (click)="selectAllParentsCheckbox.checked = true; parentSelection = []; filterSelectableItems(parentSelection)">
+    <input id="selectAllParentsCheckbox" #selectAllParentsCheckbox type="checkbox"
+           [checked]="parentSelection.length < 1">
+    {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.parentSelection.selectAll.' + parentType | translate }}
+  </div>
+</div>
+
+<ng-container *ngIf="showChildSelection">
+  <label for="result-selection-child-selection">
+    <strong>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.' + childType | translate }}
+      :</strong>
+  </label>
+  <ng-select id="result-selection-child-selection"
+             [items]="childData$ | async" [(ngModel)]="childSelection" (ngModelChange)="updateResultSelectionCommand()"
+             [multiple]="true" [closeOnSelect]="true" bindValue="id" bindLabel="name" [groupBy]="'parent.id'"
+             placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
+  </ng-select>
+  <div class="checkbox-inline" (click)="selectAllChildrenCheckbox.checked = true; childSelection = []">
+    <input id="selectAllChildrenCheckbox" #selectAllChildrenCheckbox type="checkbox"
+           [checked]="childSelection.length < 1">
+    {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.childSelection.selectAll.' + childType | translate }}
+  </div>
+</ng-container>

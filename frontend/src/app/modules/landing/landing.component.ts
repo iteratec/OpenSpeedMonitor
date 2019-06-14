@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
-import { filter, map } from 'rxjs/operators';
+import {filter, map} from 'rxjs/operators';
 import {ApplicationService} from "../../services/application.service";
-import { combineLatest, Observable, of } from 'rxjs';
+import {combineLatest, Observable, of} from 'rxjs';
 import {ApplicationWithCsi} from "./models/application-with-csi.model";
 import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
-import { FailingJob } from './models/failing-jobs.model';
+import {FailingJob} from './models/failing-jobs.model';
 
 @Component({
   selector: 'osm-landing',
@@ -36,7 +36,6 @@ export class LandingComponent {
         }
       }))
     );
-    this.applicationService.loadApplications();
     this.applicationService.loadRecentCsiForApplications();
     this.failingJobs$ = this.applicationService.failingJobs$;
 

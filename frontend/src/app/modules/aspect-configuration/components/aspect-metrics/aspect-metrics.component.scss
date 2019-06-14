@@ -1,0 +1,54 @@
+@import "../../../../../styles/clickable-list";
+
+.performance-aspect-type {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  font-size: 1.5em;
+  font-weight: bold;
+
+  i {
+    justify-self: end;
+  }
+}
+
+i.aspect-device-type {
+  grid-area: icon;
+  align-self: center;
+  justify-self: start;
+}
+
+.aspect-row-top {
+  grid-area: browser;
+  font-size: 1.2em;
+}
+
+.aspect-row-bottom {
+  grid-area: os;
+}
+
+.aspect-right {
+  grid-area: measurand;
+  align-self: center;
+  justify-self: end;
+  font-size: 1.2em;
+}
+
+.aspect-links {
+  display: grid;
+  grid-template-columns: 8fr 30fr 20fr;
+  grid-template-rows: 1fr 1fr;
+  grid-template-areas: "icon browser measurand" "icon os measurand";
+  width: 100%;
+}
+
+.persistent-aspect {
+  font-weight: bold;
+}
+
+.non-persistent-aspect {
+  color: darkgray;
+}
+
+.selected-list-item {
+  background: $color-contour-light;
+}

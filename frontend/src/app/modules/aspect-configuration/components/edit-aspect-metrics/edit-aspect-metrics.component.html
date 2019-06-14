@@ -1,0 +1,22 @@
+<h1>{{ 'frontend.de.iteratec.osm.performance-aspects' | translate }}: {{(application$ | async)?.name}}
+  - {{(page$ | async)?.name}}</h1>
+<a [routerLink]="['/aspectConfiguration', (application$ | async)?.id || '', (page$ | async)?.id || '']">
+  <i class="fas fa-arrow-left"></i>
+  {{ 'frontend.back.label' | translate }}
+  {{ 'frontend.de.iteratec.osm.performance-aspect.configuration.link-title' | translate }}
+</a>
+
+<div class="grid-container">
+  <div class="card">
+    <osm-aspect-metrics [application]="application$ | async"
+                        [page]="page$ | async"
+                        [browserId]="browserId$ | async"
+                        [actualType]="aspectType$ | async"
+                        class="aspect-inspect"></osm-aspect-metrics>
+  </div>
+  <div class="card">
+    <osm-metric-finder></osm-metric-finder>
+    <button class="btn btn-primary btn-aspect-config"
+            [disabled]="" (click)="persistAspect()">{{'frontend.default.button.save' | translate}}</button>
+  </div>
+</div>

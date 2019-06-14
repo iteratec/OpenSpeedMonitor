@@ -140,27 +140,11 @@ class EventResultQueryBuilder {
     }
 
     EventResultQueryBuilder withOperatingSystems(List<OperatingSystem> operatingSystems, boolean project = true) {
-        if (operatingSystems) {
-            filters.add({
-                'in'('operatingSystem', operatingSystems)
-            })
-            if (project) {
-                baseProjections.add(new ProjectionProperty(dbName: 'operatingSystem', alias: 'operatingSystem'))
-            }
-        }
-        return this
+        return withAssociatedDomainIn(operatingSystems, 'operatingSystem', project)
     }
 
     EventResultQueryBuilder withDeviceTypes(List<DeviceType> deviceTypes, boolean project = true) {
-        if (deviceTypes) {
-            filters.add({
-                'in'('deviceType', deviceTypes)
-            })
-            if (project) {
-                baseProjections.add(new ProjectionProperty(dbName: 'deviceType', alias: 'deviceType'))
-            }
-        }
-        return this
+        return withAssociatedDomainIn(deviceTypes, 'deviceType', project)
     }
 
     EventResultQueryBuilder withJobGroupIn(List<JobGroup> jobGroups, boolean project = true) {
@@ -183,6 +167,15 @@ class EventResultQueryBuilder {
 
     EventResultQueryBuilder withPerformanceAspects(List<PerformanceAspectType> aspectTypes) {
         this.aspectUtil.setAspectTypes(aspectTypes)
+
+        if (!measurandQueryExecutor.selectedMeasurands) {
+            measurandQueryExecutor.setMeasurands([])
+        }
+
+        if (!userTimingQueryExecutor.selectedMeasurands) {
+            userTimingQueryExecutor.setUserTimings([])
+        }
+
         return this
     }
 
@@ -232,6 +225,19 @@ class EventResultQueryBuilder {
         return this
     }
 
+    private EventResultQueryBuilder withAssociatedDomainIn(List associatedDomain, String associatedDomainFieldName, boolean project = true) {
+        if (associatedDomain) {
+            Closure filterClosure = {
+                'in' "${associatedDomainFieldName}", associatedDomain
+            }
+            filters.add(filterClosure)
+            if (project) {
+                return withProjectedForAssociatedDomain(associatedDomainFieldName)
+            }
+        }
+        return this
+    }
+
     private EventResultQueryBuilder withAssociatedDomainIdsNotIn(List<Long> associatedDomainIds, String associatedDomainFieldName) {
         if (associatedDomainIds) {
             Closure filterClosure = {
@@ -245,6 +251,13 @@ class EventResultQueryBuilder {
     EventResultQueryBuilder withProjectedIdForAssociatedDomain(String associatedDomainFieldName) {
         if (associatedDomainFieldName) {
             baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName + '.id', alias: associatedDomainFieldName + 'Id'))
+        }
+        return this
+    }
+
+    EventResultQueryBuilder withProjectedForAssociatedDomain(String associatedDomainFieldName) {
+        if (associatedDomainFieldName) {
+            baseProjections.add(new ProjectionProperty(dbName: associatedDomainFieldName, alias: associatedDomainFieldName))
         }
         return this
     }

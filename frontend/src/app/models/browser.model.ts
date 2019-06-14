@@ -12,3 +12,15 @@ export class Browser implements BrowserDTO {
     this.name = dto.name;
   }
 }
+
+export interface BrowserInfoDto {
+  browserId: number
+  browserName: string
+  operatingSystem: string
+  deviceType: DeviceType
+}
+
+export interface DeviceType {
+  name: string
+  icon: string
+}

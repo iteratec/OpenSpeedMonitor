@@ -16,6 +16,7 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.external.GraphiteServer
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
+import de.iteratec.osm.result.dao.PerformanceAspectDto
 import grails.gorm.transactions.Transactional
 import org.hibernate.criterion.CriteriaSpecification
 import org.joda.time.DateTime
@@ -29,21 +30,26 @@ class ApplicationDashboardService {
     JobDaoService jobDaoService
     JobGroupService jobGroupService
 
-    List<EventResultProjection> getRecentMetricsForJobGroup(Long jobGroupId) {
-        SelectedMeasurand bytesFullyLoaded = new SelectedMeasurand(Measurand.FULLY_LOADED_INCOMING_BYTES.toString(), CachedView.UNCACHED)
-        SelectedMeasurand speedIndex = new SelectedMeasurand(Measurand.SPEED_INDEX.toString(), CachedView.UNCACHED)
-        SelectedMeasurand docCompleteTime = new SelectedMeasurand(Measurand.DOC_COMPLETE_TIME.toString(), CachedView.UNCACHED)
+    List<EventResultProjection> getRecentAspectMetricsForJobGroup(Long jobGroupId) {
+
+            List<PerformanceAspectType> performanceAspectTypes = [
+                    PerformanceAspectType.PAGE_CONSTRUCTION_STARTED,
+                    PerformanceAspectType.PAGE_IS_USABLE,
+                    PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT
+            ]
 
         Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
         Date to = new DateTime().toDate()
+        List<Page> pages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
 
         return new EventResultQueryBuilder()
-                .withJobGroupIdsIn([jobGroupId], false)
-                .withProjectedIdForAssociatedDomain('page')
-                .withJobResultDateBetween(from, to)
-                .withoutPagesIn([Page.findByName(Page.UNDEFINED)])
-                .withSelectedMeasurands([bytesFullyLoaded, speedIndex, docCompleteTime])
-                .getAverageData()
+            .withJobGroupIdsIn([jobGroupId], false)
+            .withJobResultDateBetween(from, to)
+            .withPageIn(pages)
+            .withoutPagesIn([Page.findByName(Page.UNDEFINED)])
+            .withSelectedMeasurands([])
+            .withPerformanceAspects(performanceAspectTypes)
+            .getAverageData()
     }
 
     private List<PageCsiDto> getAllCsiForPagesOfJobGroup(JobGroup jobGroup) {
@@ -79,30 +85,16 @@ class ApplicationDashboardService {
 
     }
 
-    List<Map> getAllActivePagesAndMetrics(Long jobGroupId) {
-        List<Map> recentMetrics = getRecentMetricsForJobGroup(jobGroupId).collect {
+    List<Map> getAllActivePagesAndAspectMetrics(Long jobGroupId) {
+        List<Map> recentAspectMetrics = getRecentAspectMetricsForJobGroup(jobGroupId).collect {
             return it.projectedProperties
         }
 
-        jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
-                .findAll { Page page -> page.name != Page.UNDEFINED }
-                .each { Page page ->
-                    Map entry = recentMetrics.find {
-                        it.pageId == page.id
-                    }
-                    if (!entry) {
-                        recentMetrics.add(
-                                [
-                                        'pageId'  : page.id,
-                                        'pageName': page.name
-                                ]
-                        )
-                    } else {
-                        entry.pageName = page.name
-                    }
-                }
-
-        return recentMetrics
+        recentAspectMetrics.each {
+            Long pageId = it.get('pageId')
+            it << [pageName: Page.findById(pageId).name]
+        }
+        return recentAspectMetrics
     }
 
     List<Map> getPerformanceAspects(Long jobGroupId, Long pageId, List<Long> browserIds) {
@@ -111,42 +103,37 @@ class ApplicationDashboardService {
         Page page = Page.findById(pageId)
         List<Browser> browsers = browserIds.collect { Browser.get(it) }
 
-        List<Map> performanceAspects = getAspectsAsMap(jobGroup, page, browsers)
+        List<PerformanceAspectDto> performanceAspects = getAspects(jobGroup, page, browsers)
         addDefaultsForMissing(performanceAspects, page, jobGroup, browsers)
-        formatMeasurand(performanceAspects)
 
-        return performanceAspects.sort { it.performanceAspectTypeIndex }
+        return performanceAspects.sort { PerformanceAspectType.valueOf(it.performanceAspectType.name) }
 
     }
 
-    private formatMeasurand(List<Map> performanceAspects) {
-        return performanceAspects.each {
-            SelectedMeasurand selectedMetric = new SelectedMeasurand(it.metricIdentifier, CachedView.UNCACHED)
-            it.remove('metricIdentifier')
-            it.measurand = [name: selectedMetric.name, id: selectedMetric.optionValue]
-            it.performanceAspectTypeIndex = it.performanceAspectType
-            it.performanceAspectType = it.performanceAspectType.toString();
-        }
-    }
-
-    private void addDefaultsForMissing(List<Map> performanceAspects, Page page, JobGroup jobGroup, List<Browser> browsers) {
+    private void addDefaultsForMissing(List<PerformanceAspectDto> performanceAspects, Page page, JobGroup jobGroup, List<Browser> browsers) {
         PerformanceAspectType.values().each { PerformanceAspectType type ->
             browsers.each { browser ->
-                if (!performanceAspects.any { it.performanceAspectType == type && it.browserId == browser.id }) {
-                    performanceAspects.add([
-                            id                   : null,
-                            pageId               : page.id,
-                            jobGroupId           : jobGroup.id,
-                            browserId            : browser.id,
-                            performanceAspectType: type,
-                            metricIdentifier     : type.defaultMetric.toString()])
+                if (!performanceAspects.any {
+                    it.performanceAspectType.name == type.name() && it.browserId == browser.id
+                }) {
+                    performanceAspects.add(
+                            new PerformanceAspectDto([
+                                    id                   : null,
+                                    pageId               : page.id,
+                                    jobGroupId           : jobGroup.id,
+                                    browserId            : browser.id,
+                                    performanceAspectType: type,
+                                    metricIdentifier     : type.defaultMetric.toString(),
+                                    persistent           : false
+                            ])
+                    )
                 }
             }
         }
     }
 
-    private getAspectsAsMap(JobGroup jobGroup, Page page, List<Browser> browsers) {
-        return PerformanceAspect.createCriteria().list {
+    private List<PerformanceAspectDto> getAspects(JobGroup jobGroup, Page page, List<Browser> browsers) {
+        PerformanceAspect.createCriteria().list {
             resultTransformer(CriteriaSpecification.ALIAS_TO_ENTITY_MAP)
             eq 'jobGroup', jobGroup
             eq 'page', page
@@ -159,6 +146,9 @@ class ApplicationDashboardService {
                 property 'metricIdentifier', 'metricIdentifier'
                 property 'performanceAspectType', 'performanceAspectType'
             }
+        }.collect { Map aspectAsMap ->
+            aspectAsMap['persistent'] = true
+            new PerformanceAspectDto(aspectAsMap)
         }
     }
 

@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
 import { MetricFinderService } from './metric-finder.service';
-import {HttpClientTestingModule, HttpTestingController, TestRequest} from '@angular/common/http/testing';
+import { HttpTestingController, TestRequest} from '@angular/common/http/testing';
 import {skip} from 'rxjs/operators';
-import {TestInfo, TestResult, TestResultDTO} from '../models/test-result';
+import { TestResult, TestResultDTO} from '../models/test-result.model';
+import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 
 describe('MetricFinderService', () => {
   let httpMock: HttpTestingController;
@@ -17,8 +18,8 @@ describe('MetricFinderService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [ HttpClientTestingModule ],
-      providers: [ MetricFinderService ]
+      imports: [ SharedMocksModule ],
+      providers: [ MetricFinderService ],
     });
     httpMock = TestBed.get(HttpTestingController);
     metricService = TestBed.get(MetricFinderService);

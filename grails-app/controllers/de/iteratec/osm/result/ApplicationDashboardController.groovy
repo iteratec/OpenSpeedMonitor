@@ -42,12 +42,11 @@ class ApplicationDashboardController {
         return ControllerUtils.sendObjectAsJSON(response, pageCsiDtos)
     }
 
-    def getMetricsForApplication(DefaultApplicationCommand command) {
+    def getAspectMetricsForApplication(DefaultApplicationCommand command) {
         Long jobGroupId = command.applicationId
 
-        List<Map> activePagesAndMetrics = applicationDashboardService.getAllActivePagesAndMetrics(jobGroupId)
-
-        return ControllerUtils.sendObjectAsJSON(response, activePagesAndMetrics)
+        List<Map> activePagesAndAspectMetrics = applicationDashboardService.getAllActivePagesAndAspectMetrics(jobGroupId)
+        return ControllerUtils.sendObjectAsJSON(response, activePagesAndAspectMetrics)
     }
 
     def getPerformanceAspectsForApplication(PerformanceAspectManagementRequestCommand command) {
@@ -97,6 +96,16 @@ class ApplicationDashboardController {
     def getApplications() {
         def allActiveAndRecent = jobGroupService.getAllActiveAndRecentWithResultInformation()
         return ControllerUtils.sendObjectAsJSON(response, allActiveAndRecent)
+    }
+
+    def getApplication(Long applicationId) {
+        List<Map> allActiveAndRecent = jobGroupService.getAllActiveAndRecentWithResultInformation()
+        Map app = allActiveAndRecent.find { it.id == applicationId }
+        if (app) {
+            ControllerUtils.sendObjectAsJSON(response, app)
+        } else {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, "No Application with id '${applicationId}' found.")
+        }
     }
 
     def getCsiValuesForApplications() {

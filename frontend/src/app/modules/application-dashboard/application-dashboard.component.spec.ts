@@ -14,10 +14,9 @@ import {CsiValueMediumComponent} from "../shared/components/csi-value/csi-value-
 import {ApplicationJobStatusComponent} from "./components/application-job-status/application-job-status.component";
 import {GraphiteIntegrationComponent} from "./components/application-job-status/graphite-integration/graphite-integration.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {PerformanceAspectManagementComponent} from "./components/performance-aspect-management/performance-aspect-management.component";
-import {PerformanceAspectInspectComponent} from "./components/performance-aspect-management/performance-aspect-inspect/performance-aspect-inspect.component";
-import {MeasurandSelectComponent} from "../result-selection/components/measurand-select/measurand-select.component";
+import {MeasurandSelectComponent} from "../result-selection/components/measurands/measurand-select/measurand-select.component";
 import {ResultSelectionService} from "../result-selection/services/result-selection.service";
+import {GrailsBridgeService} from "../../services/grails-bridge.service";
 
 describe('ApplicationDashboardComponent', () => {
   let component: ApplicationDashboardComponent;
@@ -42,13 +41,12 @@ describe('ApplicationDashboardComponent', () => {
         CsiValueBigComponent,
         CsiValueBaseComponent,
         CsiValueMediumComponent,
-        PerformanceAspectManagementComponent,
-        PerformanceAspectInspectComponent,
         MeasurandSelectComponent
       ],
       providers: [
         ApplicationService,
-        ResultSelectionService
+        ResultSelectionService,
+        GrailsBridgeService
       ]
     })
       .compileComponents();

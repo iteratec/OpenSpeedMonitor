@@ -1,11 +1,14 @@
 import {BehaviorSubject} from 'rxjs';
 import {Thumbnail} from '../models/thumbnail.model';
+import {TestResult} from '../models/test-result.model';
 
 export class FilmstripServiceMock {
 
-  filmStripData$ = new BehaviorSubject<Thumbnail[]>([]);
+  filmStripData$ = new BehaviorSubject<{[resultId: string]: Thumbnail[]}>({});
 
-  getFilmstripData() {}
+  loadFilmstripIfNecessary(result: TestResult): void {}
 
-  createFilmStrip() {}
+  loadFilmstrip(result: TestResult): void { }
+
+  getThumbnailTime(time: number): number { return 0; }
 }
