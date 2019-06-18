@@ -28,12 +28,8 @@ import spock.lang.Unroll
 /**
  * Test-suite for {@link BrowserService}.
  */
-@Build([Browser, Location])
+@Build([Browser, Location, WebPageTestServer])
 class BrowserServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<BrowserService> {
-
-    void setupSpec() {
-        mockDomains(Browser, BrowserAlias)
-    }
 
     void "find by name or alias returns correct browsers"(String nameOrAlias, String expectedBrowserName) {
         given: "Two browsers with aliases"
@@ -89,9 +85,10 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
     void "Get extended Browser informations for Browser #browserName"() {
         given: "A browser with an associated Location with information"
         Browser b = Browser.build(name: "Chrome")
-        Location loc = Location.build(browser: b, active: true, operatingSystem: os, deviceType: dt)
-        loc.active = true
-        loc.save(flush: true)
+        new Location(
+                browser: b, active: true, operatingSystem: os, deviceType: dt,
+                label: 'loc', wptServer: WebPageTestServer.build(), location: 'loc'
+        ).save()
 
         when: "Getting Browser infos and look up for the created browser"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()
