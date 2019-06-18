@@ -1,0 +1,32 @@
+<p>{{ 'frontend.de.iteratec.osm.aggregation.description' | translate }}</p>
+<div class="action-row">
+  <div class="col-md-12">
+
+    <div class="btn-group pull-right" id="show-button-group">
+      <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button" (click)="getBarchartData()">
+        {{ 'frontend.de.iteratec.osm.aggregation.show' | translate }}
+      </button>
+    </div>
+    <!--<div class="pull-right hidden-warnings">
+      <p class="bg-warning" id="warning-long-processing">
+        {{ 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime' | translate }}
+      </p>
+      <p class="bg-danger" id="warning-no-data">
+        {{ 'de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection' | translate }}
+      </p>
+      <p class="bg-danger" id="warning-no-job-group">
+        {{ 'de.iteratec.isocsi.CsiDashboardController.noJobGroupSelected' | translate }}
+      </p>
+      <p class="bg-danger" id="warning-no-page">
+        {{ 'de.iteratec.isocsi.CsiDashboardController.noPageSelected' | translate }}
+      </p>
+      <p class="bg-danger" id="warning-no-measurand">
+        {{ 'de.iteratec.isocsi.CsiDashboardController.noMeasurandSelected' | translate }}
+      </p>
+    </div>-->
+
+  </div>
+</div>
+<p>
+  <osm-result-selection></osm-result-selection>
+</p>

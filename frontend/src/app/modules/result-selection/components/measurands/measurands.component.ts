@@ -33,10 +33,7 @@ export class MeasurandsComponent implements OnInit {
         this.resultSelectionStore.percentages$
       ]
     });
-    this.resultSelectionStore.loadTimes$.subscribe(next => {
-      this.defaultValue = next.values[0];
-      this.selectedMeasurands = [this.defaultValue];
-    });
+    this.setDefaultValue();
   }
 
   ngOnInit() {
@@ -47,18 +44,31 @@ export class MeasurandsComponent implements OnInit {
 
   selectMeasurand(index: number, measurand: SelectableMeasurand) {
     this.selectedMeasurands[index] = measurand;
+    this.setMeasurandIds();
   }
 
   addMeasurandField() {
     this.selectedMeasurands.push(this.defaultValue);
+    this.setMeasurandIds();
   }
 
   removeMeasurandField(index: number) {
     this.selectedMeasurands.splice(index, 1);
+    this.setMeasurandIds();
   }
 
   trackByFn(index: number, item: any) {
     return index;
+  }
+
+  setDefaultValue() {
+    this.resultSelectionStore.loadTimes$.subscribe((next: MeasurandGroup) => {
+      this.defaultValue = next.values[0];
+      this.selectedMeasurands = [this.defaultValue];
+      if (this.defaultValue) {
+        this.setMeasurandIds();
+      }
+    });
   }
 
   private loadingState(): Observable<boolean> {
@@ -72,5 +82,10 @@ export class MeasurandsComponent implements OnInit {
     ).pipe(
         map(next => next.map(item => item.isLoading).some(value => value))
     )
+  }
+
+  private setMeasurandIds() {
+    this.resultSelectionStore.setMeasurands(
+      this.selectedMeasurands.map((measurand: SelectableMeasurand) => measurand.id));
   }
 }

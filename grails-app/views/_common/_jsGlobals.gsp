@@ -16,7 +16,7 @@
             }
         }
         return lang;
-    };
+    }
 
     OpenSpeedMonitor.i18n = {
         lang: language,
@@ -118,7 +118,7 @@
         discard: '${message(code: 'job.threshold.discard')}',
         delete: '${message(code: 'job.threshold.delete')}',
         remove: '${message(code: 'job.threshold.remove')}'
-    }
+    };
 
     OpenSpeedMonitor.user.loggedIn = ${grails.plugin.springsecurity.SpringSecurityUtils.ifAnyGranted("ROLE_ADMIN,ROLE_SUPER_ADMIN") ? 'true': 'false'};
 </script>

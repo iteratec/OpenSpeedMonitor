@@ -14,12 +14,14 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
+import {GetBarchartCommand} from "../../aggregation/models/get-barchart-command.model";
 
 @Injectable()
 export class ResultSelectionStore {
   from: Date;
   to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
+  _remainingGetBarchartCommand$: BehaviorSubject<GetBarchartCommand>;
 
   applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({isLoading: false, data: []});
   applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({isLoading: false, data: []});
@@ -39,11 +41,12 @@ export class ResultSelectionStore {
     let defaultTo = new Date();
     defaultFrom.setDate(defaultTo.getDate() - 3);
     this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
+    this._remainingGetBarchartCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo});
   }
 
   registerComponent(component: UiComponent): void {
     if(component === UiComponent.MEASURAND) {
-      this.loadMeasurands(this._resultSelectionCommand$.getValue());
+      this.loadMeasurands(this.resultSelectionCommand);
     }
 
     this._resultSelectionCommand$.subscribe(state => {
@@ -74,9 +77,29 @@ export class ResultSelectionStore {
     return this._resultSelectionCommand$.getValue();
   }
 
+  setRemainingGetBarchartCommandComparativeTimeFrame(timeFrame: Date[]): void {
+    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, from: timeFrame[0], to: timeFrame[1]});
+  }
+
+  setRemainingGetBarchartCommandIds(ids: number[], type: ResultSelectionCommandParameter): void {
+    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, [type]: ids});
+  }
+
+  setMeasurands(measurands: string[]): void {
+    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, measurands: measurands});
+  }
+
+  get remainingGetBarchartCommand(): GetBarchartCommand {
+    return this._remainingGetBarchartCommand$.getValue();
+  }
+
   private setResultSelectionCommand(newState: ResultSelectionCommand): void {
     this.loadResultCount(newState);
     this._resultSelectionCommand$.next(newState);
+  }
+
+  private setRemainingGetBarchartCommand(newState: GetBarchartCommand): void {
+    this._remainingGetBarchartCommand$.next(newState);
   }
 
   private loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {
