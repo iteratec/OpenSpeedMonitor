@@ -2,12 +2,7 @@ package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.DeviceType
-import de.iteratec.osm.result.MeasurandGroup
-import de.iteratec.osm.result.OperatingSystem
-import de.iteratec.osm.result.PerformanceAspectType
-import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.*
 import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
 import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
@@ -88,6 +83,7 @@ class EventResultQueryBuilder {
                 return []
             case MetaDataSet.ASPECT:
                 return [
+                        new ProjectionProperty(dbName: 'id', alias: 'id'),
                         new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
                         new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
                         new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
