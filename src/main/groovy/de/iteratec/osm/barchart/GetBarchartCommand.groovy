@@ -1,8 +1,8 @@
 package de.iteratec.osm.barchart
 
-import grails.databinding.BindUsing
+import de.iteratec.osm.result.DeviceType
+import de.iteratec.osm.result.OperatingSystem
 import grails.validation.Validateable
-import groovy.json.JsonSlurper
 import org.joda.time.DateTime
 
 class GetBarchartCommand implements Validateable {
@@ -12,35 +12,12 @@ class GetBarchartCommand implements Validateable {
     DateTime fromComparative
     DateTime toComparative
 
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedPages'])
-    })
-    List<String> selectedPages
+    List<Long> pages
+    List<Long> jobGroups
+    List<String> measurands
+    List<Long> browsers
+    List<DeviceType> deviceTypes
+    List<OperatingSystem> operatingSystems
 
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedJobGroups'])
-    })
-    List<String> selectedJobGroups
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedSeries'])
-    })
-    List selectedSeries
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedBrowsers'])
-    })
-    List<Long> selectedBrowsers
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedDeviceTypes'])
-    })
-    List selectedDeviceTypes
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedOperatingSystems'])
-    })
-    List selectedOperatingSystems
-
-    String selectedAggregationValue
+    String aggregationValue
 }

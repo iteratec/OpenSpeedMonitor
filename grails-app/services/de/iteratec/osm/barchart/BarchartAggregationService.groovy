@@ -4,7 +4,6 @@ import de.iteratec.osm.OsmConfigCacheService
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.d3Data.GetPageComparisonDataCommand
 import de.iteratec.osm.measurement.environment.Browser
-import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.DeviceType
@@ -23,14 +22,14 @@ class BarchartAggregationService {
 
     List<BarchartAggregation> getBarchartAggregationsFor(GetBarchartCommand cmd) {
         List<JobGroup> allJobGroups = null
-        if (cmd.selectedJobGroups) {
-            allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
+        if (cmd.jobGroups) {
+            allJobGroups = JobGroup.findAllByIdInList(cmd.jobGroups)
         }
         List<Page> allPages = null
-        if (cmd.selectedPages) {
-            allPages = Page.findAllByNameInList(cmd.selectedPages)
+        if (cmd.pages) {
+            allPages = Page.findAllByIdInList(cmd.pages)
         }
-        List<SelectedMeasurand> allSelected = cmd.selectedSeries*.measurands.flatten().collect {
+        List<SelectedMeasurand> measurands = cmd.measurands.collect {
             new SelectedMeasurand(it, CachedView.UNCACHED)
         }
         Date from = cmd.from.toDate()
@@ -39,13 +38,13 @@ class BarchartAggregationService {
         Date toComparative = null
 
         List<DeviceType> deviceTypes = []
-        if (cmd.selectedDeviceTypes) {
-            deviceTypes = cmd.selectedDeviceTypes.collect{it.toString().toUpperCase() as DeviceType}
+        if (cmd.deviceTypes) {
+            deviceTypes = cmd.deviceTypes.collect{it.toString().toUpperCase() as DeviceType}
         }
 
         List<OperatingSystem> operatingSystems = []
-        if (cmd.selectedOperatingSystems) {
-            operatingSystems = cmd.selectedOperatingSystems.collect{it.toString().toUpperCase() as OperatingSystem}
+        if (cmd.operatingSystems) {
+            operatingSystems = cmd.operatingSystems.collect{it.toString().toUpperCase() as OperatingSystem}
         }
 
         if (cmd.fromComparative && cmd.toComparative) {
@@ -53,7 +52,7 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        return aggregateWithComparativesForMeasurandOrUserTiming(allSelected, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.selectedAggregationValue, cmd.selectedBrowsers, deviceTypes, operatingSystems)
+        return aggregateWithComparativesForMeasurandOrUserTiming(measurands, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.aggregationValue, cmd.browsers, deviceTypes, operatingSystems)
     }
 
     List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative,

@@ -1,6 +1,6 @@
 package de.iteratec.osm.barchart
 
-import com.google.gson.JsonObject
+
 import de.iteratec.osm.OsmConfiguration
 import de.iteratec.osm.csi.NonTransactionalIntegrationSpec
 import de.iteratec.osm.csi.Page
@@ -16,7 +16,6 @@ import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.OperatingSystem
 import grails.testing.mixin.integration.Integration
 import grails.gorm.transactions.Rollback
-import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
@@ -190,28 +189,28 @@ class BarchartAggregationServiceSpec extends NonTransactionalIntegrationSpec {
 
         def selectedSeries = ["measurands": ["DOC_COMPLETE_TIME"]]
 
-        cmd1.selectedOperatingSystems = ["Windows"]
-        cmd1.selectedPages = ["HP"]
-        cmd1.selectedJobGroups = ["Test"]
-        cmd1.selectedAggregationValue = 'avg'
-        cmd1.selectedSeries = [selectedSeries]
+        cmd1.operatingSystems = ["Windows"]
+        cmd1.pages = ["HP"]
+        cmd1.jobGroups = ["Test"]
+        cmd1.aggregationValue = 'avg'
+        cmd1.measurands = [selectedSeries]
         cmd1.from = today.minusHours(12)
         cmd1.to = today.plusHours(12)
 
-        cmd2.selectedOperatingSystems = ["Android"]
-        cmd2.selectedDeviceTypes = ["Smartphone"]
-        cmd2.selectedPages = ["HP"]
-        cmd2.selectedJobGroups = ["Test"]
-        cmd2.selectedAggregationValue = 'avg'
-        cmd2.selectedSeries = [selectedSeries]
+        cmd2.operatingSystems = ["Android"]
+        cmd2.deviceTypes = ["Smartphone"]
+        cmd2.pages = ["HP"]
+        cmd2.jobGroups = ["Test"]
+        cmd2.aggregationValue = 'avg'
+        cmd2.measurands = [selectedSeries]
         cmd2.from = today.minusHours(12)
         cmd2.to = today.plusHours(12)
 
-        cmd3.selectedPages = ["HP"]
-        cmd3.selectedJobGroups = ["Test"]
-        cmd3.selectedBrowsers = [1.toLong()]
-        cmd3.selectedAggregationValue = 'avg'
-        cmd3.selectedSeries = [selectedSeries]
+        cmd3.pages = ["HP"]
+        cmd3.jobGroups = ["Test"]
+        cmd3.browsers = [1.toLong()]
+        cmd3.aggregationValue = 'avg'
+        cmd3.measurands = [selectedSeries]
         cmd3.from = today.minusHours(12)
         cmd3.to = today.plusHours(12)
         cmd3.fromComparative = yesterday.minusHours(12)

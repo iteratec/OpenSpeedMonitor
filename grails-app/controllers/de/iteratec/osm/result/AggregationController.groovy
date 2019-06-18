@@ -85,13 +85,13 @@ class AggregationController extends ExceptionHandlerController {
         }
 
         List<JobGroup> allJobGroups = null
-        if (cmd.selectedJobGroups) {
-            allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
+        if (cmd.jobGroups) {
+            allJobGroups = JobGroup.findAllByIdInList(cmd.jobGroups)
         }
 
         List<Page> allPages = null
-        if (cmd.selectedPages) {
-            allPages = Page.findAllByNameInList(cmd.selectedPages)
+        if (cmd.pages) {
+            allPages = Page.findAllByIdInList(cmd.pages)
         }
 
         List<BarchartAggregation> barchartAggregations = barchartAggregationService.getBarchartAggregationsFor(cmd)
@@ -244,11 +244,11 @@ class AggregationController extends ExceptionHandlerController {
      */
     private String getErrorMessages(GetBarchartCommand cmd) {
         String result = ""
-        if (!cmd.selectedSeries) {
+        if (!cmd.measurands) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedMeasurandSeries.error.validator.error.selectedMeasurandSeries", "Please select at least one measurand series")
             result += "<br />"
         }
-        if (!cmd.selectedJobGroups) {
+        if (!cmd.jobGroups) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder", "Please select at least one jobGroup")
             result += "<br />"
         }

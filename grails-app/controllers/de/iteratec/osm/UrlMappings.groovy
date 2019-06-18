@@ -32,6 +32,8 @@ class UrlMappings {
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/applicationDashboard/**?"(view: "/angularFrontend")
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
+        "/aggregation/**?"(view: "/angularFrontend")
+        //"/aggregation/getBarchartData"(controller: "aggregation/getBarchartData")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
         "/metricFinder/**?"(view: "/angularFrontend")
@@ -57,6 +59,11 @@ class UrlMappings {
         ////////////////////////////////////////////////////////////////////////////////////////////////
         // rest api of osm
         ////////////////////////////////////////////////////////////////////////////////////////////////
+
+        "/aggregation/getBarchartData" {
+            controller = "aggregation"
+            action = "getBarchartData"
+        }
 
         "/rest/man/$action?/$id?" {
             controller = "ApiDoc"
