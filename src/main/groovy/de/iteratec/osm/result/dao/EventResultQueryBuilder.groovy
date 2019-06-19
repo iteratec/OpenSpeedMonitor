@@ -294,7 +294,7 @@ class EventResultQueryBuilder {
         if (this.aspectUtil.aspectsIncluded()) {
             try {
                 this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - expandByAspects', 2) {
-                    aspectUtil.expandByAspects(results)
+                    aspectUtil.expandByAspects(results, performanceLoggingService)
                 }
             } catch (IllegalStateException e) {
                 log.error(e.getMessage(), e)
@@ -354,7 +354,7 @@ class EventResultQueryBuilder {
             List<EventResultProjection> avgs = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getAverageFrom', 1) {
                 this.aspectUtil.getAverageFrom(rawData)
             }
-            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.INFO))
+            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.DEBUG))
             return avgs
         } else {
             return getAverageDataWithoutAspects()
