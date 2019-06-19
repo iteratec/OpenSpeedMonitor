@@ -1,5 +1,12 @@
 <select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()"
         [compareWith]="compareMeasurands">
+  <ng-container *ngFor="let type of perfAspectTypes$ |async">
+  <optgroup label="{{type.name}}">
+    <option>
+      metrics
+    </option>
+  </optgroup>
+  </ng-container>
   <ng-container *ngFor="let group$ of selectableMeasurandGroups.getValue().data">
     <optgroup *ngIf="group$.getValue().values && group$.getValue().values.length > 0"
               label="{{group$.getValue().name | translate}}">

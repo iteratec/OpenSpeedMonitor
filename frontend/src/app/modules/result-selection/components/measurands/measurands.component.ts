@@ -1,10 +1,12 @@
 import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
-import {BehaviorSubject, combineLatest, Observable} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {map} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
+import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
+import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 
 @Component({
   selector: 'osm-measurands',
@@ -16,11 +18,12 @@ export class MeasurandsComponent implements OnInit {
     isLoading: false,
     data: []
   });
+  aspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
 
-  constructor(private resultSelectionStore: ResultSelectionStore) {
+  constructor(private resultSelectionStore: ResultSelectionStore, private performanceAspectService: PerformanceAspectService) {
     this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
     this.measurands$.next({
       ...this.measurands$.getValue(),
@@ -37,6 +40,7 @@ export class MeasurandsComponent implements OnInit {
       this.defaultValue = next.values[0];
       this.selectedMeasurands = [this.defaultValue];
     });
+    this.aspectTypes$ = performanceAspectService.aspectTypes$;
   }
 
   ngOnInit() {
