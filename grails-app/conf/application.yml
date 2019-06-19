@@ -5,7 +5,7 @@ de:
     osm:
      application-dashboard:
       metrics-max-age-in-h: 6
-
+      metrics-duration-in-h: 6
 
 hibernate:
     cache:
