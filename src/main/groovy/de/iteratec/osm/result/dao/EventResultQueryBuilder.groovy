@@ -17,7 +17,6 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * Created by mwg on 31.08.2017.
  */
