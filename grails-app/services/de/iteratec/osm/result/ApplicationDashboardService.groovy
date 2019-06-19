@@ -38,13 +38,13 @@ class ApplicationDashboardService {
                     PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT
             ]
 
-        Date from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours()).toDate()
-        Date to = new DateTime().toDate()
+        DateTime from = new DateTime().minusHours(configService.getMaxAgeForMetricsInHours())
+        Date to = from.plusHours(configService.getDurationForMetricsInHours()).toDate()
         List<Page> pages = jobGroupService.getPagesWithResultsOrActiveJobsForJobGroup(jobGroupId)
 
         return new EventResultQueryBuilder()
             .withJobGroupIdsIn([jobGroupId], false)
-            .withJobResultDateBetween(from, to)
+                .withJobResultDateBetween(from.toDate(), to)
             .withPageIn(pages)
             .withoutPagesIn([Page.findByName(Page.UNDEFINED)])
             .withSelectedMeasurands([])

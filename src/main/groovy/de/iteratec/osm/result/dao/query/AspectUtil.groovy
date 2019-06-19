@@ -195,7 +195,7 @@ class AspectUtil {
     private appendMetricIfMissing(SelectedMeasurand metric, List<SelectedMeasurand> userTimings, List<SelectedMeasurand> measurands) {
         if (metric.selectedType.isUserTiming() && !userTimings.contains(metric)) {
             userTimings.add(metric)
-        } else if (!measurands.contains(metric)) {
+        } else if (!metric.selectedType.isUserTiming() && !measurands.contains(metric)) {
             measurands.add(metric)
         }
     }
