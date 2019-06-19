@@ -204,6 +204,8 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
 
     void "Graph is shown for custom connectivity"(){
         given: "User selects custom connectivity"
+        pageList[0].click()
+        pageList[0].click()
         connectivityTab.click()
         selectAllConnectivityButton.click()
         selectConnectivityProfilesList.find { it.getAttribute("value").startsWith("Custom") }.click()
