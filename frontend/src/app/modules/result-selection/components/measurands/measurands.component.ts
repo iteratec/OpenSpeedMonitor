@@ -7,7 +7,7 @@ import {map} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
 
 @Component({
-  selector: 'osm-measurands',
+  selector: 'osm-result-selection-measurands',
   templateUrl: './measurands.component.html',
   styleUrls: ['./measurands.component.scss']
 })
@@ -21,7 +21,6 @@ export class MeasurandsComponent implements OnInit {
   defaultValue: SelectableMeasurand;
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
     this.measurands$.next({
       ...this.measurands$.getValue(),
       data: [
@@ -37,6 +36,7 @@ export class MeasurandsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
     this.loadingState().subscribe(next => {
       this.measurands$.next({...this.measurands$.getValue(), isLoading: next});
     });

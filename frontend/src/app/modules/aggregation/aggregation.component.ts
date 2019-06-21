@@ -1,9 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {AggregationService} from "./services/aggregation.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
-import {GetBarchartCommand} from "./models/get-barchart-command.model";
-import {ResultSelectionCommand} from "../result-selection/models/result-selection-command.model";
 import {URL} from "../../enums/url.enum";
+import {BarchartDataService} from "../chart/services/barchart-data.service";
 
 @Component({
   selector: 'osm-aggregation',
@@ -12,31 +10,56 @@ import {URL} from "../../enums/url.enum";
 })
 export class AggregationComponent implements OnInit {
 
-  constructor(private dataService: AggregationService, private resultSelectionStore: ResultSelectionStore) { }
+  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) { }
 
   ngOnInit() {
   }
 
-  getBarchartData() {
-    let getBarchartCommand: GetBarchartCommand = AggregationComponent.createGetBarchartCommand(
+  getBarchartData(): void {
+    this.barchartDataService.fetchBarchartData<any>(
       this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingGetBarchartCommand);
-    this.dataService.fetchBarChartData<any>( getBarchartCommand, URL.AGGREGATION_BARCHART_DATA).subscribe(result => console.log(result));
+      this.resultSelectionStore.remainingGetBarchartCommand,
+      "avg",
+      URL.AGGREGATION_BARCHART_DATA
+    ).subscribe(result => console.log(result));
+
+    this.barchartDataService.fetchBarchartData<any>(
+      this.resultSelectionStore.resultSelectionCommand,
+      this.resultSelectionStore.remainingGetBarchartCommand,
+      50,
+      URL.AGGREGATION_BARCHART_DATA
+    ).subscribe(result => console.log(result));
   }
 
-  private static createGetBarchartCommand(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: GetBarchartCommand): GetBarchartCommand {
-    return new GetBarchartCommand({
-      from: resultSelectionCommand.from,
-      to: resultSelectionCommand.to,
-      fromComparative: remainingGetBarchartCommand.fromComparative,
-      toComparative: remainingGetBarchartCommand.toComparative,
-      pages: resultSelectionCommand.pageIds,
-      jobGroups: resultSelectionCommand.jobGroupIds,
-      measurands: remainingGetBarchartCommand.measurands,
-      browsers: resultSelectionCommand.browserIds,
-      deviceTypes: remainingGetBarchartCommand.deviceTypes,
-      operatingSystems: remainingGetBarchartCommand.operatingSystems,
-      aggregationValue: "avg"
-    });
+  isGetBarchartDataAllowed(): boolean {
+    return this.resultSelectionStore.resultSelectionCommand.from
+      && this.resultSelectionStore.resultSelectionCommand.to
+      && this.areApplicationsSelected()
+      && this.areMeasurandsSelected()
+  }
+
+  isDataAvailable(): boolean {
+    return this.resultSelectionStore.resultCount$.getValue() > 0;
+  }
+
+  areApplicationsSelected(): boolean {
+    return this.resultSelectionStore.resultSelectionCommand.jobGroupIds &&
+      this.resultSelectionStore.resultSelectionCommand.jobGroupIds.length > 0;
+  }
+
+  arePagesSelected() {
+    return true;
+  }
+
+  areMeasurandsSelected() {
+    return true;
+  }
+
+  isProcessTimeLong(): boolean {
+    return this.resultSelectionStore.resultCount$.getValue() == -1 &&
+      ((this.resultSelectionStore.resultSelectionCommand.pageIds && this.resultSelectionStore.resultSelectionCommand.pageIds.length > 0
+          || this.resultSelectionStore.resultSelectionCommand.measuredEventIds && this.resultSelectionStore.resultSelectionCommand.measuredEventIds.length > 0 )
+        && this.resultSelectionStore.resultSelectionCommand.jobGroupIds && this.resultSelectionStore.resultSelectionCommand.jobGroupIds.length > 0
+      );
   }
 }

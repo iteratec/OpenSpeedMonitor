@@ -36,7 +36,7 @@ export const TIME_FORMAT = {
     PageLocationConnectivityComponent,
     SelectionDataComponent
   ],
-  exports: [MeasurandSelectComponent, ResultSelectionComponent],
+  exports: [TimeFrameComponent, ApplicationComponent, MeasurandsComponent, PageLocationConnectivityComponent],
   providers: [
     {
       provide: 'components',

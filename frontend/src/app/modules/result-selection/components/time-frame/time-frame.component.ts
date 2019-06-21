@@ -13,9 +13,8 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 })
 export class TimeFrameComponent implements OnInit {
 
-  @Input() currentChart: string;
-  @Input() enableAggregation: boolean = true;
-  @Input() enableComparative: boolean = true;
+  @Input() enableAggregation: boolean = false;
+  @Input() enableComparative: boolean = false;
   @ViewChild('dateTimeFrom') dateTimeFrom: OwlDateTimeComponent<Date>;
   @ViewChild('dateTimeTo') dateTimeTo: OwlDateTimeComponent<Date>;
   @ViewChild('comparativeDateTimeFrom') comparativeDateTimeFrom: OwlDateTimeComponent<Date>;
@@ -88,6 +87,9 @@ export class TimeFrameComponent implements OnInit {
       this.selectedComparativeDates = [comparativeFrom, comparativeTo];
     }
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
+    if (this.comparativeSelectionActive) {
+      this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame(this.selectedComparativeDates);
+    }
   }
 
   updateFromDate(calendar: CalendarType): void {
@@ -105,7 +107,9 @@ export class TimeFrameComponent implements OnInit {
       this.selectedDates = this.dateTimeFrom.selecteds;
     }
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
-
+    if (this.comparativeSelectionActive) {
+      this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame(this.selectedComparativeDates);
+    }
   }
 
   updateToDate(calendar: CalendarType): void {
@@ -123,7 +127,9 @@ export class TimeFrameComponent implements OnInit {
       this.selectedDates = this.dateTimeTo.selecteds;
     }
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
-
+    if (this.comparativeSelectionActive) {
+      this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame(this.selectedComparativeDates);
+    }
   }
 
   observeCalendarClicks(calendar: CalendarType): void {

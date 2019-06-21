@@ -9,7 +9,7 @@ export interface GetBarchartCommandDTO {
   browsers?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
-  aggregationValue?: string;
+  aggregationValue?: string | number;
 }
 
 export class GetBarchartCommand implements GetBarchartCommandDTO {
@@ -23,7 +23,7 @@ export class GetBarchartCommand implements GetBarchartCommandDTO {
   browsers?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
-  aggregationValue?: string;
+  aggregationValue?: string | number;
 
   constructor (dto: GetBarchartCommandDTO) {
     this.from = dto.from;

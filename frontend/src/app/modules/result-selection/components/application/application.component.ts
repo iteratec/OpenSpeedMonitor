@@ -19,10 +19,13 @@ export class ApplicationComponent {
   selectedTag: string = '';
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
     this.resultSelectionStore.applications$.subscribe(applications => {
       this.updateApplicationsAndTags(applications.data);
     });
+  }
+
+  ngOnInit() {
+    this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
   }
 
   updateApplicationsAndTags(applications: SelectableApplication[]): void {

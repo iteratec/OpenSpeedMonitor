@@ -1,32 +1,53 @@
-<p>{{ 'frontend.de.iteratec.osm.aggregation.description' | translate }}</p>
+<h2>
+  Menu
+</h2>
+<p>
+  {{ 'frontend.de.iteratec.osm.aggregation.description' | translate }}
+</p>
 <div class="action-row">
   <div class="col-md-12">
 
-    <div class="btn-group pull-right" id="show-button-group">
-      <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button" (click)="getBarchartData()">
-        {{ 'frontend.de.iteratec.osm.aggregation.show' | translate }}
+    <div class="btn-group pull-right">
+      <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button" (click)="getBarchartData()"
+              [disabled]="!isGetBarchartDataAllowed()">
+        {{ 'frontend.de.iteratec.osm.resultSelection.show' | translate }}
       </button>
     </div>
-    <!--<div class="pull-right hidden-warnings">
-      <p class="bg-warning" id="warning-long-processing">
-        {{ 'de.iteratec.isocsi.CsiDashboardController.warnAboutLongProcessingTime' | translate }}
+    <div class="pull-right">
+      <p class="bg-warning get-barchart-data-warnings" *ngIf="isProcessTimeLong()">
+        {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
       </p>
-      <p class="bg-danger" id="warning-no-data">
-        {{ 'de.iteratec.isocsi.CsiDashboardController.no.data.on.current.selection' | translate }}
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="!isDataAvailable()">
+        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
       </p>
-      <p class="bg-danger" id="warning-no-job-group">
-        {{ 'de.iteratec.isocsi.CsiDashboardController.noJobGroupSelected' | translate }}
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="isDataAvailable() && !areApplicationsSelected()">
+        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
       </p>
-      <p class="bg-danger" id="warning-no-page">
-        {{ 'de.iteratec.isocsi.CsiDashboardController.noPageSelected' | translate }}
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="isDataAvailable() && !arePagesSelected()">
+        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
       </p>
-      <p class="bg-danger" id="warning-no-measurand">
-        {{ 'de.iteratec.isocsi.CsiDashboardController.noMeasurandSelected' | translate }}
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="isDataAvailable() && !areMeasurandsSelected()">
+        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
       </p>
-    </div>-->
+    </div>
 
   </div>
 </div>
-<p>
-  <osm-result-selection></osm-result-selection>
-</p>
+<div class="row">
+  <div class="col-md-12">
+    <div class="action-row">
+
+      <div class="col-md-4">
+        <osm-result-selection-time-frame [enableComparative]="true"></osm-result-selection-time-frame>
+        <osm-result-selection-measurands></osm-result-selection-measurands>
+      </div>
+      <div class="col-md-3">
+        <osm-result-selection-application></osm-result-selection-application>
+      </div>
+      <div class="col-md-5">
+        <osm-result-selection-page-location-connectivity [showPageSelection]="true" [showBrowserSelection]="true"></osm-result-selection-page-location-connectivity>
+      </div>
+
+    </div>
+  </div>
+</div>

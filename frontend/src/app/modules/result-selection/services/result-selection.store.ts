@@ -14,7 +14,7 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
-import {GetBarchartCommand} from "../../aggregation/models/get-barchart-command.model";
+import {GetBarchartCommand} from "../../chart/models/get-barchart-command.model";
 
 @Injectable()
 export class ResultSelectionStore {

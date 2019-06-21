@@ -1,12 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import {BarchartDataService} from "./barchart-data.service";
 
-import { AggregationService } from './aggregation.service';
-
-describe('AggregationService', () => {
+describe('BarchartDataService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: AggregationService = TestBed.get(AggregationService);
+    const service: BarchartDataService = TestBed.get(BarchartDataService);
     expect(service).toBeTruthy();
   });
 });

@@ -1,6 +1,4 @@
-import {Component, ElementRef} from '@angular/core';
-
-import {ResultSelectionService} from "./services/result-selection.service";
+import {Component} from '@angular/core';
 
 @Component({
   selector: 'osm-result-selection',
@@ -9,11 +7,6 @@ import {ResultSelectionService} from "./services/result-selection.service";
 })
 export class ResultSelectionComponent {
 
-  currentChart: string;
-
-
-  constructor(private resultSelectionService: ResultSelectionService, element: ElementRef) {
-    this.currentChart = element.nativeElement.getAttribute('data-current-chart');
-  }
+  constructor() {  }
 
 }
