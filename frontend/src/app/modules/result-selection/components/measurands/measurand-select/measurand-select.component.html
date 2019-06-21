@@ -1,12 +1,12 @@
 <select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()"
         [compareWith]="compareMeasurands">
-  <ng-container *ngFor="let type of perfAspectTypes$ |async">
-  <optgroup label="{{type.name}}">
-    <option>
-      metrics
-    </option>
+  <optgroup label="{{'frontend.de.iteratec.osm.performance-aspects' | translate}}">
+    <ng-container *ngFor="let type of perfAspectTypes$ |async">
+      <option>
+        {{ 'frontend.de.iteratec.osm.performance-aspect.' + type.name + '.user-centric-question' | translate }}
+      </option>
+    </ng-container>
   </optgroup>
-  </ng-container>
   <ng-container *ngFor="let group$ of selectableMeasurandGroups.getValue().data">
     <optgroup *ngIf="group$.getValue().values && group$.getValue().values.length > 0"
               label="{{group$.getValue().name | translate}}">
