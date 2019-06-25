@@ -38,6 +38,9 @@
         showMsg: '${message(code: 'de.iteratec.osm.csi.ui.show.label', default: 'Show')}',
         noResultsMsg: '${message(code: 'de.iteratec.osm.resultSelection.noResults', default: 'No Results in selected time frame')}'
     };
+    OpenSpeedMonitor.assetPaths = {
+        aggregationChart: '${assetPath(src: 'aggregation/aggregationChart.js')}'
+    };
     OpenSpeedMonitor.urls = {
         getNamesOfDefaultMappings: '${createLink(controller: 'csiConfigIO', action: 'getNamesOfDefaultCsiMappings')}',
         validateDeletionOfCsiConfiguration: '${createLink(controller: 'csiConfiguration', action: 'validateDeletion')}',
