@@ -38,7 +38,8 @@ OpenSpeedMonitor.ChartModules.Aggregation = (function (selector) {
     };
 
     var setData = function (inputData) {
-        data.setData(inputData);
+        // data.setData(inputData);
+        OpenSpeedMonitor.ChartModules.AggregationData.setData(inputData);
         chartHeaderComponent.setData(data.getDataForHeader());
         chartBarScoreComponent.setData(data.getDataForBarScore());
         chartLegendComponent.setData(data.getDataForLegend());

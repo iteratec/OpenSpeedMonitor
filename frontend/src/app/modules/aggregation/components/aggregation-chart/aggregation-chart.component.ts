@@ -50,7 +50,11 @@ export class AggregationChartComponent implements OnInit {
 
   constructor(private grailsBridgeService: GrailsBridgeService, private aggregationChartDataService: AggregationChartDataService) {
     window.addEventListener("aggregationChartLoaded", () => {
-      this.grailsBridgeService.globalOsmNamespace.ChartModules.Aggregation('#aggregation-chart');
+      this.grailsBridgeService.globalOsmNamespace.ChartModules.AggregationData.setData = (svg) => {
+        console.log(svg);
+        console.log("Angular Service")
+      };
+      this.grailsBridgeService.globalOsmNamespace.ChartModules.Aggregation('#aggregation-chart').setData("Real Data");
     });
   }
 
