@@ -24,6 +24,7 @@ export class SelectionDataComponent implements OnInit {
   @Input() parentType: ResultSelectionCommandParameter;
   @Input() showChildSelection: boolean = true;
   @Input() parentSelectionOptional: boolean = true;
+  @Input() resetResultSelectionEvent: Observable<void>;
 
   parentSelection$ = new BehaviorSubject<number[]>([]);
   parentSelection: number[] = [];
@@ -55,6 +56,8 @@ export class SelectionDataComponent implements OnInit {
         }
       })
     );
+
+    this.resetResultSelectionEvent.subscribe(() => this.resetResultSelection())
   }
 
   filterSelectableItems(selectedParents: number[]): void {
@@ -71,6 +74,15 @@ export class SelectionDataComponent implements OnInit {
       return 1;
     } else {
       return 0.5;
+    }
+  }
+
+  private resetResultSelection() {
+    this.parentSelection = [];
+    this.filterSelectableItems([]);
+    if (this.showChildSelection) {
+      this.childSelection = [];
+      this.updateResultSelectionCommand();
     }
   }
 

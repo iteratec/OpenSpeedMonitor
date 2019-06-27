@@ -14,14 +14,14 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
-import {GetBarchartCommand} from "../../chart/models/get-barchart-command.model";
+import {RemainingGetBarchartCommand} from "../../chart/models/get-barchart-command.model";
 
 @Injectable()
 export class ResultSelectionStore {
   from: Date;
   to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
-  _remainingGetBarchartCommand$: BehaviorSubject<GetBarchartCommand>;
+  _remainingGetBarchartCommand$: BehaviorSubject<RemainingGetBarchartCommand>;
 
   applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({isLoading: false, data: []});
   applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({isLoading: false, data: []});
@@ -41,24 +41,24 @@ export class ResultSelectionStore {
     let defaultTo = new Date();
     defaultFrom.setDate(defaultTo.getDate() - 3);
     this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
-    this._remainingGetBarchartCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo});
+    this._remainingGetBarchartCommand$ = new BehaviorSubject({});
   }
 
   registerComponent(component: UiComponent): void {
-    if(component === UiComponent.MEASURAND) {
+    if (component === UiComponent.MEASURAND) {
       this.loadMeasurands(this.resultSelectionCommand);
     }
 
     this._resultSelectionCommand$.subscribe(state => {
-      if(component === UiComponent.APPLICATION) {
+      if (component === UiComponent.APPLICATION) {
         this.loadSelectableApplications(state);
-      } else if(component === UiComponent.PAGE) {
+      } else if (component === UiComponent.PAGE) {
         this.loadSelectableEventsAndPages(state);
-      } else if(component === UiComponent.LOCATION) {
+      } else if (component === UiComponent.LOCATION) {
         this.loadSelectableLocationsAndBrowsers(state);
-      } else if(component === UiComponent.CONNECTIVITY) {
+      } else if (component === UiComponent.CONNECTIVITY) {
         this.loadSelectableConnectivities(state);
-      } else if(component === UiComponent.MEASURAND) {
+      } else if (component === UiComponent.MEASURAND) {
         this.loadUserTimings(state);
         this.loadHeroTimings(state);
       }
@@ -78,7 +78,7 @@ export class ResultSelectionStore {
   }
 
   setRemainingGetBarchartCommandComparativeTimeFrame(timeFrame: Date[]): void {
-    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, from: timeFrame[0], to: timeFrame[1]});
+    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
   }
 
   setRemainingGetBarchartCommandIds(ids: number[], type: ResultSelectionCommandParameter): void {
@@ -89,16 +89,16 @@ export class ResultSelectionStore {
     this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, measurands: measurands});
   }
 
-  get remainingGetBarchartCommand(): GetBarchartCommand {
+  get remainingGetBarchartCommand(): RemainingGetBarchartCommand {
     return this._remainingGetBarchartCommand$.getValue();
   }
 
-  private setResultSelectionCommand(newState: ResultSelectionCommand): void {
+  setResultSelectionCommand(newState: ResultSelectionCommand): void {
     this._resultSelectionCommand$.next(newState);
     this.loadResultCount(newState);
   }
 
-  private setRemainingGetBarchartCommand(newState: GetBarchartCommand): void {
+  private setRemainingGetBarchartCommand(newState: RemainingGetBarchartCommand): void {
     this._remainingGetBarchartCommand$.next(newState);
   }
 

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {EMPTY, Observable, OperatorFunction} from "rxjs";
 import {catchError} from "rxjs/operators";
-import {GetBarchartCommand} from "../models/get-barchart-command.model";
+import {GetBarchartCommand, RemainingGetBarchartCommand} from "../models/get-barchart-command.model";
 import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
 
 @Injectable()
@@ -10,7 +10,7 @@ export class BarchartDataService {
 
   constructor(private http: HttpClient) { }
 
-  fetchBarchartData<T>(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: GetBarchartCommand, aggregationValue: (string | number), url: string): Observable<T> {
+  fetchBarchartData<T>(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: RemainingGetBarchartCommand, aggregationValue: (string | number), url: string): Observable<T> {
     const getBarchartCommand = BarchartDataService.buildGetBarchartCommand(resultSelectionCommand, remainingGetBarchartCommand, aggregationValue);
     const params = this.createParams(getBarchartCommand);
     return this.http.get<T>(url, {params: params}).pipe(
@@ -18,7 +18,7 @@ export class BarchartDataService {
     )
   }
 
-  private static buildGetBarchartCommand(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: GetBarchartCommand, aggregationValue: (string | number)): GetBarchartCommand {
+  private static buildGetBarchartCommand(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: RemainingGetBarchartCommand, aggregationValue: (string | number)): GetBarchartCommand {
     return new GetBarchartCommand({
       from: resultSelectionCommand.from,
       to: resultSelectionCommand.to,

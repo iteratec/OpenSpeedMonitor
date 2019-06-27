@@ -50,16 +50,22 @@ describe('ApplicationComponent', () => {
   it('should correctly show the tags according to the available job groups', () =>{
     let tags: string[] = ['application','test','test2'];
 
-    component.updateApplicationsAndTags(applications);
+    component.updateApplications(applications);
+    component.updateTags(applications);
+    component.filterApplicationsByTag(this.selectedTag);
     expect(component.selectableTags.sort()).toEqual(tags);
 
-    component.updateApplicationsAndTags([]);
+    component.updateApplications([]);
+    component.updateTags([]);
+    component.filterApplicationsByTag(this.selectedTag);
     expect(component.selectableTags).toEqual([]);
 
   });
 
   it('should correctly show the job groups according to the selected tag',() => {
-    component.updateApplicationsAndTags(applications);
+    component.updateApplications(applications);
+    component.updateTags(applications);
+    component.filterApplicationsByTag(this.selectedTag);
     let tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
 
     expect(component.filteredApplications).toEqual(component.applications);
@@ -79,8 +85,10 @@ describe('ApplicationComponent', () => {
 
   it('should show the no result message', ()=>{
     const select = fixture.debugElement.query(By.css('select > option')).nativeElement;
-    
-    component.updateApplicationsAndTags([]);
+
+    component.updateApplications([]);
+    component.updateTags([]);
+    component.filterApplicationsByTag(this.selectedTag);
     fixture.detectChanges();
 
     expect(select.innerText.trim()).toEqual('frontend.de.iteratec.osm.resultSelection.application.noResults');

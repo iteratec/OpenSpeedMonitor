@@ -1,10 +1,10 @@
 <div class="card form-horizontal">
   <h2>
-    <ng-container *ngIf="enableAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }} & </ng-container>
+    <ng-container *ngIf="showAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }} & </ng-container>
     {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}
   </h2>
 
-  <div class="row form-group" *ngIf="enableAggregation">
+  <div class="row form-group" *ngIf="showAggregation">
     <label class="control-label col-md-4">
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}:
     </label>
@@ -72,7 +72,7 @@
     </div>
   </ng-template>
 
-  <div class="row form-group" *ngIf="!comparativeSelectionActive && enableComparative">
+  <div class="row form-group" *ngIf="!comparativeSelectionActive && showComparativeTimeFrame">
     <div class="col-md-8 col-md-offset-4">
       <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()">
         <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}

@@ -39,14 +39,21 @@
     <div class="action-row">
 
       <div class="col-md-4">
-        <osm-result-selection-time-frame [enableComparative]="true"></osm-result-selection-time-frame>
+        <osm-result-selection-time-frame [showComparativeTimeFrame]="true"></osm-result-selection-time-frame>
         <osm-result-selection-measurands></osm-result-selection-measurands>
       </div>
       <div class="col-md-3">
-        <osm-result-selection-application></osm-result-selection-application>
+        <osm-result-selection-application [resetResultSelectionEvent]="resetResultSelectionEvent.asObservable()"></osm-result-selection-application>
       </div>
       <div class="col-md-5">
-        <osm-result-selection-page-location-connectivity [showPageSelection]="true" [showBrowserSelection]="true"></osm-result-selection-page-location-connectivity>
+        <osm-result-selection-page-location-connectivity [showPageSelection]="true" [showBrowserSelection]="true"
+                                                         [resetResultSelectionEvent]="resetResultSelectionEvent.asObservable()">
+        </osm-result-selection-page-location-connectivity>
+      </div>
+      <div class="col-md-12">
+        <button class="reset-result-selection btn btn-default btn-sm" (click)="emitResetEventToComponent()">
+          <i class="fas fa-undo"></i> Reset
+        </button>
       </div>
 
     </div>

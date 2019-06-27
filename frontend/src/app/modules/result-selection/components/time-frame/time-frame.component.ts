@@ -13,8 +13,8 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 })
 export class TimeFrameComponent implements OnInit {
 
-  @Input() enableAggregation: boolean = false;
-  @Input() enableComparative: boolean = false;
+  @Input() showAggregation: boolean = false;
+  @Input() showComparativeTimeFrame: boolean = false;
   @ViewChild('dateTimeFrom') dateTimeFrom: OwlDateTimeComponent<Date>;
   @ViewChild('dateTimeTo') dateTimeTo: OwlDateTimeComponent<Date>;
   @ViewChild('comparativeDateTimeFrom') comparativeDateTimeFrom: OwlDateTimeComponent<Date>;
