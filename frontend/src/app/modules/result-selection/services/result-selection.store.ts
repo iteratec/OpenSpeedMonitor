@@ -34,7 +34,7 @@ export class ResultSelectionStore {
   requestCounts$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   requestSizes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   percentages$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
-  resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
+  resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
 
   constructor(private resultSelectionService: ResultSelectionService) {
     let defaultFrom = new Date();
@@ -94,8 +94,8 @@ export class ResultSelectionStore {
   }
 
   private setResultSelectionCommand(newState: ResultSelectionCommand): void {
-    this.loadResultCount(newState);
     this._resultSelectionCommand$.next(newState);
+    this.loadResultCount(newState);
   }
 
   private setRemainingGetBarchartCommand(newState: GetBarchartCommand): void {

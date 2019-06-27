@@ -9,24 +9,25 @@
 
     <div class="btn-group pull-right">
       <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button" (click)="getBarchartData()"
-              [disabled]="!isGetBarchartDataAllowed()">
+              [disabled]="!(areApplicationsSelected$ | async) || !(areMeasurandsSelected$ | async)"> <!-- page && measurandEvents -->
         {{ 'frontend.de.iteratec.osm.resultSelection.show' | translate }}
       </button>
     </div>
     <div class="pull-right">
-      <p class="bg-warning get-barchart-data-warnings" *ngIf="isProcessTimeLong()">
+      <p class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 && (areApplicationsSelected$ | async)
+       && ((arePagesSelected$ | async) || (areMeasuredEventsSelected$ | async))">
         {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
       </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="!isDataAvailable()">
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
         {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
       </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="isDataAvailable() && !areApplicationsSelected()">
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && !(areApplicationsSelected$ | async)">
         {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
       </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="isDataAvailable() && !arePagesSelected()">
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && !(arePagesSelected$ | async)">
         {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
       </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="isDataAvailable() && !areMeasurandsSelected()">
+      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && !(areMeasurandsSelected$ | async)">
         {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
       </p>
     </div>
