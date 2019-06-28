@@ -98,9 +98,12 @@ export class ApplicationComponent {
   }
 
   private resetResultSelection() {
-    this.selectedApplications = [];
-    this.selectedTag = '';
-    this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
+    if (this.selectedApplications.length > 0 || this.isTagSelected()) {
+      this.selectedApplications = [];
+      this.selectedTag = '';
+      this.filterApplicationsByTag(this.selectedTag);
+      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
+    }
   }
 
   private static sortByName(applications: SelectableApplication[]): SelectableApplication[] {
