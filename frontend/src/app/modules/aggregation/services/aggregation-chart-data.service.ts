@@ -28,22 +28,6 @@ export class AggregationChartDataService {
     this.selectedFilter = data.selectedFilter !== undefined ? data.selectedFilter: this.selectedFilter;
     this.i18nMap = data.i18nMap;
     this.allMeasurandDataMap = this.getMeasurandDataMap(data.series);
-
-    /*transformAndMergeData(data);
-    comparitiveValue = aggregationValue + "Comparative";
-    if (data.series || data.filterRules || data.selectedFilter || data.aggregationValue) {
-      var filteredSeries = filterSeries(rawSeries);
-      if (filteredSeries.length === dataLength * 2) filteredSeries.splice(dataLength);
-      Array.prototype.push.apply(filteredSeries, extractComparativeValuesAsSeries(filteredSeries));
-      measurandGroupDataMap = extractMeasurandGroupData(filteredSeries);
-      allMeasurandDataMap = extractMeasurandData(filteredSeries);
-      dataOrder = createDataOrder();
-      var chartLabelUtils = OpenSpeedMonitor.ChartModules.ChartLabelUtil(dataOrder, data.i18nMap);
-      headerText = chartLabelUtils.getCommonLabelParts(true);
-      headerText += headerText ? " - " + getAggregationValueLabel() : getAggregationValueLabel();
-      sideLabelData = chartLabelUtils.getSeriesWithShortestUniqueLabels(true).map(function (s) {
-        return s.label;
-      });*/
   }
 
   public getDataForHeader(){
@@ -89,7 +73,7 @@ export class AggregationChartDataService {
     };
   }
 
-  public getAllMeasurands(series){
+  public getAllMeasurands(){
     return Object.keys(this.allMeasurandDataMap);
   }
 
