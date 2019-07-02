@@ -11,8 +11,14 @@ export interface GlobalOsmNamespace {
   },
   ChartModules: {
     Aggregation(selector: string): void;
+    AggregationData(selector: string): void;
+    GuiHandling:{
+      aggregation(): void;
+    }
   },
+  ChartColorProvider(): void;
   assetPaths: {
-    aggregationChart: string
+    aggregationChart: string,
+    aggregationGuiHandling: string
   }
 }
