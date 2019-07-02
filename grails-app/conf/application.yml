@@ -4,8 +4,8 @@ de:
   iteratec:
     osm:
      application-dashboard:
-      metrics-max-age-in-h: 6
-
+       metrics-max-age-in-h: 24
+       metrics-duration-in-h: 24
 
 hibernate:
     cache:

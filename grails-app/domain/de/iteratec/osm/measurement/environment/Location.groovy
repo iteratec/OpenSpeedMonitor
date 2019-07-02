@@ -77,7 +77,6 @@ class Location {
         queuethresholdgreenlimit(nullable: true, min: -2147483648, max: 2147483647)
         queuethresholdyellowlimit(nullable: true, min: -2147483648, max: 2147483647)
         queuethresholdredlimit(nullable: true, min: -2147483648, max: 2147483647)
-        wptServer(nullable: false)
     }
 
     /**

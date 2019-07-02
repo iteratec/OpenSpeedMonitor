@@ -2,12 +2,7 @@ package de.iteratec.osm.result.dao
 
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.DeviceType
-import de.iteratec.osm.result.MeasurandGroup
-import de.iteratec.osm.result.OperatingSystem
-import de.iteratec.osm.result.PerformanceAspectType
-import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.*
 import de.iteratec.osm.result.dao.query.*
 import de.iteratec.osm.result.dao.query.projector.MeasurandAverageDataProjector
 import de.iteratec.osm.result.dao.query.projector.MeasurandRawDataProjector
@@ -22,7 +17,6 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * Created by mwg on 31.08.2017.
  */
@@ -88,6 +82,7 @@ class EventResultQueryBuilder {
                 return []
             case MetaDataSet.ASPECT:
                 return [
+                        new ProjectionProperty(dbName: 'id', alias: 'id'),
                         new ProjectionProperty(dbName: 'jobGroup.id', alias: 'jobGroupId'),
                         new ProjectionProperty(dbName: 'page.id', alias: 'pageId'),
                         new ProjectionProperty(dbName: 'browser.id', alias: 'browserId')
@@ -275,24 +270,32 @@ class EventResultQueryBuilder {
     List<EventResultProjection> getRawData(MetaDataSet metaDataSet = MetaDataSet.COMPLETE) {
 
         if (this.aspectUtil.aspectsIncluded()) {
-            aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
+            this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - appendAspectMetrics', 2) {
+                aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
+            }
         }
 
-        baseProjections.addAll(getMetaDataProjections(metaDataSet))
+        this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - preparation', 2) {
+            baseProjections.addAll(getMetaDataProjections(metaDataSet))
 
-        measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
-        measurandQueryExecutor.setTransformer(new MeasurandRawDataTransformer())
-        measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
+            measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
+            measurandQueryExecutor.setTransformer(new MeasurandRawDataTransformer())
+            measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
 
-        userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
-        userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer(baseProjections: baseProjections))
-        userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+            userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
+            userTimingQueryExecutor.setTransformer(new UserTimingRawDataTransformer(baseProjections: baseProjections))
+            userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
+        }
 
-        List<EventResultProjection> results = getResults()
+        List<EventResultProjection> results = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - getting results', 2) {
+            getResults()
+        }
 
         if (this.aspectUtil.aspectsIncluded()) {
             try {
-                aspectUtil.expandByAspects(results)
+                this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - expandByAspects', 2) {
+                    aspectUtil.expandByAspects(results, performanceLoggingService)
+                }
             } catch (IllegalStateException e) {
                 log.error(e.getMessage(), e)
                 return []
@@ -344,8 +347,15 @@ class EventResultQueryBuilder {
 
     List<EventResultProjection> getAverageData() {
         if (this.aspectUtil.aspectsIncluded()) {
-            List<EventResultProjection> rawData = getRawData(MetaDataSet.ASPECT)
-            return this.aspectUtil.getAverageFrom(rawData)
+            this.performanceLoggingService.resetExecutionTimeLoggingSession()
+            List<EventResultProjection> rawData = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData', 1) {
+                getRawData(MetaDataSet.ASPECT)
+            }
+            List<EventResultProjection> avgs = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getAverageFrom', 1) {
+                this.aspectUtil.getAverageFrom(rawData)
+            }
+            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.DEBUG))
+            return avgs
         } else {
             return getAverageDataWithoutAspects()
         }
@@ -365,28 +375,42 @@ class EventResultQueryBuilder {
 
     private List<EventResultProjection> getResults() {
 
-        List<EventResultProjection> userTimingsResult = userTimingQueryExecutor.getResultFor(filters, trims, baseProjections)
-        List<EventResultProjection> measurandResult = measurandQueryExecutor.getResultFor(filters, trims, baseProjections)
+        List<EventResultProjection> userTimingsResult = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'getResults - getting user timing results', 3) {
+            userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        }
+        List<EventResultProjection> measurandResult = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'getResults - getting measurand results', 3) {
+            measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        }
 
         List<EventResultProjection> merged
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - merge results', 3) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, "getResults - merge ${measurandResult.size()} measurand results with ${userTimingsResult.size()} user timing results", 3) {
             merged = mergeResults(measurandResult, userTimingsResult)
         }
 
         return merged
     }
 
-    private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResult, List<EventResultProjection> userTimingResult) {
-        if (measurandResult && userTimingResult) {
-            measurandResult.each { result ->
-                EventResultProjection match = userTimingResult.find { it == result }
-                if (match) {
-                    result.projectedProperties.putAll(match.projectedProperties)
-                }
+    private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResults, List<EventResultProjection> userTimingResults) {
+        Map<Object, List<EventResultProjection>> userTimingResultsById = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group user timings', 4) {
+            userTimingResults.groupBy { EventResultProjection erp ->
+                erp.id
             }
-            return measurandResult
-        } else {
-            return measurandResult ? measurandResult : userTimingResult
+        }
+        return (List<EventResultProjection>) this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group merge user timings into measurands', 4) {
+            if (measurandResults && userTimingResults) {
+                measurandResults.each { result ->
+                    userTimingResultsById[result.id].each { EventResultProjection userTimingResult ->
+                        result.projectedProperties.putAll(userTimingResult.projectedProperties)
+                    }
+                }
+                return measurandResults
+            } else {
+                return measurandResults ? measurandResults : userTimingResults
+            }
         }
 
     }
