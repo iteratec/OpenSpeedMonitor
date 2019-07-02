@@ -20,7 +20,7 @@ export class ApplicationComponent {
   selectedTag: string = '';
   unfilteredSelectedApplications: number[] = [];
 
-  @Input() resetResultSelectionEvent: Observable<void>;
+  @Input() resetResultSelectionEvent: Observable<void> = new Observable<void>();
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultSelectionStore.applications$.subscribe(applications => {

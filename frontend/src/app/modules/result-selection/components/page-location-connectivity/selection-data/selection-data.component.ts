@@ -24,7 +24,7 @@ export class SelectionDataComponent implements OnInit {
   @Input() parentType: ResultSelectionCommandParameter;
   @Input() showChildSelection: boolean = true;
   @Input() parentSelectionOptional: boolean = true;
-  @Input() resetResultSelectionEvent: Observable<void>;
+  @Input() resetResultSelectionEvent: Observable<void> = new Observable<void>();
 
   parentSelection$ = new BehaviorSubject<number[]>([]);
   parentSelection: number[] = [];

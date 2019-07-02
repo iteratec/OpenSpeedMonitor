@@ -16,8 +16,8 @@ class GetBarchartCommand implements Validateable {
     List<Long> jobGroups
     List<String> measurands
     List<Long> browsers
-    List<DeviceType> deviceTypes
-    List<OperatingSystem> operatingSystems
+    List<String> deviceTypes
+    List<String> operatingSystems
 
     String aggregationValue
 }

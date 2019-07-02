@@ -6,32 +6,7 @@
 </p>
 <div class="action-row">
   <div class="col-md-12">
-
-    <div class="btn-group pull-right">
-      <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button" (click)="getBarchartData()"
-              [disabled]="!(areApplicationsSelected$ | async) || !(areMeasurandsSelected$ | async)"> <!-- page && measurandEvents -->
-        {{ 'frontend.de.iteratec.osm.resultSelection.show' | translate }}
-      </button>
-    </div>
-    <div class="pull-right">
-      <p class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 && (areApplicationsSelected$ | async)
-       && ((arePagesSelected$ | async) || (areMeasuredEventsSelected$ | async))">
-        {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
-      </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
-        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
-      </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && !(areApplicationsSelected$ | async)">
-        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
-      </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && !(arePagesSelected$ | async)">
-        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
-      </p>
-      <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && !(areMeasurandsSelected$ | async)">
-        {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
-      </p>
-    </div>
-
+    <osm-result-selection-submit [applicationsRequired]="true" [measurandsRequired]="true"></osm-result-selection-submit>
   </div>
 </div>
 <div class="row">
@@ -51,9 +26,7 @@
         </osm-result-selection-page-location-connectivity>
       </div>
       <div class="col-md-12">
-        <button class="reset-result-selection btn btn-default btn-sm" (click)="emitResetEventToComponent()">
-          <i class="fas fa-undo"></i> Reset
-        </button>
+        <osm-result-selection-reset [clickEvent]="resetResultSelectionEvent"></osm-result-selection-reset>
       </div>
 
     </div>

@@ -27,7 +27,7 @@
              [multiple]="true" [closeOnSelect]="true" bindValue="id" bindLabel="name" [groupBy]="'parent.id'"
              placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
   </ng-select>
-  <div class="checkbox-inline" (click)="selectAllChildrenCheckbox.checked = true; childSelection = []">
+  <div class="checkbox-inline" (click)="selectAllChildrenCheckbox.checked = true; childSelection = []; updateResultSelectionCommand()">
     <input id="selectAllChildrenCheckbox" #selectAllChildrenCheckbox type="checkbox"
            [checked]="childSelection.length < 1">
     {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.childSelection.selectAll.' + childType | translate }}

@@ -12,6 +12,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.JobResult
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.OperatingSystem
 import grails.testing.mixin.integration.Integration
@@ -187,30 +188,28 @@ class BarchartAggregationServiceSpec extends NonTransactionalIntegrationSpec {
         cmd2 = new GetBarchartCommand()
         cmd3 = new GetBarchartCommand()
 
-        def selectedSeries = ["measurands": ["DOC_COMPLETE_TIME"]]
-
-        cmd1.operatingSystems = ["Windows"]
-        cmd1.pages = ["HP"]
-        cmd1.jobGroups = ["Test"]
+        cmd1.operatingSystems = [OperatingSystem.WINDOWS.toString()]
+        cmd1.pages = [Page.findByName("HP").id]
+        cmd1.jobGroups = [JobGroup.findByName("Test").id]
         cmd1.aggregationValue = 'avg'
-        cmd1.measurands = [selectedSeries]
+        cmd1.measurands = [Measurand.DOC_COMPLETE_TIME.toString()]
         cmd1.from = today.minusHours(12)
         cmd1.to = today.plusHours(12)
 
-        cmd2.operatingSystems = ["Android"]
-        cmd2.deviceTypes = ["Smartphone"]
-        cmd2.pages = ["HP"]
-        cmd2.jobGroups = ["Test"]
+        cmd2.operatingSystems = [OperatingSystem.ANDROID.toString()]
+        cmd2.deviceTypes = [DeviceType.SMARTPHONE.toString()]
+        cmd2.pages = [Page.findByName("HP").id]
+        cmd2.jobGroups = [JobGroup.findByName("Test").id]
         cmd2.aggregationValue = 'avg'
-        cmd2.measurands = [selectedSeries]
+        cmd2.measurands = [Measurand.DOC_COMPLETE_TIME.toString()]
         cmd2.from = today.minusHours(12)
         cmd2.to = today.plusHours(12)
 
-        cmd3.pages = ["HP"]
-        cmd3.jobGroups = ["Test"]
+        cmd3.pages = [Page.findByName("HP").id]
+        cmd3.jobGroups = [JobGroup.findByName("Test").id]
         cmd3.browsers = [1.toLong()]
         cmd3.aggregationValue = 'avg'
-        cmd3.measurands = [selectedSeries]
+        cmd3.measurands = [Measurand.DOC_COMPLETE_TIME.toString()]
         cmd3.from = today.minusHours(12)
         cmd3.to = today.plusHours(12)
         cmd3.fromComparative = yesterday.minusHours(12)
@@ -219,7 +218,7 @@ class BarchartAggregationServiceSpec extends NonTransactionalIntegrationSpec {
         comCmd = new GetPageComparisonDataCommand()
         comCmd.from = today.minusHours(12)
         comCmd.to = today.plusHours(12)
-        comCmd.measurand = "DOC_COMPLETE_TIME"
+        comCmd.measurand = Measurand.DOC_COMPLETE_TIME.toString()
         comCmd.selectedAggregationValue = 'avg'
 
         def pageComparison = new JsonSlurper().parseText('{"firstJobGroupId":"1","firstPageId":"1","secondPageId":"2","secondJobGroupId":"1"}')
