@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
-import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {map} from 'rxjs/operators';
@@ -18,7 +18,7 @@ export class MeasurandsComponent implements OnInit {
     isLoading: false,
     data: []
   });
-  aspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
+  aspectTypes$:BehaviorSubject<PerformanceAspectType[]> = new BehaviorSubject<PerformanceAspectType[]>([]);
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
