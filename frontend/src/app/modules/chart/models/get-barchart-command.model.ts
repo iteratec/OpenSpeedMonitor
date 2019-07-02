@@ -43,23 +43,21 @@ export class GetBarchartCommand implements GetBarchartCommandDTO {
 export class RemainingGetBarchartCommand implements GetBarchartCommandDTO {
   fromComparative?: Date;
   toComparative?: Date;
-  pages?: number[];
-  jobGroups?: number[];
   measurands?: string[];
-  browsers?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
-  aggregationValue?: string | number;
 
   constructor (dto: GetBarchartCommandDTO) {
     this.fromComparative = dto.fromComparative;
     this.toComparative = dto.toComparative;
-    this.pages = dto.pages;
-    this.jobGroups = dto.jobGroups;
     this.measurands = dto.measurands;
-    this.browsers = dto.browsers;
     this.deviceTypes = dto.deviceTypes;
     this.operatingSystems = dto.operatingSystems;
-    this.aggregationValue = dto.aggregationValue;
   }
+}
+
+export enum GetBarchartCommandParameter {
+  MEASURANDS = "measurands",
+  DEVICE_TYPES = "deviceTypes",
+  OPERATING_SYSTEMS = "operatingSystems"
 }

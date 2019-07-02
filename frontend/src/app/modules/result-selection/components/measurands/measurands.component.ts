@@ -5,6 +5,7 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {map} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
+import {GetBarchartCommandParameter} from "../../../chart/models/get-barchart-command.model";
 
 @Component({
   selector: 'osm-result-selection-measurands',
@@ -85,7 +86,9 @@ export class MeasurandsComponent implements OnInit {
   }
 
   private setMeasurandIds() {
-    this.resultSelectionStore.setMeasurands(
-      this.selectedMeasurands.map((measurand: SelectableMeasurand) => measurand.id));
+    this.resultSelectionStore.setRemainingGetBarchartCommandEnums(
+      this.selectedMeasurands.map((measurand: SelectableMeasurand) => measurand.id),
+      GetBarchartCommandParameter.MEASURANDS
+    );
   }
 }

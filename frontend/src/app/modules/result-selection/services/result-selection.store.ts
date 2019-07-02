@@ -14,7 +14,7 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
-import {RemainingGetBarchartCommand} from "../../chart/models/get-barchart-command.model";
+import {GetBarchartCommandParameter, RemainingGetBarchartCommand} from "../../chart/models/get-barchart-command.model";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -81,12 +81,8 @@ export class ResultSelectionStore {
     this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
   }
 
-  setRemainingGetBarchartCommandIds(ids: number[], type: ResultSelectionCommandParameter): void {
-    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, [type]: ids});
-  }
-
-  setMeasurands(measurands: string[]): void {
-    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, measurands: measurands});
+  setRemainingGetBarchartCommandEnums(enums: string[], type: GetBarchartCommandParameter): void {
+    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, [type]: enums});
   }
 
   get remainingGetBarchartCommand(): RemainingGetBarchartCommand {
