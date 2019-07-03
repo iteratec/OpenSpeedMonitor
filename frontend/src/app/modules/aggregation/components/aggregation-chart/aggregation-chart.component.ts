@@ -2,11 +2,11 @@ import {
   AfterContentInit,
   Component,
   ElementRef,
-  Input, OnChanges, OnInit, SimpleChanges,
+  Input, OnChanges, SimpleChanges,
   ViewChild
 } from '@angular/core';
 import {select} from "d3-selection";
-import {ScaleBand, scaleBand, ScaleLinear, scaleLinear, scaleOrdinal} from "d3-scale";
+import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
 import {max} from "d3-array";
 
@@ -31,13 +31,12 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
       comparativeImprovement: "Improvement",
       comparativeDeterioration: "Deterioration"
     },
-
     series: [
       {
         aggregationValue: "avg",
         browser: null,
         deviceType: null,
-        jobGroup: "LokalTest_pal",
+        jobGroup: "otto.de",
         measurand: "DOC_COMPLETE_TIME",
         measurandGroup: "LOAD_TIMES",
         measurandLabel: "Document Complete",
@@ -65,7 +64,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
         aggregationValue: "avg",
         browser: null,
         deviceType: null,
-        jobGroup: "LokalTest_pal",
+        jobGroup: "job group",
         measurand: "DOC_COMPLETE_TIME",
         measurandGroup: "LOAD_TIMES",
         measurandLabel: "Document Complete",
@@ -79,7 +78,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
         aggregationValue: "avg",
         browser: null,
         deviceType: null,
-        jobGroup: "LokalTest_pal",
+        jobGroup: "Transfermarkt",
         measurand: "DOC_COMPLETE_TIME",
         measurandGroup: "LOAD_TIMES",
         measurandLabel: "Document Complete",
@@ -91,6 +90,33 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
       }
     ]
   };
+
+   availableScoreBars = [
+    {
+      id: "good",
+      fill: "#bbe2bb",
+      label: "GOOD",
+      cssClass: "d3chart-good",
+      end: 1000,
+      start: undefined
+    },
+    {
+      id: "okay",
+      fill: "#f9dfba",
+      label: "OK",
+      cssClass: "d3chart-ok",
+      end: 3000,
+      start: undefined
+
+    },
+    {
+      id: "bad",
+      fill: "#f5d1d0",
+      label: "BAD",
+      cssClass: "d3chart-bad",
+      start: undefined
+    }
+  ];
 
 
   margin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -109,6 +135,10 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   private barScoreHeight: number;
   private legendPosY: number;
   private legendHeight: number;
+  private minValue: number;
+  private maxValue: number;
+
+  dataForBarScore = [];
 
   constructor() {}
 
@@ -119,6 +149,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     }
 
     this.data = this.barchartAverageData;
+    this.dataForBarScore = this.setDataForScoreBar(this.data);
 
 
     this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
@@ -155,6 +186,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
     this.exit(selection.exit());
+
   }
 
 
@@ -194,7 +226,8 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     const chartScoreGroup = barsContentGroup
       .append('g')
       .attr('class', 'chart-score-group')
-      .attr('transform', 'translate(0, ' + this.barScorePosY + ')');
+      .attr('transform', 'translate(0, ' + this.barScorePosY + ')')
+      .style("opacity", 1);
 
     const chartLegendGroup = barsContentGroup
       .append('g')
@@ -214,7 +247,13 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
         .attr('class', 'side-label')
         .attr('dominant-baseline', 'middle')
         .style('opacity', 0);
-    })
+    });
+
+    this.dataForBarScore.forEach(() =>{
+      chartScoreGroup
+        .append('g')
+        .attr('class', 'score-bar');
+    });
   }
 
   private update(selection: any) {
@@ -281,8 +320,38 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
           .attr('y', () => {
             return this.yScale(data.series[index].page) + ChartCommons.BAR_BAND / 2;
           })
-
       });
+
+    let scaleForScoreBar = scaleLinear().range([0, this.barsWidth]).domain([this.minValue, this.maxValue]);
+    const scoreBars = selection.selectAll('.score-bar')
+      .data(this.dataForBarScore)
+      .each((data, index, element) => {
+        select(element[index])
+          .append('rect')
+          .attr('height', this.barsHeight)
+          .attr('y', ChartCommons.BAR_BAND /2)
+          .attr('fill', data.fill)
+          .attr('width', () => {
+            return scaleForScoreBar(data.end) - scaleForScoreBar(data.start);
+          })
+          .attr("x", ()=> {
+            return scaleForScoreBar(data.start);
+          });
+        select(element[index])
+          .append('text')
+          .text(() => {
+            return data.label;
+          })
+          .attr('class', 'chart-' + data.id)
+          .attr('dominant-baseline', 'middle')
+          .style('opacity', 1)
+          .attr("text-anchor", "middle")
+          .attr('x', () => {
+            return (scaleForScoreBar(data.end) + scaleForScoreBar(data.start)) / 2;
+          })
+          .attr('y', this.barsHeight);
+      });
+
   }
 
 
@@ -295,7 +364,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   };
 
   calculateMaxEntryGroupWidth (svgForEstimation) {
-    const labels = this.data.series.map(item => item.page);
+    const labels = this.data.series.map(item => item.jobGroup);
     const labelWidths = this.getTextWidths(svgForEstimation, labels);
     return max(labelWidths) + 10 + 20 + 5;
   };
@@ -337,6 +406,30 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     const gapSize = barGap * ((numberOfMeasurands < 2) ? 1 : 2);
     return ((this.data.series.length - 1) * gapSize) + numberOfBars * barBand;
   };
+
+
+  setDataForScoreBar(data){
+    let barsToRender = [];
+    if(data) {
+      let values = data.series.filter(x => x.measurandGroup === "LOAD_TIMES").map(x => x.value);
+      this.minValue = values.length > 0 ? Math.min(Math.min(values), 0) : 0;
+      this.maxValue = values.length > 0 ? Math.max(Math.max(values), 0) : 0;
+
+      let lastBarEnd = 0;
+      for (let curScoreBar = 0; curScoreBar < this.availableScoreBars.length; curScoreBar++) {
+        let bar = this.availableScoreBars[curScoreBar];
+        barsToRender.push(bar);
+        bar.start = lastBarEnd;
+        if (!bar.end || this.maxValue < bar.end || !this.availableScoreBars[curScoreBar + 1]) {
+          bar.end = this.maxValue;
+          break;
+        }
+        lastBarEnd = bar.end;
+      }
+      barsToRender.reverse();
+    }
+    return barsToRender;
+  }
 
 
 
