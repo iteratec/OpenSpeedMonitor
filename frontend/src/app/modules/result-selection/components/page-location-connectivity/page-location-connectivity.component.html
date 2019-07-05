@@ -28,17 +28,14 @@
     <div class="tab-pane active">
       <osm-selection-data *ngIf="showPageSelection" [hidden]="activeTab !== ActiveTab.PageAndEvent" [parentChildData$]="eventsAndPages$" [showChildSelection]="showMeasuredStepSelection"
                           [childType]="ResultSelectionCommandParameter.MEASURED_EVENTS"
-                          [parentType]="ResultSelectionCommandParameter.PAGES"
-                          [resetResultSelectionEvent]="resetResultSelectionEvent">
+                          [parentType]="ResultSelectionCommandParameter.PAGES">
       </osm-selection-data>
       <osm-selection-data *ngIf="showBrowserSelection" [hidden]="activeTab !== ActiveTab.BrowserAndLocation" [parentChildData$]="locationsAndBrowsers$" [showChildSelection]="showLocationSelection"
                           [childType]="ResultSelectionCommandParameter.LOCATIONS"
-                          [parentType]="ResultSelectionCommandParameter.BROWSERS"
-                          [resetResultSelectionEvent]="resetResultSelectionEvent">
+                          [parentType]="ResultSelectionCommandParameter.BROWSERS">
       </osm-selection-data>
       <osm-selection-data *ngIf="showConnectivitySelection" [hidden]="activeTab !== ActiveTab.Connectivity" [parentChildData$]="connectivities$" [showChildSelection]="false"
-                          [parentType]="ResultSelectionCommandParameter.CONNECTIVITIES"
-                          [resetResultSelectionEvent]="resetResultSelectionEvent">
+                          [parentType]="ResultSelectionCommandParameter.CONNECTIVITIES">
       </osm-selection-data>
     </div>
   </div>

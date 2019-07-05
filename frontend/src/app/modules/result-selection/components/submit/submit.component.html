@@ -7,20 +7,22 @@
   </button>
 </div>
 <div class="pull-right">
-  <p class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 && (applicationsSelected$ | async)
-       && ((pagesSelected$ | async) || (measuredEventsSelected$ | async))">
+  <p class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 &&
+      (!applicationsRequired || (applicationsSelected$ | async)) &&
+      (!pagesRequired || (pagesSelected$ | async) || (measuredEventsSelected$ | async)) &&
+      (!measurandsRequired || (measurandsSelected$ | async))">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
   </p>
   <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && applicationsRequired && !(applicationsSelected$ | async)">
+  <p class="bg-danger get-barchart-data-warnings" *ngIf="applicationsRequired && !(applicationsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async)">
+  <p class="bg-danger get-barchart-data-warnings" *ngIf="pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) > 0 && measurandsRequired && !(measurandsSelected$ | async)">
+  <p class="bg-danger get-barchart-data-warnings" *ngIf="measurandsRequired && !(measurandsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
   </p>
 </div>

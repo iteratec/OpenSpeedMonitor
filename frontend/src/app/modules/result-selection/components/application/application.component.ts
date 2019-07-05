@@ -1,9 +1,8 @@
-import {Component, Input, ViewEncapsulation,} from '@angular/core';
+import {Component, ViewEncapsulation,} from '@angular/core';
 import {SelectableApplication} from 'src/app/models/application.model';
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 import {UiComponent} from "../../../../enums/ui-component.enum";
-import {Observable} from "rxjs";
 
 @Component({
     selector: 'osm-result-selection-application',
@@ -20,8 +19,6 @@ export class ApplicationComponent {
   selectedTag: string = '';
   unfilteredSelectedApplications: number[] = [];
 
-  @Input() resetResultSelectionEvent: Observable<void> = new Observable<void>();
-
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultSelectionStore.applications$.subscribe(applications => {
       this.updateApplicationsAndTags(applications.data);
@@ -30,7 +27,7 @@ export class ApplicationComponent {
 
   ngOnInit() {
     this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
-    this.resetResultSelectionEvent.subscribe(() => this.resetResultSelection())
+    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection())
   }
 
   onSelectionChange() {

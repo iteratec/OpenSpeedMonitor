@@ -8,8 +8,6 @@ import {Subject} from "rxjs";
 })
 export class AggregationComponent implements OnInit {
 
-  resetResultSelectionEvent: Subject<void> = new Subject<void>();
-
   constructor() {
   }
 

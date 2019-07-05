@@ -57,9 +57,9 @@
                                 <g:message code="eventResultDashboard.label" default="Time Series"/>
                         </g:link>
                     </li>
-                    <li class="${request.forwardURI.equals('/aggregation') ? 'active' : ''}"
+                    <li class="${request.forwardURI.equals('/aggregation/show') ? 'active' : ''}"
                         data-active-matches="/aggregation/?.*">
-                        <a href="${createLink(uri: '/aggregation')}">
+                        <a href="${createLink(uri: '/aggregation/show')}">
                             <i class="fas fa-chart-bar"></i>
                             <g:message message="frontend.de.iteratec.osm.aggregation.title"/>
                         </a>

@@ -165,6 +165,8 @@ export class TimeFrameComponent implements OnInit {
       return
     }
     this.comparativeSelectionActive = !this.comparativeSelectionActive;
+    this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame([null, null]);
+
   }
 }
 

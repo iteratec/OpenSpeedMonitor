@@ -3,7 +3,7 @@ import {
   ResultSelectionCommand,
   ResultSelectionCommandParameter
 } from "../models/result-selection-command.model";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subject} from "rxjs";
 import {MeasuredEvent} from "../../../models/measured-event.model";
 import {Location} from "../../../models/location.model";
 import {Connectivity} from "../../../models/connectivity.model";
@@ -35,6 +35,8 @@ export class ResultSelectionStore {
   requestSizes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   percentages$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
+  reset$: Subject<void> = new Subject<void>();
 
   constructor(private resultSelectionService: ResultSelectionService) {
     let defaultFrom = new Date();

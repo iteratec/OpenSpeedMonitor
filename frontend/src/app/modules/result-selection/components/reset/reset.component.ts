@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {Subject} from "rxjs";
+import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({
   selector: 'osm-result-selection-reset',
@@ -8,14 +9,12 @@ import {Subject} from "rxjs";
 })
 export class ResetComponent implements OnInit {
 
-  @Input() clickEvent: Subject<void> = new Subject<void>();
-
-  constructor() { }
+  constructor(private resultSelectionStore: ResultSelectionStore) { }
 
   ngOnInit() {
   }
 
   emitResetEventToComponent() {
-    this.clickEvent.next();
+    this.resultSelectionStore.reset$.next();
   }
 }

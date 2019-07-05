@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
@@ -20,6 +20,10 @@ export class MeasurandsComponent implements OnInit {
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
+  addingComparativeTimeFrameDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+  @Input() multipleMeasurands = false;
+  @Input() addingMeasurandsDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.measurands$.next({
@@ -51,11 +55,15 @@ export class MeasurandsComponent implements OnInit {
   addMeasurandField() {
     this.selectedMeasurands.push(this.defaultValue);
     this.setMeasurandIds();
+    this.addingComparativeTimeFrameDisabled$.next(true);
   }
 
   removeMeasurandField(index: number) {
     this.selectedMeasurands.splice(index, 1);
     this.setMeasurandIds();
+    if (this.selectedMeasurands.length == 1) {
+      this.addingComparativeTimeFrameDisabled$.next(false);
+    }
   }
 
   trackByFn(index: number, item: any) {

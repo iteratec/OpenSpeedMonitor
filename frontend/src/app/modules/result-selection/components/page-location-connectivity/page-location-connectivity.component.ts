@@ -28,7 +28,6 @@ export class PageLocationConnectivityComponent implements OnInit {
   @Input() showConnectivitySelection: boolean = false;
   @Input() showMeasuredStepSelection: boolean = false;
   @Input() showLocationSelection: boolean = false;
-  @Input() resetResultSelectionEvent: Observable<void> = new Observable<void>();
 
   constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
     this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;

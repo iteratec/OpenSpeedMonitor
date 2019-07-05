@@ -1,0 +1,10 @@
+<h1>
+  <span *ngFor="let chart of chartMenu">
+    <a *ngIf="!router.url.startsWith(chart.baseUrl)" [href]="chart.baseUrl" class="btn">
+      <i [ngClass]="chart.icon"></i>
+    </a>
+    <span *ngIf="router.url.startsWith(chart.baseUrl)">
+      {{ chart.label }}
+    </span>
+  </span>
+</h1>
