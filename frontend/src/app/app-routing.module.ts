@@ -25,7 +25,7 @@ const appRoutes: Routes = [
     loadChildren: './modules/metric-finder/metric-finder.module#MetricFinderModule'
   },
   {
-    path: 'aggregation/show',
+    path: 'aggregationDev/show',
     loadChildren: './modules/aggregation/aggregation.module#AggregationModule'
   },
   {

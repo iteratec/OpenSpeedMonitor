@@ -44,9 +44,7 @@ export class BarchartDataService {
         } else if (key === 'aggregationValue') {
           params = params.append(key, getBarchartCommand[key].toString());
         } else {
-          getBarchartCommand[key].forEach(id => {
-            params = params.append(key, id.toString())
-          })
+          params = params.append(key, JSON.stringify(getBarchartCommand[key]));
         }
       }
     });
