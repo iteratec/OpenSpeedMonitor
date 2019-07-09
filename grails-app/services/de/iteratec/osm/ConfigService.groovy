@@ -166,6 +166,10 @@ class ConfigService {
 		return grailsApplication.config.getProperty("de.iteratec.osm.application-dashboard.metrics-max-age-in-h", Integer, 6)
 	}
 
+    Integer getDurationForMetricsInHours() {
+        return grailsApplication.config.getProperty("de.iteratec.osm.application-dashboard.metrics-duration-in-h", Integer, 6)
+    }
+
     DateTime getStartDateForRecentMeasurements() {
         return new DateTime().withTimeAtStartOfDay().minusWeeks(4)
     }

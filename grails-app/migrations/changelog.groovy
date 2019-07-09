@@ -78,4 +78,5 @@ databaseChangeLog = {
     include file: '2019-04-30-v512-browser-in-perf-aspect.groovy'
     include file: '2019-05-06-v512-add-os-and-device-type.groovy'
     include file: '2019-05-20-migrate-otto-locations.groovy'
+    include file: '2019-06-19-add-user-timing-idx.groovy'
 }
