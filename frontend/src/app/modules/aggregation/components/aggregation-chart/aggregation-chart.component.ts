@@ -9,6 +9,7 @@ import {select} from "d3-selection";
 import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
 import {max} from "d3-array";
+import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
 
 @Component({
   selector: 'osm-aggregation-chart',
@@ -65,9 +66,9 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
         browser: null,
         deviceType: null,
         jobGroup: "job group",
-        measurand: "DOC_COMPLETE_TIME",
+        measurand: "LOAD_TIME",
         measurandGroup: "LOAD_TIMES",
-        measurandLabel: "Document Complete",
+        measurandLabel: "load time",
         operatingSystem: null,
         page: "finn3",
         unit: "ms",
@@ -91,32 +92,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     ]
   };
 
-   availableScoreBars = [
-    {
-      id: "good",
-      fill: "#bbe2bb",
-      label: "GOOD",
-      cssClass: "d3chart-good",
-      end: 1000,
-      start: undefined
-    },
-    {
-      id: "okay",
-      fill: "#f9dfba",
-      label: "OK",
-      cssClass: "d3chart-ok",
-      end: 3000,
-      start: undefined
 
-    },
-    {
-      id: "bad",
-      fill: "#f5d1d0",
-      label: "BAD",
-      cssClass: "d3chart-bad",
-      start: undefined
-    }
-  ];
 
 
   margin = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -135,12 +111,14 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   private barScoreHeight: number;
   private legendPosY: number;
   private legendHeight: number;
-  private minValue: number;
   private maxValue: number;
+  private minValue: number;
 
-  dataForBarScore = [];
+  private dataForBarScore = [];
+  private dataForLegend = [];
 
-  constructor() {}
+  constructor(private aggregationChartDataService: AggregationChartDataService) {
+  }
 
 
   redraw() {
@@ -149,7 +127,11 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     }
 
     this.data = this.barchartAverageData;
-    this.dataForBarScore = this.setDataForScoreBar(this.data);
+    this.aggregationChartDataService.setData(this.data);
+    this.dataForBarScore = this.aggregationChartDataService.getDataForScoreBar().barsToRender;
+    this.maxValue = this.aggregationChartDataService.getDataForScoreBar().max;
+    this.minValue = this.aggregationChartDataService.getDataForScoreBar().min;
+    this.dataForLegend = this.aggregationChartDataService.getDataForLegend();
 
 
     this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
@@ -164,7 +146,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     this.headerHeight = ChartCommons.CHART_HEADER_HEIGHT + ChartCommons.COMPONENT_MARGIN;
     this.barScorePosY = this.barsHeight + ChartCommons.COMPONENT_MARGIN;
     this.barScoreHeight = ChartCommons.BAR_BAND + ChartCommons.COMPONENT_MARGIN;
-    this.legendPosY = this.barScorePosY + this.barScoreHeight;
+    this.legendPosY = this.barScorePosY + this.barScoreHeight + ChartCommons.COMPONENT_MARGIN;
     this.legendHeight = this.estimateHeight(this.svgElement.nativeElement) + ChartCommons.COMPONENT_MARGIN;
 
     this.svgHeight = this.legendPosY + this.legendHeight + this.headerHeight;
@@ -183,10 +165,9 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
 
   render() {
     const selection = select(this.svgElement.nativeElement).selectAll('g.chart').data([this.data]);
+    this.exit(selection.exit());
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
-    this.exit(selection.exit());
-
   }
 
 
@@ -254,6 +235,17 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
         .append('g')
         .attr('class', 'score-bar');
     });
+
+    this.dataForLegend.forEach(() => {
+      chartLegendGroup
+        .append('g')
+        .attr('class', 'legend-entry')
+        .classed("d3chart-legend-entry", true)
+        .style("opacity", 1)
+        //.on("mouseover", mouseOverEntry)
+        //.on("mouseout", mouseOutEntry)
+        //.on("click", clickEntry);
+    })
   }
 
   private update(selection: any) {
@@ -328,7 +320,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
       .each((data, index, element) => {
         select(element[index])
           .append('rect')
-          .attr('height', this.barsHeight)
+          .attr('height', ChartCommons.BAR_BAND)
           .attr('y', ChartCommons.BAR_BAND /2)
           .attr('fill', data.fill)
           .attr('width', () => {
@@ -349,13 +341,34 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
           .attr('x', () => {
             return (scaleForScoreBar(data.end) + scaleForScoreBar(data.start)) / 2;
           })
-          .attr('y', this.barsHeight);
+          .attr('y', ChartCommons.BAR_BAND);
       });
 
+    let maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement);
+    let maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
+    const legend = selection.selectAll('.legend-entry')
+      .data(this.dataForLegend)
+      .each((data, index, element) => {
+        select(element[index])
+          .attr("transform",()=>{
+          let x = maxEntryGroupSize * (index % maxEntriesInRow);
+          return "translate(" + x + "," +this.legendPosY + ")";
+        });
+        select(element[index])
+          .append('rect')
+          .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr("rx", 2)
+          .attr("ry", 2)
+          .attr('fill', data.color);
+
+        select(element[index])
+          .append('text')
+          .attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
+          .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+          .text(data.label);
+      })
   }
-
-
-
 
   estimateHeight (svgForEstimation) {
     const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(svgForEstimation);
@@ -364,7 +377,9 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   };
 
   calculateMaxEntryGroupWidth (svgForEstimation) {
-    const labels = this.data.series.map(item => item.jobGroup);
+    let dataMap = this.aggregationChartDataService.allMeasurandDataMap;
+    const labels = Object.keys(dataMap).map(measurand => dataMap[measurand].label);
+    console.log(labels);
     const labelWidths = this.getTextWidths(svgForEstimation, labels);
     return max(labelWidths) + 10 + 20 + 5;
   };
@@ -383,8 +398,6 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
       });
     return widths;
   };
-
-
 
   barWidth(xScale, value) {
     return value === null ? 0 : (this.barEnd(xScale, value) - this.barStart(xScale, value));
@@ -405,32 +418,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     const numberOfBars = this.data.series.length * (numberOfMeasurands);
     const gapSize = barGap * ((numberOfMeasurands < 2) ? 1 : 2);
     return ((this.data.series.length - 1) * gapSize) + numberOfBars * barBand;
-  };
-
-
-  setDataForScoreBar(data){
-    let barsToRender = [];
-    if(data) {
-      let values = data.series.filter(x => x.measurandGroup === "LOAD_TIMES").map(x => x.value);
-      this.minValue = values.length > 0 ? Math.min(Math.min(values), 0) : 0;
-      this.maxValue = values.length > 0 ? Math.max(Math.max(values), 0) : 0;
-
-      let lastBarEnd = 0;
-      for (let curScoreBar = 0; curScoreBar < this.availableScoreBars.length; curScoreBar++) {
-        let bar = this.availableScoreBars[curScoreBar];
-        barsToRender.push(bar);
-        bar.start = lastBarEnd;
-        if (!bar.end || this.maxValue < bar.end || !this.availableScoreBars[curScoreBar + 1]) {
-          bar.end = this.maxValue;
-          break;
-        }
-        lastBarEnd = bar.end;
-      }
-      barsToRender.reverse();
-    }
-    return barsToRender;
   }
-
 
 
   private exit(selection: any) {
