@@ -4,7 +4,7 @@
       <i [ngClass]="chart.icon"></i>
     </a>
     <span *ngIf="router.url.startsWith(chart.baseUrl)">
-      {{ chart.label }}
+      {{ chart.label | translate }}
     </span>
   </span>
 </h1>
