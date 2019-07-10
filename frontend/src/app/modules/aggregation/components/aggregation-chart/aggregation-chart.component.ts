@@ -169,7 +169,8 @@ export class AggregationChartComponent implements OnChanges {
     const contentGroup = select(svgElement).selectAll('.bars-content-group').data([1]);
     contentGroup.enter()
       .append('g')
-      .attr('class', 'bars-content-group');
+      .attr('class', 'bars-content-group')
+      .attr('transform', `translate(${this.sideLabelWidth + ChartCommons.COMPONENT_MARGIN}, ${ChartCommons.CHART_HEADER_HEIGHT + ChartCommons.COMPONENT_MARGIN})`);
     contentGroup.attr('transform', `translate(${this.sideLabelWidth + ChartCommons.COMPONENT_MARGIN}, ${ChartCommons.CHART_HEADER_HEIGHT + ChartCommons.COMPONENT_MARGIN})`);
 
     this.renderBarGroup();
@@ -322,13 +323,39 @@ export class AggregationChartComponent implements OnChanges {
       .each((datum, index, groups) => {
         const color = false ? datum.color : '#1660a7';
         select(groups[index]).attr('fill', color);
+      })
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .attr('x', (datum) => {
+        return this.barStart(this.xScale, datum.value)
+      })
+      .attr('y', (datum) => {
+        return this.yScale(datum.page);
+      })
+      .attr('width', (datum) => {
+        return this.barWidth(this.xScale, datum.value)
       });
+
     bar
       .append('text')
       .attr('class', 'bar-value')
       .attr('dominant-baseline', 'middle')
       .style('fill', 'white')
-      .style('font-weight', 'bold');
+      .style('font-weight', 'bold')
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .text((datum) => {
+        return datum.value.toString();
+      })
+      .attr('x', (datum) => {
+        return (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10);
+      })
+      .attr('y', (datum) => {
+        return (this.yScale(datum.page) + ChartCommons.BAR_BAND / 2);
+      })
+      .attr('text-anchor', (datum) => {
+        return (datum.value < 0) ? 'start' : 'end';
+      });
 
     this.renderBarUpdate(bars);
   }
