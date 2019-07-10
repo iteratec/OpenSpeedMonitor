@@ -33,7 +33,6 @@ export class FilmstripService {
   }
 
   createFilmstripView(thumbnails: Thumbnail[], timings: TimingsMap, highlightedMetric?: string, offset?: number): FilmstripView {
-    // const end = Math.max(...thumbnails.map(t => t.time));
     const end = Math.max(
       ...thumbnails.map(t => t.time),
       ...Object.values(timings)
