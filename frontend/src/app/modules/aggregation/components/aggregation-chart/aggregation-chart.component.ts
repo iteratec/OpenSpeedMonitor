@@ -10,13 +10,14 @@ import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
 import {max} from "d3-array";
 import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
+import {text} from "d3-fetch";
 
 @Component({
   selector: 'osm-aggregation-chart',
   templateUrl: './aggregation-chart.component.html',
   styleUrls: ['./aggregation-chart.component.scss']
 })
-export class AggregationChartComponent implements AfterContentInit, OnChanges {
+export class AggregationChartComponent implements OnChanges {
 
   @ViewChild('svg') svgElement: ElementRef;
   @Input() barchartAverageData;
@@ -93,12 +94,9 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   };
 
 
-
-
-  margin = { top: 0, right: 0, bottom: 0, left: 0 };
+  margin = {top: 0, right: 0, bottom: 0, left: 0};
   svgWidth: number;
   svgHeight: number;
-
   private xScale: ScaleLinear<number, number>;
   private yScale: ScaleBand<string>;
 
@@ -111,8 +109,8 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   private barScoreHeight: number;
   private legendPosY: number;
   private legendHeight: number;
-  private maxValue: number;
   private minValue: number;
+  private maxValue: number;
 
   private dataForBarScore = [];
   private dataForLegend = [];
@@ -132,7 +130,6 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     this.maxValue = this.aggregationChartDataService.getDataForScoreBar().max;
     this.minValue = this.aggregationChartDataService.getDataForScoreBar().min;
     this.dataForLegend = this.aggregationChartDataService.getDataForLegend();
-
 
     this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
 
@@ -164,156 +161,209 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
   }
 
   render() {
-    const selection = select(this.svgElement.nativeElement).selectAll('g.chart').data([this.data]);
-    this.exit(selection.exit());
-    this.enter(selection.enter());
-    this.update(selection.merge(selection.enter()));
+    const svgElement = this.svgElement.nativeElement;
+
+    this.renderHeaderGroup(svgElement);
+    this.renderSideLabelGroup(svgElement);
+
+    const contentGroup = select(svgElement).selectAll('.bars-content-group').data([1]);
+    contentGroup.enter()
+      .append('g')
+      .attr('class', 'bars-content-group');
+    contentGroup.attr('transform', `translate(${this.sideLabelWidth + ChartCommons.COMPONENT_MARGIN}, ${ChartCommons.CHART_HEADER_HEIGHT + ChartCommons.COMPONENT_MARGIN})`);
+
+    this.renderBarGroup();
+
   }
 
-
-
-
-  private enter(selection: any) {
-    const chart = selection
-      .append('g')
-      .attr('class', 'chart');
-
-    const headerGroup = chart
+  private renderHeaderGroup(svgElement) {
+    const header = select(svgElement).selectAll('.header-group').data([this.data.series]);
+    header.exit().remove();
+    header.enter()
       .append('g')
       .attr('class', 'header-group');
-    headerGroup
+    this.renderChartHeader();
+  }
+
+  private renderChartHeader() {
+    const headerText = select('.header-group').selectAll('.header-text').data([this.data.series]);
+    headerText.exit()
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .style('opacity', 0)
+      .remove();
+
+    headerText.enter()
       .append('text')
       .attr('class', 'header-text')
       .attr('text-anchor', 'middle')
       .attr('dominant-baseline', 'alphabetic')
+      .text("Average")
       .style('opacity', 0);
 
-    const sideLabelsGroup = chart
-      .append('g')
-      .attr('class', 'side-labels-group');
-
-    const barsContentGroup = chart
-      .append('g')
-      .attr('class', 'bars-content-group')
-      .attr('transform', 'translate('
-        + (this.sideLabelWidth + ChartCommons.COMPONENT_MARGIN) + ', '
-        + (ChartCommons.CHART_HEADER_HEIGHT + ChartCommons.COMPONENT_MARGIN)
-        + ')');
-
-    const chartBarGroup = barsContentGroup
-      .append('g')
-      .attr('class', 'chart-bar-group');
-
-    const chartScoreGroup = barsContentGroup
-      .append('g')
-      .attr('class', 'chart-score-group')
-      .attr('transform', 'translate(0, ' + this.barScorePosY + ')')
-      .style("opacity", 1);
-
-    const chartLegendGroup = barsContentGroup
-      .append('g')
-      .attr('class', 'chart-legend-group');
-
-    const chartBars = chartBarGroup
-      .append('g')
-      .attr('class', 'chart-bars')
-      .attr('transform', 'translate(0, 0)');
-
-    this.data.series.forEach(() => {
-      chartBars
-        .append('g')
-        .attr('class', 'bar');
-      sideLabelsGroup
-        .append('text')
-        .attr('class', 'side-label')
-        .attr('dominant-baseline', 'middle')
-        .style('opacity', 0);
-    });
-
-    this.dataForBarScore.forEach(() =>{
-      chartScoreGroup
-        .append('g')
-        .attr('class', 'score-bar');
-    });
-
-    this.dataForLegend.forEach(() => {
-      chartLegendGroup
-        .append('g')
-        .attr('class', 'legend-entry')
-        .classed("d3chart-legend-entry", true)
-        .style("opacity", 1)
-        //.on("mouseover", mouseOverEntry)
-        //.on("mouseout", mouseOutEntry)
-        //.on("click", clickEntry);
-    })
+    this.updateChartHeader(headerText.merge(headerText.enter()));
   }
 
-  private update(selection: any) {
-    const headerText = selection.select('.header-text')
-      .text((barData) => barData.series[0].jobGroup)
-      .attr('x', this.svgWidth/2)
+  private updateChartHeader(selection: any) {
+    selection.selectAll('.header-text')
+      .attr('x', this.svgWidth / 2)
       .attr('y', ChartCommons.CHART_HEADER_HEIGHT)
       .transition()
       .duration(ChartCommons.TRANSITION_DURATION)
       .style('opacity', 1);
+  }
 
-    const sideLabelsGroup = selection.select('.side-labels-group')
-      .attr('transform', 'translate(0, ' + this.headerHeight + ')');
+  private renderSideLabelGroup(svgElement) {
+    const sideLabels = select(svgElement).selectAll('.side-labels-group').data([this.data]);
+    sideLabels.exit().remove();
+    sideLabels.enter()
+      .append('g')
+      .attr('class', 'side-labels-group');
 
-    const chartBars = selection.selectAll('.chart-bars')
+    sideLabels.merge(sideLabels.enter()).selectAll('.side-labels-group')
+      .attr('transform', `translate(0, ${this.headerHeight})`);
+
+    this.renderChartSideLabels();
+  }
+
+  private renderChartSideLabels() {
+    const sideLabels = select('.side-labels-group').selectAll('.side-label').data(this.data.series, (data: any) => data.jobGroup + data.page);
+
+    sideLabels.exit()
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .style('opacity', 0)
+      .remove();
+
+    sideLabels.enter()
+      .append('text')
+      .attr('class', 'side-label')
+      .attr('dominant-baseline', 'middle')
+      .text(data => data.page)
+      .style('opacity', 0)
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .style('opacity', 1)
+      .attr('transform', (data) => {
+        return `translate(0, ${this.yScale(data.page) + this.yScale.bandwidth() / 2})`;
+      });
+
+    sideLabels
+      .transition()
+      .style('opacity', 1)
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .attr('transform', (data) => {
+        return `translate(0, ${this.yScale(data.page) + this.yScale.bandwidth() / 2})`;
+      });
+  }
+
+  private renderBarGroup() {
+    const barGroup = select('.bars-content-group').selectAll('.chart-bar-group').data([1]);
+    barGroup.exit().remove();
+    barGroup.enter()
+      .append('g')
+      .attr('class', 'chart-bar-group');
+
+    //TODO stacked bars
+
+    this.renderChartBars();
+  }
+
+  private renderChartBars() {
+    const uniqueMeasurands = Array.from(new Set(this.data.series.map(item => item.measurand)));
+
+    const chartBars = select('.chart-bar-group').selectAll('.chart-bars').data(uniqueMeasurands);
+    chartBars.exit()
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .attr('transform', 'translate(0, 0)')
+      .style('opacity', 0)
+      .remove();
+
+    chartBars.enter()
+      .append('g')
+      .attr('class', 'chart-bars')
+      .attr('transform', (data, index) => {
+        return `translate(0, ${index * ChartCommons.BAR_BAND})`;
+      })
+      .each((datum, index, groups) => {
+        this.renderBar(select(groups[index]));
+      });
+
+    chartBars
       .transition()
       .duration(ChartCommons.TRANSITION_DURATION)
       .attr('transform', (data, index) => {
-        return 'translate(0, ' + (index * ChartCommons.BAR_BAND) + ')';
+        return `translate(0, ${index * ChartCommons.BAR_BAND})`;
+      })
+      .each((datum, index, groups) => {
+        this.renderBar(select(groups[index]));
+      });
+  }
+
+  private renderBar(chartBarSelection) {
+    const bars = chartBarSelection.selectAll('.bar').data(this.data.series, (data: any) => data.jobGroup + data.page);
+    bars.exit()
+      .transition()
+      .duration(ChartCommons.TRANSITION_DURATION)
+      .style('opacity', 0)
+      .remove();
+
+    const bar = bars.enter()
+      .append('g')
+      .attr('class', 'bar');
+
+    bar
+      .append('rect')
+      .attr('class', 'bar-rect')
+      .attr('x', 0)
+      .attr('y', 0)
+      .attr('height', ChartCommons.BAR_BAND)
+      .each((datum, index, groups) => {
+        const color = false ? datum.color : '#1660a7';
+        select(groups[index]).attr('fill', color);
+      });
+    bar
+      .append('text')
+      .attr('class', 'bar-value')
+      .attr('dominant-baseline', 'middle')
+      .style('fill', 'white')
+      .style('font-weight', 'bold');
+
+    this.renderBarUpdate(bars);
+  }
+
+  private renderBarUpdate(selection: any) {
+    selection.select('.bar-rect')
+      .attr('x', (datum) => {
+        return this.barStart(this.xScale, datum.value)
+      })
+      .attr('y', (datum) => {
+        return this.yScale(datum.page);
+      })
+      .attr('width', (datum) => {
+        return this.barWidth(this.xScale, datum.value)
       });
 
-    const sideLabels = selection.selectAll('.side-label')
-      .each((data, index, element) => {
-        select(element[index])
-          .transition()
-          .duration(ChartCommons.TRANSITION_DURATION)
-          .text(data.series[index].page)
-          .style('opacity', 1)
-          .attr('transform', () => {
-            return 'translate(0 ' + (this.yScale(data.series[index].page) + (this.yScale.bandwidth() / 2)) + ')';
-          })
+    selection.select('.bar-value')
+      .text((datum) => {
+        return datum.value.toString();
+      })
+      .attr('x', (datum) => {
+        return (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10);
+      })
+      .attr('y', (datum) => {
+        return (this.yScale(datum.page) + ChartCommons.BAR_BAND / 2);
+      })
+      .attr('text-anchor', (datum) => {
+        return (datum.value < 0) ? 'start' : 'end';
       });
 
-    const bars = selection.selectAll('.bar')
-      .each((data, index, element) => {
-        select(element[index])
-          .append('rect')
-          .attr('class', 'bar-rect')
-          .attr('height', ChartCommons.BAR_BAND)
-          .attr('width', () => {
-            return this.barWidth(this.xScale, data.series[index].value);
-          })
-          .attr('fill', '#e0000f')
-          .attr('x', () => {
-            return this.barStart(this.xScale, data.series[index].value)
-          })
-          .transition()
-          .duration(ChartCommons.TRANSITION_DURATION)
-          .attr('y', () => {
-            return this.yScale(data.series[index].page);
-          });
-        select(element[index])
-          .append('text')
-          .text(() => {
-            return data.series[index].value
-          })
-          .attr('class', 'bar-value')
-          .attr('dominant-baseline', 'middle')
-          .style('fill', 'white')
-          .style('font-weight', 'bold')
-          .attr('x', () => {
-            return (data.series[index].value < 0) ? (this.barStart(this.xScale, data.series[index].value) + 10) : (this.barEnd(this.xScale, data.series[index].value) - 10);
-          })
-          .attr('y', () => {
-            return this.yScale(data.series[index].page) + ChartCommons.BAR_BAND / 2;
-          })
-      });
+    this.updateScoreBar(selection);
+    this.updateLegend(selection);
+  }
 
+  private updateScoreBar(selection: any) {
     let scaleForScoreBar = scaleLinear().range([0, this.barsWidth]).domain([this.minValue, this.maxValue]);
     const scoreBars = selection.selectAll('.score-bar')
       .data(this.dataForBarScore)
@@ -321,12 +371,12 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
         select(element[index])
           .append('rect')
           .attr('height', ChartCommons.BAR_BAND)
-          .attr('y', ChartCommons.BAR_BAND /2)
+          .attr('y', ChartCommons.BAR_BAND / 2)
           .attr('fill', data.fill)
           .attr('width', () => {
             return scaleForScoreBar(data.end) - scaleForScoreBar(data.start);
           })
-          .attr("x", ()=> {
+          .attr("x", () => {
             return scaleForScoreBar(data.start);
           });
         select(element[index])
@@ -343,17 +393,19 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
           })
           .attr('y', ChartCommons.BAR_BAND);
       });
+  }
 
+  private updateLegend(selection: any) {
     let maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement);
     let maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
     const legend = selection.selectAll('.legend-entry')
       .data(this.dataForLegend)
       .each((data, index, element) => {
         select(element[index])
-          .attr("transform",()=>{
-          let x = maxEntryGroupSize * (index % maxEntriesInRow);
-          return "translate(" + x + "," +this.legendPosY + ")";
-        });
+          .attr("transform", () => {
+            let x = maxEntryGroupSize * (index % maxEntriesInRow);
+            return "translate(" + x + "," + this.legendPosY + ")";
+          });
         select(element[index])
           .append('rect')
           .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
@@ -370,13 +422,13 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
       })
   }
 
-  estimateHeight (svgForEstimation) {
+  estimateHeight(svgForEstimation) {
     const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(svgForEstimation);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
     return Math.floor(this.data.series.length / maxEntriesInRow) * 20;
   };
 
-  calculateMaxEntryGroupWidth (svgForEstimation) {
+  calculateMaxEntryGroupWidth(svgForEstimation) {
     let dataMap = this.aggregationChartDataService.allMeasurandDataMap;
     const labels = Object.keys(dataMap).map(measurand => dataMap[measurand].label);
     console.log(labels);
@@ -384,7 +436,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     return max(labelWidths) + 10 + 20 + 5;
   };
 
-  getTextWidths (svgForEstimation, texts) {
+  getTextWidths(svgForEstimation, texts) {
     const widths = [];
     select(svgForEstimation).selectAll('.invisible-text-to-measure')
       .data(texts)
@@ -392,7 +444,7 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
       .append("text")
       .attr("opacity", 0)
       .text((d) => d.toString())
-      .each(function() {
+      .each(function () {
         widths.push(this.getComputedTextLength());
         this.remove();
       });
@@ -411,24 +463,13 @@ export class AggregationChartComponent implements AfterContentInit, OnChanges {
     return (value < 0) ? xScale(value) : xScale(0);
   };
 
-  calculateChartBarsHeight () {
+  calculateChartBarsHeight() {
     const barBand = ChartCommons.BAR_BAND;
     const barGap = ChartCommons.BAR_GAP;
     const numberOfMeasurands = new Set(this.data.series.map(item => item.measurand)).size;
     const numberOfBars = this.data.series.length * (numberOfMeasurands);
     const gapSize = barGap * ((numberOfMeasurands < 2) ? 1 : 2);
     return ((this.data.series.length - 1) * gapSize) + numberOfBars * barBand;
-  }
-
-
-  private exit(selection: any) {
-    selection.remove();
-  }
-
-
-
-  ngAfterContentInit(): void {
-    this.redraw();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
