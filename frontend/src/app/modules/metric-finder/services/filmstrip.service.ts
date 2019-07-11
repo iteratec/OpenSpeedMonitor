@@ -40,7 +40,8 @@ export class FilmstripService {
 
     for (let time = start; time < end + this.viewInterval; time += this.viewInterval) {
       const videoFrame = this.findFrame(thumbnails, time);
-      const timingsInFrame = this.findTimingsInInterval(timings, time - this.viewInterval, time);
+      const halfInterval = this.viewInterval >> 1;
+      const timingsInFrame = this.findTimingsInInterval(timings, time - halfInterval, time + halfInterval - 1);
       filmstrip.push({
         time: time,
         imageUrl: videoFrame.imageUrl,
