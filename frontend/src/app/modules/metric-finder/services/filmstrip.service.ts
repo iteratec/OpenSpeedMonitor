@@ -41,7 +41,7 @@ export class FilmstripService {
     for (let time = start; time < end + this.viewInterval; time += this.viewInterval) {
       const videoFrame = this.findFrame(thumbnails, time);
       const halfInterval = this.viewInterval >> 1;
-      const timingsInFrame = this.findTimingsInInterval(timings, time - halfInterval, time + halfInterval - 1);
+      const timingsInFrame = this.findTimingsInInterval(timings, time - halfInterval, time + halfInterval);
       filmstrip.push({
         time: time,
         imageUrl: videoFrame.imageUrl,
@@ -105,7 +105,7 @@ export class FilmstripService {
 
   private findTimingsInInterval(timings: TimingsMap, start: number, end: number): Timing[] {
     return Object.keys(timings)
-      .filter(metric => timings[metric] > start && timings[metric] <= end)
+      .filter(metric => timings[metric] >= start && timings[metric] < end)
       .map(metric => ({metric: metric, time: timings[metric]}));
   }
 }
