@@ -220,11 +220,20 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     this.updateHighlightedPoint();
     const formattedDate = this.formatDate(this.highlightedResult.date);
     const bottom = this.height + this.margin.top - Math.max(resultPosY - 5, this.tooltipHeight);
-    const left = Math.min(resultPosX + this.margin.left + 20, this.margin.left + this.margin.right + this.width - this.tooltipWidth);
+    const left = this.leftMarginOfTooltip(resultPosX);
     tooltip
       .html(`<span class="y-value">${this.formatValue(yValue)}</span><span class="x-value">${formattedDate}</span>`)
       .style('bottom', `${bottom}px`)
       .style('left', `${left}px`);
+  }
+
+  private leftMarginOfTooltip(resultPosX) {
+    const rightEdgeOfChart = resultPosX + this.tooltipWidth > this.width;
+    if (rightEdgeOfChart) {
+      return resultPosX - this.margin.right - 20;
+    } else {
+      return resultPosX + this.margin.left + 20;
+    }
   }
 
   private updateHighlightedPoint() {
