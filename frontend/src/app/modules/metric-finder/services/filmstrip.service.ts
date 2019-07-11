@@ -61,7 +61,8 @@ export class FilmstripService {
     if (!time) {
       return 0;
     }
-    const remaining = time % this.viewInterval;
+    const halfInterval = this.viewInterval >> 1;
+    const remaining = (time - halfInterval) % this.viewInterval + halfInterval;
     return time + (this.viewInterval - remaining);
   }
 
