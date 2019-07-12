@@ -9,6 +9,7 @@ import {ResponseWithLoadingState} from "../../../../models/response-with-loading
 import {Application} from "../../../../models/application.model";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {PerformanceAspectTypes} from "../../../../enums/performance-aspect-types.enum";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 
 @Component({
   selector: 'osm-page',
@@ -25,7 +26,7 @@ export class PageComponent {
   isLoading: boolean = true;
   PerformanceAspectTypes: typeof PerformanceAspectTypes = PerformanceAspectTypes;
 
-  constructor(private applicationDashboardService: ApplicationService) {
+  constructor(private applicationDashboardService: ApplicationService, private grailsBridgeService: GrailsBridgeService) {
 
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
@@ -57,7 +58,7 @@ export class PageComponent {
     return "";
   }
 
-  convertToMib(value: number): number {
+  static convertToMib(value: number): number {
     if (value) {
       return CalculationUtil.convertBytesToMiB(value);
     }

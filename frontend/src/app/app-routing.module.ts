@@ -1,12 +1,14 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {NotFoundComponent} from './not-found.component';
+import {GrailsBridgeService} from "./services/grails-bridge.service";
 
 
 const appRoutes: Routes = [
   {
     path: 'aspectConfiguration',
-    loadChildren: './modules/aspect-configuration/aspect-configuration.module#AspectConfigurationModule'
+    loadChildren: './modules/aspect-configuration/aspect-configuration.module#AspectConfigurationModule',
+    canActivate: [GrailsBridgeService]
   },
   {
     path: 'applicationDashboard',

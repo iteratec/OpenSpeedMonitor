@@ -320,6 +320,7 @@ grails:
                             {pattern: '/applicationDashboard/rest/removeJobHealthGraphiteServers',  access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/rest/createGraphiteServer',            access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/rest/createCsiConfiguration',          access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
+                            {pattern: '/applicationDashboard/rest/createOrUpdatePerformanceAspect', access: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN']},
                             {pattern: '/applicationDashboard/**',                       access: ['permitAll']},
                             {pattern: '/metricFinder/**',                               access: ['permitAll']},
                             {pattern: '/queueDashboard/**',                             access: ['permitAll']},
