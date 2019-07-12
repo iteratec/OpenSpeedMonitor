@@ -1,9 +1,10 @@
-import {Component, ViewChild} from '@angular/core';
+import {Component, Input, ViewChild} from '@angular/core';
 import {Observable} from 'rxjs';
 import {TestResult} from './models/test-result.model';
 import {MetricFinderService} from './services/metric-finder.service';
 import {LineChartComponent} from "./components/line-chart/line-chart.component";
 import {ComparableFilmstripsComponent} from "./components/comparable-filmstrips/comparable-filmstrips.component";
+import {PerformanceAspect} from "../../models/perfomance-aspect.model";
 
 @Component({
   selector: 'osm-metric-finder',
@@ -11,6 +12,8 @@ import {ComparableFilmstripsComponent} from "./components/comparable-filmstrips/
   styleUrls: ['./metric-finder.component.scss']
 })
 export class MetricFinderComponent {
+
+  // @Input() selectedAspect: PerformanceAspect;
 
   @ViewChild(LineChartComponent)
   lineChartCmp: LineChartComponent;
