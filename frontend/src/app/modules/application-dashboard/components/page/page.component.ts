@@ -58,7 +58,7 @@ export class PageComponent {
     return "";
   }
 
-  static convertToMib(value: number): number {
+  convertToMib(value: number): number {
     if (value) {
       return CalculationUtil.convertBytesToMiB(value);
     }
