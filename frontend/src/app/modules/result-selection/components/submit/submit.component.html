@@ -1,5 +1,5 @@
 <div class="btn-group pull-right">
-  <button type="button" id="graphButtonHtmlId" class="btn btn-primary show-button" (click)="getBarchartData()"
+  <button type="button" id="bet-barchart-data-submit" class="btn btn-primary show-button" (click)="getBarchartData()"
           [disabled]="applicationsRequired && !(applicationsSelected$ | async) ||
             pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async) ||
             measurandsRequired && !(measurandsSelected$ | async)">
@@ -7,22 +7,22 @@
   </button>
 </div>
 <div class="pull-right">
-  <p class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 &&
+  <p id="long-processing-time" class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 &&
       (!applicationsRequired || (applicationsSelected$ | async)) &&
       (!pagesRequired || (pagesSelected$ | async) || (measuredEventsSelected$ | async)) &&
       (!measurandsRequired || (measurandsSelected$ | async))">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
+  <p id="unavailable-data" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && applicationsRequired && !(applicationsSelected$ | async)">
+  <p id="no-application-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && applicationsRequired && !(applicationsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async)">
+  <p id="no-page-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
   </p>
-  <p class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && measurandsRequired && !(measurandsSelected$ | async)">
+  <p id="no-measurand-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && measurandsRequired && !(measurandsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
   </p>
 </div>
