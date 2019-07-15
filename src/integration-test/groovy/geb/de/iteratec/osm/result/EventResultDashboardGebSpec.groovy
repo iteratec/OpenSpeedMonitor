@@ -22,6 +22,7 @@ import grails.testing.mixin.integration.Integration
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.openqa.selenium.Keys
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Stepwise
 
@@ -116,6 +117,53 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         }
         waitFor {
             showButton.@disabled
+        }
+    }
+
+    @Ignore
+    void "No page selection warning is shown"() {
+        given: "User is on dashboard page"
+        to EventResultDashboardPage
+        when: "User selects valid time frame and jobgroup"
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
+        jobGroupList[0].click()
+        then:
+        waitFor {
+            !$("#warning-no-job-group").displayed
+        }
+        waitFor(10) {
+            $("#warning-no-page").displayed
+        }
+        waitFor {
+            !$("#warning-no-data").displayed
+        }
+        waitFor {
+            showButton.@disabled
+        }
+    }
+
+    @Ignore()
+    void "The user sees no warning on valid selection"() {
+        given: "User is on dashboard page"
+        to EventResultDashboardPage
+        when: "User selects time frame, job group and page"
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
+        jobGroupList[0].click()
+        pageList[0].click()
+        then:
+        waitFor {
+            !$("#warning-no-job-group").displayed
+        }
+        waitFor(10) {
+            !$("#warning-no-data").displayed
+        }
+        waitFor {
+            !$("#warning-no-page").displayed
+        }
+        waitFor {
+            !showButton.@disabled
         }
     }
 
