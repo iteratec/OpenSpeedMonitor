@@ -119,7 +119,7 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         }
     }
 
-    void "No page selection warning is shown"() {
+    /*void "No page selection warning is shown"() {
         given: "User is on dashboard page"
         to EventResultDashboardPage
 
@@ -141,9 +141,9 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         waitFor {
             showButton.@disabled
         }
-    }
+    }*/
 
-    void "The user sees no warning on valid selection"() {
+    /*void "The user sees no warning on valid selection"() {
         given: "User is on dashboard page"
         to EventResultDashboardPage
 
@@ -166,11 +166,15 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         waitFor {
             !showButton.@disabled
         }
-    }
+    }*/
 
     void "Valid selection graph is shown"() {
 
         when: "User wants to see the graph"
+        selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
+        selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
+        jobGroupList[0].click()
+        pageList[0].click()
         clickShowButton()
 
         then: "A graph with a line is shown"
