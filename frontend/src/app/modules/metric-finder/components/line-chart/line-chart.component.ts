@@ -86,7 +86,9 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   }
 
   public render() {
-    const selection = select(this.svgElement.nativeElement).selectAll('g.graph').data<TestResult[]>([this.results]);
+    const selection = select(this.svgElement.nativeElement).selectAll('g.graph').data<TestResult[]>([this.results.filter((result: TestResult) => {
+      return !!result.timings[this.metric] && result.timings[this.metric] > 0
+    })]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
     this.renderSelectedPoints();
@@ -99,7 +101,12 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   private renderSelectedPoints() {
     const selectedPoints = select('g.selected-points')
       .selectAll('circle.selected-point')
-      .data<TestResult>(this.selectedResults, (result: TestResult) => result.id);
+      .data<TestResult>(
+        this.selectedResults.filter((result: TestResult) => {
+          return !!result.timings[this.metric] && result.timings[this.metric] > 0
+        }),
+        (result: TestResult) => result.id
+      );
     selectedPoints.enter()
       .append('circle')
       .attr('class', 'selected-point')
