@@ -127,16 +127,17 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
         selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
         jobGroupList[0].click()
+        jobGroupList[0].click()
 
         then:
         waitFor {
-            !$("#warning-no-job-group").displayed
-        }
-        waitFor(10) {
-            $("#warning-no-page").displayed
+            !$("#warning-no-data").displayed
         }
         waitFor {
-            !$("#warning-no-data").displayed
+            !$("#warning-no-job-group").displayed
+        }
+        waitFor(20) {
+            $("#warning-no-page").displayed
         }
         waitFor {
             showButton.@disabled
@@ -152,12 +153,13 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
         jobGroupList[0].click()
         pageList[0].click()
+        pageList[0].click()
 
         then:
         waitFor {
             !$("#warning-no-job-group").displayed
         }
-        waitFor(10) {
+        waitFor(20) {
             !$("#warning-no-data").displayed
         }
         waitFor {
