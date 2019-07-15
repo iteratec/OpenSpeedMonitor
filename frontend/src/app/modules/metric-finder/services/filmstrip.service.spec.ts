@@ -76,14 +76,14 @@ describe('FilmstripService', () => {
   });
 
   it('fill up filmstrip list with interval steps and thumbnails', () => {
-    const timings = {speedIndex: 120, docComplete: 220};
+    const timings = {speedIndex: 120, docComplete: 250};
     const calculatedFilmstrip: Thumbnail[] = filmstripService.createFilmstripView(thumbnails, timings, 'speedIndex', 100);
     const expectedFilmstrip = [
       {time: -100, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [], isOffset: true},
       {time: 0, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [], isOffset: false},
-      {time: 100, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [], isOffset: false},
-      {time: 200, imageUrl: 'bild1', hasChange: false, isHighlighted: true, timings: [{metric: 'speedIndex', time: 120}], isOffset: false},
-      {time: 300, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [{metric: 'docComplete', time: 220}], isOffset: false},
+      {time: 100, imageUrl: 'bild1', hasChange: false, isHighlighted: true, timings: [{metric: 'speedIndex', time: 120}], isOffset: false},
+      {time: 200, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [], isOffset: false},
+      {time: 300, imageUrl: 'bild1', hasChange: false, isHighlighted: false, timings: [{metric: 'docComplete', time: 250}], isOffset: false},
       {time: 400, imageUrl: 'bild2', hasChange: true, isHighlighted: false, timings: [], isOffset: false}
     ];
 
