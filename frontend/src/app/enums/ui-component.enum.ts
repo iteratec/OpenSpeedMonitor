@@ -1,0 +1,3 @@
+export enum UiComponent {
+  APPLICATION, PAGE, LOCATION, CONNECTIVITY, MEASURAND
+}

@@ -1,30 +1,36 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { SelectionDataComponent } from './selection-data.component';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {SelectionDataComponent} from './selection-data.component';
 import {SharedMocksModule} from "../../../../../testing/shared-mocks.module";
-import {ResultSelectionService} from "../../../services/result-selection.service";
 import {of} from "rxjs";
 import {By} from "@angular/platform-browser";
+import {ResultSelectionCommandParameter} from "../../../models/result-selection-command.model";
+import {ResultSelectionStore} from "../../../services/result-selection.store";
+import {ResultSelectionService} from "../../../services/result-selection.service";
 
 describe('SelectionDataComponent', () => {
   let component: SelectionDataComponent;
   let fixture: ComponentFixture<SelectionDataComponent>;
-  let resultSelectionService: ResultSelectionService;
+  let resultSelectionStore: ResultSelectionStore;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ SelectionDataComponent ],
       imports: [ SharedMocksModule ],
-      providers: [ ResultSelectionService]
+      providers: [
+        ResultSelectionStore,
+        ResultSelectionService
+      ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    resultSelectionService = TestBed.get(ResultSelectionService);
+    resultSelectionStore = TestBed.get(ResultSelectionStore);
     fixture = TestBed.createComponent(SelectionDataComponent);
     component = fixture.componentInstance;
 
-    resultSelectionService.eventsAndPages$.next([
+    resultSelectionStore.eventsAndPages$.next({
+      isLoading: false, data: [
       {
         id: 100,
         name: "Website1_HP_entry",
@@ -49,8 +55,10 @@ describe('SelectionDataComponent', () => {
           name: "HP_entry"
         }
       }
-    ]);
-    resultSelectionService.locationsAndBrowsers$.next([
+      ]
+    });
+    resultSelectionStore.locationsAndBrowsers$.next({
+      isLoading: false, data: [
       {
         id: 100,
         name: "prod-location-1",
@@ -75,8 +83,10 @@ describe('SelectionDataComponent', () => {
           name: "Firefox"
         }
       }
-    ]);
-    resultSelectionService.connectivities$.next([
+      ]
+    });
+    resultSelectionStore.connectivities$.next({
+      isLoading: false, data: [
       {
         id: 1,
         name: "DSL 6.000",
@@ -85,19 +95,20 @@ describe('SelectionDataComponent', () => {
         id: 2,
         name: "UMTS",
       }
-    ]);
+      ]
+    });
   });
 
   it('should create', () => {
-    component.parentChildData$ = of([]);
+    component.parentChildData$ = of({isLoading: false, data: []});
     fixture.detectChanges();
     expect(component).toBeTruthy();
   });
 
   it('should display the correct data with active child selection', () => {
-    component.childType="measuredStep";
-    component.parentType="page";
-    component.parentChildData$ = resultSelectionService.eventsAndPages$;
+    component.childType = ResultSelectionCommandParameter.MEASURED_EVENTS;
+    component.parentType = ResultSelectionCommandParameter.PAGES;
+    component.parentChildData$ = resultSelectionStore.eventsAndPages$;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.options.length).toBe(2);
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.options[0].innerText).toBe("ADS");
@@ -107,10 +118,10 @@ describe('SelectionDataComponent', () => {
   });
 
   it('should display the correct data with inactive child selection', () => {
-    component.childType="location";
-    component.parentType="browser";
+    component.childType = ResultSelectionCommandParameter.LOCATIONS;
+    component.parentType = ResultSelectionCommandParameter.BROWSERS;
     component.showChildSelection = false;
-    component.parentChildData$ = resultSelectionService.locationsAndBrowsers$;
+    component.parentChildData$ = resultSelectionStore.locationsAndBrowsers$;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.options.length).toBe(2);
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.options[0].innerText).toBe("Chrome");
@@ -119,9 +130,9 @@ describe('SelectionDataComponent', () => {
   });
 
   it('should correctly assign the opacity of the selection field if the selection is not optional', () => {
-    component.childType="location";
-    component.parentType="browser";
-    component.parentChildData$ = resultSelectionService.locationsAndBrowsers$;
+    component.childType = ResultSelectionCommandParameter.LOCATIONS;
+    component.parentType = ResultSelectionCommandParameter.BROWSERS;
+    component.parentChildData$ = resultSelectionStore.locationsAndBrowsers$;
     component.parentSelectionOptional = false;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.style.opacity).toBe('1');
@@ -131,9 +142,9 @@ describe('SelectionDataComponent', () => {
   });
 
   it('should correctly assign the opacity of the selection field if the selection is optional', () => {
-    component.childType="location";
-    component.parentType="browser";
-    component.parentChildData$ = resultSelectionService.locationsAndBrowsers$;
+    component.childType = ResultSelectionCommandParameter.LOCATIONS;
+    component.parentType = ResultSelectionCommandParameter.BROWSERS;
+    component.parentChildData$ = resultSelectionStore.locationsAndBrowsers$;
     component.parentSelectionOptional = true;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.style.opacity).toBe('0.5');

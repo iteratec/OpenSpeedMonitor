@@ -6,8 +6,9 @@ import {map} from "rxjs/operators";
 import {CalculationUtil} from "../../../../utils/calculation.util";
 import {PageCsiDto} from "../../models/page-csi.model";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {Metrics} from "../../../../enums/metric.enum";
 import {Application} from "../../../../models/application.model";
+import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
+import {PerformanceAspectTypes} from "../../../../enums/performance-aspect-types.enum";
 
 @Component({
   selector: 'osm-page',
@@ -18,12 +19,14 @@ export class PageComponent {
   @Input() lastDateOfResult: string;
   @Input() metricsForPage: PageMetricsDto;
   @Input() application: Application;
+  @Input() aspectTypes: PerformanceAspectType[];
   pageCsi$: Observable<number>;
   pageCsiDate$: Observable<string>;
   isLoading: boolean = true;
-  metrics = Metrics;
+  PerformanceAspectTypes: typeof PerformanceAspectTypes = PerformanceAspectTypes;
 
   constructor(private applicationDashboardService: ApplicationService) {
+
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {
         this.isLoading = next.isLoading;
@@ -43,6 +46,9 @@ export class PageComponent {
     );
   }
 
+  findCorrectPerformanceAspectType(performanceAspectType: String): PerformanceAspectType {
+    return this.aspectTypes.find(item => item.name === performanceAspectType);
+  }
 
   transform(value: number): string {
     if (value) {

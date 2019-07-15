@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -28,11 +28,9 @@ import spock.lang.Unroll
 /**
  * Test-suite for {@link BrowserService}.
  */
-@Build([Browser, Location])
 class BrowserServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<BrowserService> {
-
     void setupSpec() {
-        mockDomains(Browser, BrowserAlias)
+        mockDomains(Browser, Location, WebPageTestServer)
     }
 
     void "find by name or alias returns correct browsers"(String nameOrAlias, String expectedBrowserName) {
@@ -89,9 +87,10 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
     void "Get extended Browser informations for Browser #browserName"() {
         given: "A browser with an associated Location with information"
         Browser b = Browser.build(name: "Chrome")
-        Location loc = Location.build(browser: b, active: true, operatingSystem: os, deviceType: dt)
-        loc.active = true
-        loc.save(flush: true)
+        new Location(
+                browser: b, active: true, operatingSystem: os, deviceType: dt,
+                label: 'loc', wptServer: WebPageTestServer.build(), location: 'loc'
+        ).save()
 
         when: "Getting Browser infos and look up for the created browser"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()

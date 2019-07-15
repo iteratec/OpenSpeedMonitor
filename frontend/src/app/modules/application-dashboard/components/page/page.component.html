@@ -7,11 +7,12 @@
   <osm-csi-value-medium [csiValue]="pageCsi$ | async" [csiDate]="pageCsiDate$ | async"
                         [showLoading]="isLoading" [lastResultDate]="lastDateOfResult"></osm-csi-value-medium>
   <div class="metric-list">
-    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.speedIndex))"
-                     [metric]="metrics.SPEED_INDEX"></osm-page-metric>
-    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.docCompleteTimeInMillisecs))"
-                     [metric]="metrics.DOCUMENT_COMPLETE"></osm-page-metric>
-    <osm-page-metric [value]="transform(convertToMib(metricsForPage?.fullyLoadedIncomingBytes))"
-                     [metric]="metrics.BYTES_FULLY_LOADED"></osm-page-metric>
+    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.PAGE_CONSTRUCTION_STARTED))"
+                     [metric]="findCorrectPerformanceAspectType(PerformanceAspectTypes.PAGE_CONSTRUCTION_STARTED)"></osm-page-metric>
+    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.PAGE_SHOWS_USEFUL_CONTENT))"
+                     [metric]="findCorrectPerformanceAspectType(PerformanceAspectTypes.PAGE_SHOWS_USEFUL_CONTENT)"></osm-page-metric>
+    <osm-page-metric [value]="transform(convertMillisecsToSecs(metricsForPage?.PAGE_IS_USABLE))"
+                     [metric]="findCorrectPerformanceAspectType(PerformanceAspectTypes.PAGE_IS_USABLE)"></osm-page-metric>
   </div>
+
 </div>

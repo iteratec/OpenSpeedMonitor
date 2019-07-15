@@ -33,7 +33,7 @@ describe('AspectMetricsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AspectMetricsComponent);
     component = fixture.componentInstance;
-    component.actualType = {name: 'aspect-type', icon: 'aspect-type-icon'};
+    component.actualType = {name: 'aspect-type', icon: 'aspect-type-icon', unit: 'aspect-type-unit'};
     fixture.detectChanges();
   });
 
@@ -43,8 +43,8 @@ describe('AspectMetricsComponent', () => {
   it('should filter aspects respective asp', inject(
     [AspectMetricsComponent, AspectConfigurationService],
     (component: AspectMetricsComponent, aspectConfService: AspectConfigurationService) => {
-      const type1: PerformanceAspectType = {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass'};
-      const type2: PerformanceAspectType = {name: 'PAGE_SHOWS_USEFUL_CONTENT', icon: 'hourglass'};
+      const type1: PerformanceAspectType = {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'};
+      const type2: PerformanceAspectType = {name: 'PAGE_SHOWS_USEFUL_CONTENT', icon: 'hourglass', unit: 'ms'};
       const aspectsOfTwoDifferentTypes: ExtendedPerformanceAspect[] = [
         {
           id: 1,
