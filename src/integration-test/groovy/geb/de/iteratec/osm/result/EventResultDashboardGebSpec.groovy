@@ -127,7 +127,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
         selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
         jobGroupList[0].click()
-        jobGroupList[0].click()
 
         then:
         waitFor {
@@ -152,7 +151,6 @@ class EventResultDashboardGebSpec extends CustomUrlGebReportingSpec {
         selectDateInDatepicker(fromDatepicker, "21.06.2016 00:00")
         selectDateInDatepicker(toDatepicker, "23.06.2016 23:59")
         jobGroupList[0].click()
-        pageList[0].click()
         pageList[0].click()
 
         then:
