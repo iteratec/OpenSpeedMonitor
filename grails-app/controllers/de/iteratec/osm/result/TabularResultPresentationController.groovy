@@ -381,18 +381,30 @@ class TabularResultPresentationController {
             }
         }
 
+        final DateTimeFormatter FORMATTER = csvExportService.CSV_TABLE_DATE_TIME_FORMAT;
         // round doubles and convert date
         result.each { row ->
             // jobResultDate
-            row[0] = csvExportService.CSV_TABLE_DATE_TIME_FORMAT.print(new DateTime(row[0]))
+            row[0] = FORMATTER.print(new DateTime(row[0]))
             // csByWptDocCompleteInPercent
             row[8] = row[8]?.round(2).toString()
             // csByWptVisuallyCompleteInPercent
             row[23] = row[23]?.round(2).toString()
             // get wptUrl
-            row[32] = csvExportService.buildTestDetailsURL(row[32], row[19], row[24])
+            row[32] = buildTestDetailsURL(row[32], row[19], row[24])
         }
         return result
+    }
+
+    private final String buildTestDetailsURL(final JobResult jobResult, final Integer numberOfWptRun, final Integer oneBasedStepIndexInJourney) {
+        if (!jobResult) return "no_job_result_available"
+
+        final String baseUrl = jobResult.wptServerBaseurl?.toString()
+        final String testId = jobResult.testId?.toString()
+        final String wptRun = numberOfWptRun.toString()
+        final String step = oneBasedStepIndexInJourney.toString()
+
+        return "${baseUrl}result/${testId}/${wptRun}/details/#waterfall_view_step${step}"
     }
 
     private List<String> getCsvHeaders() {
