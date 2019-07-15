@@ -15,7 +15,7 @@
                         class="aspect-inspect"></osm-aspect-metrics>
   </div>
   <div class="card">
-    <osm-metric-finder [selectedMeasurand] = "selectedMeasurand"
+    <osm-metric-finder [selectedMetric] = "selectedMetric"
     ></osm-metric-finder>
     <button class="btn btn-primary btn-aspect-config"
             [disabled]="" (click)="persistAspect()">{{'frontend.default.button.save' | translate}}</button>

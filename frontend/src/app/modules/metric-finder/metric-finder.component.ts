@@ -13,8 +13,7 @@ import {PerformanceAspect} from "../../models/perfomance-aspect.model";
 })
 export class MetricFinderComponent {
 
-  // @Input() selectedAspect: PerformanceAspect;
-  @Input() selectedMeasurand: string;
+  @Input() selectedMetric: string;
 
   @ViewChild(LineChartComponent)
   lineChartCmp: LineChartComponent;
@@ -24,21 +23,9 @@ export class MetricFinderComponent {
 
   public testResults$: Observable<TestResult[]>;
   public selectedResults: TestResult[] = [];
-  public selectedMetric = 'SPEED_INDEX';
-
-
 
   constructor(private metricFinderService: MetricFinderService) {
     this.testResults$ = metricFinderService.testResults$;
-  }
-
-  ngOnInit(){
-    console.log("selectedMeasurand in child metric finder: " + this.selectedMeasurand);
-  }
-
-  ngOnChanges(){
-    console.log("selectedMeasurand in child metric finder: " + this.selectedMeasurand);
-    this.selectedMetric = this.selectedMeasurand;
   }
 
   setSelectedResults(results: TestResult[]) {

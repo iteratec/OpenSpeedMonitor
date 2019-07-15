@@ -31,14 +31,10 @@ export class EditAspectMetricsComponent implements OnInit {
   application$: Observable<Application>;
   page$: Observable<Page>;
   browserId$ = new ReplaySubject<number>(1);
-
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
   aspectType$: Observable<PerformanceAspectType>;
-  aspectsToShow$: Observable<ExtendedPerformanceAspect[]>;
-  selectedMeasurand$: Observable<any>;
   private selectedAspect: ExtendedPerformanceAspect;
-  private selectedMeasurand: string;
-  selectedMeasurand$: Observable<any>;
+  private selectedMetric: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -53,7 +49,6 @@ export class EditAspectMetricsComponent implements OnInit {
     this.initMetricFinderDataLoading();
   }
 
-
   ngOnInit() {
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.aspectConfService.loadApplication(params.get('applicationId'));
@@ -63,34 +58,7 @@ export class EditAspectMetricsComponent implements OnInit {
       this.browserId$.next(browserId);
       this.aspectConfService.initSelectedAspectType(params.get('aspectType'));
       this.loadChartData(Number(params.get('applicationId')), Number(params.get('pageId')), Number(params.get('browserId')));
-
-      combineLatest(this.aspectConfService.extendedAspects$, this.aspectConfService.selectedAspectType$).subscribe(
-        ([aspects, selectedType]: [ExtendedPerformanceAspect[], PerformanceAspectType]) => {
-
-          console.log(
-            "aspects: " + JSON.stringify (aspects, null, 4) +
-            "selectedType: " + JSON.stringify (selectedType, null, 4)
-          );
-
-          //aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == selectedType.name);
-
-          this.selectedAspect = aspects
-            .filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == selectedType.name)
-            .find((aspect: ExtendedPerformanceAspect) => {
-              return aspect.browserId === browserId;
-
-
-          });
-
-          console.log("selectedAspect: ", JSON.stringify (this.selectedAspect, null, 4));
-          if (typeof this.selectedAspect != "undefined") {
-
-            this.selectedMeasurand= this.selectedAspect.measurand.name;
-            console.log("selectedMeasurand: " + this.selectedMeasurand);
-          }
-          console.log("this.browserId: " + browserId);
-        }
-      );
+      this.getSelectedMeasurand(browserId);
     });
   }
 
@@ -110,6 +78,23 @@ export class EditAspectMetricsComponent implements OnInit {
     this.metricFinderService.loadData(from, now, appId, pageId, browserId);
   }
 
+  private getSelectedMeasurand(browserId) {
+    combineLatest(this.aspectConfService.extendedAspects$, this.aspectConfService.selectedAspectType$).subscribe(
+      ([aspects, selectedType]: [ExtendedPerformanceAspect[], PerformanceAspectType]) => {
+
+        this.selectedAspect = aspects
+          .filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == selectedType.name)
+          .find((aspect: ExtendedPerformanceAspect) => {
+            return aspect.browserId === browserId;
+          });
+
+        if (typeof this.selectedAspect != "undefined") {
+          this.selectedMetric= this.selectedAspect.measurand.name;
+        }
+      }
+    );
+  }
+
   persistAspect() {
     const perfAspectToCreateOrUpdate = {
       ...this.aspectMetricsCmp.getSelectedAspect(),
@@ -117,7 +102,4 @@ export class EditAspectMetricsComponent implements OnInit {
     };
     this.aspectConfService.createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate);
   }
-
 }
-
-//[selectedAspect]="selectedAspect"
