@@ -26,7 +26,7 @@ export class PageComponent {
   isLoading: boolean = true;
   PerformanceAspectTypes: typeof PerformanceAspectTypes = PerformanceAspectTypes;
 
-  constructor(private applicationDashboardService: ApplicationService, private grailsBridgeService: GrailsBridgeService) {
+  constructor(private applicationDashboardService: ApplicationService) {
 
     this.pageCsi$ = applicationDashboardService.pageCsis$.pipe(
       map((next: ResponseWithLoadingState<PageCsiDto[]>) => {

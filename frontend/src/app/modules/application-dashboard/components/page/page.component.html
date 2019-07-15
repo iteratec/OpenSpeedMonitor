@@ -1,6 +1,6 @@
 <h2>
   {{metricsForPage?.pageName}}
-  <a *ngIf="grailsBridgeService.globalOsmNamespace.user.loggedIn" [routerLink]="['/aspectConfiguration', application.id, metricsForPage?.pageId]"><i
+  <a [routerLink]="['/aspectConfiguration', application.id, metricsForPage?.pageId]"><i
     class="fas fa-cog icon-right"></i></a>
 </h2>
 <div class="page-metrics">

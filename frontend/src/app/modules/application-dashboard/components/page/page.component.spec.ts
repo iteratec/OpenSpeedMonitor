@@ -34,8 +34,7 @@ describe('PageComponent', () => {
       providers: [
         ApplicationService,
         ResultSelectionModule,
-        ResultSelectionService,
-        {provide: GrailsBridgeService, useClass: MockGrailsBridgeService}
+        ResultSelectionService
       ]
     })
       .compileComponents();
@@ -60,7 +59,3 @@ describe('PageComponent', () => {
     expect(component).toBeTruthy();
   });
 });
-
-class MockGrailsBridgeService extends GrailsBridgeService {
-  globalOsmNamespace: GlobalOsmNamespace = {i18n: {lang: 'de'}, user: {loggedIn: true}};
-}
