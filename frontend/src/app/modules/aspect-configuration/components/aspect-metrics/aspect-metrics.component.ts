@@ -34,9 +34,6 @@ export class AspectMetricsComponent implements OnInit {
         return aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == this.actualType.name)
       })
     );
-
-
-
   }
 
   getSelectedAspect(): PerformanceAspect {

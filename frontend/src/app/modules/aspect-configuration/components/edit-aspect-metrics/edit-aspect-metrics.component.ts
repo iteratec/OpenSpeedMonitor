@@ -35,7 +35,10 @@ export class EditAspectMetricsComponent implements OnInit {
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
   aspectType$: Observable<PerformanceAspectType>;
   aspectsToShow$: Observable<ExtendedPerformanceAspect[]>;
-  private selectedAspect: string;
+  selectedMeasurand$: Observable<any>;
+  private selectedAspect: ExtendedPerformanceAspect;
+  private selectedMeasurand: string;
+  selectedMeasurand$: Observable<any>;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,39 +64,35 @@ export class EditAspectMetricsComponent implements OnInit {
       this.aspectConfService.initSelectedAspectType(params.get('aspectType'));
       this.loadChartData(Number(params.get('applicationId')), Number(params.get('pageId')), Number(params.get('browserId')));
 
-      this.aspectsToShow$ = combineLatest(this.aspectConfService.extendedAspects$, this.aspectConfService.selectedAspectType$).subscribe(
-        ([aspects, selectedType]: [ExtendedPerformanceAspect[], PerformanceAspectType]) => 
-      ).pipe(
-        map((aspects: ExtendedPerformanceAspect[]) => {
-          return aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == this.actualType.name)
-        }));
+      combineLatest(this.aspectConfService.extendedAspects$, this.aspectConfService.selectedAspectType$).subscribe(
+        ([aspects, selectedType]: [ExtendedPerformanceAspect[], PerformanceAspectType]) => {
+
+          console.log(
+            "aspects: " + JSON.stringify (aspects, null, 4) +
+            "selectedType: " + JSON.stringify (selectedType, null, 4)
+          );
+
+          //aspects.filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == selectedType.name);
+
+          this.selectedAspect = aspects
+            .filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == selectedType.name)
+            .find((aspect: ExtendedPerformanceAspect) => {
+              return aspect.browserId === browserId;
 
 
-       this.selectedAspect = aspects.find((aspect) => {
-        return aspect.browserId === browserId;
-      });
-      console.log("selected: ", JSON.stringify (selectedAspect, null, 4));
-      if (typeof this.selectedAspect != "undefined") {
+          });
 
-        this.selectedAspect= this.selectedAspect.measurand.name;
-        console.log("selectedAspect: " + this.selectedAspect.measurand.name);
-      }
+          console.log("selectedAspect: ", JSON.stringify (this.selectedAspect, null, 4));
+          if (typeof this.selectedAspect != "undefined") {
 
-
-      console.log("this.browserId: " + browserId);
-
-
+            this.selectedMeasurand= this.selectedAspect.measurand.name;
+            console.log("selectedMeasurand: " + this.selectedMeasurand);
+          }
+          console.log("this.browserId: " + browserId);
+        }
+      );
     });
-    //console.log("selectedAspect: " + this.aspectMetricsCmp.getSelectedAspect());
-
-
-
-
-    //this.selectedAspect = this.aspectMetricsCmp.getSelectedAspect();
-
   }
-
-  ngAfter
 
   private initMetricFinderDataLoading() {
     this.browserId$.pipe(
