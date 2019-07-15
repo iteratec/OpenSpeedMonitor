@@ -230,7 +230,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   private leftMarginOfTooltip(resultPosX) {
     const rightEdgeOfChart = resultPosX + this.tooltipWidth > this.width;
     if (rightEdgeOfChart) {
-      return resultPosX - this.margin.right - 20;
+      return resultPosX + this.margin.left - this.tooltipWidth - 15;
     } else {
       return resultPosX + this.margin.left + 20;
     }
