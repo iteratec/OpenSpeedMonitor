@@ -1,7 +1,6 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {TestResult} from '../../models/test-result.model';
 import {MetricFinderService} from '../../services/metric-finder.service';
-import {Subscription} from "rxjs";
 
 interface SelectableMetric {
   id: string;

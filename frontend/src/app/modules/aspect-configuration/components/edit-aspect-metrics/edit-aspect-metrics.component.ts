@@ -40,7 +40,7 @@ export class EditAspectMetricsComponent implements OnInit {
     private route: ActivatedRoute,
     private applicationService: ApplicationService,
     private aspectConfService: AspectConfigurationService,
-    private metricFinderService: MetricFinderService ) {
+    private metricFinderService: MetricFinderService) {
 
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
@@ -88,7 +88,7 @@ export class EditAspectMetricsComponent implements OnInit {
             return aspect.browserId === browserId;
           });
 
-        if (typeof this.selectedAspect != "undefined") {
+        if (typeof(this.selectedAspect) != "undefined") {
           this.selectedMetric= this.selectedAspect.measurand.name;
         }
       }

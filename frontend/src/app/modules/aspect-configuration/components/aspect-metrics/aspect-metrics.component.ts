@@ -37,7 +37,7 @@ export class AspectMetricsComponent implements OnInit {
   }
 
   getSelectedAspect(): PerformanceAspect {
-    if (typeof (this.application) === 'undefined') return null;
+    if (typeof(this.application) === 'undefined') return null;
     const matchingAspect: PerformanceAspect = this.aspectConfService.extendedAspects$.getValue().find((aspect: PerformanceAspect) => {
       return aspect.applicationId == this.application.id && aspect.pageId == this.page.id &&
         aspect.browserId == this.browserId && aspect.performanceAspectType.name == this.actualType.name
