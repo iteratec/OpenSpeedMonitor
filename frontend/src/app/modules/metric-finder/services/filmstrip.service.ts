@@ -33,14 +33,18 @@ export class FilmstripService {
   }
 
   createFilmstripView(thumbnails: Thumbnail[], timings: TimingsMap, highlightedMetric?: string, offset?: number): FilmstripView {
-    const end = Math.max(...thumbnails.map(t => t.time));
+    const end = Math.max(
+      ...thumbnails.map(t => t.time),
+      ...Object.values(timings)
+    );
     const filmstrip = [];
     let lastVideoFrame = null;
     const start = offset ? -offset : 0;
 
     for (let time = start; time < end + this.viewInterval; time += this.viewInterval) {
       const videoFrame = this.findFrame(thumbnails, time);
-      const timingsInFrame = this.findTimingsInInterval(timings, time - this.viewInterval, time);
+      const halfInterval = this.viewInterval >> 1;
+      const timingsInFrame = this.findTimingsInInterval(timings, time - halfInterval, time + halfInterval);
       filmstrip.push({
         time: time,
         imageUrl: videoFrame.imageUrl,
@@ -60,7 +64,8 @@ export class FilmstripService {
     if (!time) {
       return 0;
     }
-    const remaining = time % this.viewInterval;
+    const halfInterval = this.viewInterval >> 1;
+    const remaining = (time - halfInterval) % this.viewInterval + halfInterval;
     return time + (this.viewInterval - remaining);
   }
 
@@ -103,7 +108,7 @@ export class FilmstripService {
 
   private findTimingsInInterval(timings: TimingsMap, start: number, end: number): Timing[] {
     return Object.keys(timings)
-      .filter(metric => timings[metric] > start && timings[metric] <= end)
+      .filter(metric => timings[metric] >= start && timings[metric] < end)
       .map(metric => ({metric: metric, time: timings[metric]}));
   }
 }

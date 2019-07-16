@@ -64,10 +64,12 @@ class PerformanceLoggingService {
     void resetExecutionTimeLoggingSession(){
         loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
     }
-    void logExecutionTimeSilently(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
+
+    def logExecutionTimeSilently(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
         DateTime started = new DateTime()
-        toMeasure.call()
+        def returnValue = toMeasure.call()
         loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentationDepth, level, getElapsedSeconds(started))
+        return returnValue
     }
     String getExecutionTimeLoggingSessionData(LogLevel level){
         return loggedExecutionTimesThreadLocal.get().getRepresentation(level)
