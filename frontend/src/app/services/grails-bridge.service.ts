@@ -17,14 +17,6 @@ export class GrailsBridgeService {
     });
   }
 
-  canActivate(): boolean {
-    if (!this.globalOsmNamespace.user.loggedIn) {
-      window.location.href = '/login/auth';
-      return false;
-    }
-    return true;
-  }
-
   private toggleNavbarClasses(newUrl: string, attributeName: string, cssClass: string) {
     const matches = Array.from(document.querySelectorAll(`#main-navbar [${attributeName}]`))
       .filter(node => new RegExp(node.getAttribute(attributeName)).test(newUrl));
