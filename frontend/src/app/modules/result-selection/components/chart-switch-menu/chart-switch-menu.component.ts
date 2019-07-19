@@ -1,14 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import {Router} from "@angular/router";
+import {ChartSwitchMenuEntry} from "../../models/chart-switch-menu-entry.model";
 
 @Component({
   selector: 'osm-menu',
-  templateUrl: './menu.component.html',
-  styleUrls: ['./menu.component.scss']
+  templateUrl: './chart-switch-menu.component.html',
+  styleUrls: ['./chart-switch-menu.component.scss']
 })
-export class MenuComponent implements OnInit {
+export class ChartSwitchMenuComponent implements OnInit {
 
-  chartMenu: any[] = [
+  chartSwitchMenu: ChartSwitchMenuEntry[] = [
     {baseUrl: "/eventResultDashboard/showAll", label: "frontend.de.iteratec.osm.results.timeSeries", icon: "fas fa-chart-line"},
     {baseUrl: "/aggregationDev/show", label: "frontend.de.iteratec.osm.results.aggregation", icon: "fas fa-chart-bar"},
     {baseUrl: "/distributionChart/show", label: "frontend.de.iteratec.osm.results.distributionChart", icon: "fas fa-chart-area"},

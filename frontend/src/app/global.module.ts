@@ -7,7 +7,7 @@ import {OsmLangService} from "./services/osm-lang.service";
 import {ApplicationService} from "./services/application.service";
 import {ResultSelectionService} from "./modules/result-selection/services/result-selection.service";
 import {ResultSelectionStore} from "./modules/result-selection/services/result-selection.store";
-import {BarchartDataService} from "./modules/chart/services/barchart-data.service";
+import {BarchartDataService} from "./modules/aggregation/services/barchart-data.service";
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {

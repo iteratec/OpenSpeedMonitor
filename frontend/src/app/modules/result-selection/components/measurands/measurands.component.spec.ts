@@ -6,7 +6,6 @@ import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
-import {HttpClientTestingModule} from "@angular/common/http/testing";
 
 describe('MeasurandsComponent', () => {
   let component: MeasurandsComponent;

@@ -1,5 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {Subject} from "rxjs";
+import {Component, OnInit} from '@angular/core';
 import {ResultSelectionStore} from "../../services/result-selection.store";
 
 @Component({

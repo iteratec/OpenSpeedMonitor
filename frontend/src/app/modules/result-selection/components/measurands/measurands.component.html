@@ -19,7 +19,7 @@
 
     <div class="row form-group" *ngIf="multipleMeasurands">
       <div class="col-sm-8 col-sm-offset-3">
-        <button type="button" id="add-measurand-button" class="btn btn-default btn-block" (click)="addMeasurandField()" [disabled]="resultSelectionStore.remainingGetBarchartCommand.fromComparative || resultSelectionStore.remainingGetBarchartCommand.toComparative">
+        <button type="button" id="add-measurand-button" class="btn btn-default btn-block" (click)="addMeasurandField()" [disabled]="resultSelectionStore.remainingResultSelection.fromComparative || resultSelectionStore.remainingResultSelection.toComparative">
           <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate }}
         </button>
       </div>

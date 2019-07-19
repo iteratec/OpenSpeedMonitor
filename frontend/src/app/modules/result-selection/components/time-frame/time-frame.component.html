@@ -76,7 +76,7 @@
 
   <div class="row form-group" *ngIf="!comparativeSelectionActive && showComparativeTimeFrame">
     <div class="col-md-8 col-md-offset-3">
-      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()" [disabled]="resultSelectionStore.remainingGetBarchartCommand.measurands?.length > 1">
+      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()" [disabled]="resultSelectionStore.remainingResultSelection.measurands?.length > 1">
         <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
       </button>
     </div>

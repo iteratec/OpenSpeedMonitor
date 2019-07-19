@@ -88,7 +88,7 @@ export class TimeFrameComponent implements OnInit {
     }
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
     if (this.comparativeSelectionActive) {
-      this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame(this.selectedComparativeDates);
+      this.resultSelectionStore.setRemainingResultSelectionComparativeTimeFrame(this.selectedComparativeDates);
     }
   }
 
@@ -108,7 +108,7 @@ export class TimeFrameComponent implements OnInit {
     }
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
     if (this.comparativeSelectionActive) {
-      this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame(this.selectedComparativeDates);
+      this.resultSelectionStore.setRemainingResultSelectionComparativeTimeFrame(this.selectedComparativeDates);
     }
   }
 
@@ -128,7 +128,7 @@ export class TimeFrameComponent implements OnInit {
     }
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
     if (this.comparativeSelectionActive) {
-      this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame(this.selectedComparativeDates);
+      this.resultSelectionStore.setRemainingResultSelectionComparativeTimeFrame(this.selectedComparativeDates);
     }
   }
 
@@ -165,7 +165,7 @@ export class TimeFrameComponent implements OnInit {
       return
     }
     this.comparativeSelectionActive = !this.comparativeSelectionActive;
-    this.resultSelectionStore.setRemainingGetBarchartCommandComparativeTimeFrame([null, null]);
+    this.resultSelectionStore.setRemainingResultSelectionComparativeTimeFrame([null, null]);
 
   }
 }

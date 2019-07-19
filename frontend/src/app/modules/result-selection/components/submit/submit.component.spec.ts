@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import {SubmitComponent} from './submit.component';
-import {BarchartDataService} from "../../../chart/services/barchart-data.service";
+import {BarchartDataService} from "../../../aggregation/services/barchart-data.service";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionService} from "../../services/result-selection.service";
@@ -47,7 +47,7 @@ describe('SubmitComponent', () => {
       jobGroupIds: [1, 2, 3],
       pageIds: [4, 7, 9]
     });
-    resultSelectionStore._remainingGetBarchartCommand$.next({
+    resultSelectionStore._remainingResultSelection$.next({
       measurands: ["DOC_COMPLETE_TIME"]
     });
     fixture.detectChanges();
@@ -89,7 +89,7 @@ describe('SubmitComponent', () => {
       jobGroupIds: [1, 2, 3],
       pageIds: [4, 7, 9]
     });
-    resultSelectionStore._remainingGetBarchartCommand$.next({
+    resultSelectionStore._remainingResultSelection$.next({
       measurands: ["DOC_COMPLETE_TIME"]
     });
     expect(fixture.debugElement.query(By.css('#bet-barchart-data-submit')).nativeElement.disabled).toBeTruthy();
@@ -196,7 +196,7 @@ describe('SubmitComponent', () => {
 
   it('should not warn about the selected meausrand', () => {
     resultSelectionStore.resultCount$.next(100);
-    resultSelectionStore._remainingGetBarchartCommand$.next({
+    resultSelectionStore._remainingResultSelection$.next({
       measurands: ["DOC_COMPLETE_TIME"]
     });
     fixture.detectChanges();

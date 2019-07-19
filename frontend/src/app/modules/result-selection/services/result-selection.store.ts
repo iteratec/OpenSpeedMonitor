@@ -14,14 +14,14 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
-import {GetBarchartCommandParameter, RemainingGetBarchartCommand} from "../../chart/models/get-barchart-command.model";
+import {RemainingResultSelection, RemainingResultSelectionParameter} from "../models/remaing-result-selection.model";
 
 @Injectable()
 export class ResultSelectionStore {
   from: Date;
   to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
-  _remainingGetBarchartCommand$: BehaviorSubject<RemainingGetBarchartCommand>;
+  _remainingResultSelection$: BehaviorSubject<RemainingResultSelection>;
 
   applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({isLoading: false, data: []});
   applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({isLoading: false, data: []});
@@ -43,7 +43,7 @@ export class ResultSelectionStore {
     let defaultTo = new Date();
     defaultFrom.setDate(defaultTo.getDate() - 3);
     this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
-    this._remainingGetBarchartCommand$ = new BehaviorSubject({});
+    this._remainingResultSelection$ = new BehaviorSubject({});
   }
 
   registerComponent(component: UiComponent): void {
@@ -79,25 +79,25 @@ export class ResultSelectionStore {
     return this._resultSelectionCommand$.getValue();
   }
 
-  setRemainingGetBarchartCommandComparativeTimeFrame(timeFrame: Date[]): void {
-    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
-  }
-
-  setRemainingGetBarchartCommandEnums(enums: string[], type: GetBarchartCommandParameter): void {
-    this.setRemainingGetBarchartCommand({...this.remainingGetBarchartCommand, [type]: enums});
-  }
-
-  get remainingGetBarchartCommand(): RemainingGetBarchartCommand {
-    return this._remainingGetBarchartCommand$.getValue();
-  }
-
   setResultSelectionCommand(newState: ResultSelectionCommand): void {
     this._resultSelectionCommand$.next(newState);
     this.loadResultCount(newState);
   }
 
-  private setRemainingGetBarchartCommand(newState: RemainingGetBarchartCommand): void {
-    this._remainingGetBarchartCommand$.next(newState);
+  setRemainingResultSelectionComparativeTimeFrame(timeFrame: Date[]): void {
+    this.setRemainingResultSelection({...this.remainingResultSelection, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
+  }
+
+  setRemainingResultSelectionEnums(enums: string[], type: RemainingResultSelectionParameter): void {
+    this.setRemainingResultSelection({...this.remainingResultSelection, [type]: enums});
+  }
+
+  get remainingResultSelection(): RemainingResultSelection {
+    return this._remainingResultSelection$.getValue();
+  }
+
+  private setRemainingResultSelection(newState: RemainingResultSelection): void {
+    this._remainingResultSelection$.next(newState);
   }
 
   private loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {

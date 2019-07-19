@@ -2,7 +2,7 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {AggregationComponent} from './aggregation.component';
 import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
-import {BarchartDataService} from "../chart/services/barchart-data.service";
+import {BarchartDataService} from "./services/barchart-data.service";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 

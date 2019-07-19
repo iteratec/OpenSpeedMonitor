@@ -2,34 +2,35 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {EMPTY, Observable, OperatorFunction} from "rxjs";
 import {catchError} from "rxjs/operators";
-import {GetBarchartCommand, RemainingGetBarchartCommand} from "../models/get-barchart-command.model";
+import {GetBarchartCommand} from "../models/get-barchart-command.model";
 import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
+import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
 
 @Injectable()
 export class BarchartDataService {
 
   constructor(private http: HttpClient) { }
 
-  fetchBarchartData<T>(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: RemainingGetBarchartCommand, aggregationValue: (string | number), url: string): Observable<T> {
-    const getBarchartCommand = BarchartDataService.buildGetBarchartCommand(resultSelectionCommand, remainingGetBarchartCommand, aggregationValue);
+  fetchBarchartData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, aggregationValue: (string | number), url: string): Observable<T> {
+    const getBarchartCommand = BarchartDataService.buildGetBarchartCommand(resultSelectionCommand, remainingResultSelection, aggregationValue);
     const params = this.createParams(getBarchartCommand);
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
     )
   }
 
-  private static buildGetBarchartCommand(resultSelectionCommand: ResultSelectionCommand, remainingGetBarchartCommand: RemainingGetBarchartCommand, aggregationValue: (string | number)): GetBarchartCommand {
+  private static buildGetBarchartCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, aggregationValue: (string | number)): GetBarchartCommand {
     return new GetBarchartCommand({
       from: resultSelectionCommand.from,
       to: resultSelectionCommand.to,
-      fromComparative: remainingGetBarchartCommand.fromComparative,
-      toComparative: remainingGetBarchartCommand.toComparative,
+      fromComparative: remainingResultSelection.fromComparative,
+      toComparative: remainingResultSelection.toComparative,
       pages: resultSelectionCommand.pageIds,
       jobGroups: resultSelectionCommand.jobGroupIds,
-      measurands: remainingGetBarchartCommand.measurands,
+      measurands: remainingResultSelection.measurands,
       browsers: resultSelectionCommand.browserIds,
-      deviceTypes: remainingGetBarchartCommand.deviceTypes,
-      operatingSystems: remainingGetBarchartCommand.operatingSystems,
+      deviceTypes: remainingResultSelection.deviceTypes,
+      operatingSystems: remainingResultSelection.operatingSystems,
       aggregationValue: aggregationValue
     });
   }

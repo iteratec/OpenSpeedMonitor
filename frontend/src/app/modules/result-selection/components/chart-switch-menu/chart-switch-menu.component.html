@@ -1,5 +1,5 @@
 <h1>
-  <span *ngFor="let chart of chartMenu">
+  <span *ngFor="let chart of chartSwitchMenu">
     <a *ngIf="!router.url.startsWith(chart.baseUrl)" [href]="chart.baseUrl" class="btn">
       <i [ngClass]="chart.icon"></i>
     </a>

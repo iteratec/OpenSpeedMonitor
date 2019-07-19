@@ -1,16 +1,16 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {MenuComponent} from './menu.component';
+import {ChartSwitchMenuComponent} from './chart-switch-menu.component';
 import {RouterTestingModule} from "@angular/router/testing";
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 
-describe('MenuComponent', () => {
-  let component: MenuComponent;
-  let fixture: ComponentFixture<MenuComponent>;
+describe('ChartSwitchMenuComponent', () => {
+  let component: ChartSwitchMenuComponent;
+  let fixture: ComponentFixture<ChartSwitchMenuComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [MenuComponent],
+      declarations: [ChartSwitchMenuComponent],
       imports: [SharedMocksModule],
       providers: [RouterTestingModule]
     })
@@ -18,7 +18,7 @@ describe('MenuComponent', () => {
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(MenuComponent);
+    fixture = TestBed.createComponent(ChartSwitchMenuComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

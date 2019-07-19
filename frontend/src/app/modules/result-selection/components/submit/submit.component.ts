@@ -1,10 +1,10 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
-import {BarchartDataService} from "../../../chart/services/barchart-data.service";
+import {BarchartDataService} from "../../../aggregation/services/barchart-data.service";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionCommand} from "../../models/result-selection-command.model";
-import {RemainingGetBarchartCommand} from "../../../chart/models/get-barchart-command.model";
 import {URL} from "../../../../enums/url.enum";
+import {RemainingResultSelection} from "../../models/remaing-result-selection.model";
 
 @Component({
   selector: 'osm-result-selection-submit',
@@ -22,6 +22,7 @@ export class SubmitComponent implements OnInit {
   @Input() applicationsRequired: boolean = false;
   @Input() pagesRequired: boolean = false;
   @Input() measurandsRequired: boolean = false;
+  @Input() getData: any;
 
   constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
     this.resultCount$ = this.resultSelectionStore.resultCount$;
@@ -39,7 +40,7 @@ export class SubmitComponent implements OnInit {
         this.measuredEventsSelected$.next(next.measuredEventIds.length > 0);
       }
     });
-    this.resultSelectionStore._remainingGetBarchartCommand$.subscribe((next: RemainingGetBarchartCommand) => {
+    this.resultSelectionStore._remainingResultSelection$.subscribe((next: RemainingResultSelection) => {
       if (next.measurands) {
         this.measurandsSelected$.next(next.measurands.length > 0);
       }
@@ -49,14 +50,14 @@ export class SubmitComponent implements OnInit {
   getBarchartData(): void {
     this.barchartDataService.fetchBarchartData<any>(
       this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingGetBarchartCommand,
+      this.resultSelectionStore.remainingResultSelection,
       "avg",
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => console.log(result));
 
     this.barchartDataService.fetchBarchartData<any>(
       this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingGetBarchartCommand,
+      this.resultSelectionStore.remainingResultSelection,
       50,
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => console.log(result));
