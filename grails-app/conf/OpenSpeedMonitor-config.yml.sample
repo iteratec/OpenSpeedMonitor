@@ -50,7 +50,7 @@ environments:
       username: "[your-prod-mysql-user]"
       password: "[password-of-your-prod-mysql-user]"
       dbCreate: "managed by liquibase"
-      driverClassName: "com.mysql.jdbc.Driver"
+      driverClassName: "com.mysql.cj.jdbc.Driver"
       logSql: false
       pooled: true
       properties:
@@ -93,7 +93,7 @@ environments:
       username: "[your-prod-mysql-user]"
       password: "[password-of-your-prod-mysql-user]"
       dbCreate: "managed by liquibase"
-      driverClassName: "com.mysql.jdbc.Driver"
+      driverClassName: "com.mysql.cj.jdbc.Driver"
       pooled: true
       properties:
         minEvictableIdleTimeMillis: 60000
