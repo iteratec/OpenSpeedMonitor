@@ -1,5 +1,5 @@
 <div class="btn-group pull-right">
-  <button type="button" id="bet-barchart-data-submit" class="btn btn-primary show-button" (click)="getBarchartData()"
+  <button type="button" id="bet-barchart-data-submit" class="btn btn-primary show-button" (click)="show()"
           [disabled]="applicationsRequired && !(applicationsSelected$ | async) ||
             pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async) ||
             measurandsRequired && !(measurandsSelected$ | async)">

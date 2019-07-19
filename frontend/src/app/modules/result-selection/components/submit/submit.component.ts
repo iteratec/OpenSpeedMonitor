@@ -1,9 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject, Observable} from "rxjs";
-import {BarchartDataService} from "../../../aggregation/services/barchart-data.service";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionCommand} from "../../models/result-selection-command.model";
-import {URL} from "../../../../enums/url.enum";
 import {RemainingResultSelection} from "../../models/remaing-result-selection.model";
 
 @Component({
@@ -22,9 +20,9 @@ export class SubmitComponent implements OnInit {
   @Input() applicationsRequired: boolean = false;
   @Input() pagesRequired: boolean = false;
   @Input() measurandsRequired: boolean = false;
-  @Input() getData: any;
+  @Output() submit: EventEmitter<void> = new EventEmitter<void>();
 
-  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
+  constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultCount$ = this.resultSelectionStore.resultCount$;
   }
 
@@ -47,19 +45,7 @@ export class SubmitComponent implements OnInit {
     });
   }
 
-  getBarchartData(): void {
-    this.barchartDataService.fetchBarchartData<any>(
-      this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingResultSelection,
-      "avg",
-      URL.AGGREGATION_BARCHART_DATA
-    ).subscribe(result => console.log(result));
-
-    this.barchartDataService.fetchBarchartData<any>(
-      this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingResultSelection,
-      50,
-      URL.AGGREGATION_BARCHART_DATA
-    ).subscribe(result => console.log(result));
+  show(): void {
+    this.submit.emit();
   }
 }
