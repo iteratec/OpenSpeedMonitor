@@ -1,36 +1,12 @@
 package de.iteratec.osm.util
 
-import de.iteratec.osm.result.JobResult
 import grails.gorm.transactions.Transactional
-import org.joda.time.format.DateTimeFormat
-import org.joda.time.format.DateTimeFormatter
 import org.supercsv.encoder.DefaultCsvEncoder
 import org.supercsv.io.CsvListWriter
 import org.supercsv.prefs.CsvPreference
 
 @Transactional
 class CsvExportService {
-
-    /**
-     * The {@link org.joda.time.format.DateTimeFormat} used for CSV export and table view.
-     */
-    static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
-
-
-    String buildTestDetailsURL(JobResult jobResult, Integer numberOfWptRun, Integer oneBasedStepIndexInJourney) {
-        String urlString = "no_job_result_available"
-
-        if (jobResult) {
-            String baseUrl = jobResult?.wptServerBaseurl?.toString()
-            String testId = jobResult?.testId?.toString()
-            String wptRun = numberOfWptRun.toString()
-            String step = oneBasedStepIndexInJourney.toString()
-
-            urlString = "${baseUrl}result/${testId}/${wptRun}/details/#waterfall_view_step${step}"
-        }
-
-        return urlString
-    }
 
     /**
      * Writes given data as csv file to target.
