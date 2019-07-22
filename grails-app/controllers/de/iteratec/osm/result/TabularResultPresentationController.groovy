@@ -34,6 +34,7 @@ import de.iteratec.osm.util.CsvExportService
 import org.hibernate.sql.JoinType
 import org.joda.time.DateTime
 import org.joda.time.Interval
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.format.DateTimeFormatter
 import org.joda.time.format.ISODateTimeFormat
 
@@ -48,6 +49,10 @@ import org.joda.time.format.ISODateTimeFormat
 class TabularResultPresentationController {
 
     private final static String JAVASCRIPT_DATE_FORMAT_STRING = 'dd.mm.yyyy'
+    /**
+     * The {@link org.joda.time.format.DateTimeFormat} used for CSV export and table view.
+     */
+    private static final DateTimeFormatter CSV_TABLE_DATE_TIME_FORMAT = DateTimeFormat.forPattern("dd.MM.yyyy HH:mm:ss")
 
     JobGroupService jobGroupService
     BrowserService browserService
@@ -381,11 +386,11 @@ class TabularResultPresentationController {
             }
         }
 
-        final DateTimeFormatter FORMATTER = csvExportService.CSV_TABLE_DATE_TIME_FORMAT;
+
         // round doubles and convert date
         result.each { row ->
             // jobResultDate
-            row[0] = FORMATTER.print(new DateTime(row[0]))
+            row[0] = CSV_TABLE_DATE_TIME_FORMAT.print(new DateTime(row[0]))
             // csByWptDocCompleteInPercent
             row[8] = row[8]?.round(2).toString()
             // csByWptVisuallyCompleteInPercent
