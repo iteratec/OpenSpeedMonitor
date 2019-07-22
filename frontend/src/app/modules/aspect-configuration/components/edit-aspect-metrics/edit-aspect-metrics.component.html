@@ -15,7 +15,8 @@
                         class="aspect-inspect"></osm-aspect-metrics>
   </div>
   <div class="card">
-    <osm-metric-finder></osm-metric-finder>
+    <osm-metric-finder [selectedMetric] = "selectedMetric"
+    ></osm-metric-finder>
     <button class="btn btn-primary btn-aspect-config"
             [disabled]="!grailsBridgeService.globalOsmNamespace.user.loggedIn" (click)="persistAspect()">{{'frontend.default.button.save' | translate}}</button>
   </div>
