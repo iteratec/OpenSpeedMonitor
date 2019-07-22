@@ -113,6 +113,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
 
     }
 
+    @Ignore
     void "Get extended Browser informations for Browser with inconclusive location informations"() {
         given: "Two browsers with conclusive and one with inconclusive location information"
         Browser chrome = Browser.build(name: "Chrome")
