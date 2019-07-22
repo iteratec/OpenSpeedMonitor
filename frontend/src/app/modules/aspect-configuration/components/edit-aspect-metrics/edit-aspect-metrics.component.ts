@@ -34,20 +34,22 @@ export class EditAspectMetricsComponent implements OnInit {
   browserId$ = new ReplaySubject<number>(1);
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
   aspectType$: Observable<PerformanceAspectType>;
-  private selectedAspect: ExtendedPerformanceAspect;
-  private selectedMetric: string;
+  grailsBridgeService: GrailsBridgeService;
+  selectedAspect: ExtendedPerformanceAspect;
+  selectedMetric: string;
 
   constructor(
     private route: ActivatedRoute,
     private applicationService: ApplicationService,
     private aspectConfService: AspectConfigurationService,
     private metricFinderService: MetricFinderService,
-    private grailsBridgeService: GrailsBridgeService) {
-
+    grailsBridgeService: GrailsBridgeService
+  ) {
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
     this.performanceAspects$ = aspectConfService.extendedAspects$;
     this.aspectType$ = aspectConfService.selectedAspectType$;
+    this.grailsBridgeService = grailsBridgeService;
     this.initMetricFinderDataLoading();
   }
 
