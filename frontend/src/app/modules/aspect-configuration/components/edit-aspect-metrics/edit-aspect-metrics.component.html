@@ -18,6 +18,6 @@
     <osm-metric-finder [selectedMetric] = "selectedMetric"
     ></osm-metric-finder>
     <button class="btn btn-primary btn-aspect-config"
-            [disabled]="" (click)="persistAspect()">{{'frontend.default.button.save' | translate}}</button>
+            [disabled]="!grailsBridgeService.globalOsmNamespace.user.loggedIn" (click)="persistAspect()">{{'frontend.default.button.save' | translate}}</button>
   </div>
 </div>
