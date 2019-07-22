@@ -10,6 +10,7 @@ import {distinctUntilChanged, withLatestFrom} from "rxjs/operators";
 import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
 import {MetricFinderComponent} from "../../../metric-finder/metric-finder.component";
 import {AspectMetricsComponent} from "../aspect-metrics/aspect-metrics.component";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 
 @Component({
   selector: 'osm-edit-aspect-metrics',
@@ -35,7 +36,8 @@ export class EditAspectMetricsComponent implements OnInit {
     private route: ActivatedRoute,
     private applicationService: ApplicationService,
     private aspectConfService: AspectConfigurationService,
-    private metricFinderService: MetricFinderService) {
+    private metricFinderService: MetricFinderService,
+    private grailsBridgeService: GrailsBridgeService) {
 
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;

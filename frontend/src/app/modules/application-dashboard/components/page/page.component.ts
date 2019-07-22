@@ -9,6 +9,7 @@ import {ResponseWithLoadingState} from "../../../../models/response-with-loading
 import {Application} from "../../../../models/application.model";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {PerformanceAspectTypes} from "../../../../enums/performance-aspect-types.enum";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
 
 @Component({
   selector: 'osm-page',
