@@ -1,10 +1,12 @@
 <h1>
   <span *ngFor="let chart of chartSwitchMenu">
-    <a *ngIf="!router.url.startsWith(chart.baseUrl)" [href]="chart.baseUrl" class="btn">
-      <i [ngClass]="chart.icon"></i>
-    </a>
-    <span *ngIf="router.url.startsWith(chart.baseUrl)">
+    <span *ngIf="router.url.startsWith(chart.baseUrl); else showIcon">
       {{ chart.label | translate }} (Dev)
     </span>
+    <ng-template #showIcon>
+      <a [href]="chart.baseUrl" class="btn">
+      <i [ngClass]="chart.icon"></i>
+    </a>
+    </ng-template>
   </span>
 </h1>
