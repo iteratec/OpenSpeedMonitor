@@ -13,34 +13,34 @@ class GetBarchartCommand implements Validateable {
     DateTime toComparative
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedPages'])
+        return new JsonSlurper().parseText(source['pages'])
     })
-    List<String> selectedPages
+    List<Long> pages = []
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedJobGroups'])
+        return new JsonSlurper().parseText(source['jobGroups'])
     })
-    List<String> selectedJobGroups
+    List<Long> jobGroups = []
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedSeries'])
+        return new JsonSlurper().parseText(source['measurands'])
     })
-    List selectedSeries
+    List<String> measurands = []
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedBrowsers'])
+        return new JsonSlurper().parseText(source['browsers'])
     })
-    List<Long> selectedBrowsers
+    List<Long> browsers = []
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedDeviceTypes'])
+        return new JsonSlurper().parseText(source['deviceTypes'])
     })
-    List selectedDeviceTypes
+    List<String> deviceTypes = []
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['selectedOperatingSystems'])
+        return new JsonSlurper().parseText(source['operatingSystems'])
     })
-    List selectedOperatingSystems
+    List<String> operatingSystems = []
 
-    String selectedAggregationValue
+    String aggregationValue
 }

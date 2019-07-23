@@ -23,22 +23,29 @@ export class PageLocationConnectivityComponent implements OnInit {
   activeTab: ActiveTab;
   ResultSelectionCommandParameter = ResultSelectionCommandParameter;
 
-  @Input() showMeasuredStepSelection: boolean = true;
-  @Input() showLocationSelection: boolean = true;
-  @Input() showPageSelection: boolean = true;
-  @Input() showBrowserSelection: boolean = true;
-  @Input() showConnectivitySelection: boolean = true;
+  @Input() showPageSelection: boolean = false;
+  @Input() showBrowserSelection: boolean = false;
+  @Input() showConnectivitySelection: boolean = false;
+  @Input() showMeasuredStepSelection: boolean = false;
+  @Input() showLocationSelection: boolean = false;
 
   constructor(private resultSelectionService: ResultSelectionService, private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.registerComponent(UiComponent.PAGE);
-    this.resultSelectionStore.registerComponent(UiComponent.LOCATION);
-    this.resultSelectionStore.registerComponent(UiComponent.CONNECTIVITY);
     this.eventsAndPages$ = this.resultSelectionStore.eventsAndPages$;
     this.locationsAndBrowsers$ = this.resultSelectionStore.locationsAndBrowsers$;
     this.connectivities$ = this.resultSelectionStore.connectivities$;
   }
 
   ngOnInit(): void {
+    if (this.showMeasuredStepSelection || this.showPageSelection) {
+      this.resultSelectionStore.registerComponent(UiComponent.PAGE);
+    }
+    if (this.showLocationSelection || this.showBrowserSelection) {
+      this.resultSelectionStore.registerComponent(UiComponent.LOCATION);
+    }
+    if (this.showConnectivitySelection) {
+      this.resultSelectionStore.registerComponent(UiComponent.CONNECTIVITY);
+    }
+
     if (this.showPageSelection) {
       this.activeTab = ActiveTab.PageAndEvent;
     }

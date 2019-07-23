@@ -32,6 +32,8 @@ class UrlMappings {
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/applicationDashboard/**?"(view: "/angularFrontend")
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
+        "/aggregation/getBarchartData"(controller: "aggregation/getBarchartData")
+        "/aggregationDev/**?"(view: "/angularFrontend")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
         "/metricFinder/**?"(view: "/angularFrontend")
@@ -195,5 +197,11 @@ class UrlMappings {
             action = [POST: "receiveCallback"]
         }
 
+        // AggregationController //////////////////////////////////////////
+
+        "/aggregation/getBarchartData" {
+            controller = "aggregation"
+            action = "getBarchartData"
+        }
     }
 }

@@ -267,16 +267,16 @@ OpenSpeedMonitor.ChartModules.GuiHandling.aggregation = (function () {
         var queryData = {
             from: selectedTimeFrame[0].toISOString(),
             to: selectedTimeFrame[1].toISOString(),
-            selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
-                return $(e).text()
-            })),
-            selectedPages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
-                return $(e).text()
-            })),
-            selectedBrowsers: JSON.stringify($.map($("#selectedBrowsersHtmlId option:selected"), function (e) {
+            jobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
                 return $(e).val()
             })),
-            selectedSeries: JSON.stringify(selectedSeries)
+            pages: JSON.stringify($.map($("#pageSelectHtmlId option:selected"), function (e) {
+                return $(e).val()
+            })),
+            browsers: JSON.stringify($.map($("#selectedBrowsersHtmlId option:selected"), function (e) {
+                return $(e).val()
+            })),
+            measurands: JSON.stringify(selectedSeries[0].measurands)
         };
 
         if (comparativeTimeFrame) {
@@ -299,9 +299,9 @@ OpenSpeedMonitor.ChartModules.GuiHandling.aggregation = (function () {
     };
 
     function getDataForAggregationValue(aggregationValue, queryData, isStateChange) {
-        queryData.selectedAggregationValue = aggregationValue;
+        queryData.aggregationValue = aggregationValue;
         $.ajax({
-            type: 'POST',
+            type: 'GET',
             data: queryData,
             url: OpenSpeedMonitor.urls.aggregationGetData,
             dataType: "json",

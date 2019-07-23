@@ -3,7 +3,7 @@ import {
   ResultSelectionCommand,
   ResultSelectionCommandParameter
 } from "../models/result-selection-command.model";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subject} from "rxjs";
 import {MeasuredEvent} from "../../../models/measured-event.model";
 import {Location} from "../../../models/location.model";
 import {Connectivity} from "../../../models/connectivity.model";
@@ -14,12 +14,14 @@ import {ResponseWithLoadingState} from "../../../models/response-with-loading-st
 import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.model";
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
+import {RemainingResultSelection, RemainingResultSelectionParameter} from "../models/remaing-result-selection.model";
 
 @Injectable()
 export class ResultSelectionStore {
   from: Date;
   to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
+  _remainingResultSelection$: BehaviorSubject<RemainingResultSelection>;
 
   applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({isLoading: false, data: []});
   applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({isLoading: false, data: []});
@@ -32,30 +34,33 @@ export class ResultSelectionStore {
   requestCounts$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   requestSizes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   percentages$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
-  resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(-1);
+  resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+
+  reset$: Subject<void> = new Subject<void>();
 
   constructor(private resultSelectionService: ResultSelectionService) {
     let defaultFrom = new Date();
     let defaultTo = new Date();
     defaultFrom.setDate(defaultTo.getDate() - 3);
     this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
+    this._remainingResultSelection$ = new BehaviorSubject({});
   }
 
   registerComponent(component: UiComponent): void {
-    if(component === UiComponent.MEASURAND) {
-      this.loadMeasurands(this._resultSelectionCommand$.getValue());
+    if (component === UiComponent.MEASURAND) {
+      this.loadMeasurands(this.resultSelectionCommand);
     }
 
     this._resultSelectionCommand$.subscribe(state => {
-      if(component === UiComponent.APPLICATION) {
+      if (component === UiComponent.APPLICATION) {
         this.loadSelectableApplications(state);
-      } else if(component === UiComponent.PAGE) {
+      } else if (component === UiComponent.PAGE) {
         this.loadSelectableEventsAndPages(state);
-      } else if(component === UiComponent.LOCATION) {
+      } else if (component === UiComponent.LOCATION) {
         this.loadSelectableLocationsAndBrowsers(state);
-      } else if(component === UiComponent.CONNECTIVITY) {
+      } else if (component === UiComponent.CONNECTIVITY) {
         this.loadSelectableConnectivities(state);
-      } else if(component === UiComponent.MEASURAND) {
+      } else if (component === UiComponent.MEASURAND) {
         this.loadUserTimings(state);
         this.loadHeroTimings(state);
       }
@@ -74,9 +79,25 @@ export class ResultSelectionStore {
     return this._resultSelectionCommand$.getValue();
   }
 
-  private setResultSelectionCommand(newState: ResultSelectionCommand): void {
-    this.loadResultCount(newState);
+  setResultSelectionCommand(newState: ResultSelectionCommand): void {
     this._resultSelectionCommand$.next(newState);
+    this.loadResultCount(newState);
+  }
+
+  setRemainingResultSelectionComparativeTimeFrame(timeFrame: Date[]): void {
+    this.setRemainingResultSelection({...this.remainingResultSelection, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
+  }
+
+  setRemainingResultSelectionEnums(enums: string[], type: RemainingResultSelectionParameter): void {
+    this.setRemainingResultSelection({...this.remainingResultSelection, [type]: enums});
+  }
+
+  get remainingResultSelection(): RemainingResultSelection {
+    return this._remainingResultSelection$.getValue();
+  }
+
+  private setRemainingResultSelection(newState: RemainingResultSelection): void {
+    this._remainingResultSelection$.next(newState);
   }
 
   private loadSelectableApplications(resultSelectionCommand: ResultSelectionCommand): void {

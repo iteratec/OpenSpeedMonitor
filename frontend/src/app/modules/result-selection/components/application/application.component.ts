@@ -17,88 +17,116 @@ export class ApplicationComponent {
   selectedApplications: number[] = [];
   selectableTags: string[];
   selectedTag: string = '';
+  unfilteredSelectedApplications: number[] = [];
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
-    this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
     this.resultSelectionStore.applications$.subscribe(applications => {
       this.updateApplicationsAndTags(applications.data);
     });
   }
 
-  updateApplicationsAndTags(applications: SelectableApplication[]): void {
-    if(applications != null && applications.length > 0) {
-      applications.sort((a, b) => {
-        return a.name.localeCompare(b.name);
-      });
-      this.applications = applications;
-      this.updateTags(applications);
+  ngOnInit() {
+    this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
+    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection())
+  }
 
-      if (this.isTagSelected && (this.selectableTags.indexOf(this.selectedTag) > -1)) {
-        this.filterApplicationsByTag(this.selectedTag);
-      } else {
-        this.removeSelection(applications);
-      }
-    } else {
-      this.updateTags(applications);
-      this.removeSelection(applications)
+  onSelectionChange() {
+    this.unfilteredSelectedApplications = [];
+    if (this.selectedApplications) {
+      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
     }
   }
 
   selectTag(tag: string): void {
-    this.filterApplicationsByTag(tag);
-    if(this.isTagSelected()) {
-      this.selectedTag = tag;
-    } else {
+    if (tag == this.selectedTag && this.isTagSelected()) {
       this.selectedTag = '';
+    } else {
+      this.selectedTag = tag;
     }
+    this.filterApplicationsByTag(tag);
   }
 
   isTagSelected(): boolean {
-    return this.applications.length != this.filteredApplications.length;
+    return this.selectedTag != '';
+  }
+
+  updateApplicationsAndTags(applications: SelectableApplication[]) {
+    this.updateApplications(applications);
+    this.updateTags(applications);
+    this.filterApplicationsByTag(this.selectedTag);
+  }
+
+  private updateApplications(applications: SelectableApplication[]): void {
+    if (applications != null && applications.length > 0) {
+      this.applications = ApplicationComponent.sortByName(applications);
+    } else {
+      this.applications = [];
+    }
   }
 
   private updateTags(applications: SelectableApplication[]) {
-    if(applications) {
+    if (applications) {
       this.selectableTags = applications.map(value => value.tags).reduce((a, b) =>
          a.concat(b), []).filter((v, i, a) => 
          a.indexOf(v) === i);
     } else {
       this.selectableTags = [];
     }
+    if (this.selectableTags.indexOf(this.selectedTag) == -1) {
+      this.selectedTag = '';
+    }
   }
 
   private filterApplicationsByTag(tag: string): void {
-    if (tag !== this.selectedTag) {
-      let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
-      let numberOfSelectedApplications = 0;
-      if (this.applications) {
-        this.filteredApplications = this.applications.filter((app: SelectableApplication) => app.tags.indexOf(tag) > -1);
-        this.selectedApplications = this.selectedApplications.filter((selectedAppId: number) =>
-          this.filteredApplications.map(item => item.id).includes(selectedAppId)
-        );
-      }
-      if (this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
+    this.filteredApplications = this.filterSelectableApplicationsByTag(tag);
+    this.filterSelectedApplications();
+  }
+
+  private resetResultSelection(): void {
+    if (this.unfilteredSelectedApplications.length > 0 || this.selectedApplications.length > 0 || this.isTagSelected()) {
+      this.unfilteredSelectedApplications = [];
+      this.selectedApplications = [];
+      this.selectedTag = '';
+      this.filterApplicationsByTag(this.selectedTag);
+    }
+  }
+
+  private filterSelectableApplicationsByTag(tag: string): SelectableApplication[] {
+    if (this.isTagSelected() && this.applications) {
+      return this.applications.filter((app: SelectableApplication) => app.tags.indexOf(tag) > -1);
+    } else if (!this.isTagSelected()) {
+      return this.applications;
+    }
+  }
+
+  private filterSelectedApplications(): void {
+    let selectedApplications: number[] = [];
+    if (this.unfilteredSelectedApplications.length == 0) {
+      selectedApplications = this.selectedApplications.filter((selectedAppId: number) =>
+        this.filteredApplications.map(item => item.id).includes(selectedAppId)
+      );
+      if (this.selectedApplications.length > selectedApplications.length) {
+        this.unfilteredSelectedApplications = this.selectedApplications;
+        this.selectedApplications = selectedApplications;
         this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
       }
     } else {
-      this.filteredApplications = this.applications;
+      selectedApplications = this.unfilteredSelectedApplications.filter((selectedAppId: number) =>
+        this.filteredApplications.map(item => item.id).includes(selectedAppId)
+      );
+      if (this.unfilteredSelectedApplications.length == selectedApplications.length) {
+        this.unfilteredSelectedApplications = [];
+      }
+      if (selectedApplications.length > this.selectedApplications.length) {
+        this.selectedApplications = selectedApplications;
+        this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
+      }
     }
   }
 
-  private removeSelection(applications: SelectableApplication[]) {
-    this.filteredApplications = applications;
-    let numberOfPreviouslySelectedApplications = this.selectedApplications.length;
-    this.selectedApplications = this.selectedApplications.filter(item =>
-      applications.map(item => item.id).includes(item)
-    );
-    if(this.selectedApplications.length !== numberOfPreviouslySelectedApplications) {
-      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
-    }
-  }
-
-  onSelectionChange() {
-    if(this.selectedApplications) {
-      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
-    }
+  private static sortByName(applications: SelectableApplication[]): SelectableApplication[] {
+    return applications.sort((a, b) => {
+      return a.name.localeCompare(b.name);
+    });
   }
 }

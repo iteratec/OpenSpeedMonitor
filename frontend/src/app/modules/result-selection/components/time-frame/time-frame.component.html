@@ -1,11 +1,11 @@
 <div class="card form-horizontal">
   <h2>
-    <ng-container *ngIf="enableAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }} & </ng-container>
+    <ng-container *ngIf="showAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }} & </ng-container>
     {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}
   </h2>
 
-  <div class="row form-group" *ngIf="enableAggregation">
-    <label class="control-label col-md-4">
+  <div class="row form-group" *ngIf="showAggregation">
+    <label class="control-label col-md-3">
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}:
     </label>
     <div class="col-md-8">
@@ -18,7 +18,7 @@
   </div>
 
   <div class="row form-group">
-    <label class="control-label col-md-4">
+    <label class="control-label col-md-3">
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}:
     </label>
     <div class="col-md-8">
@@ -31,7 +31,7 @@
   </div>
 
   <div class="row form-group">
-    <div class="col-md-4">
+    <div class="col-md-3 time-frame-label">
       <label for="main-date-time-picker" class="text-muted sub" *ngIf="comparativeSelectionActive">
         {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.label' | translate }}
       </label>
@@ -51,13 +51,10 @@
   <ng-template #showComparativeSelection>
     <div>
       <div class="row form-group">
-        <div class="col-md-4">
+        <div class="col-md-3 time-frame-label">
           <label for="comparative-date-time-picker" class="text-muted sub">
             {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.label' | translate }}
           </label>
-          <a (click)="toggleComparativeSelection()" style="margin-left: 5px; cursor: pointer;">
-            <i class="fas fa-times"></i>
-          </a>
         </div>
         <div class="col-md-8" id="comparative-date-time-picker">
           <div class="input-group">
@@ -68,13 +65,18 @@
             <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeTo'" [max]="max">
           </div>
         </div>
+        <div class="col-md-1 remove-comparative-time-frame">
+          <a (click)="toggleComparativeSelection()">
+            <i class="fas fa-times"></i>
+          </a>
+        </div>
       </div>
     </div>
   </ng-template>
 
-  <div class="row form-group" *ngIf="!comparativeSelectionActive && enableComparative">
-    <div class="col-md-8 col-md-offset-4">
-      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()">
+  <div class="row form-group" *ngIf="!comparativeSelectionActive && showComparativeTimeFrame">
+    <div class="col-md-8 col-md-offset-3">
+      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="toggleComparativeSelection()" [disabled]="resultSelectionStore.remainingResultSelection.measurands?.length > 1">
         <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
       </button>
     </div>

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
@@ -7,9 +7,10 @@ import {map} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
 import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
+import {RemainingResultSelectionParameter} from "../../models/remaing-result-selection.model";
 
 @Component({
-  selector: 'osm-measurands',
+  selector: 'osm-result-selection-measurands',
   templateUrl: './measurands.component.html',
   styleUrls: ['./measurands.component.scss']
 })
@@ -22,9 +23,12 @@ export class MeasurandsComponent implements OnInit {
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
+  addingComparativeTimeFrameDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+
+  @Input() multipleMeasurands = false;
+  @Input() addingMeasurandsDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private resultSelectionStore: ResultSelectionStore, private performanceAspectService: PerformanceAspectService) {
-    this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
     this.measurands$.next({
       ...this.measurands$.getValue(),
       data: [
@@ -36,14 +40,11 @@ export class MeasurandsComponent implements OnInit {
         this.resultSelectionStore.percentages$
       ]
     });
-    this.resultSelectionStore.loadTimes$.subscribe(next => {
-      this.defaultValue = next.values[0];
-      this.selectedMeasurands = [this.defaultValue];
-    });
-    this.aspectTypes$ = performanceAspectService.aspectTypes$;
+    this.setDefaultValue();
   }
 
   ngOnInit() {
+    this.resultSelectionStore.registerComponent(UiComponent.MEASURAND);
     this.loadingState().subscribe(next => {
       this.measurands$.next({...this.measurands$.getValue(), isLoading: next});
     });
@@ -51,18 +52,36 @@ export class MeasurandsComponent implements OnInit {
 
   selectMeasurand(index: number, measurand: SelectableMeasurand) {
     this.selectedMeasurands[index] = measurand;
+    this.setMeasurandIds();
   }
 
   addMeasurandField() {
     this.selectedMeasurands.push(this.defaultValue);
+    this.setMeasurandIds();
+    this.addingComparativeTimeFrameDisabled$.next(true);
   }
 
   removeMeasurandField(index: number) {
     this.selectedMeasurands.splice(index, 1);
+    this.setMeasurandIds();
+    if (this.selectedMeasurands.length == 1) {
+      this.addingComparativeTimeFrameDisabled$.next(false);
+    }
   }
 
   trackByFn(index: number, item: any) {
     return index;
+  }
+
+  setDefaultValue() {
+    this.resultSelectionStore.loadTimes$.subscribe((next: MeasurandGroup) => {
+      this.defaultValue = next.values[0];
+      this.selectedMeasurands = [this.defaultValue];
+      this.aspectTypes$ = this.performanceAspectService.aspectTypes$;
+      if (this.defaultValue) {
+        this.setMeasurandIds();
+      }
+    });
   }
 
   private loadingState(): Observable<boolean> {
@@ -76,5 +95,12 @@ export class MeasurandsComponent implements OnInit {
     ).pipe(
         map(next => next.map(item => item.isLoading).some(value => value))
     )
+  }
+
+  private setMeasurandIds() {
+    this.resultSelectionStore.setRemainingResultSelectionEnums(
+      this.selectedMeasurands.map((measurand: SelectableMeasurand) => measurand.id),
+      RemainingResultSelectionParameter.MEASURANDS
+    );
   }
 }
