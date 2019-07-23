@@ -41,8 +41,8 @@ export class SubmitComponent implements OnInit {
       if (next.measurands) {
         this.measurandsOrPerformanceAspectsSelected$.next(next.measurands.length > 0);
       }
-      if (next.performanceAspects) {
-        this.measurandsOrPerformanceAspectsSelected$.next(this.measurandsOrPerformanceAspectsSelected$.getValue() || next.performanceAspects.length > 0)
+      if (next.performanceAspectTypes) {
+        this.measurandsOrPerformanceAspectsSelected$.next(this.measurandsOrPerformanceAspectsSelected$.getValue() || next.performanceAspectTypes.length > 0)
       }
     });
   }

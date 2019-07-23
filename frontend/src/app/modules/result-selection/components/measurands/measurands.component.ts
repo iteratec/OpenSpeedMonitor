@@ -101,8 +101,8 @@ export class MeasurandsComponent implements OnInit {
     this.resultSelectionStore.setRemainingResultSelectionEnums(
       this.selectedMeasurands.filter((item: PerformanceAspectType | SelectableMeasurand) => {
         return !('id' in item)
-      }).map((performanceAspect: PerformanceAspectType) => performanceAspect.name),
-      RemainingResultSelectionParameter.PERFORMANCE_ASPECTS
+      }).map((performanceAspectType: PerformanceAspectType) => performanceAspectType.name),
+      RemainingResultSelectionParameter.PERFORMANCE_ASPECT_TYPES
     );
     this.resultSelectionStore.setRemainingResultSelectionEnums(
       this.selectedMeasurands.filter((item: PerformanceAspectType | SelectableMeasurand) => {

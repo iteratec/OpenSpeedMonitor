@@ -8,6 +8,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.OperatingSystem
+import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
@@ -52,25 +53,31 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        return aggregateWithComparativesForMeasurandOrUserTiming(measurands, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.aggregationValue, cmd.browsers, deviceTypes, operatingSystems)
+        List<PerformanceAspectType> performanceAspectTypes = []
+        if (cmd.performanceAspectTypes) {
+            performanceAspectTypes = cmd.performanceAspectTypes.collect{it.toString().toUpperCase() as PerformanceAspectType}
+        }
+
+        return aggregateWithComparativesForMeasurandOrUserTiming(measurands, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.aggregationValue, cmd.browsers, deviceTypes, operatingSystems, performanceAspectTypes)
     }
 
     List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative,
                                                                                 List<JobGroup> allJobGroups, List<Page> allPages, String selectedAggregationValue, List<Long> browserIds,
-                                                                                List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems) {
-        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems)
+                                                                                List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems, List<PerformanceAspectType> performanceAspectTypes) {
+        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems, performanceAspectTypes)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
-            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems)
+            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems, performanceAspectTypes)
         }
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
     List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages,
-                                           String selectedAggregationValue, List<Long> browserIds, List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems) {
-        if (!selectedMeasurands) {
+                                           String selectedAggregationValue, List<Long> browserIds, List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems, List<PerformanceAspectType> performanceAspectTypes) {
+        if (!selectedMeasurands && !performanceAspectTypes) {
             return []
         }
+        // TODO performanceApects
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
 
         EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder()
@@ -94,6 +101,10 @@ class BarchartAggregationService {
 
         if (operatingSystems) {
             queryBuilder = queryBuilder.withOperatingSystems(operatingSystems)
+        }
+
+        if (performanceAspectTypes) {
+            queryBuilder = queryBuilder.withPerformanceAspects(performanceAspectTypes)
         }
 
         List<EventResultProjection> eventResultProjections = []

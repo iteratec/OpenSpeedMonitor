@@ -28,7 +28,7 @@ export class BarchartDataService {
       pages: resultSelectionCommand.pageIds,
       jobGroups: resultSelectionCommand.jobGroupIds,
       measurands: remainingResultSelection.measurands,
-      performanceAspects: remainingResultSelection.performanceAspects,
+      performanceAspectTypes: remainingResultSelection.performanceAspectTypes,
       browsers: resultSelectionCommand.browserIds,
       deviceTypes: remainingResultSelection.deviceTypes,
       operatingSystems: remainingResultSelection.operatingSystems,

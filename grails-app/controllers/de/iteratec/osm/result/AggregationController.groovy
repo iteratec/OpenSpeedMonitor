@@ -244,7 +244,7 @@ class AggregationController extends ExceptionHandlerController {
      */
     private String getErrorMessages(GetBarchartCommand cmd) {
         String result = ""
-        if (!cmd.measurands) {
+        if (!cmd.measurands && !cmd.performanceAspectTypes) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedMeasurandSeries.error.validator.error.selectedMeasurandSeries", "Please select at least one measurand series")
             result += "<br />"
         }

@@ -6,7 +6,7 @@ export interface GetBarchartCommandDTO {
   pages?: number[];
   jobGroups?: number[];
   measurands?: string[];
-  performanceAspects?: string[];
+  performanceAspectTypes?: string[];
   browsers?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
@@ -21,7 +21,7 @@ export class GetBarchartCommand implements GetBarchartCommandDTO {
   pages?: number[];
   jobGroups?: number[];
   measurands?: string[];
-  performanceAspects?: string[];
+  performanceAspectTypes?: string[];
   browsers?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
@@ -35,7 +35,7 @@ export class GetBarchartCommand implements GetBarchartCommandDTO {
     this.pages = dto.pages;
     this.jobGroups = dto.jobGroups;
     this.measurands = dto.measurands;
-    this.performanceAspects = dto.performanceAspects;
+    this.performanceAspectTypes = dto.performanceAspectTypes;
     this.browsers = dto.browsers;
     this.deviceTypes = dto.deviceTypes;
     this.operatingSystems = dto.operatingSystems;
