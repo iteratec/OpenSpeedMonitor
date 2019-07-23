@@ -10,11 +10,14 @@ import {MeasurandSelectComponent} from "../../../result-selection/components/mea
 import {ResultSelectionModule} from "../../../result-selection/result-selection.module";
 import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
 import {Application} from "../../../../models/application.model";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
+import {GlobalOsmNamespace} from "../../../../models/global-osm-namespace.model";
 
 describe('PageComponent', () => {
 
   let component: PageComponent;
   let fixture: ComponentFixture<PageComponent>;
+  let grailsBridgeService: GrailsBridgeService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
