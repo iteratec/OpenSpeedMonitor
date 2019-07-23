@@ -6,7 +6,7 @@ export interface SelectableMeasurand {
   isUserTiming?: boolean
 }
 
-export interface MeasurandGroup extends  Loading {
+export interface MeasurandGroup extends Loading {
   name: string,
   values: SelectableMeasurand[]
 }

@@ -14,7 +14,7 @@ export class MeasurandSelectComponent implements OnInit {
   @Output() onSelect: EventEmitter<SelectableMeasurand> = new EventEmitter<SelectableMeasurand>();
 
   @Input() selectableMeasurandGroups: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>>;
-  @Input() perfAspectTypes$: ReplaySubject<PerformanceAspectType[]>;
+  @Input() perfAspectTypes$: BehaviorSubject<PerformanceAspectType[]>;
 
 
   ngOnInit() {

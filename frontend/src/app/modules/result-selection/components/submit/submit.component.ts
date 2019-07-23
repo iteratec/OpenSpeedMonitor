@@ -12,9 +12,8 @@ import {RemainingResultSelection} from "../../models/remaing-result-selection.mo
 export class SubmitComponent implements OnInit {
 
   applicationsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  pagesSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  measuredEventsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  measurandsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  pagesOrMeasuredEventsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
+  measurandsOrPerformanceAspectsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   resultCount$: Observable<number>;
 
   @Input() applicationsRequired: boolean = false;
@@ -32,15 +31,18 @@ export class SubmitComponent implements OnInit {
         this.applicationsSelected$.next(next.jobGroupIds.length > 0);
       }
       if (next.pageIds) {
-        this.pagesSelected$.next(next.pageIds.length > 0);
+        this.pagesOrMeasuredEventsSelected$.next(next.pageIds.length > 0);
       }
       if (next.measuredEventIds) {
-        this.measuredEventsSelected$.next(next.measuredEventIds.length > 0);
+        this.pagesOrMeasuredEventsSelected$.next(this.pagesOrMeasuredEventsSelected$.getValue() || next.measuredEventIds.length > 0);
       }
     });
     this.resultSelectionStore._remainingResultSelection$.subscribe((next: RemainingResultSelection) => {
       if (next.measurands) {
-        this.measurandsSelected$.next(next.measurands.length > 0);
+        this.measurandsOrPerformanceAspectsSelected$.next(next.measurands.length > 0);
+      }
+      if (next.performanceAspects) {
+        this.measurandsOrPerformanceAspectsSelected$.next(this.measurandsOrPerformanceAspectsSelected$.getValue() || next.performanceAspects.length > 0)
       }
     });
   }
