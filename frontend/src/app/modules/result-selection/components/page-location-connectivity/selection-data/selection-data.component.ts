@@ -79,11 +79,9 @@ export class SelectionDataComponent implements OnInit {
   private resetResultSelection() {
     if (this.parentSelection.length > 0) {
       this.parentSelection = [];
-      this.filterSelectableItems([]);
     }
     if (this.showChildSelection && this.childSelection.length > 0) {
       this.childSelection = [];
-      this.updateResultSelectionCommand();
     }
   }
 

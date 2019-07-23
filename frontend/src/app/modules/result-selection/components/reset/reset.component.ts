@@ -14,6 +14,15 @@ export class ResetComponent implements OnInit {
   }
 
   emitResetEventToComponent() {
+    this.resultSelectionStore.setResultSelectionCommand({
+      ...this.resultSelectionStore.resultSelectionCommand,
+      jobGroupIds: [],
+      pageIds: [],
+      measuredEventIds: [],
+      browserIds: [],
+      locationIds: [],
+      selectedConnectivities: []
+    });
     this.resultSelectionStore.reset$.next();
   }
 }

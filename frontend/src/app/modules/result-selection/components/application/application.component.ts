@@ -83,12 +83,11 @@ export class ApplicationComponent {
   }
 
   private resetResultSelection(): void {
-    if (this.unfilteredSelectedApplications. length > 0 || this.selectedApplications.length > 0 || this.isTagSelected()) {
+    if (this.unfilteredSelectedApplications.length > 0 || this.selectedApplications.length > 0 || this.isTagSelected()) {
       this.unfilteredSelectedApplications = [];
       this.selectedApplications = [];
       this.selectedTag = '';
       this.filterApplicationsByTag(this.selectedTag);
-      this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
     }
   }
 
