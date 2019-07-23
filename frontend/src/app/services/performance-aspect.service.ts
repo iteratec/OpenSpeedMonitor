@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {EMPTY, ReplaySubject} from "rxjs";
+import {BehaviorSubject, EMPTY} from "rxjs";
 import {PerformanceAspectType} from "../models/perfomance-aspect.model";
 import {HttpClient} from "@angular/common/http";
 import {catchError} from "rxjs/operators";
@@ -9,7 +9,7 @@ import {catchError} from "rxjs/operators";
 })
 export class PerformanceAspectService {
 
-  aspectTypes$ = new ReplaySubject<PerformanceAspectType[]>(1);
+  aspectTypes$ = new BehaviorSubject<PerformanceAspectType[]>([]);
 
   constructor(private http: HttpClient) {
     this.loadAspectTypes();

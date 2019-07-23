@@ -5,6 +5,8 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 import {map} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
+import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
+import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {RemainingResultSelectionParameter} from "../../models/remaing-result-selection.model";
 
 @Component({
@@ -17,6 +19,7 @@ export class MeasurandsComponent implements OnInit {
     isLoading: false,
     data: []
   });
+  aspectTypes$:BehaviorSubject<PerformanceAspectType[]> = new BehaviorSubject<PerformanceAspectType[]>([]);
 
   selectedMeasurands: SelectableMeasurand[] = [];
   defaultValue: SelectableMeasurand;
@@ -25,7 +28,7 @@ export class MeasurandsComponent implements OnInit {
   @Input() multipleMeasurands = false;
   @Input() addingMeasurandsDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  constructor(private resultSelectionStore: ResultSelectionStore) {
+  constructor(private resultSelectionStore: ResultSelectionStore, private performanceAspectService: PerformanceAspectService) {
     this.measurands$.next({
       ...this.measurands$.getValue(),
       data: [
@@ -74,6 +77,7 @@ export class MeasurandsComponent implements OnInit {
     this.resultSelectionStore.loadTimes$.subscribe((next: MeasurandGroup) => {
       this.defaultValue = next.values[0];
       this.selectedMeasurands = [this.defaultValue];
+      this.aspectTypes$ = this.performanceAspectService.aspectTypes$;
       if (this.defaultValue) {
         this.setMeasurandIds();
       }
