@@ -12,4 +12,8 @@ export class TimeSeriesComponent implements OnInit {
   ngOnInit() {
   }
 
+  getTimeSeriesChartData() {
+
+  }
+
 }
