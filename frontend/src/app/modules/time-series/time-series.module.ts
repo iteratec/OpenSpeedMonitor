@@ -14,6 +14,7 @@ const TimeSeriesRoutes: Routes = [
   imports: [
     CommonModule,
     RouterModule.forChild(TimeSeriesRoutes),
+    SharedModule,
     ResultSelectionModule
   ]
 })
