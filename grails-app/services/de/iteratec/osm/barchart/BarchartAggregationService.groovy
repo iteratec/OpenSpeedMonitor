@@ -77,8 +77,8 @@ class BarchartAggregationService {
         if (!selectedMeasurands && !performanceAspectTypes) {
             return []
         }
-        // TODO performanceApects
         selectedMeasurands.unique({ a, b -> a.name <=> b.name })
+        performanceAspectTypes.unique()
 
         EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder()
                 .withJobResultDateBetween(from, to)
@@ -121,7 +121,7 @@ class BarchartAggregationService {
                     e.printStackTrace()
                 }
         }
-        return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
+        return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages, performanceAspectTypes)
     }
 
     List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
@@ -147,7 +147,7 @@ class BarchartAggregationService {
         }
 
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue, browsers, deviceTypes, operatingSystems)
+        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue, browsers, deviceTypes, operatingSystems, null)
         cmd.selectedPageComparisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
             pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.firstJobGroupId as long) && aggr.page.id == (comparison.firstPageId as long) }
@@ -168,7 +168,7 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages, List<PerformanceAspectType> performanceAspectTypes) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
@@ -176,6 +176,18 @@ class BarchartAggregationService {
             Browser browser = Browser.findById(aggregation.browserId)
             DeviceType deviceType = aggregation?.deviceType
             OperatingSystem operatingSystem = aggregation?.operatingSystem
+            result += performanceAspectTypes.collect { PerformanceAspectType aspectType ->
+                new BarchartAggregation(
+                        value: aggregation."${aspectType.name()}",
+                        performanceAspectType: aspectType,
+                        jobGroup: jobGroup,
+                        page: page,
+                        browser: browser ?: null,
+                        aggregationValue: selectedAggregationValue,
+                        deviceType: deviceType?.deviceTypeLabel,
+                        operatingSystem: operatingSystem?.OSLabel
+                )
+            }
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),

@@ -3,6 +3,7 @@ package de.iteratec.osm.barchart
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.environment.Browser
 import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import groovy.transform.EqualsAndHashCode
 
@@ -14,6 +15,7 @@ class BarchartAggregation {
     Double value
     Double valueComparative
     SelectedMeasurand selectedMeasurand
+    PerformanceAspectType performanceAspectType
     Page page
     JobGroup jobGroup
     Browser browser
