@@ -313,7 +313,7 @@ export class AggregationChartComponent implements OnChanges {
           .attr('x', datum => (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10))
           .attr('y', datum => (this.yScale(datum.sideLabel) + ChartCommons.BAR_BAND / 2))
           .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end');
-        return enter;
+        return barElement;
       },
       update => {
         update.select('.bar-rect')
