@@ -19,71 +19,8 @@ export class AggregationChartComponent implements OnChanges {
   data = {
     filterRules: {},
     hasComparativeData: false,
-    i18nMap: {
-      measurand: "Measurand",
-      jobGroup: "Job Group",
-      page: "Page",
-      comparativeImprovement: "Improvement",
-      comparativeDeterioration: "Deterioration"
-    },
-    series: [
-      {
-        aggregationValue: "avg",
-        browser: null,
-        deviceType: null,
-        jobGroup: "otto.de",
-        measurand: "DOC_COMPLETE_TIME",
-        measurandGroup: "LOAD_TIMES",
-        measurandLabel: "Document Complete",
-        operatingSystem: null,
-        page: "finn2",
-        unit: "ms",
-        value: 4314.2,
-        valueComparative: null
-      },
-      {
-        aggregationValue: "avg",
-        browser: null,
-        deviceType: null,
-        jobGroup: "LokalTest_pal",
-        measurand: "DOC_COMPLETE_TIME",
-        measurandGroup: "LOAD_TIMES",
-        measurandLabel: "Document Complete",
-        operatingSystem: null,
-        page: "really_longPage_Name54",
-        unit: "ms",
-        value: 1314.2,
-        valueComparative: null
-      },
-      {
-        aggregationValue: "avg",
-        browser: null,
-        deviceType: null,
-        jobGroup: "job group",
-        measurand: "LOAD_TIME",
-        measurandGroup: "LOAD_TIMES",
-        measurandLabel: "load time",
-        operatingSystem: null,
-        page: "finn3",
-        unit: "ms",
-        value: 2314.2,
-        valueComparative: null
-      },
-      {
-        aggregationValue: "avg",
-        browser: null,
-        deviceType: null,
-        jobGroup: "Transfermarkt",
-        measurand: "DOC_COMPLETE_TIME",
-        measurandGroup: "LOAD_TIMES",
-        measurandLabel: "Document Complete",
-        operatingSystem: null,
-        page: "finn5_biggest_val",
-        unit: "ms",
-        value: 23214.2,
-        valueComparative: null
-      }
-    ]
+    i18nMap: {},
+    series: []
   };
 
 
@@ -247,8 +184,8 @@ export class AggregationChartComponent implements OnChanges {
     const contentGroupSelector: string = '.bars-content-group';
 
     this.renderBarGroup(contentGroupSelector);
-    this.renderChartScoreGroup();
-    this.renderLengendGroup();
+    this.renderChartScoreGroup(contentGroupSelector);
+    this.renderLegendGroup(contentGroupSelector);
   }
 
   private renderBarGroup(contentGroupSelector: string) {
@@ -307,12 +244,14 @@ export class AggregationChartComponent implements OnChanges {
           .attr('dominant-baseline', 'middle')
           .style('fill', 'white')
           .style('font-weight', 'bold')
+          .style('opacity', 0)
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
           .text(datum => `${this.formatBarValue(datum.value)} ${datum.unit}`)
           .attr('x', datum => (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10))
           .attr('y', datum => (this.yScale(datum.sideLabel) + ChartCommons.BAR_BAND / 2))
-          .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end');
+          .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end')
+          .style('opacity', (datum, index, groups) => ((groups[index].getComputedTextLength() + 2 * 10) > this.barWidth(this.xScale, datum.value)) ? 0 : 1);
         return barElement;
       },
       update => {
@@ -329,7 +268,8 @@ export class AggregationChartComponent implements OnChanges {
           .text(datum => `${this.formatBarValue(datum.value)} ${datum.unit}`)
           .attr('x', datum => (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10))
           .attr('y', datum => (this.yScale(datum.sideLabel) + ChartCommons.BAR_BAND / 2))
-          .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end');
+          .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end')
+          .style('opacity', (datum, index, groups) => ((groups[index].getComputedTextLength() + 2 * 10) > this.barWidth(this.xScale, datum.value)) ? 0 : 1);
         return update;
       },
       exit => exit
@@ -340,139 +280,128 @@ export class AggregationChartComponent implements OnChanges {
     );
   }
 
-  private renderChartScoreGroup() {
-    const scoreGroup = select('.bars-content-group').selectAll('.chart-score-group').data([1]);
-    scoreGroup.exit()
-      .remove()
-      .transition()
-      .duration(ChartCommons.TRANSITION_DURATION);
-    scoreGroup.enter()
-      .append('g')
-      .attr('class', 'chart-score-group')
-      .attr('transform', 'translate(0, ' + this.barScorePosY + ')');
-    this.renderChartScores();
+  private renderChartScoreGroup(contentGroupSelector: string) {
+    const scoreGroup = select(contentGroupSelector).selectAll('.chart-score-group').data([1]);
+    scoreGroup.join(
+      enter => enter
+        .append('g')
+        .attr('class', 'chart-score-group'),
+      update => update,
+      exit => exit.remove()
+    )
+      .attr('transform', `translate(0, ${this.barScorePosY})`);
+
+    const scoreBars = select('.chart-score-group').selectAll('.score-bar').data(this.dataForBarScore);
+    const scaleForScoreBar = scaleLinear().rangeRound([0, this.barsWidth]).domain([this.minValue, this.maxValue]);
+
+    scoreBars.join(
+      enter => {
+        const scoreBarElement = enter
+          .append('g')
+          .attr('class', 'score-bar');
+        scoreBarElement
+          .append('rect')
+          .attr('class', 'score-rect')
+          .attr('height', ChartCommons.BAR_BAND)
+          .attr('width', 0)
+          .attr('x', 0)
+          .transition()
+          .duration(ChartCommons.TRANSITION_DURATION)
+          .attr('fill', datum => datum.fill)
+          .attr('width', datum => scaleForScoreBar(datum.end) - scaleForScoreBar(datum.start))
+          .attr('x', datum => scaleForScoreBar(datum.start));
+        scoreBarElement
+          .append('text')
+          .attr('class', 'score-value')
+          .attr('dominant-baseline', 'middle')
+          .attr('text-anchor', "middle")
+          .attr('x', 0)
+          .attr('y', ChartCommons.BAR_BAND / 2)
+          .style('opacity', 0)
+          .transition()
+          .duration(ChartCommons.TRANSITION_DURATION)
+          .text(datum => datum.label)
+          .style('opacity', (datum, index, groups) => groups[index].getComputedTextLength() + 20 > (scaleForScoreBar(datum.end) - scaleForScoreBar(datum.start)) / 2 ? 0 : 1)
+          .attr('x', datum => (scaleForScoreBar(datum.end) + scaleForScoreBar(datum.start)) / 2);
+        return scoreBarElement;
+      },
+      update => {
+        update.select('.score-rect')
+          .transition()
+          .duration(ChartCommons.TRANSITION_DURATION)
+          .attr('fill', datum => datum.fill)
+          .attr('width', datum => scaleForScoreBar(datum.end) - scaleForScoreBar(datum.start))
+          .attr('x', datum => scaleForScoreBar(datum.start));
+        update.select<SVGTextElement>('.score-value')
+          .transition()
+          .duration(ChartCommons.TRANSITION_DURATION)
+          .text(datum => datum.label)
+          .style('opacity', (datum, index, groups) => groups[index].getComputedTextLength() + 20 > (scaleForScoreBar(datum.end) - scaleForScoreBar(datum.start)) / 2 ? 0 : 1)
+          .attr('x', datum => (scaleForScoreBar(datum.end) + scaleForScoreBar(datum.start)) / 2);
+        return update;
+      },
+      exit => exit
+        .transition()
+        .duration(ChartCommons.TRANSITION_DURATION)
+        .style('opacity', 0)
+        .remove()
+    );
   }
 
-  private renderChartScores() {
-    const scores = select('.chart-score-group').selectAll('.scoreBar').data(this.dataForBarScore);
+  private renderLegendGroup(contentGroupSelector: string) {
+    const legendGroup = select(contentGroupSelector).selectAll('.chart-legend-group').data([1]);
+    legendGroup.join(
+      enter => enter
+        .append('g')
+        .attr('class', 'chart-legend-group'),
+      update => update,
+      exit => exit.remove()
+    )
+      .attr('transform', `translate(0, ${this.legendPosY})`);
 
-    scores.exit()
-      .transition()
-      .duration(ChartCommons.TRANSITION_DURATION)
-      .style('opacity', 0)
-      .remove();
+    const legendEntry = select('.chart-legend-group').selectAll('.legend-entry').data(this.dataForLegend);
+    const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement);
+    const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
 
-    const score = scores.enter()
-      .append('g')
-      .attr('class', 'scoreBar');
-
-    score
-      .append('rect')
-      .attr('class', 'score-rect')
-      .attr('height', ChartCommons.BAR_BAND)
-      .attr('width', 0)
-      .attr('x', 0);
-    score
-      .append('text')
-      .attr('class', 'score-value')
-      .attr('dominant-baseline', 'middle')
-      .attr("text-anchor", "middle")
-      .attr('x', 0)
-      .attr('y', ChartCommons.BAR_BAND / 2)
-      .style('opacity', 0);
-
-    this.updateScoreBar(scores);
-  }
-
-
-  private updateScoreBar(selection: any) {
-    let scaleForScoreBar = scaleLinear().range([0, this.barsWidth]).domain([this.minValue, this.maxValue]);
-
-    select('.bars-content-group').selectAll('.chart-score-group')
-      .attr('transform', 'translate(0, ' + this.barScorePosY + ')');
-
-    selection.select('.score-rect')
-      .attr('fill', (datum) => datum.fill)
-      .attr('width', (datum => {
-        return scaleForScoreBar(datum.end) - scaleForScoreBar(datum.start);
-      }))
-      .attr("x", (datum) => {
-        return scaleForScoreBar(datum.start);
-      });
-
-    selection.select('.score-value')
-      .text((datum) => datum.label)
-      .style('opacity', 1)
-      .attr('x', (datum) => {
-        return (scaleForScoreBar(datum.end) + scaleForScoreBar(datum.start)) / 2;
-      });
-  }
-
-  private renderLengendGroup() {
-    const legendGroup = select('.bars-content-group').selectAll('.chart-legend-group').data([1]);
-    legendGroup.exit()
-      .remove()
-      .transition()
-      .duration(ChartCommons.TRANSITION_DURATION);
-    legendGroup.enter()
-      .append('g')
-      .attr('class', 'chart-legend-group')
-      .attr('transform', 'translate(0, ' + this.legendPosY + ')');
-    this.renderChartLegends();
-  }
-
-  private renderChartLegends() {
-    const legends = select('.chart-legend-group').selectAll('.legend-entry').data(this.dataForLegend);
-
-    legends.exit()
-      .transition()
-      .duration(ChartCommons.TRANSITION_DURATION)
-      .style('opacity', 0)
-      .remove();
-
-    const legend = legends.enter()
-      .append('g')
-      .attr('class', 'legend-entry')
-      .style('opacity', 0);
-
-    legend
-      .append('rect')
-      .attr('class', 'legend-rect')
-      .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
-      .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
-      .attr("rx", 2)
-      .attr("ry", 2)
-      .attr('fill', (data) => data.color);
-
-    legend
-      .append('text')
-      .attr('class', 'legend-text')
-      .attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
-      .attr('y', ChartCommons.COLOR_PREVIEW_SIZE);
-
-    this.updateLegend(legends);
-  }
-
-  private updateLegend(selection: any) {
-    let maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement);
-    let maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
-
-    select('.chart-legend-group')
-      .attr('transform', "translate(0," + this.legendPosY + ")");
-
-    select('.chart-legend-group').selectAll('.legend-entry')
-      .attr("transform", (data, index) => {
-        let x = maxEntryGroupSize * (index % maxEntriesInRow);
-        return "translate(" + x + "," + 0 + ")";
-      })
+    legendEntry.join(
+      enter => {
+        const legendElement = enter
+          .append('g')
+          .attr('class', 'legend-entry')
+          .style('opacity', 0);
+        legendElement
+          .append('rect')
+          .attr('class', 'legend-rect')
+          .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr("rx", 2)
+          .attr("ry", 2)
+          .attr('fill', datum => datum.color);
+        legendElement
+          .append('text')
+          .attr('class', 'legend-text')
+          .attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
+          .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+          .text(datum => datum.label);
+        return legendElement;
+      },
+      update => {
+        update.select('.legend-rect')
+          .attr('fill', datum => datum.color);
+        update.select('.legend-text')
+          .text(datum => datum.label);
+        return update;
+      },
+        exit => exit
+          .transition()
+          .duration(ChartCommons.TRANSITION_DURATION)
+          .style('opacity', 0)
+          .remove()
+    )
+      .attr('transform', (datum, index) => `translate(${maxEntryGroupSize * (index % maxEntriesInRow)}, 0)`)
       .style('opacity', 1);
-
-    selection.selectAll('.legend-rect')
-      .attr('fill', (data) => data.color);
-
-    selection.selectAll('.legend-text')
-      .text((data) => data.label);
   }
+
 
   formatBarValue(value): string {
     const precision = this.maxValue >= 1000 || this.minValue <= -1000 ? 0 : 2;
