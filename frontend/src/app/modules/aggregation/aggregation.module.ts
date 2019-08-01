@@ -4,7 +4,8 @@ import {RouterModule, Routes} from "@angular/router";
 import {SharedModule} from "../shared/shared.module";
 import {AggregationComponent} from './aggregation.component';
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
-import { AggregationChartComponent } from './components/aggregation-chart/aggregation-chart.component';
+import {AggregationChartComponent} from './components/aggregation-chart/aggregation-chart.component';
+import {FormsModule} from "@angular/forms";
 
 const AggregationRoutes: Routes = [
   {path: 'show', component: AggregationComponent},
@@ -16,7 +17,8 @@ const AggregationRoutes: Routes = [
     CommonModule,
     RouterModule.forChild(AggregationRoutes),
     SharedModule,
-    ResultSelectionModule
+    ResultSelectionModule,
+    FormsModule
   ]
 })
 export class AggregationModule { }
