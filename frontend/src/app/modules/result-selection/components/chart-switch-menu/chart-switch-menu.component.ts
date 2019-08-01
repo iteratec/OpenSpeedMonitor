@@ -10,7 +10,7 @@ import {ChartSwitchMenuEntry} from "../../models/chart-switch-menu-entry.model";
 export class ChartSwitchMenuComponent implements OnInit {
 
   chartSwitchMenu: ChartSwitchMenuEntry[] = [
-    {baseUrl: "/eventResultDashboard/showAll", label: "frontend.de.iteratec.osm.results.timeSeries", icon: "fas fa-chart-line"},
+    {baseUrl: "/eventResultDashboardDev/showAll", label: "frontend.de.iteratec.osm.results.timeSeries", icon: "fas fa-chart-line"},
     {baseUrl: "/aggregationDev/show", label: "frontend.de.iteratec.osm.results.aggregation", icon: "fas fa-chart-bar"},
     {baseUrl: "/distributionChart/show", label: "frontend.de.iteratec.osm.results.distributionChart", icon: "fas fa-chart-area"},
     {baseUrl: "/pageComparison/show", label: "frontend.de.iteratec.osm.results.pageComparison", icon: "fas fa-balance-scale"},

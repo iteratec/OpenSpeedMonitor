@@ -1,0 +1,30 @@
+<osm-menu></osm-menu>
+<div class="action-row">
+  <div class="col-md-12">
+    <osm-result-selection-submit [applicationsRequired]="true" [pagesRequired]="true" (submit)="getTimeSeriesChartData()"></osm-result-selection-submit>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12">
+    <div class="action-row">
+
+      <div class="col-md-4">
+        <osm-result-selection-time-frame [showAggregation]="true"></osm-result-selection-time-frame>
+        <osm-result-selection-measurands [multipleMeasurands]="true"></osm-result-selection-measurands>
+      </div>
+      <div class="col-md-3">
+        <osm-result-selection-application></osm-result-selection-application>
+      </div>
+      <div class="col-md-5">
+        <osm-result-selection-page-location-connectivity [showPageSelection]="true" [showMeasuredStepSelection]="true"
+                                                         [showBrowserSelection]="true" [showLocationSelection]="true"
+                                                         [showConnectivitySelection]="true">
+        </osm-result-selection-page-location-connectivity>
+      </div>
+      <div class="col-md-12">
+        <osm-result-selection-reset></osm-result-selection-reset>
+      </div>
+
+    </div>
+  </div>
+</div>
