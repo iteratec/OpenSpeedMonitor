@@ -8,45 +8,11 @@ import {Data} from "@angular/router";
 export class AggregationChartDataService {
 
   allMeasurandDataMap = {};
-  sideLabelData = [];
   filterRules = [];
   selectedFilter:string = "desc";
-  headerText:string = "";
   aggregationValue:string = "avg";
-  comparitiveValue = "";
-  dataAvailalbe = false;
   i18nMap = {};
-  dataLength:number = 0;
-  chartBarsWidth = 2300;
-  chartBarsHeight = 230;
   series = [];
-
-  availableScoreBars = [
-    {
-      id: "good",
-      fill: "#bbe2bb",
-      label: "GOOD",
-      cssClass: "d3chart-good",
-      end: 1000,
-      start: undefined
-    },
-    {
-      id: "okay",
-      fill: "#f9dfba",
-      label: "OK",
-      cssClass: "d3chart-ok",
-      end: 3000,
-      start: undefined
-
-    },
-    {
-      id: "bad",
-      fill: "#f5d1d0",
-      label: "BAD",
-      cssClass: "d3chart-bad",
-      start: undefined
-    }
-  ];
 
   loadingTimeColors:Array<string> = [
     "#1660A7",
@@ -106,9 +72,12 @@ export class AggregationChartDataService {
   public getMeasurandDataMap(series){
     let measurands = [];
     let measurandDataMap:{[k: string]: any} = {};
-    let loadTimeMeasurands =[];
 
     if(series) {
+      series.forEach((serie) =>{
+          serie.sideLabel = this.setDataForSideLabel(series, serie);
+      });
+
       measurands = series.map(x => x.measurand).filter((v, i, a) => a.indexOf(v) === i);
       measurands.map(measurand => {
         measurandDataMap[measurand] = {
@@ -125,10 +94,6 @@ export class AggregationChartDataService {
         measurandData.isDeterioration=firstSerie.isDeterioration;
         measurandData.isImprovement=firstSerie.isImprovement;
         measurandData.hasComparative = measurandData.series.some(() => measurandData.isDeterioration|| measurandData.isImprovement);
-        measurandData.series.forEach((serie)=>{
-          serie.sideLabel = this.getDataForSideLabel(measurandData.series, serie);
-          }
-        );
 
         if (measurandData.isImprovement || measurandData.isDeterioration) {
           measurandData.color = this.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
@@ -140,6 +105,8 @@ export class AggregationChartDataService {
 
           measurandData.color = colorScales[unit](measurands.indexOf(k));
         }
+        measurandData.highlighted = false;
+        measurandData.selected = false;
       });
     }
     return measurandDataMap;
@@ -260,29 +227,7 @@ export class AggregationChartDataService {
     return header;
   }
 
-  public getDataForLabels(){
-    let dataForLabels = [];
-
-    Object.keys(this.allMeasurandDataMap).forEach(measurand => {
-      let measurandData = this.allMeasurandDataMap[measurand];
-      measurandData.series.forEach(serie => {
-        dataForLabels.push({
-          color: measurandData.color,
-          value: serie.value,
-          measurand: measurand,
-          jobGroup: serie.jobGroup,
-          page: serie.page,
-          measurandGroup: measurandData.measurandGroup,
-          pageAndJobGroup: '' + serie.page +', ' + serie.jobGroup
-        });
-      });
-    });
-    return dataForLabels;
-  }
-
-
-
-  public getDataForSideLabel(series, serie){
+  public setDataForSideLabel(series, serie){
     let pages = series.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     let jobGroups = series.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
     if (pages.length > 1 && jobGroups.length > 1) {
@@ -294,6 +239,49 @@ export class AggregationChartDataService {
     } else if(pages.length ===1&&jobGroups.length===1){
       return ''
     }
+  }
+
+  public getUniqueSideLabels() : String[]{
+    return this.getDataForLabels().map(x => x.sideLabel).filter((el, i, a) => i === a.indexOf(el));
+  }
+
+  public createEmptyBarsForMissingData(data): any{
+    let sideLabels = this.getUniqueSideLabels();
+    let sideLabelsForMeasurand =[];
+    Object.keys(data).forEach((measurand) => {
+      if (sideLabels.length === data[measurand].series.length) {
+        return data;
+      } else if(sideLabels.length > data[measurand].series.length){
+        sideLabelsForMeasurand = data[measurand].series.map(x => x.sideLabel);
+        sideLabels.forEach((label) =>{
+          if(!sideLabelsForMeasurand.includes(label)){
+
+            data[measurand].series.push({sideLabel: label, value: null});
+          }
+        });
+      }
+    });
+    return data;
+  }
+
+  private getDataForLabels(){
+    let dataForLabels = [];
+    Object.keys(this.allMeasurandDataMap).forEach(measurand => {
+      let measurandData = this.allMeasurandDataMap[measurand];
+      measurandData.series.forEach(serie => {
+        dataForLabels.push({
+          color: measurandData.color,
+          value: serie.value,
+          measurand: measurand,
+          jobGroup: serie.jobGroup,
+          page: serie.page,
+          measurandGroup: measurandData.measurandGroup,
+          pageAndJobGroup: '' + serie.page +', ' + serie.jobGroup,
+          sideLabel: serie.sideLabel
+        });
+      });
+    });
+    return dataForLabels;
   }
 
 }
