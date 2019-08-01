@@ -23,6 +23,10 @@ export class AggregationChartComponent implements OnChanges {
     series: []
   };
 
+  hasFilterRules: boolean = false;
+  percentileValue: number = 50;
+  stackBars: string = '1';
+  aggregationType: string = 'avg';
 
   margin = {top: 0, right: 0, bottom: 0, left: 0};
   svgWidth: number;
@@ -55,13 +59,13 @@ export class AggregationChartComponent implements OnChanges {
   constructor(private aggregationChartDataService: AggregationChartDataService) {
   }
 
-
   redraw() {
     if (this.barchartAverageData.length < 1 || this.barchartMedianData.length < 1) {
       return;
     }
 
     this.data = this.barchartAverageData;
+    this.hasFilterRules = Object.keys(this.data.filterRules).length > 0;
     // this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
     this.aggregationChartDataService.setData(this.data);
     this.dataForBarsAndLabels = this.aggregationChartDataService.allMeasurandDataMap;
@@ -100,7 +104,6 @@ export class AggregationChartComponent implements OnChanges {
 
     this.render();
   }
-
 
   render() {
     const svgElement: SVGElement = this.svgElement.nativeElement;
@@ -506,6 +509,10 @@ export class AggregationChartComponent implements OnChanges {
     }
     this.renderBarGroup('.bars-content-group');
     this.renderLegendGroup('.legend-content-group');
+  }
+
+  test() {
+    console.log(this.stackBars);
   }
 
   ngOnChanges(changes: SimpleChanges): void {

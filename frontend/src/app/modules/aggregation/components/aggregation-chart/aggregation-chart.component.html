@@ -1,5 +1,74 @@
 <div class="card">
   <div class="aggregation-chart">
+    <div class="filter-dropdown-group">
+      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="stack-bars-switch">
+        <label class="btn btn-sm btn-default" id="switch-beside-button"
+               [class.active]="stackBars === '0'" (click)="stackBars = beside.value">
+          <input #beside type="radio" name="stackBars" value="0">
+          Beside
+        </label>
+        <label class="btn btn-sm btn-default" id="switch-infront-button"
+               [class.active]="stackBars === '1'" (click)="stackBars = inFront.value">
+          <input #inFront type="radio" name="stackBars" value="1">
+          In Front
+        </label>
+      </div>
+      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="aggregation-value-switch">
+        <label class="btn btn-sm btn-default" id="aggregation-average-button"
+               [class.active]="aggregationType === 'avg'" (click)="aggregationType = average.value">
+          <input #average type="radio" name="aggregationValue" value="avg" checked>
+          Average
+        </label>
+        <label class="btn btn-sm btn-default" id="aggregation-percentile-button"
+               [class.active]="aggregationType === 'percentile'" (click)="aggregationType = percentile.value">
+          <input #percentile type="radio" name="aggregationValue" value="percentile">
+          Percentile
+        </label>
+      </div>
+
+      <input class="btn btn-sm btn-default perc-element" id="percentage-field" type="number" placeholder="%"
+             [(ngModel)]="percentileValue" min="0" max="100" style="max-width: 5em;" [disabled]="aggregationType === 'avg'"/>
+      <input class="form-control perc-element perc-slider" id="percentage-slider" type="range"
+             [(ngModel)]="percentileValue" min="0" max="100" step="5" [disabled]="aggregationType === 'avg'"/>
+
+      <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle perc-element"
+              data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">Filter <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right">
+        <li id="all-bars-header" class="dropdown-header">
+          Sort
+        </li>
+        <li>
+          <a class="chart-filter"><i class="fas fa-check"></i>
+            Descending
+          </a>
+        </li>
+        <li>
+          <a class="chart-filter"><i class="fas fa-check filter-inactive"></i>
+            Ascending
+          </a>
+        </li>
+        <ng-container *ngIf="hasFilterRules">
+          <li id="customer-journey-header" class="dropdown-header">
+            Customer Journey
+          </li>
+          <li *ngFor="let filterRule of data.filterRules | keyvalue">
+            <a class="chart-filter">
+              <i class="fas fa-check filter-inactive"></i>
+              {{filterRule.key}}
+            </a>
+          </li>
+        </ng-container>
+      </ul>
+    </div>
+
+    <div class="in-chart-buttons">
+      <a data-toggle="modal" role="button" title="Download as PNG">
+        <i class="fas fa-download"></i>
+      </a>
+    </div>
+
     <div class="svg-container">
       <svg #svg id="aggregation-chart-svg" class="aggregation-chart-svg" xmlns="http://www.w3.org/1999/html"></svg>
     </div>
