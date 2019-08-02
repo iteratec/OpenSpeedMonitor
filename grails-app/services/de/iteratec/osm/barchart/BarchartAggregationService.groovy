@@ -103,7 +103,7 @@ class BarchartAggregationService {
         if (operatingSystems) {
             queryBuilder = queryBuilder.withOperatingSystems(operatingSystems)
         }
-        
+
         if (performanceAspectTypes) {
             performanceAspectTypes.unique()
             queryBuilder = queryBuilder.withPerformanceAspects(performanceAspectTypes)
@@ -149,7 +149,7 @@ class BarchartAggregationService {
         }
 
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue, browsers, deviceTypes, operatingSystems, null)
+        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue, browsers, deviceTypes, operatingSystems, [])
         cmd.selectedPageComparisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
             pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.firstJobGroupId as long) && aggr.page.id == (comparison.firstPageId as long) }

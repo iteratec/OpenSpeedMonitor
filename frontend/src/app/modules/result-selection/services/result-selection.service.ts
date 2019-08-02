@@ -27,7 +27,7 @@ export class ResultSelectionService {
       if (key === 'from' || key === 'to' || key === 'caller') {
         return;
       }
-      if(resultSelectionCommand[key].length > 0) {
+      if (resultSelectionCommand[key].length > 0) {
         resultSelectionCommand[key].forEach(id => {
           params = params.append(key, id.toString())
         });
