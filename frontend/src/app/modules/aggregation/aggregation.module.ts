@@ -6,7 +6,7 @@ import {AggregationComponent} from './aggregation.component';
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
 
 const AggregationRoutes: Routes = [
-  {path: '', component: AggregationComponent},
+  {path: 'show', component: AggregationComponent},
 ];
 
 @NgModule({
