@@ -77,8 +77,9 @@ class BarchartAggregationService {
         if (!selectedMeasurands && !performanceAspectTypes) {
             return []
         }
-        selectedMeasurands.unique({ a, b -> a.name <=> b.name })
-        performanceAspectTypes.unique()
+        if (selectedMeasurands) {
+            selectedMeasurands.unique({ a, b -> a.name <=> b.name })
+        }
 
         EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder()
                 .withJobResultDateBetween(from, to)
@@ -102,8 +103,9 @@ class BarchartAggregationService {
         if (operatingSystems) {
             queryBuilder = queryBuilder.withOperatingSystems(operatingSystems)
         }
-
+        
         if (performanceAspectTypes) {
+            performanceAspectTypes.unique()
             queryBuilder = queryBuilder.withPerformanceAspects(performanceAspectTypes)
         }
 
