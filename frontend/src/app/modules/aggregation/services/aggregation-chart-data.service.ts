@@ -12,6 +12,9 @@ export class AggregationChartDataService {
   aggregationValue:string = "avg";
   i18nMap = {};
   series = [];
+  stackBars = true;
+
+  aggregationType: string = 'avg';
 
   loadingTimeColors:Array<string> = [
     "#1660A7",
@@ -55,7 +58,6 @@ export class AggregationChartDataService {
     "%": this.csiColors,
     "": this.speedIndexColors
   };
-
 
   constructor() {}
 

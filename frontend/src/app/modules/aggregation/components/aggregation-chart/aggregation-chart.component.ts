@@ -25,8 +25,6 @@ export class AggregationChartComponent implements OnChanges {
 
   hasFilterRules: boolean = false;
   percentileValue: number = 50;
-  stackBars: string = '1';
-  aggregationType: string = 'avg';
 
   margin = {top: 0, right: 0, bottom: 0, left: 0};
   svgWidth: number;
@@ -64,7 +62,8 @@ export class AggregationChartComponent implements OnChanges {
       return;
     }
 
-    this.data = this.barchartAverageData;
+    this.data = (this.aggregationChartDataService.aggregationType === 'avg') ? this.barchartAverageData : this.barchartMedianData;
+
     this.hasFilterRules = Object.keys(this.data.filterRules).length > 0;
     // this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
     this.aggregationChartDataService.setData(this.data);
@@ -213,6 +212,8 @@ export class AggregationChartComponent implements OnChanges {
     );
 
     const chartBars = select('.chart-bar-group').selectAll('.chart-bars').data(Object.keys(this.measurandDataMap));
+    const barOffset = this.aggregationChartDataService.stackBars ? 0 : ChartCommons.BAR_BAND;
+
     chartBars.join(
       enter => enter
         .append('g')
@@ -227,7 +228,7 @@ export class AggregationChartComponent implements OnChanges {
     )
       .transition()
       .duration(ChartCommons.TRANSITION_DURATION)
-      .attr('transform', (datum, index) => `translate(0, ${index * ChartCommons.BAR_BAND})`)
+      .attr('transform', (datum, index) => `translate(0, ${index * barOffset})`)
       .each((datum, index, groups) => this.renderBar(select(groups[index]), datum));
 
     //TODO stacked bars
@@ -428,7 +429,6 @@ export class AggregationChartComponent implements OnChanges {
       .on('mouseover', (datum) => this.onMouseOver(datum))
       .on('mouseout', (datum) => this.onMouseOut(datum))
       .on('click', (datum) => this.onMouseClick(datum));
-
   }
 
 
@@ -481,12 +481,13 @@ export class AggregationChartComponent implements OnChanges {
     const barBand = ChartCommons.BAR_BAND;
     const barGap = ChartCommons.BAR_GAP;
     const numberOfMeasurands = Object.keys(this.measurandDataMap).length;
-    let numberOfBars = 0;
+    let numberOfPages = 0;
     Object.keys(this.measurandDataMap).forEach((k) => {
-      numberOfBars = numberOfBars + this.measurandDataMap[k].series.length;
+      numberOfPages = (this.measurandDataMap[k].series.length > numberOfPages) ? this.measurandDataMap[k].series.length : numberOfPages;
     });
-    const gapSize = barGap * ((numberOfMeasurands < 2) ? 1 : 2);
-    return ((numberOfBars / numberOfMeasurands - 1) * gapSize) + numberOfBars * barBand;
+    const numberOfBars = numberOfPages * (this.aggregationChartDataService.stackBars ? 1 : numberOfMeasurands);
+    const gapSize = barGap * ((this.aggregationChartDataService.stackBars || numberOfMeasurands < 2) ? 1 : 2);
+    return ((numberOfPages - 1) * gapSize) + numberOfBars * barBand;
   }
 
   private onMouseOver(data){
@@ -526,8 +527,8 @@ export class AggregationChartComponent implements OnChanges {
     this.renderLegendGroup('.legend-content-group');
   }
 
-  test() {
-    console.log(this.stackBars);
+  changeStackBars(status: string): void {
+    this.aggregationChartDataService.stackBars = (status === 'true');
   }
 
   ngOnChanges(changes: SimpleChanges): void {
