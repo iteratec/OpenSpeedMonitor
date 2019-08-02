@@ -214,7 +214,7 @@ export class AggregationChartDataService {
     let aggregation = "";
     let pages = dataForBars.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     let jobGroups = dataForBars.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
-    this.aggregationValue ==='avg'? aggregation ="Average" : aggregation ="Percentile"+ this.aggregationValue + "%";
+    this.aggregationValue ==='avg'? aggregation ="Average" : aggregation = `Percentile ${this.aggregationValue}%`;
 
       if (pages.length > 1 && jobGroups.length > 1) {
         header = aggregation;

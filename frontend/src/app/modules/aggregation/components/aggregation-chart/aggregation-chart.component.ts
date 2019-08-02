@@ -4,6 +4,9 @@ import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
 import {max} from "d3-array";
 import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
+import {BarchartDataService} from "../../services/barchart-data.service";
+import {URL} from "../../../../enums/url.enum";
+import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
 
 @Component({
   selector: 'osm-aggregation-chart',
@@ -54,7 +57,7 @@ export class AggregationChartComponent implements OnChanges {
   private anySelected = false;
   private clickedMeasurand = '';
 
-  constructor(private aggregationChartDataService: AggregationChartDataService) {
+  constructor(private aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
   }
 
   redraw() {
@@ -63,6 +66,7 @@ export class AggregationChartComponent implements OnChanges {
     }
 
     this.data = (this.aggregationChartDataService.aggregationType === 'avg') ? this.barchartAverageData : this.barchartMedianData;
+    this.aggregationChartDataService.aggregationValue = (this.aggregationChartDataService.aggregationType === 'avg') ? 'avg' : this.percentileValue.toString();
 
     this.hasFilterRules = Object.keys(this.data.filterRules).length > 0;
     // this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
@@ -375,7 +379,8 @@ export class AggregationChartComponent implements OnChanges {
     legendGroup.join(
       enter => enter
         .append('g')
-        .attr('class', 'chart-legend-group'),
+        .attr('class', 'chart-legend-group')
+        .style('cursor', 'pointer'),
       update => update,
       exit => exit.remove()
     )
@@ -499,7 +504,6 @@ export class AggregationChartComponent implements OnChanges {
     }
   }
 
-
   private onMouseOut(data){
     if(this.anyHighlighted === true) {
       this.anyHighlighted = false;
@@ -510,11 +514,11 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   private onMouseClick(measurand){
-    if(this.anySelected === false){
+    if (this.anySelected === false) {
       this.measurandDataMap[measurand].selected = true;
       this.clickedMeasurand = measurand;
       this.anySelected = true;
-    }else if(this.anySelected === true && this.clickedMeasurand !== measurand){
+    } else if(this.anySelected === true && this.clickedMeasurand !== measurand){
       this.measurandDataMap[this.clickedMeasurand].selected = false;
       this.measurandDataMap[measurand].selected = true;
       this.clickedMeasurand = measurand;
@@ -529,6 +533,16 @@ export class AggregationChartComponent implements OnChanges {
 
   changeStackBars(status: string): void {
     this.aggregationChartDataService.stackBars = (status === 'true');
+  }
+
+  reloadPercentile() {
+    this.barchartDataService.fetchBarchartData<any>(
+      this.resultSelectionStore.resultSelectionCommand,
+      this.resultSelectionStore.remainingResultSelection,
+      this.percentileValue.toString(),
+      URL.AGGREGATION_BARCHART_DATA
+    ).subscribe(result => this.barchartMedianData = result);
+    this.redraw();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
