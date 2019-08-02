@@ -22,8 +22,8 @@ OpenSpeedMonitor.ChartModules.Aggregation = (function (selector) {
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
-    var data;
-    //var data = OpenSpeedMonitor.ChartModules.AggregationData(svg);
+    // var data;
+    var data = OpenSpeedMonitor.ChartModules.AggregationData(svg);
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
 
     chartLegendComponent.on("select", function (selectEvent) {

@@ -10,6 +10,10 @@ svg.aggregation-chart-svg {
   height: 100%;
 }
 
+.legend-entry {
+  cursor: pointer;
+}
+
 .in-chart-buttons {
   position: absolute;
   top: 10px;
