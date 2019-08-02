@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import {scaleOrdinal} from "d3-scale";
-import {Data} from "@angular/router";
 
 @Injectable({
   providedIn: 'root'
@@ -74,7 +73,7 @@ export class AggregationChartDataService {
     let measurandDataMap:{[k: string]: any} = {};
 
     if(series) {
-      series.forEach((serie) =>{
+      series.forEach((serie) => {
           serie.sideLabel = this.setDataForSideLabel(series, serie);
       });
 
@@ -85,12 +84,15 @@ export class AggregationChartDataService {
           series: series.filter(serie => serie.measurand === measurand)
         };
       });
-      Object.keys(measurandDataMap).forEach(k => {
-        let measurandData = measurandDataMap[k];
+
+      Object.keys(measurandDataMap).forEach(measurand => {
+        let measurandData = measurandDataMap[measurand];
         let firstSerie = measurandData.series[0];
         measurandData.label = firstSerie.measurandLabel;
         measurandData.measurandGroup = firstSerie.measurandGroup;
         measurandData.unit= firstSerie.unit;
+        measurandData.highlighted = false;
+        measurandData.selected = false;
         measurandData.isDeterioration=firstSerie.isDeterioration;
         measurandData.isImprovement=firstSerie.isImprovement;
         measurandData.hasComparative = measurandData.series.some(() => measurandData.isDeterioration|| measurandData.isImprovement);
@@ -102,11 +104,8 @@ export class AggregationChartDataService {
           let colorScales ={};
           let hasComparative = measurandData.hasComparative;
           colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, hasComparative);
-
-          measurandData.color = colorScales[unit](measurands.indexOf(k));
+          measurandData.color = colorScales[unit](measurands.indexOf(measurand));
         }
-        measurandData.highlighted = false;
-        measurandData.selected = false;
       });
     }
     return measurandDataMap;
@@ -227,21 +226,7 @@ export class AggregationChartDataService {
     return header;
   }
 
-  public setDataForSideLabel(series, serie){
-    let pages = series.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
-    let jobGroups = series.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
-    if (pages.length > 1 && jobGroups.length > 1) {
-     return  '' + serie.page +', ' + serie.jobGroup;
-    } else if (pages.length > 1 && jobGroups.length === 1) {
-      return  serie.page;
-    } else if (jobGroups.length > 1 && pages.length === 1) {
-      return serie.jobGroup;
-    } else if(pages.length ===1&&jobGroups.length===1){
-      return ''
-    }
-  }
-
-  public getUniqueSideLabels() : String[]{
+  public getUniqueSideLabels() {
     return this.getDataForLabels().map(x => x.sideLabel).filter((el, i, a) => i === a.indexOf(el));
   }
 
@@ -255,13 +240,26 @@ export class AggregationChartDataService {
         sideLabelsForMeasurand = data[measurand].series.map(x => x.sideLabel);
         sideLabels.forEach((label) =>{
           if(!sideLabelsForMeasurand.includes(label)){
-
             data[measurand].series.push({sideLabel: label, value: null});
           }
         });
       }
     });
     return data;
+  }
+
+  private setDataForSideLabel(series, serie){
+    let pages = series.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
+    let jobGroups = series.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
+    if (pages.length > 1 && jobGroups.length > 1) {
+      return  '' + serie.page +', ' + serie.jobGroup;
+    } else if (pages.length > 1 && jobGroups.length === 1) {
+      return  serie.page;
+    } else if (jobGroups.length > 1 && pages.length === 1) {
+      return serie.jobGroup;
+    } else if(pages.length ===1&&jobGroups.length===1){
+      return ''
+    }
   }
 
   private getDataForLabels(){
@@ -283,5 +281,4 @@ export class AggregationChartDataService {
     });
     return dataForLabels;
   }
-
 }
