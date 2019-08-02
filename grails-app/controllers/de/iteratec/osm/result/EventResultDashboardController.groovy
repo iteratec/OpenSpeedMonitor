@@ -18,6 +18,8 @@
 package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
+import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.linechart.GetLinechartCommand
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
@@ -112,7 +114,7 @@ class EventResultDashboardController {
                 flash.message = i18nService.msg("de.iteratec.osm.userspecificDashboard.notAllowed", "not allowed", [params.dashboardID])
                 requestedAllowedDashboard = false
             } else {
-                fillWithUserspecificDashboardValues(cmd, params.dashboardID)
+                fillWithUserspecificDashboardValues(cmd, Long.parseLong(params.dashboardID))
             }
         }
 
@@ -139,6 +141,44 @@ class EventResultDashboardController {
         return modelToRender
     }
 
+    /**
+     * Rest Method for ajax call.
+     * @param cmd The requested data.
+     * @return TimeSeriesChartDTO as JSON or string message if an error occurred
+     */
+    @RestAction
+    def getLinechartData(GetLinechartCommand cmd) {
+        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
+
+        boolean requestedAllowedDashboard = true;
+
+        if (cmd.preconfiguredDashboard) {
+            if (!isUserAllowedToViewDashboard(cmd.preconfiguredDashboard.toString())) {
+                flash.message = i18nService.msg("de.iteratec.osm.userspecificDashboard.notAllowed", "not allowed", [cmd.preconfiguredDashboard])
+                requestedAllowedDashboard = false
+            } else {
+                fillWithUserspecificDashboardValues(cmd, cmd.preconfiguredDashboard)
+            }
+        }
+
+        // cmd.copyRequestDataToViewModelMap(modelToRender)
+
+        if (!ControllerUtils.isEmptyRequest(params) && requestedAllowedDashboard) {
+            if (!cmd.validate()) {
+                modelToRender.put('command', cmd)
+            } else {
+                // fillWithEventResultData(modelToRender, cmd);
+            }
+        }
+        modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableEventResultDashboards())
+
+        log.debug("from=${modelToRender['from']}")
+        log.debug("to=${modelToRender['to']}")
+
+        fillWithI18N(modelToRender)
+        ControllerUtils.sendObjectAsJSON(response, modelToRender)
+    }
+
     private boolean isUserAllowedToViewDashboard(String dashboardID) {
         UserspecificDashboardBase requestedDashboard = UserspecificDashboardBase.get(dashboardID)
         return requestedDashboard && (requestedDashboard.publiclyVisible || this.userspecificDashboardService.isCurrentUserDashboardOwner(dashboardID))
@@ -148,8 +188,8 @@ class EventResultDashboardController {
  * @param cmd the command where the attribute gets set
  * @param dashboardID the id of the saved userspecificCsiDashboard
  */
-    private void fillWithUserspecificDashboardValues(EventResultDashboardShowAllCommand cmd, String dashboardID) {
-        UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(Long.parseLong(dashboardID))
+    private void fillWithUserspecificDashboardValues(EventResultDashboardShowAllCommand cmd, Long dashboardID) {
+        UserspecificEventResultDashboard dashboard = UserspecificEventResultDashboard.get(dashboardID)
         dashboard.fillCommand(cmd)
     }
 
