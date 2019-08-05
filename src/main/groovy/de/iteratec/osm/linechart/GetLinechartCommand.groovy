@@ -1,11 +1,15 @@
 package de.iteratec.osm.linechart
 
+import de.iteratec.osm.report.chart.CsiAggregationInterval
+import de.iteratec.osm.result.SelectedMeasurand
+import de.iteratec.osm.result.SelectedMeasurandType
+import de.iteratec.osm.result.TimeSeriesShowCommandBase
 import grails.databinding.BindUsing
 import grails.validation.Validateable
 import groovy.json.JsonSlurper
 import org.joda.time.DateTime
 
-class GetLinechartCommand implements Validateable {
+class GetLinechartCommand extends TimeSeriesShowCommandBase {
     @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['preconfiguredDashboard'])
     })
@@ -25,9 +29,9 @@ class GetLinechartCommand implements Validateable {
     List<String> measurands = []
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['applications'])
+        return new JsonSlurper().parseText(source['jobGroups'])
     })
-    List<Long> applications = []
+    List<Long> jobGroups = []
 
     @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['pages'])

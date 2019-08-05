@@ -19,7 +19,11 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.annotations.RestAction
+import de.iteratec.osm.csi.Page
 import de.iteratec.osm.linechart.GetLinechartCommand
+import de.iteratec.osm.linechart.LineChartTimeSeriesService
+import de.iteratec.osm.linechart.LinechartTimeSeries
+import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
@@ -29,6 +33,8 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.EventService
 import de.iteratec.osm.report.chart.OsmChartAxis
 import de.iteratec.osm.report.chart.OsmRickshawChart
+import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -44,6 +50,7 @@ class EventResultDashboardController {
 
     JobGroupService jobGroupService
     EventResultDashboardService eventResultDashboardService
+    LineChartTimeSeriesService lineChartTimeSeriesService
     I18nService i18nService
     EventService eventService
     def springSecurityService
@@ -148,35 +155,8 @@ class EventResultDashboardController {
      */
     @RestAction
     def getLinechartData(GetLinechartCommand cmd) {
-        Map<String, Object> modelToRender = constructStaticViewDataOfShowAll();
-
-        boolean requestedAllowedDashboard = true;
-
-        if (cmd.preconfiguredDashboard) {
-            if (!isUserAllowedToViewDashboard(cmd.preconfiguredDashboard.toString())) {
-                flash.message = i18nService.msg("de.iteratec.osm.userspecificDashboard.notAllowed", "not allowed", [cmd.preconfiguredDashboard])
-                requestedAllowedDashboard = false
-            } else {
-                fillWithUserspecificDashboardValues(cmd, cmd.preconfiguredDashboard)
-            }
-        }
-
-        // cmd.copyRequestDataToViewModelMap(modelToRender)
-
-        if (!ControllerUtils.isEmptyRequest(params) && requestedAllowedDashboard) {
-            if (!cmd.validate()) {
-                modelToRender.put('command', cmd)
-            } else {
-                // fillWithEventResultData(modelToRender, cmd);
-            }
-        }
-        modelToRender.put("availableDashboards", userspecificDashboardService.getListOfAvailableEventResultDashboards())
-
-        log.debug("from=${modelToRender['from']}")
-        log.debug("to=${modelToRender['to']}")
-
-        fillWithI18N(modelToRender)
-        ControllerUtils.sendObjectAsJSON(response, modelToRender)
+        List<LinechartTimeSeries> result = lineChartTimeSeriesService.getLinechartTimeSeriesFor(cmd)
+        ControllerUtils.sendObjectAsJSON(response, result)
     }
 
     private boolean isUserAllowedToViewDashboard(String dashboardID) {
