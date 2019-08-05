@@ -3,6 +3,7 @@ import {URL} from "../../enums/url.enum";
 import {BarchartDataService} from "./services/barchart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
 import {BehaviorSubject} from "rxjs";
+import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
 
 @Component({
   selector: 'osm-aggregation',
@@ -11,15 +12,26 @@ import {BehaviorSubject} from "rxjs";
 })
 export class AggregationComponent implements OnInit {
 
-  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) { }
-
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+
+  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, private aggregationChartDataService: AggregationChartDataService) {
+    this.aggregationChartDataService.barchartAverageData$.subscribe((data) =>{
+      this.barchartAverageData$.next(data);
+    });
+    this.aggregationChartDataService.barchartMedianData$.subscribe((data) => {
+      this.barchartMedianData$.next(data);
+    })
+  }
 
   ngOnInit() {
   }
 
   getBarchartData(): void {
+    this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand,this.resultSelectionStore.remainingResultSelection);
+  }
+
+  /*getBarchartData(): void {
     this.barchartDataService.fetchBarchartData<any>(
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
@@ -33,5 +45,5 @@ export class AggregationComponent implements OnInit {
       50,
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => this.barchartMedianData$.next(result));
-  }
+  }*/
 }
