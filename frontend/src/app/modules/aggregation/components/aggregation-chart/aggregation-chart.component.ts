@@ -61,16 +61,15 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   redraw() {
-    if (this.barchartAverageData.length < 1 || this.barchartMedianData.length < 1) {
+    if (this.barchartAverageData.length< 1 ||this.barchartMedianData.length< 1 || Object.getOwnPropertyNames(this.barchartAverageData).length <1 || Object.getOwnPropertyNames(this.barchartMedianData).length<1) {
       return;
     }
-
-    this.data = (this.aggregationChartDataService.aggregationType === 'avg') ? this.barchartAverageData : this.barchartMedianData;
+    this.aggregationChartDataService.setData();
+    //this.data = (this.aggregationChartDataService.aggregationType === 'avg') ? this.barchartAverageData : this.barchartMedianData;
     this.aggregationChartDataService.aggregationValue = (this.aggregationChartDataService.aggregationType === 'avg') ? 'avg' : this.percentileValue.toString();
 
-    this.hasFilterRules = Object.keys(this.data.filterRules).length > 0;
+    this.hasFilterRules = Object.keys(this.aggregationChartDataService.filterRules).length > 0;
     // this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
-    this.aggregationChartDataService.setData(this.data);
     this.measurandDataMap = this.aggregationChartDataService.allMeasurandDataMap;
     this.dataForScoreBar = this.aggregationChartDataService.getDataForScoreBar().barsToRender;
     this.maxValue = this.aggregationChartDataService.getDataForScoreBar().max;
@@ -103,7 +102,7 @@ export class AggregationChartComponent implements OnChanges {
     this.svgElement.nativeElement.setAttribute('height', this.svgHeight);
 
     this.xScale = scaleLinear()
-      .domain([0, max(this.data.series.map(it => it.value))])
+      .domain([0, max(this.aggregationChartDataService.series.map(it => it.value))])
       .range([0, this.barsWidth]);
 
     this.yScale = scaleBand()
@@ -445,7 +444,7 @@ export class AggregationChartComponent implements OnChanges {
   estimateHeight(svgForEstimation) {
     const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(svgForEstimation);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
-    return Math.floor(this.data.series.length / maxEntriesInRow) * 20;
+    return Math.floor(this.aggregationChartDataService.series.length / maxEntriesInRow) * 20;
   };
 
   calculateMaxEntryGroupWidth(svgForEstimation) {
@@ -536,13 +535,8 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   reloadPercentile() {
-    this.barchartDataService.fetchBarchartData<any>(
-      this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingResultSelection,
-      this.percentileValue.toString(),
-      URL.AGGREGATION_BARCHART_DATA
-    ).subscribe(result => this.barchartMedianData = result);
-    this.redraw();
+    this.aggregationChartDataService.reloadPercentile(this.percentileValue,this.resultSelectionStore.resultSelectionCommand, this.resultSelectionStore.remainingResultSelection);
+
   }
 
   ngOnChanges(changes: SimpleChanges): void {

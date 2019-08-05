@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
 import {scaleOrdinal} from "d3-scale";
+import {URL} from "../../../enums/url.enum";
+import {BarchartDataService} from "./barchart-data.service";
+import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
+import {BehaviorSubject} from "rxjs";
+import {first} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +15,7 @@ export class AggregationChartDataService {
   filterRules = [];
   selectedFilter:string = "desc";
   aggregationValue:string = "avg";
+  percentileValue: number = 50;
   i18nMap = {};
   series = [];
   stackBars = true;
@@ -59,12 +65,55 @@ export class AggregationChartDataService {
     "": this.speedIndexColors
   };
 
-  constructor() {}
+  barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
-  public setData(data: any): any{
-    this.aggregationValue = data.aggregationValue !== undefined ? data.aggregationValue: this.aggregationValue;
+  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {}
+
+  getBarchartData(resultSelectionCommand,remainingResultSelection): void {
+    this.barchartDataService.fetchBarchartData<any>(
+      resultSelectionCommand,
+      remainingResultSelection,
+      "avg",
+      URL.AGGREGATION_BARCHART_DATA
+    ).subscribe(result => {
+      this.barchartAverageData$.next(result);
+    });
+
+    this.barchartDataService.fetchBarchartData<any>(
+      resultSelectionCommand,
+      remainingResultSelection,
+      this.percentileValue.toString(),
+      URL.AGGREGATION_BARCHART_DATA
+    ).subscribe(result => {
+      this.barchartMedianData$.next(result);
+    });
+  }
+
+  reloadPercentile(percentile,resultSelectionCommand, remainingResultSelection) {
+    if(percentile) {
+      this.percentileValue = percentile;
+      this.barchartDataService.fetchBarchartData<any>(
+        resultSelectionCommand,
+        remainingResultSelection,
+        percentile.toString(),
+        URL.AGGREGATION_BARCHART_DATA
+      ).subscribe(result => {
+        this.barchartMedianData$.next(result);
+      });
+    }
+  }
+
+  public setData(): any {
+    let data;
+    if(this.aggregationType==='avg'){
+      data = this.barchartAverageData$.getValue();
+    }else{
+      data = this.barchartMedianData$.getValue();
+    }
+    this.aggregationValue = data.series[0].aggregationValue !== undefined ? data.series[0].aggregationValue : this.aggregationValue;
     this.filterRules = data.filterRules;
-    this.selectedFilter = data.selectedFilter !== undefined ? data.selectedFilter: this.selectedFilter;
+    this.selectedFilter = data.selectedFilter !== undefined ? data.selectedFilter : this.selectedFilter;
     this.i18nMap = data.i18nMap;
     this.series = data.series;
     this.allMeasurandDataMap = this.getMeasurandDataMap(data.series);
@@ -90,6 +139,7 @@ export class AggregationChartDataService {
       Object.keys(measurandDataMap).forEach(measurand => {
         let measurandData = measurandDataMap[measurand];
         let firstSerie = measurandData.series[0];
+        measurandData.aggregationValue = firstSerie.aggregationValue;
         measurandData.label = firstSerie.measurandLabel;
         measurandData.measurandGroup = firstSerie.measurandGroup;
         measurandData.unit= firstSerie.unit;
