@@ -33,9 +33,9 @@ enum Measurand{
     private String graphiteLabelSuffix
     private String tagInResultXml
 
-    private Measurand(MeasurandGroup value, String name, String label, String tag){
-        group = value
-        eventResultField = name
+    private Measurand(MeasurandGroup measurandGroup, String fieldName, String label, String tag) {
+        group = measurandGroup
+        eventResultField = fieldName
         graphiteLabelSuffix = label
         tagInResultXml = tag
     }
