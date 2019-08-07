@@ -20,7 +20,7 @@ enum Measurand{
     CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent", "cs-by-wpt-doc-complete", null),
     CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete", null),
     FIRST_CPU_IDLE(MeasurandGroup.LOAD_TIMES, "firstCpuIdleInMillisecs", "first-cpu-idle", "FirstInteractive"),
-    TIME_TO_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "timeToInteractiveInMillisecs", "time-to-interactive", "TimeToInteractive"),
+    TIME_TO_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "timeToInteractiveInMillisecs", "time-to-interactive", "LastInteractive"),
     JS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "jsTotalBytes", "javascript-total", "js"),
     IMAGE_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "imageTotalBytes", "image-total", "image"),
     CSS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "cssTotalBytes", "css-total", "css"),
