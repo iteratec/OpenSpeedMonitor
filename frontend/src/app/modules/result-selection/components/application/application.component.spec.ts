@@ -2,8 +2,6 @@ import { async, ComponentFixture, TestBed} from '@angular/core/testing';
 import { ApplicationComponent } from './application.component';
 import { SelectableApplication } from 'src/app/models/application.model';
 import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
-import { OsmLangService } from 'src/app/services/osm-lang.service';
-import { GrailsBridgeService } from 'src/app/services/grails-bridge.service';
 import { By } from '@angular/platform-browser';
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
@@ -28,8 +26,6 @@ describe('ApplicationComponent', () => {
       imports: [SharedMocksModule],
       providers: [
         ResultSelectionStore,
-        OsmLangService,
-        GrailsBridgeService,
         ResultSelectionService
       ]
     })
@@ -47,7 +43,7 @@ describe('ApplicationComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should correctly show the tags according to the available job groups', () =>{
+  it('should correctly show the tags according to the available applications', () =>{
     let tags: string[] = ['application','test','test2'];
 
     component.updateApplicationsAndTags(applications);
@@ -58,7 +54,7 @@ describe('ApplicationComponent', () => {
 
   });
 
-  it('should correctly show the job groups according to the selected tag',() => {
+  it('should correctly show the applications according to the selected tag',() => {
     component.updateApplicationsAndTags(applications);
     let tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
 
@@ -79,7 +75,7 @@ describe('ApplicationComponent', () => {
 
   it('should show the no result message', ()=>{
     const select = fixture.debugElement.query(By.css('select > option')).nativeElement;
-    
+
     component.updateApplicationsAndTags([]);
     fixture.detectChanges();
 

@@ -32,6 +32,11 @@ describe('PageLocationConnectivityComponent', () => {
     component = fixture.componentInstance;
     resultSelectionStore.eventsAndPages$.next({isLoading: false, data: []});
     resultSelectionStore.locationsAndBrowsers$.next({isLoading: false, data: []});
+    component.showPageSelection = true;
+    component.showMeasuredStepSelection = true;
+    component.showBrowserSelection = true;
+    component.showLocationSelection = true;
+    component.showConnectivitySelection = true;
     fixture.detectChanges();
   });
 

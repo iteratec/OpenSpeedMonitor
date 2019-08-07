@@ -13,8 +13,11 @@
     </ng-template>
   </select>
 
-  <button class="btn btn-xs btn-default filter-buttons" id="filterBtn" *ngFor="let tag of selectableTags" (click)="selectTag(tag)" [ngClass]="{'active': isTagSelected&&selectedTag===tag}">
-    <i class="fas fa-filter"></i>
-    &nbsp;{{tag}}
-  </button>
+  <div class="tag-button-group">
+    <button class="btn btn-xs btn-default tag-buttons" id="filterBtn" *ngFor="let tag of selectableTags" (click)="selectTag(tag)" [ngClass]="{'active': isTagSelected&&selectedTag===tag}">
+      <i class="fas fa-filter"></i>
+      &nbsp;{{tag}}
+    </button>
+  </div>
+
 </div>

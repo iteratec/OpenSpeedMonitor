@@ -29,6 +29,7 @@ describe('TimeFrameComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TimeFrameComponent);
     component = fixture.componentInstance;
+    component.showComparativeTimeFrame = true;
     fixture.detectChanges();
   });
 

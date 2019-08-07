@@ -27,6 +27,10 @@ class UserTiming {
         })
     }
 
+    static mapping = {
+        name(index: 'name_idx')
+    }
+
     Double getValue(){
         return this.type == (UserTimingType.MARK || UserTimingType.HERO_MARK) ? this.startTime : this.duration
     }

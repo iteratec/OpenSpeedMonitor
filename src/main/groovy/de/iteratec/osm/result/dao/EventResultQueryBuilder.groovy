@@ -17,7 +17,6 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
 /**
  * Created by mwg on 31.08.2017.
  */
@@ -295,7 +294,7 @@ class EventResultQueryBuilder {
         if (this.aspectUtil.aspectsIncluded()) {
             try {
                 this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - expandByAspects', 2) {
-                    aspectUtil.expandByAspects(results)
+                    aspectUtil.expandByAspects(results, performanceLoggingService)
                 }
             } catch (IllegalStateException e) {
                 log.error(e.getMessage(), e)
@@ -355,7 +354,7 @@ class EventResultQueryBuilder {
             List<EventResultProjection> avgs = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getAverageFrom', 1) {
                 this.aspectUtil.getAverageFrom(rawData)
             }
-            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.INFO))
+            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.DEBUG))
             return avgs
         } else {
             return getAverageDataWithoutAspects()
@@ -376,11 +375,13 @@ class EventResultQueryBuilder {
 
     private List<EventResultProjection> getResults() {
 
-        List<EventResultProjection> userTimingsResult = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getResults - getting user timing results', 3) {
-            userTimingQueryExecutor.getResultFor(filters, trims, baseProjections)
+        List<EventResultProjection> userTimingsResult = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'getResults - getting user timing results', 3) {
+            userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
         }
-        List<EventResultProjection> measurandResult = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getResults - getting measurand results', 3) {
-            measurandQueryExecutor.getResultFor(filters, trims, baseProjections)
+        List<EventResultProjection> measurandResult = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'getResults - getting measurand results', 3) {
+            measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
         }
 
         List<EventResultProjection> merged
@@ -391,17 +392,25 @@ class EventResultQueryBuilder {
         return merged
     }
 
-    private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResult, List<EventResultProjection> userTimingResult) {
-        if (measurandResult && userTimingResult) {
-            measurandResult.each { result ->
-                EventResultProjection match = userTimingResult.find { it == result }
-                if (match) {
-                    result.projectedProperties.putAll(match.projectedProperties)
-                }
+    private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResults, List<EventResultProjection> userTimingResults) {
+        Map<Object, List<EventResultProjection>> userTimingResultsById = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group user timings', 4) {
+            userTimingResults.groupBy { EventResultProjection erp ->
+                erp.id
             }
-            return measurandResult
-        } else {
-            return measurandResult ? measurandResult : userTimingResult
+        }
+        return (List<EventResultProjection>) this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group merge user timings into measurands', 4) {
+            if (measurandResults && userTimingResults) {
+                measurandResults.each { result ->
+                    userTimingResultsById[result.id].each { EventResultProjection userTimingResult ->
+                        result.projectedProperties.putAll(userTimingResult.projectedProperties)
+                    }
+                }
+                return measurandResults
+            } else {
+                return measurandResults ? measurandResults : userTimingResults
+            }
         }
 
     }

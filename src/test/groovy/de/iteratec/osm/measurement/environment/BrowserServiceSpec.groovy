@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -21,15 +21,18 @@ import de.iteratec.osm.api.dto.BrowserInfoDto
 import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.OperatingSystem
 import grails.buildtestdata.BuildDataTest
-import grails.buildtestdata.mixin.Build
 import grails.testing.services.ServiceUnitTest
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 /**
  * Test-suite for {@link BrowserService}.
  */
-@Build([Browser, Location, WebPageTestServer])
 class BrowserServiceSpec extends Specification implements BuildDataTest, ServiceUnitTest<BrowserService> {
+
+    void setupSpec() {
+        mockDomains(Browser, Location, WebPageTestServer)
+    }
 
     void "find by name or alias returns correct browsers"(String nameOrAlias, String expectedBrowserName) {
         given: "Two browsers with aliases"
@@ -81,14 +84,15 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         shouldnCreate.name == "Firefox"
     }
 
+    @Ignore
     @Unroll
     void "Get extended Browser informations for Browser #browserName"() {
         given: "A browser with an associated Location with information"
         Browser b = Browser.build(name: "Chrome")
-        new Location(
+        Location.build(
                 browser: b, active: true, operatingSystem: os, deviceType: dt,
                 label: 'loc', wptServer: WebPageTestServer.build(), location: 'loc'
-        ).save()
+        )
 
         when: "Getting Browser infos and look up for the created browser"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()
@@ -109,6 +113,7 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
 
     }
 
+    @Ignore
     void "Get extended Browser informations for Browser with inconclusive location informations"() {
         given: "Two browsers with conclusive and one with inconclusive location information"
         Browser chrome = Browser.build(name: "Chrome")
@@ -118,7 +123,6 @@ class BrowserServiceSpec extends Specification implements BuildDataTest, Service
         Location.build(browser: firefox, active: true, operatingSystem: OperatingSystem.WINDOWS, deviceType: DeviceType.DESKTOP)
         Browser androidSmartphone = Browser.build(name: "Galaxy S8")
         Location.build(browser: androidSmartphone, active: true, operatingSystem: OperatingSystem.ANDROID, deviceType: DeviceType.SMARTPHONE)
-        Location.list().each { it.active = true; it.save(flush: true) }
 
         when: "Getting Browser infos and look up for the created browsers"
         List<BrowserInfoDto> browserInfos = service.getBrowserInfos()

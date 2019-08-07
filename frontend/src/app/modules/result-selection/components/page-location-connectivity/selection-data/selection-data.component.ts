@@ -40,7 +40,7 @@ export class SelectionDataComponent implements OnInit {
           selectableData = selectableData.filter(item => selectedParents.includes(item.parent.id));
           this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
         }
-        return this.sortAlphabetically(selectableData);
+        return SelectionDataComponent.sortAlphabetically(selectableData);
       })
     );
 
@@ -48,13 +48,15 @@ export class SelectionDataComponent implements OnInit {
       map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
         if (this.parentType !== ResultSelectionCommandParameter.CONNECTIVITIES) {
           let parents: (Browser | Page)[] = next.data.map(value => value.parent);
-          let uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
-          return this.sortAlphabetically(uniqueParents);
+          let uniqueParents: (Browser | Page)[] = SelectionDataComponent.getUniqueElements(parents);
+          return SelectionDataComponent.sortAlphabetically(uniqueParents);
         } else {
-          return this.sortAlphabetically(next.data);
+          return SelectionDataComponent.sortAlphabetically(next.data);
         }
       })
     );
+
+    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection())
   }
 
   filterSelectableItems(selectedParents: number[]): void {
@@ -74,7 +76,16 @@ export class SelectionDataComponent implements OnInit {
     }
   }
 
-  private getUniqueElements(items: (Browser | Page)[]): (Browser | Page)[] {
+  private resetResultSelection() {
+    if (this.parentSelection.length > 0) {
+      this.parentSelection = [];
+    }
+    if (this.showChildSelection && this.childSelection.length > 0) {
+      this.childSelection = [];
+    }
+  }
+
+  private static getUniqueElements(items: (Browser | Page)[]): (Browser | Page)[] {
     let map = new Map();
     let parentElements = [];
     for (let item of items) {
@@ -89,7 +100,7 @@ export class SelectionDataComponent implements OnInit {
     return parentElements;
   }
 
-  private sortAlphabetically<T extends { name: string }>(items: T[]): T[] {
+  private static sortAlphabetically<T extends { name: string }>(items: T[]): T[] {
     return items.sort((a, b) => {
       return a.name.localeCompare(b.name);
     })

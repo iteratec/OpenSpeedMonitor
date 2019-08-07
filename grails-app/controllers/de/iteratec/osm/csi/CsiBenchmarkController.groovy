@@ -53,7 +53,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
         }
 
         String selectedCsiType = params.csiType == "visuallyComplete" ? 'csByWptVisuallyCompleteInPercent' : 'csByWptDocCompleteInPercent'
-        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.selectedJobGroups)
+        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.jobGroups)
 
         CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
@@ -102,7 +102,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
      */
     private String getErrorMessages(GetBarchartCommand cmd) {
         String result = ""
-        if (!cmd.selectedJobGroups) {
+        if (!cmd.jobGroups) {
             result += i18nService.msg("de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder", "Please select at least one jobGroup")
             result += "<br />"
         }

@@ -8,6 +8,7 @@ import de.iteratec.osm.result.PerformanceAspect
 import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
+import de.iteratec.osm.util.PerformanceLoggingService
 import org.grails.datastore.mapping.query.api.Criteria
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,7 +26,7 @@ class AspectUtil {
     List<Long> browserIds = []
     List<PerformanceAspectType> aspectTypes = []
     List<SelectedMeasurand> metrics = []
-    List<PerformanceAspect> usedAspects = []
+    Map<String, PerformanceAspect> aspectLookup = [:]
 
     public boolean aspectsIncluded() {
         return this.aspectTypes.size() > 0
@@ -56,7 +57,7 @@ class AspectUtil {
                                     aspect.performanceAspectType == type
                         }
                         if (aspect) {
-                            usedAspects.add(aspect)
+                            aspectLookup[getKeyOf(jobGroupId, pageId, browserId, type)] = aspect
                             appendMetricIfMissing(aspect.metric, userTimings, measurands)
                         } else {
                             appendMetricIfMissing(new SelectedMeasurand(type.defaultMetric.toString(), CachedView.UNCACHED), userTimings, measurands)
@@ -65,6 +66,10 @@ class AspectUtil {
                 }
             }
         }
+    }
+
+    private String getKeyOf(Long jobGroupId, Long pageId, Long browserId, PerformanceAspectType type) {
+        return "${jobGroupId}_${pageId}_${browserId}_${type.toString()}"
     }
 
     /**
@@ -76,21 +81,22 @@ class AspectUtil {
      *              and {@link Browser} as projected properties. This would be the case if someone uses this class with something
      *              else than raw data from query builder. This isn't supported.
      */
-    public void expandByAspects(List<EventResultProjection> resultsFromDb) throws IllegalStateException {
+    public void expandByAspects(List<EventResultProjection> resultsFromDb, PerformanceLoggingService performanceLoggingService) throws IllegalStateException {
         aspectTypes.each { PerformanceAspectType type ->
-            resultsFromDb.each { EventResultProjection result ->
-                Long jobGroupId = result.projectedProperties["jobGroupId"]
-                Long pageId = result.projectedProperties["pageId"]
-                Long browserId = result.projectedProperties["browserId"]
-                if (!jobGroupId || !pageId || !browserId) {
-                    throw new IllegalStateException("Result from db doesn't contain jobgroupId, pageId and browserId: ${result}")
+            Map<String, List<EventResultProjection>> resultsByJobGroupPageAndBrowser = (Map<String, List<EventResultProjection>>) performanceLoggingService.logExecutionTimeSilently(
+                    PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - grouping results ${aspectLookup.size()}", 3) {
+                resultsFromDb.groupBy { EventResultProjection erp ->
+                    "${erp.projectedProperties.jobGroupId}_${erp.projectedProperties.pageId}_${erp.projectedProperties.browserId}".toString()
                 }
-                PerformanceAspect usedAspect = usedAspects.find { PerformanceAspect a ->
-                    a.jobGroup.ident() == jobGroupId && a.page.ident() == pageId && a.browser.ident() == browserId && a.performanceAspectType == type
+            }
+            resultsByJobGroupPageAndBrowser.each { String jobGroupPageAndBrowserKey, List<EventResultProjection> resultsOfKey ->
+                String typeAsString = type.toString()
+                PerformanceAspect usedAspect = (PerformanceAspect) performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - find aspect in list of ${aspectLookup.size()}", 3) {
+                    aspectLookup["${jobGroupPageAndBrowserKey}_${typeAsString}".toString()]
                 }
-                String metricToUse = usedAspect ? usedAspect.metric.getDatabaseRelevantName() : type.defaultMetric.getEventResultField()
-                if (result[metricToUse]) {
-                    result.projectedProperties[type.toString()] = result[metricToUse]
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, 'expandByAspects - set metric', 3) {
+                    String metricToUse = usedAspect ? usedAspect.metric.getDatabaseRelevantName() : type.defaultMetric.getEventResultField()
+                    resultsOfKey.each { if (it[metricToUse]) it.projectedProperties[typeAsString] = it[metricToUse] }
                 }
             }
         }

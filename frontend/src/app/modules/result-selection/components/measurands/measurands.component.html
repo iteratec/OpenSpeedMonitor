@@ -1,26 +1,28 @@
 <div class="card form-horizontal">
   <h2>{{ 'frontend.de.iteratec.osm.resultSelection.measurands.title' | translate }}</h2>
 
-  <div class="row form-group" *ngFor="let metric of selectedMeasurands; index as i; trackBy:trackByFn; first as isFirst">
-    <label class="control-label col-sm-4" *ngIf="isFirst">
-      {{ 'frontend.de.iteratec.osm.resultSelection.measurands.title' | translate }}:
-    </label>
-    <div class="col-sm-7" [ngClass]="{'col-sm-offset-4': !isFirst}">
-      <osm-measurand-select [selectedMeasurand]="metric" [selectableMeasurandGroups]="measurands$"
-                            (onSelect)="selectMeasurand(i, $event)"></osm-measurand-select>
+  <div class="measurand-card-content">
+    <div class="row form-group" *ngFor="let metric of selectedMeasurands; index as i; trackBy:trackByFn; first as isFirst">
+      <label class="control-label col-sm-3" *ngIf="isFirst">
+        {{ 'frontend.de.iteratec.osm.resultSelection.measurands.title' | translate }}:
+      </label>
+      <div class="col-sm-8" [ngClass]="{'col-sm-offset-3': !isFirst}">
+        <osm-measurand-select [selectedMeasurand]="metric" [selectableMeasurandGroups]="measurands$" [perfAspectTypes$]="aspectTypes$"
+                              (onSelect)="selectMeasurand(i, $event)"></osm-measurand-select>
+      </div>
+      <div class="col-sm-1 remove-measurand" *ngIf="!isFirst">
+        <a id="remove-measurand-button" (click)="removeMeasurandField(i)">
+          <i class="fas fa-times" aria-hidden="true"></i>
+        </a>
+      </div>
     </div>
-    <div class="col-sm-1 control-label remove-measurand-button" *ngIf="!isFirst">
-      <a (click)="removeMeasurandField(i)">
-        <i class="fas fa-times" aria-hidden="true"></i>
-      </a>
-    </div>
-  </div>
 
-  <div class="row form-group">
-    <div class="col-sm-7 col-sm-offset-4">
-      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" (click)="addMeasurandField()">
-        <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate }}
-      </button>
+    <div class="row form-group" *ngIf="multipleMeasurands">
+      <div class="col-sm-8 col-sm-offset-3">
+        <button type="button" id="add-measurand-button" class="btn btn-default btn-block" (click)="addMeasurandField()" [disabled]="resultSelectionStore.remainingResultSelection.fromComparative || resultSelectionStore.remainingResultSelection.toComparative">
+          <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate }}
+        </button>
+      </div>
     </div>
   </div>
 

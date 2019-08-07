@@ -25,6 +25,14 @@ const appRoutes: Routes = [
     loadChildren: './modules/metric-finder/metric-finder.module#MetricFinderModule'
   },
   {
+    path: 'aggregationDev',
+    loadChildren: './modules/aggregation/aggregation.module#AggregationModule'
+  },
+  {
+    path: 'eventResultDashboardDev',
+    loadChildren: './modules/time-series/time-series.module#TimeSeriesModule'
+  },
+  {
     path: '',
     loadChildren: './modules/landing/landing.module#LandingModule',
     pathMatch: 'full'

@@ -61,9 +61,16 @@
                         <g:link controller="aggregation" action="show"
                                 title="${message(code:'de.iteratec.isocsi.aggregationChart', default:'Aggregation')}">
                             <i class="fas fa-chart-bar"></i>
-                                <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/>
+                            <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/>
                         </g:link>
                     </li>
+                    <!--<li class="${request.forwardURI.equals('/aggregationDev/show') ? 'active' : ''}"
+                        data-active-matches="/aggregationDev/?.*">
+                        <a href="${createLink(uri: '/aggregationDev/show')}">
+                            <i class="fas fa-chart-bar"></i>
+                            <g:message message="frontend.de.iteratec.osm.aggregation.title"/>
+                        </a>
+                    </li>-->
                     <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
                         <g:link controller="distributionChart" action="show"
                                 title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">

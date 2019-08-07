@@ -5,30 +5,24 @@ import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.query.AggregationUtil
 import de.iteratec.osm.result.dao.query.ProjectionProperty
 
-class UserTimingRawDataTransformer implements EventResultTransformer{
+class UserTimingRawDataTransformer implements EventResultTransformer {
     Set<ProjectionProperty> baseProjections
 
     @Override
     List<EventResultProjection> transformRawQueryResult(List<Map> rawQueryData) {
-        List<EventResultProjection> projections = []
-        rawQueryData.each { Map dbResult ->
-            def userTimingValue = dbResult.type == UserTimingType.MEASURE ? dbResult.duration : dbResult.startTime
-            EventResultProjection projection = getRelevantProjection(dbResult, projections)
-            projection.projectedProperties.put(dbResult.name, userTimingValue)
-            projection.projectedProperties.putAll(AggregationUtil.getMetaData(dbResult, baseProjections))
+        Map<Object, List<Map>> rawDataById = rawQueryData.groupBy { Map dbResult ->
+            dbResult.id
         }
-        return projections
-    }
-
-    EventResultProjection getRelevantProjection(Map dbResult, List<EventResultProjection> projections) {
-        EventResultProjection relevantProjection = projections.find { EventResultProjection projection ->
-            projection.id == dbResult.id
+        return rawDataById.collect { id, List<Map> rawDatasOfId ->
+            EventResultProjection projectionOfId = new EventResultProjection(id: id)
+            projectionOfId.projectedProperties.putAll(AggregationUtil.getMetaData(rawDatasOfId[0], baseProjections))
+            rawDatasOfId.inject(projectionOfId) { EventResultProjection projection, Map rawDataOfId ->
+                def userTimingValue = rawDataOfId.type == UserTimingType.MEASURE ? rawDataOfId.duration : rawDataOfId.startTime
+                projection.projectedProperties.put(rawDataOfId.name, userTimingValue)
+                return projection
+            }
+            return projectionOfId
         }
-        if (!relevantProjection) {
-            relevantProjection = new EventResultProjection(id: dbResult.id)
-            projections.add(relevantProjection)
-        }
-        return relevantProjection
     }
 
 }

@@ -17,6 +17,8 @@ import {MetricSelectionComponent} from "../../../metric-finder/components/metric
 import {FilmstripComponent} from "../../../metric-finder/components/filmstrip/filmstrip.component";
 import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
 import {FilmstripService} from "../../../metric-finder/services/filmstrip.service";
+import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
+import {GlobalOsmNamespace} from "../../../../models/global-osm-namespace.model";
 
 describe('EditAspectMetricsComponent', () => {
   let component: EditAspectMetricsComponent;
@@ -47,7 +49,11 @@ describe('EditAspectMetricsComponent', () => {
         },
         AspectConfigurationService,
         MetricFinderService,
-        FilmstripService
+        FilmstripService,
+        {
+          provide: GrailsBridgeService,
+          useClass: MockGrailsBridgeService
+        }
       ],
       imports: [
         SharedMocksModule,
@@ -68,3 +74,7 @@ describe('EditAspectMetricsComponent', () => {
     expect(component).toBeTruthy();
   });
 });
+
+class MockGrailsBridgeService extends GrailsBridgeService {
+  globalOsmNamespace: GlobalOsmNamespace = {i18n: {lang: 'de'}, user: {loggedIn: true}};
+}
