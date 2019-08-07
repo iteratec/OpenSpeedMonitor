@@ -269,8 +269,8 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
 
         then: "there is one EventResult with both time to interactive values"
         eventResults.size() == 1
-        eventResults.get(0).firstInteractiveInMillisecs == 2286
-        eventResults.get(0).consistentlyInteractiveInMillisecs == 2286
+        eventResults.get(0).firstCpuIdleInMillisecs == 2286
+        eventResults.get(0).timeToInteractiveInMillisecs == 2286
     }
 
     void "check CSI value creation"() {

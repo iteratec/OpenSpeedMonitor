@@ -15,7 +15,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
     JobGroup jobGroup
     Page page1, page2
     Browser browser1, browser2
-    SelectedMeasurand docComplete, countRequest, startRender, firstContentfulPaint, visuallyCompleteInMillisecs, consistentlyInteractiveInMillisecs
+    SelectedMeasurand docComplete, countRequest, startRender, firstContentfulPaint, visuallyCompleteInMillisecs, timeToInteractiveInMillisecs
 
     def setup() {
         jobGroup = JobGroup.build()
@@ -28,7 +28,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         startRender = createMeasurand("START_RENDER")
         firstContentfulPaint = createMeasurand("FIRST_CONTENTFUL_PAINT")
         visuallyCompleteInMillisecs = createMeasurand("VISUALLY_COMPLETE")
-        consistentlyInteractiveInMillisecs = createMeasurand("CONSISTENTLY_INTERACTIVE")
+        timeToInteractiveInMillisecs = createMeasurand("TIME_TO_INTERACTIVE")
     }
 
     void "Median of aspect metrics, all results share the same aspect metrics, grouped by jobgroup, page + browser"() {
@@ -108,7 +108,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         given: "5/10 EventResults with different aspect metrics and matching Aspects in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint, page1, browser1)
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, startRender, page1, browser2)
-        persistAspect(PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT, consistentlyInteractiveInMillisecs, page1, browser1)
+        persistAspect(PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT, timeToInteractiveInMillisecs, page1, browser1)
         int visCompleteAsDefault = 500 // for PAGE_SHOWS_USEFUL_CONTENT
         5.times {
             LinkedHashMap<String, Integer> metrics = [

@@ -15,7 +15,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
     JobGroup jobGroup
     Page page
     Browser browser
-    SelectedMeasurand docComplete, countRequest, startRender, firstContentfulPaint, visuallyCompleteInMillisecs, consistentlyInteractiveInMillisecs
+    SelectedMeasurand docComplete, countRequest, startRender, firstContentfulPaint, visuallyCompleteInMillisecs, timeToInteractiveInMillisecs
 
     def setup() {
         jobGroup = JobGroup.build()
@@ -26,7 +26,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         startRender = createMeasurand("START_RENDER")
         firstContentfulPaint = createMeasurand("FIRST_CONTENTFUL_PAINT")
         visuallyCompleteInMillisecs = createMeasurand("VISUALLY_COMPLETE")
-        consistentlyInteractiveInMillisecs = createMeasurand("CONSISTENTLY_INTERACTIVE")
+        timeToInteractiveInMillisecs = createMeasurand("TIME_TO_INTERACTIVE")
     }
 
     void "query builder doesn't add aspect metrics if no aspect type is queried"() {
@@ -167,7 +167,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
 
     void "query builder gets metric of selected aspect type when NO measurand is selected"() {
         given: "an EventResult with some metrics and one matching aspect in db"
-        persistAspect(PerformanceAspectType.PAGE_IS_USABLE, consistentlyInteractiveInMillisecs)
+        persistAspect(PerformanceAspectType.PAGE_IS_USABLE, timeToInteractiveInMillisecs)
         persistEventResult([
                 startRenderInMillisecs            : 300,
                 firstContentfulPaint              : 400,
