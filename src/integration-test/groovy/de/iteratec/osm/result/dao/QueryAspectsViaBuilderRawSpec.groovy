@@ -33,12 +33,12 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         given: "An EventResult with some metrics and an Aspect in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint)
         persistEventResult([
-                startRenderInMillisecs            : 300,
-                firstContentfulPaint              : 400,
-                docCompleteTimeInMillisecs        : 1200,
-                docCompleteRequests               : 35,
-                visuallyCompleteInMillisecs       : 500,
-                consistentlyInteractiveInMillisecs: 600
+                startRenderInMillisecs      : 300,
+                firstContentfulPaint        : 400,
+                docCompleteTimeInMillisecs  : 1200,
+                docCompleteRequests         : 35,
+                visuallyCompleteInMillisecs : 500,
+                timeToInteractiveInMillisecs: 600
         ])
 
         when: "the builder is used without querying an aspect"
@@ -58,7 +58,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1200
         !result.docCompleteRequests
         !result.visuallyCompleteInMillisecs
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         !result.PAGE_CONSTRUCTION_STARTED
     }
 
@@ -66,12 +66,12 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         given: "An EventResult with some metrics and a matching Aspect in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint)
         persistEventResult([
-                startRenderInMillisecs            : 300,
-                firstContentfulPaint              : 400,
-                docCompleteTimeInMillisecs        : 1200,
-                docCompleteRequests               : 35,
-                visuallyCompleteInMillisecs       : 500,
-                consistentlyInteractiveInMillisecs: 600
+                startRenderInMillisecs      : 300,
+                firstContentfulPaint        : 400,
+                docCompleteTimeInMillisecs  : 1200,
+                docCompleteRequests         : 35,
+                visuallyCompleteInMillisecs : 500,
+                timeToInteractiveInMillisecs: 600
         ])
 
         when: "the builder is given the aspect type of matching aspect"
@@ -92,7 +92,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1200
         !result.docCompleteRequests
         !result.visuallyCompleteInMillisecs
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         result.PAGE_CONSTRUCTION_STARTED == 400
     }
 
@@ -100,12 +100,12 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         given: "An EventResult with some metrics and no matching Aspect in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint)
         persistEventResult([
-                startRenderInMillisecs            : 300,
-                firstContentfulPaint              : 400,
-                docCompleteTimeInMillisecs        : 1200,
-                docCompleteRequests               : 35,
-                visuallyCompleteInMillisecs       : 500,
-                consistentlyInteractiveInMillisecs: 600
+                startRenderInMillisecs      : 300,
+                firstContentfulPaint        : 400,
+                docCompleteTimeInMillisecs  : 1200,
+                docCompleteRequests         : 35,
+                visuallyCompleteInMillisecs : 500,
+                timeToInteractiveInMillisecs: 600
         ])
 
         when: "the builder is given the an aspect type without matching aspect"
@@ -126,7 +126,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1200
         !result.docCompleteRequests
         result.visuallyCompleteInMillisecs == 500
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         result.PAGE_SHOWS_USEFUL_CONTENT == 500
     }
 
@@ -134,12 +134,12 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         given: "An EventResult with some metrics and one matching Aspect in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint)
         persistEventResult([
-                startRenderInMillisecs            : 300,
-                firstContentfulPaint              : 400,
-                docCompleteTimeInMillisecs        : 1200,
-                docCompleteRequests               : 35,
-                visuallyCompleteInMillisecs       : 500,
-                consistentlyInteractiveInMillisecs: 600
+                startRenderInMillisecs      : 300,
+                firstContentfulPaint        : 400,
+                docCompleteTimeInMillisecs  : 1200,
+                docCompleteRequests         : 35,
+                visuallyCompleteInMillisecs : 500,
+                timeToInteractiveInMillisecs: 600
         ])
 
         when: "the builder is given the aspect type of matching aspect and another one without matching aspect"
@@ -160,7 +160,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1200
         !result.docCompleteRequests
         result.visuallyCompleteInMillisecs == 500
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         result.PAGE_CONSTRUCTION_STARTED == 400
         result.PAGE_SHOWS_USEFUL_CONTENT == 500
     }
@@ -169,12 +169,12 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         given: "an EventResult with some metrics and one matching aspect in db"
         persistAspect(PerformanceAspectType.PAGE_IS_USABLE, timeToInteractiveInMillisecs)
         persistEventResult([
-                startRenderInMillisecs            : 300,
-                firstContentfulPaint              : 400,
-                docCompleteTimeInMillisecs        : 1200,
-                docCompleteRequests               : 35,
-                visuallyCompleteInMillisecs       : 500,
-                consistentlyInteractiveInMillisecs: 600
+                startRenderInMillisecs      : 300,
+                firstContentfulPaint        : 400,
+                docCompleteTimeInMillisecs  : 1200,
+                docCompleteRequests         : 35,
+                visuallyCompleteInMillisecs : 500,
+                timeToInteractiveInMillisecs: 600
         ])
 
         when: "the builder is given the correct aspect type and no measurand"
@@ -190,7 +190,7 @@ class QueryAspectsViaBuilderRawSpec extends NonTransactionalIntegrationSpec {
         results.size() == 1
         EventResultProjection result = results[0]
         result.PAGE_IS_USABLE == 600
-        result.consistentlyInteractiveInMillisecs == 600
+        result.timeToInteractiveInMillisecs == 600
         !result.startRenderInMillisecs
         !result.firstContentfulPaint
         !result.docCompleteTimeInMillisecs
