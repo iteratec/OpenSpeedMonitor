@@ -62,7 +62,6 @@ class LineChartTimeSeriesService {
         TimeSeriesChartDTO timeSeriesChartDTO = new TimeSeriesChartDTO()
         performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
             eventResultProjections.each {EventResultProjection eventResultProjection ->
-                Page page
                 MeasuredEvent measuredEvent
                 Date date = (Date) eventResultProjection.jobResultDate;
                 Double value = (Double) eventResultProjection.docCompleteTimeInMillisecs;
@@ -83,7 +82,8 @@ class LineChartTimeSeriesService {
                     timeSeriesChartDTO.series.put(identifier, timeSeries)
                 }
                 def timeSeries = timeSeriesChartDTO.series.get(identifier)
-                timeSeries.data.put(date, value)
+                TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
+                timeSeries.data.add(timeSeriesDataPoint)
             }
         }
 
