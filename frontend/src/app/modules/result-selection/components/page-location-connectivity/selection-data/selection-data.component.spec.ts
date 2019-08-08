@@ -133,7 +133,7 @@ describe('SelectionDataComponent', () => {
     component.childType = ResultSelectionCommandParameter.LOCATIONS;
     component.parentType = ResultSelectionCommandParameter.BROWSERS;
     component.parentChildData$ = resultSelectionStore.locationsAndBrowsers$;
-    component.parentSelectionOptional = false;
+    component.parentRequired = true;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.style.opacity).toBe('1');
     component.parentSelection = [1];
@@ -145,7 +145,7 @@ describe('SelectionDataComponent', () => {
     component.childType = ResultSelectionCommandParameter.LOCATIONS;
     component.parentType = ResultSelectionCommandParameter.BROWSERS;
     component.parentChildData$ = resultSelectionStore.locationsAndBrowsers$;
-    component.parentSelectionOptional = true;
+    component.parentRequired = false;
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#result-selection-parent-selection')).nativeElement.style.opacity).toBe('0.5');
     component.parentSelection = [1];
