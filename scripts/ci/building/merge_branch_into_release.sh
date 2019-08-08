@@ -1,9 +1,9 @@
 #!/bin/bash
 
 echo "prepare some variables"
-echo "bamboo_planRepository_branchName=$bamboo_planRepository_branchName"
+echo "bamboo_osm_branch_to_merge=$bamboo_osm_branch_to_merge"
 echo "########################################'"
-echo "start bamboo job to merge $bamboo_planRepository_branchName into release"
+echo "start bamboo job to merge $bamboo_osm_branch_to_merge into release"
 echo "########################################'"
 remote=origin
 
@@ -24,5 +24,12 @@ git tag -d $(git tag -l)
 git fetch --all
 echo "git checkout release"
 git checkout release
-echo "git merge $bamboo_planRepository_branchName"
-git merge $bamboo_planRepository_branchName
+
+target_branch="develop"
+
+if [[ "$bamboo_osm_branch_to_merge" != "develop" ]]; then
+    target_branch="origin/$bamboo_osm_branch_to_merge"
+fi
+
+echo "git merge $target_branch"
+git merge $target_branch
