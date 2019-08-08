@@ -29,7 +29,7 @@ export class LinechartDataService {
       to: resultSelectionCommand.to,
       interval: remainingResultSelection.interval,
       measurands: remainingResultSelection.measurands,
-      applications: resultSelectionCommand.jobGroupIds,
+      jobGroups: resultSelectionCommand.jobGroupIds,
       pages: resultSelectionCommand.pageIds,
       measuredEvents: resultSelectionCommand.measuredEventIds,
       browsers: resultSelectionCommand.browserIds,

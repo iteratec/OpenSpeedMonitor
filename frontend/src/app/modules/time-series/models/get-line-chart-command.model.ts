@@ -4,7 +4,7 @@ export interface GetLinechartCommandDTO {
   to: Date;
   interval: number;
   measurands: string[];
-  applications: number[];
+  jobGroups: number[];
   pages?: number[];
   measuredEvents?: number[];
   browsers?: number[];
@@ -20,7 +20,7 @@ export class GetLinechartCommand implements GetLinechartCommandDTO {
   to: Date;
   interval: number;
   measurands: string[];
-  applications: number[];
+  jobGroups: number[];
   pages?: number[];
   measuredEvents?: number[];
   browsers?: number[];
@@ -35,7 +35,7 @@ export class GetLinechartCommand implements GetLinechartCommandDTO {
     this.to = dto.to;
     this.interval = dto.interval;
     this.measurands = dto.measurands;
-    this.applications = dto.applications;
+    this.jobGroups = dto.jobGroups;
     this.pages = dto.pages;
     this.measuredEvents = dto.measuredEvents;
     this.browsers = dto.browsers;

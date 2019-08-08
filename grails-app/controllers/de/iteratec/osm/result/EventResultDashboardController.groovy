@@ -19,11 +19,9 @@ package de.iteratec.osm.result
 
 import de.iteratec.osm.ConfigService
 import de.iteratec.osm.annotations.RestAction
-import de.iteratec.osm.csi.Page
 import de.iteratec.osm.linechart.GetLinechartCommand
 import de.iteratec.osm.linechart.LineChartTimeSeriesService
-import de.iteratec.osm.linechart.LinechartTimeSeries
-import de.iteratec.osm.measurement.schedule.JobGroup
+import de.iteratec.osm.linechart.TimeSeriesChartDTO
 import de.iteratec.osm.measurement.schedule.JobGroupService
 import de.iteratec.osm.p13n.CustomDashboardService
 import de.iteratec.osm.report.UserspecificDashboardBase
@@ -33,8 +31,6 @@ import de.iteratec.osm.report.chart.CsiAggregationInterval
 import de.iteratec.osm.report.chart.EventService
 import de.iteratec.osm.report.chart.OsmChartAxis
 import de.iteratec.osm.report.chart.OsmRickshawChart
-import de.iteratec.osm.result.dao.EventResultProjection
-import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.AnnotationUtil
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
@@ -45,6 +41,7 @@ import org.grails.web.json.JSONObject
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.http.HttpStatus
 
 class EventResultDashboardController {
 
@@ -155,8 +152,14 @@ class EventResultDashboardController {
      */
     @RestAction
     def getLinechartData(GetLinechartCommand cmd) {
-        List<LinechartTimeSeries> result = lineChartTimeSeriesService.getLinechartTimeSeriesFor(cmd)
-        ControllerUtils.sendObjectAsJSON(response, result)
+        String errorMessages = getErrorMessages(cmd)
+        if (errorMessages) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, errorMessages)
+            return
+        }
+
+        TimeSeriesChartDTO timeSeriesChartDTO = lineChartTimeSeriesService.getTimeSeriesFor(cmd)
+        ControllerUtils.sendObjectAsJSON(response, timeSeriesChartDTO)
     }
 
     private boolean isUserAllowedToViewDashboard(String dashboardID) {
@@ -370,6 +373,24 @@ class EventResultDashboardController {
         i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
 
         modelToRender.put('i18n', i18n as JSON)
+    }
+
+    /**
+     * Validates the command and creates an error message string if necessary.
+     * @param cmd
+     * @return a string containing the error messages in html format or an empty string if the command is valid
+     */
+    private String getErrorMessages(GetLinechartCommand cmd) {
+        String result = ""
+        if (!cmd.pages && !cmd.measuredEvents) {
+            result += i18nService.msg("de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage", "Please select at least one page")
+            result += "<br />"
+        }
+        if (!cmd.jobGroups) {
+            result += i18nService.msg("de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder", "Please select at least one jobGroup")
+            result += "<br />"
+        }
+        return result
     }
 
     /**
