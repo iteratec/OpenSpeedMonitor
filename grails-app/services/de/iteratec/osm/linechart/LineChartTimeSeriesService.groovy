@@ -74,14 +74,14 @@ class LineChartTimeSeriesService {
                     measuredEvent = (MeasuredEvent) MeasuredEvent.findById(eventResultProjection.measuredEventId)
                     identifier += " | ${measuredEvent?.name}"
                 }
-                if (!timeSeriesChartDTO.series.get(identifier)) {
-                    TimeSeries timeSeries = new TimeSeries(jobGroup: jobGroup.name)
+                TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
+                if (!timeSeries) {
+                    timeSeries = new TimeSeries(identifier: identifier, jobGroup: jobGroup.name)
                     if (measuredEvent) {
                         timeSeries.setMeasuredEvent(measuredEvent.name)
                     }
-                    timeSeriesChartDTO.series.put(identifier, timeSeries)
+                    timeSeriesChartDTO.series.add(timeSeries)
                 }
-                def timeSeries = timeSeriesChartDTO.series.get(identifier)
                 TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
                 timeSeries.data.add(timeSeriesDataPoint)
             }
