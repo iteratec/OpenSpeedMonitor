@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import {MeasurandGroup, SelectableMeasurand} from "../../../../../models/measurand.model";
+import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../../models/measurand.model";
 import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 import {PerformanceAspectType} from "../../../../../models/perfomance-aspect.model";
 
@@ -10,8 +10,8 @@ import {PerformanceAspectType} from "../../../../../models/perfomance-aspect.mod
   styleUrls: ['./measurand-select.component.scss']
 })
 export class MeasurandSelectComponent implements OnInit {
-  @Input() selectedMeasurand: PerformanceAspectType | SelectableMeasurand;
-  @Output() onSelect: EventEmitter<PerformanceAspectType | SelectableMeasurand> = new EventEmitter<PerformanceAspectType | SelectableMeasurand>();
+  @Input() selectedMeasurand: Measurand;
+  @Output() onSelect: EventEmitter<Measurand> = new EventEmitter<Measurand>();
 
   @Input() selectableMeasurandGroups: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>>;
   @Input() perfAspectTypes$: BehaviorSubject<PerformanceAspectType[]>;
@@ -24,14 +24,14 @@ export class MeasurandSelectComponent implements OnInit {
     this.onSelect.emit(this.selectedMeasurand);
   }
 
-  compareMeasurands(measurand1: PerformanceAspectType | SelectableMeasurand, measurand2: PerformanceAspectType | SelectableMeasurand): boolean {
+  compareMeasurands(measurand1: Measurand, measurand2: Measurand): boolean {
     if (measurand1 && measurand2) {
-      if ('id' in measurand1 && 'id' in measurand2) {
-        return measurand1.id == measurand2.id;
-      } else if (!('id' in measurand1 || 'id' in measurand2)) {
+      if (measurand1.kind === "performance-aspect-type" && measurand2.kind === "performance-aspect-type") {
         return measurand1.name == measurand2.name;
+      } if (measurand1.kind === "selectable-measurand" && measurand2.kind === "selectable-measurand") {
+        return measurand1.id == measurand2.id;
       }
     }
-    return measurand1 == measurand2;
+    return false;
   }
 }

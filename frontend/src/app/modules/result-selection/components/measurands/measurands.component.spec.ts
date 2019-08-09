@@ -35,14 +35,17 @@ describe('MeasurandsComponent', () => {
       name: 'frontend.de.iteratec.isr.measurand.group.LOAD_TIMES',
       values: [
         {
+          kind: "selectable-measurand",
           id: 'DOC_COMPLETE_TIME',
           name: 'frontend.de.iteratec.isr.measurand.DOC_COMPLETE_TIME'
         },
         {
+          kind: "selectable-measurand",
           id: 'DOM_TIME',
           name: 'frontend.de.iteratec.isr.measurand.DOM_TIME'
         },
         {
+          kind: "selectable-measurand",
           id: 'FIRST_BYTE',
           name: 'frontend.de.iteratec.isr.measurand.FIRST_BYTE'
         }

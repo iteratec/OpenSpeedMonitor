@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
+import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../models/measurand.model";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
@@ -21,8 +21,8 @@ export class MeasurandsComponent implements OnInit {
     data: []
   });
 
-  selectedMeasurands: (PerformanceAspectType | SelectableMeasurand)[] = [];
-  defaultValue: PerformanceAspectType | SelectableMeasurand;
+  selectedMeasurands: (Measurand)[] = [];
+  defaultValue: Measurand;
   addingComparativeTimeFrameDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   @Input() multipleMeasurands = false;
@@ -51,7 +51,7 @@ export class MeasurandsComponent implements OnInit {
     });
   }
 
-  selectMeasurand(index: number, measurand: PerformanceAspectType | SelectableMeasurand): void {
+  selectMeasurand(index: number, measurand: Measurand): void {
     this.selectedMeasurands[index] = measurand;
     this.setResultSelection();
   }
@@ -99,14 +99,14 @@ export class MeasurandsComponent implements OnInit {
 
   private setResultSelection(): void {
     this.resultSelectionStore.setRemainingResultSelectionEnums(
-      this.selectedMeasurands.filter((item: PerformanceAspectType | SelectableMeasurand) => {
-        return !('id' in item)
+      this.selectedMeasurands.filter((item: Measurand) => {
+        return item.kind === "performance-aspect-type"
       }).map((performanceAspectType: PerformanceAspectType) => performanceAspectType.name),
       RemainingResultSelectionParameter.PERFORMANCE_ASPECT_TYPES
     );
     this.resultSelectionStore.setRemainingResultSelectionEnums(
-      this.selectedMeasurands.filter((item: PerformanceAspectType | SelectableMeasurand) => {
-        return 'id' in item
+      this.selectedMeasurands.filter((item: Measurand) => {
+        return item.kind === "selectable-measurand"
       }).map((measurand: SelectableMeasurand) => measurand.id),
       RemainingResultSelectionParameter.MEASURANDS
     );
