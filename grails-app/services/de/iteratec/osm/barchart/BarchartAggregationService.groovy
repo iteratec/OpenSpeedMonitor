@@ -181,7 +181,10 @@ class BarchartAggregationService {
             result += performanceAspectTypes.collect { PerformanceAspectType aspectType ->
                 new BarchartAggregation(
                         value: aggregation."${aspectType.name()}",
-                        performanceAspectType: aspectType,
+                        unit: aspectType.unit.label,
+                        measurandLabel: i18nService.msg("frontend.de.iteratec.osm.performance-aspect.${aspectType.name()}", aspectType.name()),
+                        measurandName: aspectType.name(),
+                        measurandGroup: null,
                         jobGroup: jobGroup,
                         page: page,
                         browser: browser ?: null,
@@ -193,7 +196,10 @@ class BarchartAggregationService {
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
-                        selectedMeasurand: selected,
+                        unit: selected.getMeasurandGroup().unit.label,
+                        measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${selected.name}", selected.name),
+                        measurandName: selected.name,
+                        measurandGroup: selected.getMeasurandGroup(),
                         jobGroup: jobGroup,
                         page: page,
                         browser: browser ?: null,

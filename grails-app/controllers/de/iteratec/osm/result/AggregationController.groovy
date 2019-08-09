@@ -148,10 +148,10 @@ class AggregationController extends ExceptionHandlerController {
                 return []
             } else {
                 return [new AggregationChartSeriesDTO(
-                    unit: it.selectedMeasurand ? it.selectedMeasurand.getMeasurandGroup().unit.label : it.performanceAspectType.unit.label,
-                    measurandLabel: it.selectedMeasurand ? i18nService.msg("de.iteratec.isr.measurand.${it.selectedMeasurand.name}", it.selectedMeasurand.name) : i18nService.msg("frontend.de.iteratec.osm.performance-aspect.${it.performanceAspectType.name()}", it.performanceAspectType.name()),
-                    measurand: it.selectedMeasurand ? it.selectedMeasurand.name : it.performanceAspectType.name(),
-                    measurandGroup: it.selectedMeasurand ? it.selectedMeasurand.getMeasurandGroup() : null,
+                    unit: it.unit,
+                    measurandLabel: it.measurandLabel,
+                    measurand: it.measurandName,
+                    measurandGroup: it.measurandGroup,
                     value: it.value,
                     valueComparative: it.valueComparative,
                     page: it.page?.name,

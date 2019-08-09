@@ -14,8 +14,10 @@ import groovy.transform.EqualsAndHashCode
 class BarchartAggregation {
     Double value
     Double valueComparative
-    SelectedMeasurand selectedMeasurand
-    PerformanceAspectType performanceAspectType
+    String unit
+    String measurandLabel
+    String measurandName
+    String measurandGroup
     Page page
     JobGroup jobGroup
     Browser browser
