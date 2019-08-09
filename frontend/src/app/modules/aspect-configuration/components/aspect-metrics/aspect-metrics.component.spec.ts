@@ -33,7 +33,7 @@ describe('AspectMetricsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(AspectMetricsComponent);
     component = fixture.componentInstance;
-    component.actualType = {name: 'aspect-type', icon: 'aspect-type-icon', unit: 'aspect-type-unit'};
+    component.actualType = {kind: "performance-aspect-type", name: 'aspect-type', icon: 'aspect-type-icon', unit: 'aspect-type-unit'};
     fixture.detectChanges();
   });
 
@@ -43,15 +43,15 @@ describe('AspectMetricsComponent', () => {
   it('should filter aspects respective asp', inject(
     [AspectMetricsComponent, AspectConfigurationService],
     (component: AspectMetricsComponent, aspectConfService: AspectConfigurationService) => {
-      const type1: PerformanceAspectType = {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'};
-      const type2: PerformanceAspectType = {name: 'PAGE_SHOWS_USEFUL_CONTENT', icon: 'hourglass', unit: 'ms'};
+      const type1: PerformanceAspectType = {kind: "performance-aspect-type", name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'};
+      const type2: PerformanceAspectType = {kind: "performance-aspect-type", name: 'PAGE_SHOWS_USEFUL_CONTENT', icon: 'hourglass', unit: 'ms'};
       const aspectsOfTwoDifferentTypes: ExtendedPerformanceAspect[] = [
         {
           id: 1,
           pageId: 1,
           applicationId: 1,
           browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
+          measurand: {kind: "selectable-measurand", id: 'DOC_COMPLETE', name: 'Document complete'},
           performanceAspectType: type1,
           persistent: true,
           browserName: 'browser1',
@@ -63,7 +63,7 @@ describe('AspectMetricsComponent', () => {
           pageId: 4,
           applicationId: 1,
           browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
+          measurand: {kind: "selectable-measurand", id: 'DOC_COMPLETE', name: 'Document complete'},
           performanceAspectType: type2,
           persistent: true,
           browserName: 'browser1',

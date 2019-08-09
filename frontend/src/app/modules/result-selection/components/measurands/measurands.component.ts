@@ -22,7 +22,7 @@ export class MeasurandsComponent implements OnInit {
   });
 
   selectedMeasurands: (Measurand)[] = [];
-  defaultValue: Measurand;
+  defaultValue: PerformanceAspectType;
   addingComparativeTimeFrameDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   @Input() multipleMeasurands = false;
@@ -100,13 +100,19 @@ export class MeasurandsComponent implements OnInit {
   private setResultSelection(): void {
     this.resultSelectionStore.setRemainingResultSelectionEnums(
       this.selectedMeasurands.filter((item: Measurand) => {
-        return item.kind === "performance-aspect-type"
+        if (item) {
+          return item.kind === "performance-aspect-type"
+        }
+        return false
       }).map((performanceAspectType: PerformanceAspectType) => performanceAspectType.name),
       RemainingResultSelectionParameter.PERFORMANCE_ASPECT_TYPES
     );
     this.resultSelectionStore.setRemainingResultSelectionEnums(
       this.selectedMeasurands.filter((item: Measurand) => {
-        return item.kind === "selectable-measurand"
+        if (item) {
+          return item.kind === "selectable-measurand"
+        }
+        return false;
       }).map((measurand: SelectableMeasurand) => measurand.id),
       RemainingResultSelectionParameter.MEASURANDS
     );

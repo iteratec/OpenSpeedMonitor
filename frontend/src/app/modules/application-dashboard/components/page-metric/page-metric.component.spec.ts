@@ -39,6 +39,7 @@ describe('PageMetricComponent', () => {
   it("should show the value if the value is available", () => {
     const value: string = "2.34";
     const metric: PerformanceAspectType = {
+      kind: "performance-aspect-type",
       name: 'PAGE_CONSTRUCTION_STARTED',
       icon: 'fas fa-eye',
       unit: 'ms'
@@ -57,6 +58,7 @@ describe('PageMetricComponent', () => {
   it("should be 'n/a' and without unit if the value is empty", () => {
     const value: string = "";
     const metric: PerformanceAspectType = {
+      kind: "performance-aspect-type",
       name: 'PAGE_CONSTRUCTION_STARTED',
       icon: 'fas fa-eye',
       unit: 'ms'

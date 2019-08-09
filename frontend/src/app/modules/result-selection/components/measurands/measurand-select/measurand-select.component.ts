@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {BehaviorSubject} from "rxjs";
-import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../../models/measurand.model";
+import {MeasurandGroup, Measurand} from "../../../../../models/measurand.model";
 import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
 import {PerformanceAspectType} from "../../../../../models/perfomance-aspect.model";
 
@@ -32,6 +32,6 @@ export class MeasurandSelectComponent implements OnInit {
         return measurand1.id == measurand2.id;
       }
     }
-    return false;
+    return measurand1 == measurand2;
   }
 }

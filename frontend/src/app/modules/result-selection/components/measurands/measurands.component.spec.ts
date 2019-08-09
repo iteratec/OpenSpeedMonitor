@@ -6,6 +6,7 @@ import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
+import {MeasurandGroup} from "../../../../models/measurand.model";
 
 describe('MeasurandsComponent', () => {
   let component: MeasurandsComponent;
@@ -30,7 +31,7 @@ describe('MeasurandsComponent', () => {
     component = fixture.componentInstance;
     component.multipleMeasurands = true;
 
-    resultSelectionStore.loadTimes$.next({
+    const loadTimes: MeasurandGroup = {
       isLoading: false,
       name: 'frontend.de.iteratec.isr.measurand.group.LOAD_TIMES',
       values: [
@@ -50,7 +51,8 @@ describe('MeasurandsComponent', () => {
           name: 'frontend.de.iteratec.isr.measurand.FIRST_BYTE'
         }
       ]
-    });
+    };
+    resultSelectionStore.loadTimes$.next(loadTimes);
     fixture.detectChanges();
   });
 
