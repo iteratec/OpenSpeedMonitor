@@ -1,16 +1,16 @@
 <div class="btn-group pull-right">
   <button type="button" id="bet-barchart-data-submit" class="btn btn-primary show-button" (click)="show()"
           [disabled]="applicationsRequired && !(applicationsSelected$ | async) ||
-            pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async) ||
-            measurandsRequired && !(measurandsSelected$ | async)">
+            pagesRequired && !(pagesOrMeasuredEventsSelected$ | async) ||
+            measurandsRequired && !(measurandsOrPerformanceAspectsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.show' | translate }}
   </button>
 </div>
 <div class="pull-right">
   <p id="long-processing-time" class="bg-warning get-barchart-data-warnings" *ngIf="(resultCount$ | async) == -1 &&
       (!applicationsRequired || (applicationsSelected$ | async)) &&
-      (!pagesRequired || (pagesSelected$ | async) || (measuredEventsSelected$ | async)) &&
-      (!measurandsRequired || (measurandsSelected$ | async))">
+      (!pagesRequired || (pagesOrMeasuredEventsSelected$ | async)) &&
+      (!measurandsRequired || (measurandsOrPerformanceAspectsSelected$ | async))">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
   </p>
   <p id="unavailable-data" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
@@ -19,10 +19,10 @@
   <p id="no-application-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && applicationsRequired && !(applicationsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
   </p>
-  <p id="no-page-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && pagesRequired && !(pagesSelected$ | async) && !(measuredEventsSelected$ | async)">
+  <p id="no-page-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && pagesRequired && !(pagesOrMeasuredEventsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
   </p>
-  <p id="no-measurand-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && measurandsRequired && !(measurandsSelected$ | async)">
+  <p id="no-measurand-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && measurandsRequired && !(measurandsOrPerformanceAspectsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
   </p>
 </div>
