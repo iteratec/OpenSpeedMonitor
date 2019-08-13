@@ -1,7 +1,7 @@
 <select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()"
         [compareWith]="compareMeasurands">
   <optgroup label="{{'frontend.de.iteratec.osm.performance-aspects' | translate}}">
-      <option *ngFor="let type of perfAspectTypes$ |async">
+      <option *ngFor="let type of perfAspectTypes$ |async" [ngValue]="type">
         {{ 'frontend.de.iteratec.osm.performance-aspect.' + type.name + '.user-centric-question' | translate }}
       </option>
   </optgroup>

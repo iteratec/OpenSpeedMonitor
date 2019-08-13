@@ -7,7 +7,7 @@
         {{ 'frontend.de.iteratec.osm.resultSelection.measurands.title' | translate }}:
       </label>
       <div class="col-sm-8" [ngClass]="{'col-sm-offset-3': !isFirst}">
-        <osm-measurand-select [selectedMeasurand]="metric" [selectableMeasurandGroups]="measurands$" [perfAspectTypes$]="aspectTypes$"
+        <osm-measurand-select [selectedMeasurand]="metric" [perfAspectTypes$]="aspectTypes$" [selectableMeasurandGroups]="measurands$"
                               (onSelect)="selectMeasurand(i, $event)"></osm-measurand-select>
       </div>
       <div class="col-sm-1 remove-measurand" *ngIf="!isFirst">

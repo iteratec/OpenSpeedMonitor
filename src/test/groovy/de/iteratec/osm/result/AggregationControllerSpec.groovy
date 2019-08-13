@@ -85,11 +85,16 @@ class AggregationControllerSpec extends Specification implements BuildDomainTest
         given: "two barchart aggregations"
         JobGroup jobGroup1 = JobGroup.build(name: "job group 1", csiConfiguration: CsiConfiguration.build())
         JobGroup jobGroup2 = JobGroup.build(name: "job group 2", id: 2)
+        SelectedMeasurand selectedMeasurand1 = new SelectedMeasurand("DOC_COMPLETE_TIME", CachedView.CACHED)
+        SelectedMeasurand selectedMeasurand2 = new SelectedMeasurand("SPEED_INDEX", CachedView.UNCACHED)
         List<BarchartAggregation> barchartAggregations = [
                 new BarchartAggregation(
                         value: 1.2,
                         valueComparative: 2.4,
-                        selectedMeasurand: new SelectedMeasurand("DOC_COMPLETE_TIME", CachedView.CACHED),
+                        unit: selectedMeasurand1.measurandGroup.unit.label,
+                        measurandLabel: "de.iteratec.isr.measurand.${selectedMeasurand1.name};${selectedMeasurand1.name}",
+                        measurandName: selectedMeasurand1.name,
+                        measurandGroup: selectedMeasurand1.measurandGroup,
                         page: page1,
                         jobGroup: jobGroup1,
                         aggregationValue: "foo"
@@ -97,7 +102,10 @@ class AggregationControllerSpec extends Specification implements BuildDomainTest
                 new BarchartAggregation(
                         value: 3.2,
                         valueComparative: null,
-                        selectedMeasurand: new SelectedMeasurand("SPEED_INDEX", CachedView.UNCACHED),
+                        unit: selectedMeasurand2.measurandGroup.unit.label,
+                        measurandLabel: "de.iteratec.isr.measurand.${selectedMeasurand2.name};${selectedMeasurand2.name}",
+                        measurandName: selectedMeasurand2.name,
+                        measurandGroup: selectedMeasurand2.measurandGroup,
                         page: page2,
                         jobGroup: jobGroup2,
                         aggregationValue: "bar"
