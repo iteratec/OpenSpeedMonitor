@@ -10,13 +10,16 @@ import {AggregationChartDataService} from "./services/aggregation-chart-data.ser
 })
 export class AggregationComponent implements OnInit {
 
+  isHidden: boolean;
   constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, private aggregationChartDataService: AggregationChartDataService) {
   }
 
   ngOnInit() {
+    this.isHidden = true;
   }
 
   getBarchartData(): void {
+    this.isHidden = false;
     this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand,this.resultSelectionStore.remainingResultSelection);
   }
 }
