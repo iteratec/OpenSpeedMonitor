@@ -5,7 +5,6 @@ import {ChartCommons} from "../../../../enums/chart-commons.enum";
 import {max} from "d3-array";
 import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
 import {BarchartDataService} from "../../services/barchart-data.service";
-import {URL} from "../../../../enums/url.enum";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
 
 @Component({
@@ -19,17 +18,9 @@ export class AggregationChartComponent implements OnChanges {
   @Input() barchartAverageData;
   @Input() barchartMedianData;
 
-  data = {
-    filterRules: {},
-    hasComparativeData: false,
-    i18nMap: {},
-    series: []
-  };
-
   hasFilterRules: boolean = false;
   percentileValue: number = 50;
 
-  margin = {top: 0, right: 0, bottom: 0, left: 0};
   svgWidth: number;
   svgHeight: number;
   private xScale: ScaleLinear<number, number>;
@@ -47,38 +38,32 @@ export class AggregationChartComponent implements OnChanges {
   private minValue: number;
   private maxValue: number;
 
-  private dataForScoreBar = [];
-  //private dataForLegend = [];
+  private dataForScoreBar:{min: number, max: number, barsToRender: Array<any>};
   private measurandDataMap = {};
-  private dataForBars = {};
-  private dataForHeader = "";
-  private sideLabels = [];
-  private anyHighlighted = false;
-  private anySelected = false;
-  private clickedMeasurand = '';
+  private dataForChartBars = {};
+  private filterRules = {};
+  private dataForHeader: string = '';
+  private sideLabels:string[] = [];
+  private anyHighlighted:boolean = false;
+  private anySelected:boolean = false;
+  private clickedMeasurand:string = '';
 
   constructor(private aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
   }
 
   redraw() {
-    if (this.barchartAverageData.length< 1 ||this.barchartMedianData.length< 1 || Object.getOwnPropertyNames(this.barchartAverageData).length <1 || Object.getOwnPropertyNames(this.barchartMedianData).length<1) {
+    if (this.barchartAverageData.length< 1 ||this.barchartMedianData.length< 1) {
       return;
     }
+
     this.aggregationChartDataService.setData();
-    //this.data = (this.aggregationChartDataService.aggregationType === 'avg') ? this.barchartAverageData : this.barchartMedianData;
-    this.aggregationChartDataService.aggregationValue = (this.aggregationChartDataService.aggregationType === 'avg') ? 'avg' : this.percentileValue.toString();
-
-    this.hasFilterRules = Object.keys(this.aggregationChartDataService.filterRules).length > 0;
-    // this.data.series = this.data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
+    this.filterRules = this.aggregationChartDataService.filterRules;
+    this.hasFilterRules = Object.keys(this.filterRules).length > 0;
     this.measurandDataMap = this.aggregationChartDataService.allMeasurandDataMap;
-    this.dataForScoreBar = this.aggregationChartDataService.getDataForScoreBar().barsToRender;
-    this.maxValue = this.aggregationChartDataService.getDataForScoreBar().max;
-    this.minValue = this.aggregationChartDataService.getDataForScoreBar().min;
-    //this.dataForLegend = this.aggregationChartDataService.getDataForLegend();
-    this.dataForHeader = this.aggregationChartDataService.getDataForHeader();
-    this.sideLabels = this.aggregationChartDataService.getUniqueSideLabels();
-
-    this.dataForBars = this.aggregationChartDataService.createEmptyBarsForMissingData(this.measurandDataMap);
+    this.dataForScoreBar = this.aggregationChartDataService.dataForScoreBar;
+    this.dataForHeader = this.aggregationChartDataService.dataForHeader;
+    this.sideLabels = this.aggregationChartDataService.uniqueSideLabels;
+    this.dataForChartBars = this.aggregationChartDataService.dataForChartBars;
     if(this.clickedMeasurand.length > 0 && Object.keys(this.measurandDataMap).includes(this.clickedMeasurand)){
       this.measurandDataMap[this.clickedMeasurand].selected = true;
     }else{
@@ -130,7 +115,7 @@ export class AggregationChartComponent implements OnChanges {
       exit => exit.remove()
     );
 
-    const headerText = select('.header-group').selectAll('.header-text').data([this.dataForHeader], (data: any) => data);
+    const headerText = select('.header-group').selectAll('.header-text').data([this.dataForHeader]);
     headerText.join(
       enter => enter
         .append('text')
@@ -140,9 +125,9 @@ export class AggregationChartComponent implements OnChanges {
         .style('opacity', 0),
       update => update,
       exit => exit
+        .style('opacity', 0)
         .transition()
         .duration(ChartCommons.TRANSITION_DURATION)
-        .style('opacity', 0)
         .remove()
     )
       .attr('x', this.svgWidth / 2)
@@ -233,8 +218,6 @@ export class AggregationChartComponent implements OnChanges {
       .duration(ChartCommons.TRANSITION_DURATION)
       .attr('transform', (datum, index) => `translate(0, ${index * barOffset})`)
       .each((datum, index, groups) => this.renderBar(select(groups[index]), datum));
-
-    //TODO stacked bars
   }
 
   private renderBar(chartBarSelection, measurand: string) {
@@ -316,8 +299,8 @@ export class AggregationChartComponent implements OnChanges {
     )
       .attr('transform', `translate(0, ${this.barScorePosY})`);
 
-    const scoreBars = select('.chart-score-group').selectAll('.score-bar').data(this.dataForScoreBar);
-    const scaleForScoreBar = scaleLinear().rangeRound([0, this.barsWidth]).domain([this.minValue, this.maxValue]);
+    const scoreBars = select('.chart-score-group').selectAll('.score-bar').data(this.dataForScoreBar.barsToRender);
+    const scaleForScoreBar = scaleLinear().rangeRound([0, this.barsWidth]).domain([this.dataForScoreBar.min, this.dataForScoreBar.max]);
 
     scoreBars.join(
       enter => {
@@ -436,25 +419,25 @@ export class AggregationChartComponent implements OnChanges {
   }
 
 
-  formatBarValue(value): string {
+  formatBarValue(value: string): string {
     const precision = this.maxValue >= 1000 || this.minValue <= -1000 ? 0 : 2;
     return parseFloat(value).toFixed(precision).toString();
   }
 
-  estimateHeight(svgForEstimation) {
+  estimateHeight(svgForEstimation: SVGElement): number {
     const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(svgForEstimation);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);
     return Math.floor(this.aggregationChartDataService.series.length / maxEntriesInRow) * 20;
-  };
+  }
 
-  calculateMaxEntryGroupWidth(svgForEstimation) {
+  calculateMaxEntryGroupWidth(svgForEstimation: SVGElement): number {
     let dataMap = this.aggregationChartDataService.allMeasurandDataMap;
     const labels = Object.keys(dataMap).map(measurand => dataMap[measurand].label);
     const labelWidths = this.getTextWidths(svgForEstimation, labels);
     return max(labelWidths) + 10 + 20 + 5;
-  };
+  }
 
-  getTextWidths(svgForEstimation, texts) {
+  getTextWidths(svgForEstimation: SVGElement, texts: string[]): number[] {
     const widths = [];
     select(svgForEstimation).selectAll('.invisible-text-to-measure')
       .data(texts)
@@ -467,21 +450,21 @@ export class AggregationChartComponent implements OnChanges {
         this.remove();
       });
     return widths;
-  };
+  }
 
   barWidth(xScale, value) {
     return value === null ? 0 : (this.barEnd(xScale, value) - this.barStart(xScale, value));
-  };
+  }
 
   barEnd(xScale, value) {
     return (value < 0) ? xScale(0) : xScale(value);
-  };
+  }
 
   barStart(xScale, value) {
     return (value < 0) ? xScale(value) : xScale(0);
-  };
+  }
 
-  calculateChartBarsHeight() {
+  calculateChartBarsHeight(): number {
     const barBand = ChartCommons.BAR_BAND;
     const barGap = ChartCommons.BAR_GAP;
     const numberOfMeasurands = Object.keys(this.measurandDataMap).length;
@@ -494,25 +477,25 @@ export class AggregationChartComponent implements OnChanges {
     return ((numberOfPages - 1) * gapSize) + numberOfBars * barBand;
   }
 
-  private onMouseOver(data){
+  private onMouseOver(measurand: string): void {
     if(this.anySelected===false) {
       this.anyHighlighted = true;
-      this.measurandDataMap[data].highlighted = true;
+      this.measurandDataMap[measurand].highlighted = true;
       this.renderBarGroup('.bars-content-group');
       this.renderLegendGroup('.legend-content-group');
     }
   }
 
-  private onMouseOut(data){
+  private onMouseOut(measurand: string): void {
     if(this.anyHighlighted === true) {
       this.anyHighlighted = false;
-      this.measurandDataMap[data].highlighted = false;
+      this.measurandDataMap[measurand].highlighted = false;
       this.renderBarGroup('.bars-content-group');
       this.renderLegendGroup('.legend-content-group');
     }
   }
 
-  private onMouseClick(measurand){
+  private onMouseClick(measurand: string): void {
     if (this.anySelected === false) {
       this.measurandDataMap[measurand].selected = true;
       this.clickedMeasurand = measurand;
@@ -534,9 +517,18 @@ export class AggregationChartComponent implements OnChanges {
     this.aggregationChartDataService.stackBars = (status === 'true');
   }
 
-  reloadPercentile() {
-    this.aggregationChartDataService.reloadPercentile(this.percentileValue,this.resultSelectionStore.resultSelectionCommand, this.resultSelectionStore.remainingResultSelection);
+  reloadPercentile(): void {
+    if(this.percentileValue === null || this.percentileValue < 1){
+      this.percentileValue = 1;
+    }else if(this.percentileValue > 100){
+      this.percentileValue = 100;
+    }
+    this.aggregationChartDataService.reloadPercentile(this.percentileValue, this.resultSelectionStore.resultSelectionCommand, this.resultSelectionStore.remainingResultSelection);
+  }
 
+  selectFilter(filter: string): void{
+    this.aggregationChartDataService.selectedFilter = filter;
+    this.redraw();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

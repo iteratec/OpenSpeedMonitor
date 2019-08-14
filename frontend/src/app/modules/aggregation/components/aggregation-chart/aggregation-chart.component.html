@@ -29,9 +29,9 @@
       </div>
 
       <input class="btn btn-sm btn-default perc-element" id="percentage-field" type="number" placeholder="%"
-             [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="0" max="100" style="max-width: 5em;" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
+             [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="1" max="100" style="max-width: 5em;" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
       <input class="form-control perc-element perc-slider" id="percentage-slider" type="range"
-             [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="0" max="100" step="5" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
+             [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="5" max="100" step="5" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
 
       <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle perc-element"
               data-toggle="dropdown"
@@ -39,25 +39,25 @@
       </button>
       <ul class="dropdown-menu pull-right">
         <li id="all-bars-header" class="dropdown-header">
-          Sort
+          {{'frontend.de.iteratec.osm.barchart.filter.noFilterHeader' | translate }}
         </li>
         <li>
-          <a class="chart-filter"><i class="fas fa-check"></i>
-            Descending
+          <a class="chart-filter" (click)="selectFilter('desc')"><i [ngClass]="aggregationChartDataService.descSelected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+            {{'frontend.de.iteratec.osm.barchart.filter.noFilterDesc' | translate }}
           </a>
         </li>
         <li>
-          <a class="chart-filter"><i class="fas fa-check filter-inactive"></i>
-            Ascending
+          <a class="chart-filter" (click)="selectFilter('asc')"><i [ngClass]="aggregationChartDataService.ascSelected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+            {{'frontend.de.iteratec.osm.barchart.filter.noFilterAsc' | translate }}
           </a>
         </li>
         <ng-container *ngIf="hasFilterRules">
           <li id="customer-journey-header" class="dropdown-header">
-            Customer Journey
+            {{'frontend.de.iteratec.osm.barchart.filter.customerJourneyHeader' | translate}}
           </li>
-          <li *ngFor="let filterRule of data.filterRules | keyvalue">
-            <a class="chart-filter">
-              <i class="fas fa-check filter-inactive"></i>
+          <li *ngFor="let filterRule of filterRules | keyvalue">
+            <a class="chart-filter" (click)="selectFilter(filterRule.key)">
+              <i [ngClass]="filterRule.value.selected ? 'fas fa-check' : 'fas fa-check filter-inactive'" ></i>
               {{filterRule.key}}
             </a>
           </li>
