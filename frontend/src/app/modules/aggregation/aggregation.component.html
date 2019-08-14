@@ -3,7 +3,7 @@
   {{ 'frontend.de.iteratec.osm.aggregation.description' | translate }}
 </p>
 
-<osm-aggregation-chart [barchartAverageData]="barchartAverageData$ | async" [barchartMedianData]="barchartMedianData$ | async"></osm-aggregation-chart>
+<osm-aggregation-chart [barchartAverageData]="aggregationChartDataService.barchartAverageData$ | async" [barchartMedianData]="aggregationChartDataService.barchartMedianData$ | async"></osm-aggregation-chart>
 
 <div class="action-row">
   <div class="col-md-12">

@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import {scaleOrdinal} from "d3-scale";
 import {URL} from "../../../enums/url.enum";
 import {BarchartDataService} from "./barchart-data.service";
-import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
 import {BehaviorSubject} from "rxjs";
-import {first} from "rxjs/operators";
+import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
+import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +12,18 @@ import {first} from "rxjs/operators";
 export class AggregationChartDataService {
 
   allMeasurandDataMap = {};
-  filterRules = [];
-  selectedFilter:string = "desc";
-  aggregationValue:string = "avg";
-  percentileValue: number = 50;
+  filterRules = {};
+  dataForChartBars = {};
   i18nMap = {};
   series = [];
-  stackBars = true;
-
-  aggregationType: string = 'avg';
+  selectedFilter:string = 'asc';
+  aggregationValue:string = 'avg';
+  percentileValue:number = 50;
+  stackBars:boolean = true;
+  dataForScoreBar:{ min: number, max: number, barsToRender: Array<any> } = {min: 0 ,max: 0 ,barsToRender: []};
+  dataForHeader:string = '';
+  uniqueSideLabels:string[];
+  aggregationType:string = 'avg';
 
   loadingTimeColors:Array<string> = [
     "#1660A7",
@@ -53,6 +56,29 @@ export class AggregationChartDataService {
     "#d9534f"
   ];
 
+  measurandOrder: string[] = [
+    "CS_BY_WPT_VISUALLY_COMPLETE",
+    "CS_BY_WPT_DOC_COMPLETE",
+    "FULLY_LOADED_TIME",
+    "VISUALLY_COMPLETE",
+    "VISUALLY_COMPLETE_99",
+    "VISUALLY_COMPLETE_95",
+    "VISUALLY_COMPLETE_90",
+    "VISUALLY_COMPLETE_85",
+    "CONSISTENTLY_INTERACTIVE",
+    "FIRST_INTERACTIVE",
+    "SPEED_INDEX",
+    "DOC_COMPLETE_TIME",
+    "LOAD_TIME",
+    "START_RENDER",
+    "DOM_TIME",
+    "FIRST_BYTE",
+    "FULLY_LOADED_INCOMING_BYTES",
+    "DOC_COMPLETE_INCOMING_BYTES",
+    "FULLY_LOADED_REQUEST_COUNT",
+    "DOC_COMPLETE_REQUESTS"
+  ];
+
   speedIndexColors:Array<string> = this.loadingTimeColors;
 
   measurandGroupColorCombination: {} = {
@@ -67,17 +93,20 @@ export class AggregationChartDataService {
 
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  ascSelected:boolean = true;
+  descSelected:boolean = false;
 
-  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {}
 
-  getBarchartData(resultSelectionCommand,remainingResultSelection): void {
+  constructor(private barchartDataService: BarchartDataService) {}
+
+  getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
       "avg",
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
-      this.barchartAverageData$.next(result);
+      this.barchartAverageData$.next(this.sortDataByMeasurandOrder(result));
     });
 
     this.barchartDataService.fetchBarchartData<any>(
@@ -86,43 +115,46 @@ export class AggregationChartDataService {
       this.percentileValue.toString(),
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
-      this.barchartMedianData$.next(result);
+      this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
     });
   }
 
-  reloadPercentile(percentile,resultSelectionCommand, remainingResultSelection) {
-    if(percentile) {
-      this.percentileValue = percentile;
-      this.barchartDataService.fetchBarchartData<any>(
-        resultSelectionCommand,
-        remainingResultSelection,
-        percentile.toString(),
-        URL.AGGREGATION_BARCHART_DATA
-      ).subscribe(result => {
-        this.barchartMedianData$.next(result);
-      });
-    }
+  reloadPercentile(percentile: number,resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): void {
+    this.percentileValue = percentile;
+    this.barchartDataService.fetchBarchartData<any>(
+      resultSelectionCommand,
+      remainingResultSelection,
+      this.percentileValue.toString(),
+      URL.AGGREGATION_BARCHART_DATA
+    ).subscribe(result => {
+      this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
+    });
   }
 
-  public setData(): any {
+  public setData(): void {
     let data;
-    if(this.aggregationType==='avg'){
-      data = this.barchartAverageData$.getValue();
-    }else{
+    if(this.aggregationType==='percentile'){
       data = this.barchartMedianData$.getValue();
+    }else{
+      data = this.barchartAverageData$.getValue();
     }
-    this.aggregationValue = data.series[0].aggregationValue !== undefined ? data.series[0].aggregationValue : this.aggregationValue;
     this.filterRules = data.filterRules;
-    this.selectedFilter = data.selectedFilter !== undefined ? data.selectedFilter : this.selectedFilter;
     this.i18nMap = data.i18nMap;
+    this.aggregationValue = data.series[0].aggregationValue !== undefined ? data.series[0].aggregationValue : this.aggregationValue;
     this.series = data.series;
-    this.allMeasurandDataMap = this.getMeasurandDataMap(data.series);
+    this.setMeasurandDataMap(data.series);
+    Object.keys(this.allMeasurandDataMap).forEach((measurand) => {
+      this.sortSeriesByFilterRule(this.allMeasurandDataMap[measurand]);
+    });
+    this.setDataForScoreBar();
+    this.setDataForHeader();
+    this.setUniqueSideLabels();
+    this.createEmptyBarsForMissingData(this.allMeasurandDataMap);
   }
 
-  public getMeasurandDataMap(series){
+  public setMeasurandDataMap(series: any[]): void{
     let measurands = [];
-    let measurandDataMap:{[k: string]: any} = {};
-
+    let measurandDataMap = {};
     if(series) {
       series.forEach((serie) => {
           serie.sideLabel = this.setDataForSideLabel(series, serie);
@@ -160,14 +192,50 @@ export class AggregationChartDataService {
         }
       });
     }
-    return measurandDataMap;
+    this.allMeasurandDataMap = measurandDataMap;
   }
 
-  public getDataForScoreBar(){
+  private sortDataByMeasurandOrder(data){
+    if(Object.getOwnPropertyNames(data).length < 1) {
+      return data;
+    }
+    data.series.sort((a, b) => {
+      var idxA = this.measurandOrder.indexOf(a.measurand);
+      var idxB = this.measurandOrder.indexOf(b.measurand);
+      if (idxA < 0) {
+        return (idxB < 0) ? 0 : 1;
+      }
+      return (idxB < 0) ? -1 : (idxA - idxB);
+    });
+    return data;
+  }
+
+  private sortSeriesByFilterRule(data): void {
+    if(this.selectedFilter ==='desc'){
+      this.ascSelected = false;
+      this.descSelected = true;
+      Object.keys(this.filterRules).forEach((key)=> this.filterRules[key].selected = false);
+      data.series = data.series.sort((a, b) => (a.value > b.value) ? -1 : ((b.value > a.value) ? 1 : 0));
+    }else if (Object.keys(this.filterRules).includes(this.selectedFilter)) {
+      this.ascSelected = false;
+      this.descSelected = false;
+      Object.keys(this.filterRules).forEach((key)=> key === this.selectedFilter ? this.filterRules[key].selected = true : this.filterRules[key].selected = false);
+      let keyForFilterRule = Object.keys(this.filterRules).filter((key) => key === this.selectedFilter).toString();
+      let filterRule = this.filterRules[keyForFilterRule];
+      data.series = data.series.filter((serie) => filterRule.some(x => serie.jobGroup === x.jobGroup && serie.page === x.page));
+    }else{
+      this.selectedFilter = 'asc';
+      this.ascSelected = true;
+      this.descSelected = false;
+      Object.keys(this.filterRules).forEach((key)=> this.filterRules[key].selected = false);
+      data.series = data.series.sort((a, b) => (a.value < b.value) ? -1 : ((b.value < a.value) ? 1 : 0));
+    }
+  }
+
+  public setDataForScoreBar(): void {
     let barsToRender = [];
     let minValue = 0;
     let maxValue = 0;
-    let dataForScoreBar:{ min: number, max: number, barsToRender: Array<any> } = {min: 0 ,max: 0 ,barsToRender: []};
     const availableScoreBars = [
       {
         id: "good",
@@ -195,15 +263,14 @@ export class AggregationChartDataService {
       }
     ];
     let values = [];
-
     if(this.allMeasurandDataMap) {
       Object.keys(this.allMeasurandDataMap).forEach(k => {
         values = this.allMeasurandDataMap[k].series.map(x=>x.value);
       });
       minValue = values.length > 0 ? Math.min(Math.min.apply(null, values), 0) : 0;
       maxValue = values.length > 0 ? Math.max(Math.max.apply(null, values), 0) : 0;
-      dataForScoreBar.min = minValue;
-      dataForScoreBar.max = maxValue;
+      this.dataForScoreBar.min = minValue;
+      this.dataForScoreBar.max = maxValue;
 
       let lastBarEnd = 0;
       for (let curScoreBar = 0; curScoreBar < availableScoreBars.length; curScoreBar++) {
@@ -217,27 +284,53 @@ export class AggregationChartDataService {
         lastBarEnd = bar.end;
       }
       barsToRender.reverse();
-      dataForScoreBar.barsToRender = barsToRender;
+      this.dataForScoreBar.barsToRender = barsToRender;
     }
-    return dataForScoreBar;
   }
 
-  public getDataForLegend(){
-    return Object.keys(this.allMeasurandDataMap).map(measurand => {
-      let measurandData = this.allMeasurandDataMap[measurand];
-        return {
-          measurand: measurand,
-          color: measurandData.color,
-          label: measurandData.label,
-          highlighted: false,
-          selected: false,
-          anySelected: false,
-          anyHighlighted: false
-        }
+  public setDataForHeader(): void {
+    let data = this.getDataForLabels();
+    let header ="";
+    let aggregation = "";
+    let pages = data.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
+    let jobGroups = data.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
+    this.aggregationValue ==='avg'? aggregation ="Average" : aggregation = `Percentile ${this.aggregationValue}%`;
+
+      if (pages.length > 1 && jobGroups.length > 1) {
+        header = aggregation;
+      } else if (pages.length > 1 && jobGroups.length === 1) {
+        header = `${jobGroups[0]} - ${aggregation}`;
+      } else if (jobGroups.length > 1 && pages.length === 1) {
+        pages[0] !== null? header = `${pages[0]} - ${aggregation}` : header = aggregation;
+      } else if(pages.length ===1 && jobGroups.length===1){
+        pages[0] !== null? header = `${jobGroups[0]}, ${pages[0]} - ${aggregation}` : header = `${jobGroups[0]} - ${aggregation}`;
+      }
+      this.dataForHeader = header;
+  }
+
+  public setUniqueSideLabels(): void {
+    this.uniqueSideLabels =  this.getDataForLabels().map(x => x.sideLabel).filter((el, i, a) => i === a.indexOf(el));
+  }
+
+  public createEmptyBarsForMissingData(data): void {
+    let sideLabelsForMeasurand =[];
+    Object.keys(data).forEach((measurand) => {
+      if (this.uniqueSideLabels.length === data[measurand].series.length) {
+        return data;
+      } else if(this.uniqueSideLabels.length > data[measurand].series.length){
+        sideLabelsForMeasurand = data[measurand].series.map(x => x.sideLabel);
+        this.uniqueSideLabels.forEach((label) =>{
+          if(!sideLabelsForMeasurand.includes(label)){
+            data[measurand].series.push({sideLabel: label, value: null});
+          }
+        });
+      }
     });
+    this.dataForChartBars = data;
   }
 
-  getColorscaleForMeasurandGroup(measurandUnit, skipFirst) {
+
+  getColorscaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean){
     let colors = this.measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0);
     return scaleOrdinal()
       .domain(this.createDomain(colors.length))
@@ -250,7 +343,7 @@ export class AggregationChartDataService {
       .range(this.trafficColors);
   }
 
-  private createDomain(arrayLength) {
+  createDomain(arrayLength: number){
     var array = [];
     for (let i = 0; i < arrayLength; i++) {
       array.push(i);
@@ -258,75 +351,28 @@ export class AggregationChartDataService {
     return array;
   }
 
-  public getDataForHeader(){
-    let dataForBars = this.getDataForLabels();
-    let header ="";
-    let aggregation = "";
-    let pages = dataForBars.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
-    let jobGroups = dataForBars.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
-    this.aggregationValue ==='avg'? aggregation ="Average" : aggregation = `Percentile ${this.aggregationValue}%`;
-
-      if (pages.length > 1 && jobGroups.length > 1) {
-        header = aggregation;
-      } else if (pages.length > 1 && jobGroups.length === 1) {
-        header = jobGroups[0] + " - " + aggregation;
-      } else if (jobGroups.length > 1 && pages.length === 1) {
-        header = pages[0] + " - " + aggregation;
-      } else if(pages.length ===1&&jobGroups.length===1){
-      header = jobGroups[0] + ", " + pages[0] + " - " + aggregation;
-      }
-    return header;
-  }
-
-  public getUniqueSideLabels() {
-    return this.getDataForLabels().map(x => x.sideLabel).filter((el, i, a) => i === a.indexOf(el));
-  }
-
-  public createEmptyBarsForMissingData(data): any{
-    let sideLabels = this.getUniqueSideLabels();
-    let sideLabelsForMeasurand =[];
-    Object.keys(data).forEach((measurand) => {
-      if (sideLabels.length === data[measurand].series.length) {
-        return data;
-      } else if(sideLabels.length > data[measurand].series.length){
-        sideLabelsForMeasurand = data[measurand].series.map(x => x.sideLabel);
-        sideLabels.forEach((label) =>{
-          if(!sideLabelsForMeasurand.includes(label)){
-            data[measurand].series.push({sideLabel: label, value: null});
-          }
-        });
-      }
-    });
-    return data;
-  }
-
-  private setDataForSideLabel(series, serie){
+  private setDataForSideLabel(series, serie): string {
     let pages = series.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     let jobGroups = series.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
     if (pages.length > 1 && jobGroups.length > 1) {
-      return  '' + serie.page +', ' + serie.jobGroup;
+      return `${serie.page}, ${serie.jobGroup}`;
     } else if (pages.length > 1 && jobGroups.length === 1) {
       return  serie.page;
     } else if (jobGroups.length > 1 && pages.length === 1) {
       return serie.jobGroup;
     } else if(pages.length ===1&&jobGroups.length===1){
-      return ''
+      return '';
     }
   }
 
-  private getDataForLabels(){
+  private getDataForLabels(): any[]{
     let dataForLabels = [];
     Object.keys(this.allMeasurandDataMap).forEach(measurand => {
       let measurandData = this.allMeasurandDataMap[measurand];
       measurandData.series.forEach(serie => {
         dataForLabels.push({
-          color: measurandData.color,
-          value: serie.value,
-          measurand: measurand,
           jobGroup: serie.jobGroup,
           page: serie.page,
-          measurandGroup: measurandData.measurandGroup,
-          pageAndJobGroup: '' + serie.page +', ' + serie.jobGroup,
           sideLabel: serie.sideLabel
         });
       });
