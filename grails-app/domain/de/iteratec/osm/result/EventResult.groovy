@@ -76,8 +76,8 @@ class EventResult implements CsiValue, RepresentableWptResult {
     Double csByWptDocCompleteInPercent
     Double csByWptVisuallyCompleteInPercent
 
-    Integer consistentlyInteractiveInMillisecs
-    Integer firstInteractiveInMillisecs
+    Integer firstCpuIdleInMillisecs
+    Integer timeToInteractiveInMillisecs
     Integer visuallyComplete85InMillisecs
     Integer visuallyComplete90InMillisecs
     Integer visuallyComplete95InMillisecs
@@ -171,8 +171,8 @@ class EventResult implements CsiValue, RepresentableWptResult {
         firstMeaningfulPaint(nullable: true)
         firstContentfulPaint(nullable: true)
 
-        consistentlyInteractiveInMillisecs(nullable: true)
-        firstInteractiveInMillisecs(nullable: true)
+        firstCpuIdleInMillisecs(nullable: true)
+        timeToInteractiveInMillisecs(nullable: true)
 
         visuallyComplete85InMillisecs(nullable: true)
         visuallyComplete90InMillisecs(nullable: true)

@@ -19,8 +19,8 @@ enum Measurand{
     VISUALLY_COMPLETE(MeasurandGroup.LOAD_TIMES, "visuallyCompleteInMillisecs", "visually-complete", "visualComplete"),
     CS_BY_WPT_DOC_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptDocCompleteInPercent", "cs-by-wpt-doc-complete", null),
     CS_BY_WPT_VISUALLY_COMPLETE(MeasurandGroup.PERCENTAGES, "csByWptVisuallyCompleteInPercent", "cs-by-wpt-visually-complete", null),
-    FIRST_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "firstInteractiveInMillisecs", "first-interactive", "FirstInteractive"),
-    CONSISTENTLY_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "consistentlyInteractiveInMillisecs", "consistently-interactive", "TimeToInteractive"),
+    FIRST_CPU_IDLE(MeasurandGroup.LOAD_TIMES, "firstCpuIdleInMillisecs", "first-cpu-idle", "FirstInteractive"),
+    TIME_TO_INTERACTIVE(MeasurandGroup.LOAD_TIMES, "timeToInteractiveInMillisecs", "time-to-interactive", "LastInteractive"),
     JS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "jsTotalBytes", "javascript-total", "js"),
     IMAGE_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "imageTotalBytes", "image-total", "image"),
     CSS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "cssTotalBytes", "css-total", "css"),
@@ -33,9 +33,9 @@ enum Measurand{
     private String graphiteLabelSuffix
     private String tagInResultXml
 
-    private Measurand(MeasurandGroup value, String name, String label, String tag){
-        group = value
-        eventResultField = name
+    private Measurand(MeasurandGroup measurandGroup, String fieldName, String label, String tag) {
+        group = measurandGroup
+        eventResultField = fieldName
         graphiteLabelSuffix = label
         tagInResultXml = tag
     }
