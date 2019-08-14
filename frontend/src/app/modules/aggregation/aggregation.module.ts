@@ -5,6 +5,8 @@ import {SharedModule} from "../shared/shared.module";
 import {AggregationComponent} from './aggregation.component';
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
 import {AggregationChartComponent} from './components/aggregation-chart/aggregation-chart.component';
+import {BarchartDataService} from "./services/barchart-data.service";
+import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
 import {FormsModule} from "@angular/forms";
 
 const AggregationRoutes: Routes = [
@@ -19,6 +21,10 @@ const AggregationRoutes: Routes = [
     SharedModule,
     ResultSelectionModule,
     FormsModule
+  ],
+  providers: [
+    BarchartDataService,
+    AggregationChartDataService
   ]
 })
 export class AggregationModule { }
