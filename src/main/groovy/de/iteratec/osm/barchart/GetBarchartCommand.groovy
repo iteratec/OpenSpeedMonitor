@@ -28,6 +28,11 @@ class GetBarchartCommand implements Validateable {
     List<String> measurands = []
 
     @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['performanceAspectTypes'])
+    })
+    List<String> performanceAspectTypes = []
+
+    @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['browsers'])
     })
     List<Long> browsers = []

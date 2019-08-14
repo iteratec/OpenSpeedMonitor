@@ -20,6 +20,11 @@ export class PerformanceAspectService {
       catchError((error) => {
         console.error(error);
         return EMPTY;
-      })).subscribe((types: PerformanceAspectType[]) => this.aspectTypes$.next(types));
+      })).subscribe((types: PerformanceAspectType[]) => {
+        types.map((type) => {
+          type.kind = "performance-aspect-type"
+        });
+        this.aspectTypes$.next(types)
+    });
   }
 }

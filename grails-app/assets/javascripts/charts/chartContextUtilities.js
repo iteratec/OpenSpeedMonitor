@@ -202,7 +202,7 @@ OpenSpeedMonitor.chartContextUtil = (function () {
 
     function buildWptUrl(wptView, nearestPoint) {
         var url = null;
-        var defaultVideoParameter = '&ival=100&end=full';
+        var defaultVideoParameter = '&ival=100&end=full&sticky=true';
         if (typeof nearestPoint == 'undefined' || typeof wptView == 'undefined') {
             // build url for the comparison view launched from the chart context menu
             url = rickshawGraphBuilder.graph.selectedPoints[0].value.wptResultInfo.wptServerBaseurl +

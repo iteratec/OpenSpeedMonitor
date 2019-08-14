@@ -44,7 +44,7 @@ describe('PageComponent', () => {
     fixture = TestBed.createComponent(PageComponent);
     component = fixture.componentInstance;
     component.application = new Application({name: 'app', id: 1});
-    component.aspectTypes = [{name: 'aspect-type-name', icon: 'aspect-type-icon', unit: 'aspect-type-unit'}];
+    component.aspectTypes = [{kind: "performance-aspect-type", name: 'aspect-type-name', icon: 'aspect-type-icon', unit: 'aspect-type-unit'}];
     component.metricsForPage = {
       pageId: 1,
       pageName: 'page',
