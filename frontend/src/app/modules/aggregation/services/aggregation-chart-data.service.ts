@@ -112,7 +112,7 @@ export class AggregationChartDataService {
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
-      this.percentileValue.toString(),
+      this.percentileValue,
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
@@ -124,7 +124,7 @@ export class AggregationChartDataService {
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
-      this.percentileValue.toString(),
+      this.percentileValue,
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
