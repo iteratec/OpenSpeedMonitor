@@ -6,6 +6,7 @@ import {max} from "d3-array";
 import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
 import {BarchartDataService} from "../../services/barchart-data.service";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
+import {AggregationChartDataByMeasurand} from "../../models/aggregation-chart-data.model";
 
 @Component({
   selector: 'osm-aggregation-chart',
@@ -39,8 +40,7 @@ export class AggregationChartComponent implements OnChanges {
   private maxValue: number;
 
   private dataForScoreBar:{min: number, max: number, barsToRender: Array<any>};
-  private measurandDataMap = {};
-  private dataForChartBars = {};
+  private measurandDataMap: AggregationChartDataByMeasurand = {};
   private filterRules = {};
   private dataForHeader: string = '';
   private sideLabels:string[] = [];
@@ -63,7 +63,6 @@ export class AggregationChartComponent implements OnChanges {
     this.dataForScoreBar = this.aggregationChartDataService.dataForScoreBar;
     this.dataForHeader = this.aggregationChartDataService.dataForHeader;
     this.sideLabels = this.aggregationChartDataService.uniqueSideLabels;
-    this.dataForChartBars = this.aggregationChartDataService.dataForChartBars;
     if(this.clickedMeasurand.length > 0 && Object.keys(this.measurandDataMap).includes(this.clickedMeasurand)){
       this.measurandDataMap[this.clickedMeasurand].selected = true;
     }else{
@@ -431,7 +430,7 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   calculateMaxEntryGroupWidth(svgForEstimation: SVGElement): number {
-    let dataMap = this.aggregationChartDataService.allMeasurandDataMap;
+    let dataMap = this.measurandDataMap;
     const labels = Object.keys(dataMap).map(measurand => dataMap[measurand].label);
     const labelWidths = this.getTextWidths(svgForEstimation, labels);
     return max(labelWidths) + 10 + 20 + 5;
@@ -508,6 +507,7 @@ export class AggregationChartComponent implements OnChanges {
     else{
       this.anySelected = false;
       this.measurandDataMap[measurand].selected = false;
+      this.clickedMeasurand = '';
     }
     this.renderBarGroup('.bars-content-group');
     this.renderLegendGroup('.legend-content-group');

@@ -5,24 +5,24 @@ import {BarchartDataService} from "./barchart-data.service";
 import {BehaviorSubject} from "rxjs";
 import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
 import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
+import {AggregationChartDataByMeasurand} from "../models/aggregation-chart-data.model";
+import {AggregationChartSeries} from "../models/aggregation-chart-series.model";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AggregationChartDataService {
 
-  allMeasurandDataMap = {};
-  filterRules = {};
-  dataForChartBars = {};
-  i18nMap = {};
-  series = [];
+  allMeasurandDataMap: AggregationChartDataByMeasurand = {};
+  filterRules  = {};
+  series: AggregationChartSeries[] = [];
   selectedFilter:string = 'asc';
   aggregationValue:string = 'avg';
   percentileValue:number = 50;
   stackBars:boolean = true;
   dataForScoreBar:{ min: number, max: number, barsToRender: Array<any> } = {min: 0 ,max: 0 ,barsToRender: []};
   dataForHeader:string = '';
-  uniqueSideLabels:string[];
+  uniqueSideLabels:string[] = [];
   aggregationType:string = 'avg';
 
   loadingTimeColors:Array<string> = [
@@ -81,7 +81,7 @@ export class AggregationChartDataService {
 
   speedIndexColors:Array<string> = this.loadingTimeColors;
 
-  measurandGroupColorCombination: {} = {
+  measurandGroupColorCombination = {
     "ms": this.loadingTimeColors,
     "s": this.loadingTimeColors,
     "#": this.countOfRequestColors,
@@ -139,7 +139,6 @@ export class AggregationChartDataService {
       data = this.barchartAverageData$.getValue();
     }
     this.filterRules = data.filterRules;
-    this.i18nMap = data.i18nMap;
     this.aggregationValue = data.series[0].aggregationValue !== undefined ? data.series[0].aggregationValue : this.aggregationValue;
     this.series = data.series;
     this.setMeasurandDataMap(data.series);
@@ -149,22 +148,30 @@ export class AggregationChartDataService {
     this.setDataForScoreBar();
     this.setDataForHeader();
     this.setUniqueSideLabels();
-    this.createEmptyBarsForMissingData(this.allMeasurandDataMap);
+    this.createEmptyBarsForMissingData();
   }
 
-  public setMeasurandDataMap(series: any[]): void{
-    let measurands = [];
-    let measurandDataMap = {};
+  public setMeasurandDataMap(series: AggregationChartSeries[]): void{
+    let measurands: string[] = [];
+    let measurandDataMap: AggregationChartDataByMeasurand = {};
     if(series) {
-      series.forEach((serie) => {
-          serie.sideLabel = this.setDataForSideLabel(series, serie);
+      series.forEach(datum => {
+        datum.sideLabel = this.setDataForSideLabel(series, datum);
       });
 
       measurands = series.map(x => x.measurand).filter((v, i, a) => a.indexOf(v) === i);
       measurands.map(measurand => {
         measurandDataMap[measurand] = {
           measurand: measurand,
-          series: series.filter(serie => serie.measurand === measurand)
+          series: series.filter(datum => datum.measurand === measurand),
+          aggregationValue: '',
+          label: '',
+          measurandGroup: '',
+          unit: '',
+          highlighted: false,
+          selected: false,
+          hasComparative: false,
+          color: ''
         };
       });
 
@@ -177,19 +184,13 @@ export class AggregationChartDataService {
         measurandData.unit= firstSerie.unit;
         measurandData.highlighted = false;
         measurandData.selected = false;
-        measurandData.isDeterioration=firstSerie.isDeterioration;
-        measurandData.isImprovement=firstSerie.isImprovement;
-        measurandData.hasComparative = measurandData.series.some(() => measurandData.isDeterioration|| measurandData.isImprovement);
+        measurandData.hasComparative =false;
 
-        if (measurandData.isImprovement || measurandData.isDeterioration) {
-          measurandData.color = this.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
-        }else{
-          let unit = measurandData.unit;
-          let colorScales ={};
-          let hasComparative = measurandData.hasComparative;
-          colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, hasComparative);
-          measurandData.color = colorScales[unit](measurands.indexOf(measurand));
-        }
+        let unit = measurandData.unit;
+        let colorScales ={};
+        let hasComparative = measurandData.hasComparative;
+        colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, hasComparative);
+        measurandData.color = colorScales[unit](measurands.indexOf(measurand));
       });
     }
     this.allMeasurandDataMap = measurandDataMap;
@@ -222,7 +223,7 @@ export class AggregationChartDataService {
       Object.keys(this.filterRules).forEach((key)=> key === this.selectedFilter ? this.filterRules[key].selected = true : this.filterRules[key].selected = false);
       let keyForFilterRule = Object.keys(this.filterRules).filter((key) => key === this.selectedFilter).toString();
       let filterRule = this.filterRules[keyForFilterRule];
-      data.series = data.series.filter((serie) => filterRule.some(x => serie.jobGroup === x.jobGroup && serie.page === x.page));
+      data.series = data.series.filter(datum => filterRule.some(x => datum.jobGroup === x.jobGroup && datum.page === x.page));
     }else{
       this.selectedFilter = 'asc';
       this.ascSelected = true;
@@ -312,21 +313,21 @@ export class AggregationChartDataService {
     this.uniqueSideLabels =  this.getDataForLabels().map(x => x.sideLabel).filter((el, i, a) => i === a.indexOf(el));
   }
 
-  public createEmptyBarsForMissingData(data): void {
-    let sideLabelsForMeasurand =[];
-    Object.keys(data).forEach((measurand) => {
-      if (this.uniqueSideLabels.length === data[measurand].series.length) {
-        return data;
-      } else if(this.uniqueSideLabels.length > data[measurand].series.length){
-        sideLabelsForMeasurand = data[measurand].series.map(x => x.sideLabel);
+  public createEmptyBarsForMissingData(): void {
+    let sideLabelsForMeasurand: string[] =[];
+    Object.keys(this.allMeasurandDataMap).forEach((measurand) => {
+      let data = this.allMeasurandDataMap[measurand];
+      if (this.uniqueSideLabels.length === data.series.length) {
+        return this.allMeasurandDataMap;
+      } else if(this.uniqueSideLabels.length > data.series.length){
+        sideLabelsForMeasurand = data.series.map(x => x.sideLabel);
         this.uniqueSideLabels.forEach((label) =>{
           if(!sideLabelsForMeasurand.includes(label)){
-            data[measurand].series.push({sideLabel: label, value: null});
+            data.series.push({aggregationValue: data.aggregationValue, sideLabel: label, value: null, measurand: measurand, jobGroup: null, page:null, measurandGroup:data.measurandGroup, measurandLabel:data.label, unit:data.unit});
           }
         });
       }
     });
-    this.dataForChartBars = data;
   }
 
 
@@ -351,15 +352,15 @@ export class AggregationChartDataService {
     return array;
   }
 
-  private setDataForSideLabel(series, serie): string {
+  private setDataForSideLabel(series: AggregationChartSeries[], datum: AggregationChartSeries): string {
     let pages = series.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     let jobGroups = series.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
     if (pages.length > 1 && jobGroups.length > 1) {
-      return `${serie.page}, ${serie.jobGroup}`;
+      return `${datum.page}, ${datum.jobGroup}`;
     } else if (pages.length > 1 && jobGroups.length === 1) {
-      return  serie.page;
+      return  datum.page;
     } else if (jobGroups.length > 1 && pages.length === 1) {
-      return serie.jobGroup;
+      return datum.jobGroup;
     } else if(pages.length ===1&&jobGroups.length===1){
       return '';
     }
@@ -369,11 +370,11 @@ export class AggregationChartDataService {
     let dataForLabels = [];
     Object.keys(this.allMeasurandDataMap).forEach(measurand => {
       let measurandData = this.allMeasurandDataMap[measurand];
-      measurandData.series.forEach(serie => {
+      measurandData.series.forEach(datum => {
         dataForLabels.push({
-          jobGroup: serie.jobGroup,
-          page: serie.page,
-          sideLabel: serie.sideLabel
+          jobGroup: datum.jobGroup,
+          page: datum.page,
+          sideLabel: datum.sideLabel
         });
       });
     });
