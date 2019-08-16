@@ -36,8 +36,6 @@ export class AggregationChartComponent implements OnChanges {
   private barScoreHeight: number;
   private legendPosY: number;
   private legendHeight: number;
-  private minValue: number;
-  private maxValue: number;
 
   private dataForScoreBar:{min: number, max: number, barsToRender: Array<any>};
   private measurandDataMap: AggregationChartDataByMeasurand = {};
@@ -419,7 +417,7 @@ export class AggregationChartComponent implements OnChanges {
 
 
   formatBarValue(value: string): string {
-    const precision = this.maxValue >= 1000 || this.minValue <= -1000 ? 0 : 2;
+    const precision = this.dataForScoreBar.max >= 1000 || this.dataForScoreBar.min <= -1000 ? 0 : 2;
     return parseFloat(value).toFixed(precision).toString();
   }
 

@@ -266,7 +266,7 @@ export class AggregationChartDataService {
     let values = [];
     if(this.allMeasurandDataMap) {
       Object.keys(this.allMeasurandDataMap).forEach(k => {
-        values = this.allMeasurandDataMap[k].series.map(x=>x.value);
+        values = values.concat(this.allMeasurandDataMap[k].series.map(x=>x.value));
       });
       minValue = values.length > 0 ? Math.min(Math.min.apply(null, values), 0) : 0;
       maxValue = values.length > 0 ? Math.max(Math.max.apply(null, values), 0) : 0;
