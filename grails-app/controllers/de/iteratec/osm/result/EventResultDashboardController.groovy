@@ -152,9 +152,9 @@ class EventResultDashboardController {
      */
     @RestAction
     def getLinechartData(GetLinechartCommand cmd) {
-        String errorMessages = getErrorMessages(cmd)
-        if (errorMessages) {
-            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, errorMessages)
+        if (cmd.hasErrors()) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
+                    "Invalid parameters: " + cmd.getErrors().fieldErrors.collect { it.field }.join(", "))
             return
         }
 
@@ -373,24 +373,6 @@ class EventResultDashboardController {
         i18n.put("deselectAllPoints", message(code: 'de.iteratec.chart.contextMenu.deselectAllPoints', default: 'Deselect all Points'))
 
         modelToRender.put('i18n', i18n as JSON)
-    }
-
-    /**
-     * Validates the command and creates an error message string if necessary.
-     * @param cmd
-     * @return a string containing the error messages in html format or an empty string if the command is valid
-     */
-    private String getErrorMessages(GetLinechartCommand cmd) {
-        String result = ""
-        if (!cmd.pages && !cmd.measuredEvents) {
-            result += i18nService.msg("de.iteratec.osm.gui.selectedPage.error.validator.error.selectedPage", "Please select at least one page")
-            result += "<br />"
-        }
-        if (!cmd.jobGroups) {
-            result += i18nService.msg("de.iteratec.osm.gui.selectedFolder.error.validator.error.selectedFolder", "Please select at least one jobGroup")
-            result += "<br />"
-        }
-        return result
     }
 
     /**

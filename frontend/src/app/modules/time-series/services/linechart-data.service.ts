@@ -15,14 +15,14 @@ export class LinechartDataService {
   constructor(private http: HttpClient) { }
 
   fetchLinechartData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, url: string): Observable<T> {
-    const getLinechartCommand = LinechartDataService.buildGetLinechartCommand(resultSelectionCommand, remainingResultSelection);
+    const getLinechartCommand = this.buildGetLinechartCommand(resultSelectionCommand, remainingResultSelection);
     const params = this.createParams(getLinechartCommand);
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
     )
   }
 
-  private static buildGetLinechartCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): GetLinechartCommand {
+  private buildGetLinechartCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): GetLinechartCommand {
     return new GetLinechartCommand({
       preconfiguredDashboard: null,
       from: resultSelectionCommand.from,

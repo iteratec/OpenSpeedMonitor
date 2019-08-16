@@ -35,30 +35,36 @@ class LineChartTimeSeriesService {
         List<SelectedMeasurand> measurands = cmd.measurands.collect {
             new SelectedMeasurand(it, CachedView.UNCACHED)
         }
-        List<EventResultProjection> eventResultProjections
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - with builder', 1) {
-            EventResultQueryBuilder queryBuilder
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - create query builder', 2) {
 
-                queryBuilder = new EventResultQueryBuilder()
-                        .withJobResultDateBetween(from, to)
-                        .withJobGroupIdsIn(cmd.jobGroups as List)
-                        .withPageIdsIn(cmd.pages as List)
-                        .withLocationIdsIn(cmd.locations as List)
-                        .withBrowserIdsIn(cmd.browsers as List)
-                        .withMeasuredEventIdsIn(cmd.measuredEvents as List)
-                        .withSelectedMeasurands(measurands)
-            }
-            /*performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - append connectivities', 2) {
+        List<EventResultProjection> eventResultProjections = getResultProjecions(cmd, from, to, measurands)
+        return buildDTO(eventResultProjections, jobGroups, pages, measuredEvents)
+    }
+
+    private List<EventResultProjection> getResultProjecions(GetLinechartCommand cmd, Date from, Date to, List<SelectedMeasurand> measurands) {
+        EventResultQueryBuilder queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
+             return new EventResultQueryBuilder()
+                    .withJobResultDateBetween(from, to)
+                    .withJobGroupIdsIn(cmd.jobGroups as List)
+                    .withPageIdsIn(cmd.pages as List)
+                    .withLocationIdsIn(cmd.locations as List)
+                    .withBrowserIdsIn(cmd.browsers as List)
+                    .withMeasuredEventIdsIn(cmd.measuredEvents as List)
+                    .withSelectedMeasurands(measurands)
+
+            /*performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - append connectivities', 2) {
                 appendConnectivity(queryBuildera, queryParams)
             }
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - append trims', 2) {
+            performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - append trims', 2) {
                 appendTrims(queryBuildera, queryParams)
             }*/
-            performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'getting event-results - actually query the data', 2) {
-                eventResultProjections = queryBuilder.getRawData()
-            }
         }
+        List<EventResultProjection> eventResultProjections = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
+            queryBuilder.getRawData()
+        }
+        return eventResultProjections
+    }
+
+    private TimeSeriesChartDTO buildDTO(List<EventResultProjection> eventResultProjections, List<JobGroup> jobGroups, List<Page> pages, List<MeasuredEvent> measuredEvents) {
         TimeSeriesChartDTO timeSeriesChartDTO = new TimeSeriesChartDTO()
         performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
             eventResultProjections.each {EventResultProjection eventResultProjection ->
