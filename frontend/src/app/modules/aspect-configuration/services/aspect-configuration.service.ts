@@ -1,6 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, debounceTime, map, mergeMap, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+  catchError,
+  distinctUntilChanged,
+  map,
+  mergeMap,
+  switchMap,
+  withLatestFrom
+} from "rxjs/operators";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, ReplaySubject} from "rxjs";
 import {Page} from "../../../models/page.model";
 import {BrowserInfoDto} from "../../../models/browser.model";
@@ -107,15 +114,17 @@ export class AspectConfigurationService {
   }
 
   private getPerfAspectParams(): Observable<any> {
-    return this.selectedPage$.pipe(
-      debounceTime(500),
-      withLatestFrom(this.applicationService.selectedApplication$),
-      mergeMap(([page, application]: [Page, Application]) => {
-        const params = this.createLocationParams(application, page);
-        return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(
-          map((locations: LocationDto[]) => this.generateParams(application, page, locations)))
-      })
-    );
+    return combineLatest(this.applicationService.selectedApplication$, this.selectedPage$)
+      .pipe(
+        distinctUntilChanged((previousSelection: [Application, Page], currentSelection: [Application, Page]) => {
+          return currentSelection[1].id === -1 && currentSelection[1].name === ""
+        }),
+        mergeMap(([application, page]: [Application, Page]) => {
+          const params = this.createLocationParams(application, page);
+          return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(
+            map((locations: LocationDto[]) => this.generateParams(application, page, locations)))
+        })
+      );
   }
 
   createLocationParams(application: Application, page: Page) {
