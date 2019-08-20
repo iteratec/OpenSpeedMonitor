@@ -122,9 +122,9 @@ export class AggregationChartComponent implements OnChanges {
         .style('opacity', 0),
       update => update,
       exit => exit
-        .style('opacity', 0)
         .transition()
         .duration(ChartCommons.TRANSITION_DURATION)
+        .style('opacity', 0)
         .remove()
     )
       .attr('x', this.svgWidth / 2)
