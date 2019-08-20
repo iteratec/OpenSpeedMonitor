@@ -15,6 +15,7 @@ export interface PerformanceAspect {
 export type ExtendedPerformanceAspect = PerformanceAspect & BrowserInfoDto
 
 export interface PerformanceAspectType {
+  kind: "performance-aspect-type"
   name: string
   icon: string
   unit: string

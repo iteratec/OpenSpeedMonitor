@@ -143,9 +143,10 @@ export class ResultSelectionStore {
             isLoading: false,
             name: "frontend.de.iteratec.isr.measurand.group." + group.name,
             values: group.values.map(measurand => ({
+              kind: "selectable-measurand",
               name: "frontend.de.iteratec.isr.measurand." + measurand.name,
               id: measurand.id
-            }))
+            } as SelectableMeasurand))
           };
           let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
           if (concerningSubject$) {

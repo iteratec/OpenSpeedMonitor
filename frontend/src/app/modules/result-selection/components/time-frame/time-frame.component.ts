@@ -60,9 +60,8 @@ export class TimeFrameComponent implements OnInit {
 
   selectTimeFrame(): void {
     if (this.timeFrameInSeconds != this.selectableTimeFramesInSeconds[0]) {
-      let from = new Date();
       let to = new Date();
-      from.setSeconds(to.getSeconds() - this.timeFrameInSeconds);
+      let from = new Date(to.getTime() - this.timeFrameInSeconds * 1000);
       this.selectedDates = [from, to];
 
       if (this.comparativeSelectionActive) {

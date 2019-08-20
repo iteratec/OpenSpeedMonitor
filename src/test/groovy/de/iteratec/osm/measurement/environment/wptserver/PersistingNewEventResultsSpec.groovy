@@ -251,9 +251,9 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
 
     }
 
-    void "new results have all time to interactive"() {
-        setup:
-        File file = new File("src/test/resources/WptResultXmls/WPT_EXAMPLE_CHROME_TTI_1Run_1Event.xml")
+    void "first cpu idle and time to interactive get persisted correctly"() {
+        setup: "given a result with three steps, one with just LastInteractive, two with Last- and FirstInteractive"
+        File file = new File("src/test/resources/WptResultXmls/MULTISTEP_interactiveMetrics.xml")
         WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
         WebPageTestServer wptServer = WebPageTestServer.build()
         Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
@@ -266,11 +266,21 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
         when: "the service creates new event results from the XML result"
         service.listenToResult(xmlResult, wptServer, job.id)
         List<EventResult> eventResults = EventResult.list()
+        EventResult erBothOne = eventResults.find { it.oneBasedStepIndexInJourney == 1 }
+        EventResult erJustFirstCpuIdle = eventResults.find { it.oneBasedStepIndexInJourney == 2 }
+        EventResult erBothTwo = eventResults.find { it.oneBasedStepIndexInJourney == 3 }
 
-        then: "there is one EventResult with both time to interactive values"
-        eventResults.size() == 1
-        eventResults.get(0).firstInteractiveInMillisecs == 2286
-        eventResults.get(0).consistentlyInteractiveInMillisecs == 2286
+        then: "there is one EventResult with just first cpu idle and two with first cpu idle AND time to interactive"
+        eventResults.size() == 3
+
+        erBothOne.firstCpuIdleInMillisecs == 9911
+        erBothOne.timeToInteractiveInMillisecs == 31491
+
+        erJustFirstCpuIdle.firstCpuIdleInMillisecs == 8764
+        erJustFirstCpuIdle.timeToInteractiveInMillisecs == null
+
+        erBothTwo.firstCpuIdleInMillisecs == 11430
+        erBothTwo.timeToInteractiveInMillisecs == 11430
     }
 
     void "check CSI value creation"() {

@@ -27,7 +27,6 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
-import de.iteratec.osm.report.external.GraphiteComunicationFailureException
 import de.iteratec.osm.report.external.GraphiteReportService
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
@@ -40,7 +39,6 @@ import org.springframework.transaction.annotation.Propagation
 import java.util.zip.GZIPOutputStream
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
-
 /**
  * Persists locations and results. Observer of JobResultPersisterService.
  */
@@ -280,6 +278,7 @@ class EventResultPersisterService implements iResultListener {
         result.deviceType = result.location.deviceType
         result.operatingSystem = result.location.operatingSystem
         setAllMeasurands(viewTag, result)
+        adaptInteractivityMeasurands(viewTag, result)
         result.testAgent = jobRun.testAgent
         setConnectivity(result, jobRun)
         result.oneBasedStepIndexInJourney = testStepOneBasedIndex
@@ -326,6 +325,13 @@ class EventResultPersisterService implements iResultListener {
 
     private boolean tagExists(GPathResult viewTag, String tag) {
         return !viewTag.getProperty(tag).isEmpty() && viewTag.getProperty(tag).toString().isBigInteger() && viewTag.getProperty(tag).toBigInteger() > 0
+    }
+
+    private void adaptInteractivityMeasurands(GPathResult viewTag, EventResult result) {
+        if (!tagExists(viewTag, Measurand.FIRST_CPU_IDLE.getTagInResultXml()) && tagExists(viewTag, Measurand.TIME_TO_INTERACTIVE.getTagInResultXml())) {
+            result.firstCpuIdleInMillisecs = viewTag.getProperty(Measurand.TIME_TO_INTERACTIVE.getTagInResultXml()).toInteger()
+            result.timeToInteractiveInMillisecs = null
+        }
     }
 
     private void setBreakdownMeasurands(GPathResult viewtag, EventResult result) {
