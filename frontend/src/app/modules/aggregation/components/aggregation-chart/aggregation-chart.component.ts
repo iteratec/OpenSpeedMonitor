@@ -46,7 +46,7 @@ export class AggregationChartComponent implements OnChanges {
   private anySelected:boolean = false;
   private clickedMeasurand:string = '';
 
-  constructor(private aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
+  constructor(public aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
   }
 
   redraw() {
