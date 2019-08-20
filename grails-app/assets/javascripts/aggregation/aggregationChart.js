@@ -22,6 +22,7 @@ OpenSpeedMonitor.ChartModules.Aggregation = (function (selector) {
     var chartBarScoreComponent = OpenSpeedMonitor.ChartComponents.ChartBarScore();
     var chartSideLabelsComponent = OpenSpeedMonitor.ChartComponents.ChartSideLabels();
     var chartHeaderComponent = OpenSpeedMonitor.ChartComponents.ChartHeader();
+    // var data;
     var data = OpenSpeedMonitor.ChartModules.AggregationData(svg);
     var transitionDuration = OpenSpeedMonitor.ChartComponents.common.transitionDuration;
 
@@ -38,7 +39,9 @@ OpenSpeedMonitor.ChartModules.Aggregation = (function (selector) {
     };
 
     var setData = function (inputData) {
-        data.setData(inputData);
+         //data.setData(inputData);
+        data = OpenSpeedMonitor.ChartModules.AggregationData;
+        OpenSpeedMonitor.ChartModules.AggregationData.setData(inputData);
         chartHeaderComponent.setData(data.getDataForHeader());
         chartBarScoreComponent.setData(data.getDataForBarScore());
         chartLegendComponent.setData(data.getDataForLegend());
