@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {
   catchError,
-  distinctUntilChanged,
+  filter,
   map,
   mergeMap,
   switchMap,
@@ -116,9 +116,7 @@ export class AspectConfigurationService {
   private getPerfAspectParams(): Observable<any> {
     return combineLatest(this.applicationService.selectedApplication$, this.selectedPage$)
       .pipe(
-        distinctUntilChanged((previousSelection: [Application, Page], currentSelection: [Application, Page]) => {
-          return currentSelection[1].id === -1 && currentSelection[1].name === ""
-        }),
+        filter(([application, page]: [Application, Page]) => page.id !== -1 && page.name !== ""),
         mergeMap(([application, page]: [Application, Page]) => {
           const params = this.createLocationParams(application, page);
           return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(
