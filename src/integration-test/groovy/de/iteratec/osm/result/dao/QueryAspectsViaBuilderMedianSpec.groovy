@@ -15,7 +15,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
     JobGroup jobGroup
     Page page1, page2
     Browser browser1, browser2
-    SelectedMeasurand docComplete, countRequest, startRender, firstContentfulPaint, visuallyCompleteInMillisecs, consistentlyInteractiveInMillisecs
+    SelectedMeasurand docComplete, countRequest, startRender, firstContentfulPaint, visuallyCompleteInMillisecs, timeToInteractiveInMillisecs
 
     def setup() {
         jobGroup = JobGroup.build()
@@ -28,7 +28,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         startRender = createMeasurand("START_RENDER")
         firstContentfulPaint = createMeasurand("FIRST_CONTENTFUL_PAINT")
         visuallyCompleteInMillisecs = createMeasurand("VISUALLY_COMPLETE")
-        consistentlyInteractiveInMillisecs = createMeasurand("CONSISTENTLY_INTERACTIVE")
+        timeToInteractiveInMillisecs = createMeasurand("TIME_TO_INTERACTIVE")
     }
 
     void "Median of aspect metrics, all results share the same aspect metrics, grouped by jobgroup, page + browser"() {
@@ -37,12 +37,12 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         int resultCounter = 0
         11.times {
             persistEventResult([
-                    startRenderInMillisecs            : 300 + resultCounter,
-                    firstContentfulPaint              : 400 + resultCounter,
-                    docCompleteTimeInMillisecs        : 1200 + resultCounter,
-                    docCompleteRequests               : 35 + resultCounter,
-                    visuallyCompleteInMillisecs       : 500 + resultCounter,
-                    consistentlyInteractiveInMillisecs: 600 + resultCounter
+                    startRenderInMillisecs      : 300 + resultCounter,
+                    firstContentfulPaint        : 400 + resultCounter,
+                    docCompleteTimeInMillisecs  : 1200 + resultCounter,
+                    docCompleteRequests         : 35 + resultCounter,
+                    visuallyCompleteInMillisecs : 500 + resultCounter,
+                    timeToInteractiveInMillisecs: 600 + resultCounter
             ])
             resultCounter++
         }
@@ -64,7 +64,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1205
         !result.docCompleteRequests
         !result.visuallyCompleteInMillisecs
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         result.PAGE_CONSTRUCTION_STARTED == 405
     }
 
@@ -74,12 +74,12 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, startRender, page1, browser2)
         10.times {
             LinkedHashMap<String, Integer> metrics = [
-                    startRenderInMillisecs            : 300,
-                    firstContentfulPaint              : 400,
-                    docCompleteTimeInMillisecs        : 1200,
-                    docCompleteRequests               : 35,
-                    visuallyCompleteInMillisecs       : 500,
-                    consistentlyInteractiveInMillisecs: 600
+                    startRenderInMillisecs      : 300,
+                    firstContentfulPaint        : 400,
+                    docCompleteTimeInMillisecs  : 1200,
+                    docCompleteRequests         : 35,
+                    visuallyCompleteInMillisecs : 500,
+                    timeToInteractiveInMillisecs: 600
             ]
             persistEventResult(metrics, page1, browser1)
             persistEventResult(metrics, page1, browser2)
@@ -100,7 +100,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1200
         !result.docCompleteRequests
         !result.visuallyCompleteInMillisecs
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         result.PAGE_CONSTRUCTION_STARTED == (300+400)/2
     }
 
@@ -108,27 +108,27 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         given: "5/10 EventResults with different aspect metrics and matching Aspects in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint, page1, browser1)
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, startRender, page1, browser2)
-        persistAspect(PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT, consistentlyInteractiveInMillisecs, page1, browser1)
+        persistAspect(PerformanceAspectType.PAGE_SHOWS_USEFUL_CONTENT, timeToInteractiveInMillisecs, page1, browser1)
         int visCompleteAsDefault = 500 // for PAGE_SHOWS_USEFUL_CONTENT
         5.times {
             LinkedHashMap<String, Integer> metrics = [
-                    startRenderInMillisecs            : 300,
-                    firstContentfulPaint              : 400,
-                    docCompleteTimeInMillisecs        : 1200,
-                    docCompleteRequests               : 35,
-                    visuallyCompleteInMillisecs       : visCompleteAsDefault,
-                    consistentlyInteractiveInMillisecs: 600
+                    startRenderInMillisecs      : 300,
+                    firstContentfulPaint        : 400,
+                    docCompleteTimeInMillisecs  : 1200,
+                    docCompleteRequests         : 35,
+                    visuallyCompleteInMillisecs : visCompleteAsDefault,
+                    timeToInteractiveInMillisecs: 600
             ]
             persistEventResult(metrics, page1, browser1)
         }
         10.times {
             LinkedHashMap<String, Integer> metrics = [
-                    startRenderInMillisecs            : 300,
-                    firstContentfulPaint              : 400,
-                    docCompleteTimeInMillisecs        : 1200,
-                    docCompleteRequests               : 35,
-                    visuallyCompleteInMillisecs       : visCompleteAsDefault,
-                    consistentlyInteractiveInMillisecs: 600
+                    startRenderInMillisecs      : 300,
+                    firstContentfulPaint        : 400,
+                    docCompleteTimeInMillisecs  : 1200,
+                    docCompleteRequests         : 35,
+                    visuallyCompleteInMillisecs : visCompleteAsDefault,
+                    timeToInteractiveInMillisecs: 600
             ]
             persistEventResult(metrics, page1, browser2)
         }
@@ -148,7 +148,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         result.docCompleteTimeInMillisecs == 1200
         !result.docCompleteRequests
         !result.visuallyCompleteInMillisecs
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
         result.PAGE_CONSTRUCTION_STARTED == 300
         result.PAGE_SHOWS_USEFUL_CONTENT == visCompleteAsDefault
     }
@@ -159,12 +159,12 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         int resultCounter = 0
         11.times {
             persistEventResult([
-                    startRenderInMillisecs            : 300 + resultCounter,
-                    firstContentfulPaint              : 400 + resultCounter,
-                    docCompleteTimeInMillisecs        : 1200 + resultCounter,
-                    docCompleteRequests               : 35 + resultCounter,
-                    visuallyCompleteInMillisecs       : 500 + resultCounter,
-                    consistentlyInteractiveInMillisecs: 600 + resultCounter
+                    startRenderInMillisecs      : 300 + resultCounter,
+                    firstContentfulPaint        : 400 + resultCounter,
+                    docCompleteTimeInMillisecs  : 1200 + resultCounter,
+                    docCompleteRequests         : 35 + resultCounter,
+                    visuallyCompleteInMillisecs : 500 + resultCounter,
+                    timeToInteractiveInMillisecs: 600 + resultCounter
             ])
             resultCounter++
         }
@@ -187,7 +187,7 @@ class QueryAspectsViaBuilderMedianSpec extends NonTransactionalIntegrationSpec {
         !result.docCompleteTimeInMillisecs
         !result.docCompleteRequests
         !result.visuallyCompleteInMillisecs
-        !result.consistentlyInteractiveInMillisecs
+        !result.timeToInteractiveInMillisecs
     }
 
     private void persistEventResult(Map<String, Integer> measurands, Page page = page1, Browser browser = browser1) {

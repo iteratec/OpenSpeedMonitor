@@ -8,6 +8,7 @@ import {ApplicationService} from "./services/application.service";
 import {ResultSelectionService} from "./modules/result-selection/services/result-selection.service";
 import {ResultSelectionStore} from "./modules/result-selection/services/result-selection.store";
 import {BarchartDataService} from "./modules/aggregation/services/barchart-data.service";
+import {AggregationChartDataService} from "./modules/aggregation/services/aggregation-chart-data.service";
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -31,7 +32,8 @@ export function createTranslateLoader(http: HttpClient) {
     ApplicationService,
     ResultSelectionService,
     ResultSelectionStore,
-    BarchartDataService
+    BarchartDataService,
+    AggregationChartDataService
   ],
 })
 export class GlobalModule {

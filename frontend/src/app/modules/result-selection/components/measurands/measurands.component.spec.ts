@@ -6,6 +6,7 @@ import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
+import {MeasurandGroup} from "../../../../models/measurand.model";
 
 describe('MeasurandsComponent', () => {
   let component: MeasurandsComponent;
@@ -30,24 +31,28 @@ describe('MeasurandsComponent', () => {
     component = fixture.componentInstance;
     component.multipleMeasurands = true;
 
-    resultSelectionStore.loadTimes$.next({
+    const loadTimes: MeasurandGroup = {
       isLoading: false,
       name: 'frontend.de.iteratec.isr.measurand.group.LOAD_TIMES',
       values: [
         {
+          kind: "selectable-measurand",
           id: 'DOC_COMPLETE_TIME',
           name: 'frontend.de.iteratec.isr.measurand.DOC_COMPLETE_TIME'
         },
         {
+          kind: "selectable-measurand",
           id: 'DOM_TIME',
           name: 'frontend.de.iteratec.isr.measurand.DOM_TIME'
         },
         {
+          kind: "selectable-measurand",
           id: 'FIRST_BYTE',
           name: 'frontend.de.iteratec.isr.measurand.FIRST_BYTE'
         }
       ]
-    });
+    };
+    resultSelectionStore.loadTimes$.next(loadTimes);
     fixture.detectChanges();
   });
 

@@ -1,0 +1,98 @@
+@import '../../../../../styles/colors';
+
+.aggregation-chart {
+  position: relative;
+  width: 100%;
+}
+
+svg.aggregation-chart-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.in-chart-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+}
+
+.filter-dropdown-group {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  z-index: 2;
+  top: 4px;
+  right: 50px;
+  padding: 6px 12px;
+
+  ul > li > a {
+    cursor: pointer;
+  }
+
+  .filter-inactive {
+    visibility: hidden;
+  }
+
+  .perc-element {
+    margin-right: .5em;
+  }
+
+  .perc-slider {
+    -webkit-appearance: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border: 0;
+    max-width: 10em;
+  }
+  .perc-slider:focus {
+    -webkit-appearance: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border: 0;
+  }
+  .perc-slider:disabled {
+    opacity: 0.5;
+  }
+  .perc-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 32px;
+    width: 12px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: $color-primary;
+    border: 1px solid darken($color-primary, 10%);
+    margin-top: -12px;
+    cursor: pointer;
+  }
+  .perc-slider:disabled::-webkit-slider-thumb {
+    cursor: not-allowed;
+  }
+  .perc-slider::-moz-range-thumb {
+    width: 10px;
+    height: 30px;
+    background: $color-primary;
+    border-color: darken($color-primary, 10%);
+    border-radius: 4px;
+    cursor: pointer;
+    -moz-border-radius: 4px;
+  }
+  .perc-slider::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    background: lightgray;
+    height: 8px;
+    width: 100%;
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+    border-radius: 2px;
+  }
+  .perc-slider::-moz-range-track {
+    background: lightgray;
+    height: 8px;
+    width: 100%;
+    border-radius: 2px;
+  }
+}
