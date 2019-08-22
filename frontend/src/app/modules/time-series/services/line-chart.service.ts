@@ -43,6 +43,7 @@ import {TimeSeriesDataPointDTO} from 'src/app/modules/time-series/models/time-se
 import {LineChartData, LineChartDataDTO} from 'src/app/modules/time-series/models/line-chart-data.model';
 import {LineChartDataPoint, LineChartDataPointDTO} from 'src/app/modules/time-series/models/line-chart-data-value.model';
 import {parseDate} from 'src/app/utils/date.util';
+import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 
 /**
  * Generate line charts with ease and fun 😎
@@ -56,7 +57,7 @@ export class LineChartService {
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
   // TODO Move into frontend/src/app/enums/chart-commons.enum.ts when available (see https://github.com/iteratec/OpenSpeedMonitor/pull/241/files)
-  private _margin = { top: 40, right: 30, bottom: 20, left: 30 };
+  private _margin = { top: 40, right: 30, bottom: 20, left: 40 };
   private _width  = 600 - this._margin.left - this._margin.right;
   private _height = 600 - this._margin.top - this._margin.bottom;
 
@@ -86,13 +87,6 @@ export class LineChartService {
     this.addXAxisToChart(chart, xScale);
     this.addYAxisToChart(chart, yScale);
 
-  //  let dataSelection: any = chart.selectAll('g.line').data(data);
-  //  dataSelection.join(
-  //    enter => this.enter(enter, chart, xScale),
-  //    update => this.update(update),
-  //    exit => this.exit(exit)
-  //  );
-
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
@@ -112,36 +106,6 @@ export class LineChartService {
       });
       return lineChartData;
     });
-  }
-
-  private __prepareData(incomingData: TimeSeriesResultsDTO): LineChartDataDTO[] {
-    if (!incomingData) return [];
-
-    // Group the data by date (x-axis data points)
-    return Object.values<LineChartDataDTO>( // Remove the helper keys
-      incomingData.series
-        .reduce((result: {}, dataElement: TimeSeriesDataDTO) => {
-
-        // Transform given data for each data point to the given date grouping.
-        dataElement.data.reduce((pointResults: {}, dataPoint: TimeSeriesDataPointDTO) => {
-          let indexKey = dataPoint.date.toString();
-          if (result[indexKey] == undefined) {   // No group for this date yet, so create one.
-            result[indexKey] = new LineChartData();
-            result[indexKey].key = parseDate(dataPoint.date);
-            result[indexKey].values = [];
-          }
-
-          result[indexKey].values.push(new LineChartDataPoint(parseDate(dataPoint.date), dataPoint.value, this.generateTooltipText(dataPoint)));
-          return result;
-        }, result);
-
-        return result;
-      }, {}) // Start with an empty helper object
-    ).slice(0, 10);
-  }
-
-  private generateTooltipText(dataPoint: TimeSeriesDataPointDTO): string {
-    return dataPoint.agent;
   }
 
   private createChart(svgElement: ElementRef): D3Selection<D3BaseType, {}, D3ContainerElement, {}> {
@@ -246,12 +210,12 @@ export class LineChartService {
     let chartLineGroups = chart.selectAll('.line')  // Get all lines already drawn
                                .data(data)          // ... for this data
                                .join('g')           // Group the path so we can add dots later to this group
-                                 .attr('class', (data: TimeSeriesDataDTO) => { return 'line line-'+data.identifier; })
+                                 .attr('class', (dataItem: LineChartDataDTO) => { return 'line line-'+dataItem.key; })
 
     // Draw each line into the group
     chartLineGroups.append('path')  // Draw one path for every item in the data set
                      .attr('fill', 'none')
-                     .attr('stroke', (dataItem: LineChartDataDTO) => { return "#5E81AC"; /*TODO colors(item.key);*/ })
+                     .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
                      .attr('stroke-width', 1.5)
                      .attr('d', (dataItem: LineChartDataDTO) => {     // Apply a function to every item (data grouped by the key 'name') from the data
                        return this.getLineGenerator(xScale, yScale)(dataItem.values);  // Draw the line for every value (point) of this item
