@@ -12,6 +12,7 @@ export interface AggregationChartSeriesDTO {
   browser?: string;
   deviceType?: string;
   operatingSystem?: string;
+
 }
 
 export class AggregationChartSeries implements AggregationChartSeriesDTO {

@@ -18,6 +18,7 @@ export class AggregationChartComponent implements OnChanges {
   @ViewChild('svg') svgElement: ElementRef;
   @Input() barchartAverageData;
   @Input() barchartMedianData;
+  @Input() isLoading;
 
   hasFilterRules: boolean = false;
   percentileValue: number = 50;
@@ -530,7 +531,6 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.redraw();
+      this.redraw();
   }
-
 }

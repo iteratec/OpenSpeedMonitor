@@ -7,6 +7,8 @@ import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
 import {AggregationChartComponent} from "./components/aggregation-chart/aggregation-chart.component";
+import {SpinnerComponent} from "../shared/components/spinner/spinner.component";
+
 
 describe('AggregationComponent', () => {
   let component: AggregationComponent;
@@ -14,7 +16,7 @@ describe('AggregationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AggregationComponent, AggregationChartComponent ],
+      declarations: [ AggregationComponent, AggregationChartComponent, SpinnerComponent ],
       imports: [
         SharedMocksModule,
         ResultSelectionModule

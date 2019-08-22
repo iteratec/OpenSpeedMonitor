@@ -93,6 +93,7 @@ export class AggregationChartDataService {
 
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
+  isLoading$: BehaviorSubject<any> = new BehaviorSubject<any>(true);
   ascSelected:boolean = true;
   descSelected:boolean = false;
 
@@ -116,6 +117,7 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
+      this.isLoading$.next(false);
     });
   }
 
