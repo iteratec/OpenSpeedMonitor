@@ -11,13 +11,9 @@ import {
 } from 'd3-selection';
 
 import {
-  extent as d3Extent,
   min as d3Min,
   max as d3Max
 } from 'd3-array';
-
-import { timeDay as d3TimeDay } from 'd3-time';
-import { timeFormat as d3TimeFormat } from 'd3-time-format';
 
 import {
   scaleTime as d3ScaleTime,
@@ -63,22 +59,17 @@ export class LineChartService {
 
   constructor() {}
 
-
-
   /**
    * Draws a line chart for the given data into the given svg
    */
   drawLineChart(svgElement: ElementRef, incomingData: TimeSeriesResultsDTO): void {
-    console.log("drawLineChart(...)"); console.log(incomingData);
 
     let data: LineChartDataDTO[] = this.prepareData(incomingData);
-    console.log(data);
 
     if (data.length == 0) {
       console.log("No data > No chart !");
       return;
     }
-
 
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
@@ -91,12 +82,15 @@ export class LineChartService {
   }
 
 
-
-
+  /**
+   * Prepares the incoming data for drawing with D3.js
+   */
   private prepareData(incomingData: TimeSeriesResultsDTO): LineChartDataDTO[] {
+
     return incomingData.series.map((data: TimeSeriesDataDTO) => {
       let lineChartData: LineChartDataDTO = new LineChartData();
       lineChartData.key = data.identifier;
+
       lineChartData.values = data.data.map((point: TimeSeriesDataPointDTO) => {
         let lineChartDataPoint: LineChartDataPointDTO = new LineChartDataPoint();
         lineChartDataPoint.date = parseDate(point.date);
@@ -104,11 +98,16 @@ export class LineChartService {
         lineChartDataPoint.tooltipText = '';
         return lineChartDataPoint;
       });
+
       return lineChartData;
     });
   }
 
+  /**
+   * Setup the basic chart with an x- and y-axis
+   */
   private createChart(svgElement: ElementRef): D3Selection<D3BaseType, {}, D3ContainerElement, {}> {
+
     this._width = svgElement.nativeElement.parentElement.offsetWidth - this._margin.left - this._margin.right;
     //this._height = svgElement.nativeElement.parentElement.offsetHeight - this._margin.top - this._margin.bottom;
     const svg = d3Select(svgElement.nativeElement)
@@ -122,6 +121,9 @@ export class LineChartService {
               .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
   }
 
+  /**
+   * Determine the xScale for the given data
+   */
   private getXScale(data: LineChartDataDTO[]): D3ScaleTime<number, number> {
     return d3ScaleTime()               // Define a scale for the X-Axis
              .range([0, this._width])  // Display the X-Axis over the complete width
@@ -135,6 +137,9 @@ export class LineChartService {
              ]);
   }
 
+  /**
+   * Determine the yScale for the given data
+   */
   private getYScale(data: LineChartDataDTO[]): D3ScaleLinear<number, number> {
     return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
              .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
@@ -145,33 +150,17 @@ export class LineChartService {
                d3Max(data, (dataItem: LineChartDataDTO) => { 
                  return d3Max(dataItem.values, (point: LineChartDataPointDTO) => { return point.value; });
                })
-             ]);
+             ])
+             .nice();
   }
 
-
-
-
-  private enter(dataSelection: any, chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,xScale: D3ScaleTime<number, number>) {
-    console.log("enter(dataSelection)");
-    console.log(dataSelection);
-  }
-
-  private update(dataSelection: any) {
-    console.log("update(dataSelection)");
-    console.log(dataSelection);
-  }
-
-  private exit(dataSelection: any) {
-    console.log("exit(dataSelection)");
-    console.log(dataSelection);
-  }
-
+  /**
+   * Print the x-axis on the graph
+   */
   private addXAxisToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                           xScale: D3ScaleTime<number, number>): void {
 
     const xAxis = d3AxisBottom(xScale);
-         //           .tickFormat(d3TimeFormat('%Y-%m-%d'))  // Format the tick labels
-         //           .ticks(d3TimeDay.every(1));            // Set one tick for every day in the set
 
     // Add the X-Axis to the chart
     chart.append('g')                   // new group for the X-Axis (see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g)
@@ -180,6 +169,9 @@ export class LineChartService {
          .call(xAxis);
   }
 
+  /**
+   * Print the y-axis on the graph
+   */
   private addYAxisToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                           yScale: D3ScaleLinear<number, number>): void {
 
@@ -191,6 +183,9 @@ export class LineChartService {
          .call(yAxis);
   }
 
+  /**
+   * Configuration of the line generator which does print the lines
+   */
   private getLineGenerator(xScale: D3ScaleTime<number, number>,
                            yScale: D3ScaleLinear<number, number>): D3Line<LineChartDataPointDTO> {
 
@@ -201,6 +196,9 @@ export class LineChartService {
 
   }
 
+  /**
+   * Adds one line per data group to the chart
+   */
   private addDataLinesToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                               xScale: D3ScaleTime<number, number>,
                               yScale: D3ScaleLinear<number, number>,
@@ -231,35 +229,35 @@ export class LineChartService {
      //this.addDataPointsToChart(chartLineGroups, xScale, yScale, data);
   }
 
-  private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
-                               xScale: D3ScaleTime<number, number>,
-                               yScale: D3ScaleLinear<number, number>,
-                               data: LineChartDataDTO[]): void {
+  //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
+  //                             xScale: D3ScaleTime<number, number>,
+  //                             yScale: D3ScaleLinear<number, number>,
+  //                             data: LineChartDataDTO[]): void {
 
-    let chartLineDotGroups = chartLineGroups.selectAll('.dots')
-                   .data((data: LineChartDataDTO) => { return data.values; })  // Reduce the data to the data points per line
-                   .join('g')
-                     .attr('class', 'dot');
+  //  let chartLineDotGroups = chartLineGroups.selectAll('.dots')
+  //                 .data((data: LineChartDataDTO) => { return data.values; })  // Reduce the data to the data points per line
+  //                 .join('g')
+  //                   .attr('class', 'dot');
 
-    chartLineDotGroups.append('circle')
-                       .attr('fill', '#2E3440') // TODO Colors
-                       .attr('stroke', '#5E81AC') // TODO Colors
-                       .attr('stroke-width', 1.5)
-                       .attr('cx', (point: LineChartDataPointDTO) => { return xScale(point.date); })
-                       .attr('cy', (point: LineChartDataPointDTO) => { return yScale(point.value); })
-                       .attr('r', 4)
-                       .on('mouseover', (data, index) => {
-                         // TODO: Add the class identifier to the element 'entry.id-index'
-                         // console.log(d3.select(this))
-                         //highlightLine(this)
-                         // let element = d3.select(this.parentNode).select('.dot-desc');
-                         // element.style('visibility', 'visible');
-                       })
-                       .on('mouseout', (data, index) => {
-                         // let element = d3.select(this.parentNode).select('.dot-desc');
-                         // element.style('visibility', 'hidden');
-                       });
-  }
+  //  chartLineDotGroups.append('circle')
+  //                     .attr('fill', '#2E3440') // TODO Colors
+  //                     .attr('stroke', '#5E81AC') // TODO Colors
+  //                     .attr('stroke-width', 1.5)
+  //                     .attr('cx', (point: LineChartDataPointDTO) => { return xScale(point.date); })
+  //                     .attr('cy', (point: LineChartDataPointDTO) => { return yScale(point.value); })
+  //                     .attr('r', 4)
+  //                     .on('mouseover', (data, index) => {
+  //                       // TODO: Add the class identifier to the element 'entry.id-index'
+  //                       // console.log(d3.select(this))
+  //                       //highlightLine(this)
+  //                       // let element = d3.select(this.parentNode).select('.dot-desc');
+  //                       // element.style('visibility', 'visible');
+  //                     })
+  //                     .on('mouseout', (data, index) => {
+  //                       // let element = d3.select(this.parentNode).select('.dot-desc');
+  //                       // element.style('visibility', 'hidden');
+  //                     });
+  //}
 
 
   //private highlightLine (element: TimeSeriesResults) {
@@ -271,69 +269,4 @@ export class LineChartService {
   //    d3Select(element.parentNode).selectAll('circle').attr('stroke', (item) => { return colors(item.id); });
   //  };
   //
-
-//  private todo(): void {
-//    // https://github.com/d3/d3/blob/master/API.md
-//
-//    // https://observablehq.com/@d3/multi-line-chart
-//    // https://www.d3-graph-gallery.com/graph/line_several_group.html
-//    // https://blog.risingstack.com/d3-js-tutorial-bar-charts-with-javascript/#
-//
-//
-//    let normalizeColors = () => {
-//      d3SelectAll('.line > path').attr('stroke', (item) => { return colors(item.key); });
-//      d3SelectAll('.dots > circle').attr('stroke', (item) => { return colors(item.id); });
-//    };
-//
-//    // Reformat the data to be grouped be the name
-//    // Will give something like
-//    //   [
-//    //     { key : 'Foo 1', values: [ {date: '...', id: 'Foo 1', value: '...'}, {...} ] },
-//    //     { key : 'Foo 2', values: [ {date: '...', id: 'Foo 2', value: '...'}, {...} ] },
-//    //   ]
-//    //let data = d3Nest()
-//    //             .key((item) => { return item.id; })
-//    //             .entries(dataFlat);
-//
-//    //             console.log(data);
-//
-//
-//
-//
-//
-//
-//    const names = data.map((item) =>  { return item.name });
-//    const colors = d3ScaleOrdinal()
-//                     .range(['#BF616A', '#D08770', '#EBCB8B', '#A3BE8C', '#B48EAD'])  // The color palatte Aurora from Nord Theme (https://www.nordtheme.com/docs/colors-and-palettes)
-//                     .domain(names);  // Map the colors to the keys from out dataset
-//
-//
-//
-//
-//    // =================================================================
-//    //                            DOTS
-//    // =================================================================
-//
-//    // Add the dots to the line groups
-//    let chartLineDotDescGroups = chartLineDotGroups.append('g')
-//                                               .attr('class', (entry, index) => { return 'dot-desc dot-desc-' + entry.id + '-' + index; })
-//
-//    chartLineDotDescGroups.append('text')
-//                      .attr('text-anchor', 'middle')
-//                      .attr('x', (entry) => { return xScale(entry.date); })
-//                      .attr('y', (entry) => { return yScale(entry.value) - 13; })
-//                      .text((entry) => { return entry.id; });
-//
-//    chartLineDotDescGroups.insert('rect', ':first-child')
-//                       .attr('fill', '#2E3440')
-//                       .attr('stroke', (entry) => { return colors(entry.id); })
-//                       .attr('stroke-width', 1.5)
-//                      .attr('width', (entry, index) => { return this.parentElement.getBBox().width + 5;})
-//                      .attr('height', (entry, index) => { return this.parentElement.getBBox().height + 5;})
-//                      .attr('x', (entry) => { return xScale(entry.date) - this.getBBox().width / 2; })
-//                      .attr('y', (entry) => { return yScale(entry.value) - 8 - this.getBBox().height; })
-//
-//
-//  }
-
 }

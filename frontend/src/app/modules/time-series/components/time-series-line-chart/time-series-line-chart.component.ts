@@ -3,7 +3,6 @@ import {
   Component, ElementRef,
   OnChanges,
   SimpleChanges, ViewChild,
-  ViewEncapsulation,
   Input,
   HostListener
 } from "@angular/core/";
@@ -14,7 +13,7 @@ import {LineChartService} from '../../services/line-chart.service';
 
 @Component({
   selector: 'osm-time-series-line-chart',
-  template: '<div class="time-series-line-chart-container"><svg #svg ><g class="time-series-chart"></g></svg></div>',
+  templateUrl: './time-series-line-chart.component.html',
   styleUrls: [ './time-series-line-chart.component.scss' ]
 })
 export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges {
@@ -23,7 +22,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   timeSeriesResults: TimeSeriesResults;
 
   @ViewChild("svg") 
-  svgElement: ElementRef;  // TODO WHY IS THIS ELEMENT UNDEFINED????
+  svgElement: ElementRef;
 
 
   constructor(
