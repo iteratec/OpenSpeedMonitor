@@ -152,7 +152,9 @@ export class AggregationChartDataService {
     this.setDataForScoreBar();
     this.setDataForHeader();
     this.setUniqueSideLabels();
-    this.createEmptyBarsForMissingData();
+    if(!this.hasComparativeData) {
+      this.createEmptyBarsForMissingData();
+    }
   }
 
   public setMeasurandDataMap(series: AggregationChartSeries[]): void{
@@ -164,7 +166,6 @@ export class AggregationChartDataService {
       }
       series.forEach(datum => {
         datum.sideLabel = this.setDataForSideLabel(series, datum);
-
       });
 
       measurands = series.map(x => x.measurand).filter((v, i, a) => a.indexOf(v) === i);

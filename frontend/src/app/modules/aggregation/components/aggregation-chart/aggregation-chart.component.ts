@@ -21,6 +21,7 @@ export class AggregationChartComponent implements OnChanges {
 
   hasFilterRules: boolean = false;
   percentileValue: number = 50;
+  isHidden: boolean = true;
 
   svgWidth: number;
   svgHeight: number;
@@ -66,7 +67,6 @@ export class AggregationChartComponent implements OnChanges {
     }else{
       this.anySelected = false;
     }
-
     this.svgWidth = this.svgElement.nativeElement.getBoundingClientRect().width;
     this.svgHeight = this.svgElement.nativeElement.parentElement.offsetHeight;
 
@@ -79,12 +79,15 @@ export class AggregationChartComponent implements OnChanges {
     this.barScoreHeight = ChartCommons.BAR_BAND + ChartCommons.COMPONENT_MARGIN;
     this.legendPosY = this.barScorePosY + this.barScoreHeight + ChartCommons.COMPONENT_MARGIN;
     this.legendHeight = this.estimateHeight(this.svgElement.nativeElement) + ChartCommons.COMPONENT_MARGIN;
-
     this.svgHeight = this.legendPosY + this.legendHeight + this.headerHeight;
     this.svgElement.nativeElement.setAttribute('height', this.svgHeight);
+    this.isHidden = this.aggregationChartDataService.hasComparativeData;
+    if(this.aggregationChartDataService.hasComparativeData){
+      this.changeStackBars('true');
+    }
 
     this.xScale = scaleLinear()
-      .domain([0, max(this.aggregationChartDataService.series.map(it => it.value))])
+      .domain([this.dataForScoreBar.min, max(this.aggregationChartDataService.series.map(it => it.value))])
       .range([0, this.barsWidth]);
 
     this.yScale = scaleBand()
