@@ -108,8 +108,8 @@
         VISUALLY_COMPLETE: '${message(code: 'de.iteratec.isr.measurand.VISUALLY_COMPLETE')}',
         CS_BY_WPT_DOC_COMPLETE: '${message(code: 'de.iteratec.isr.measurand.CS_BY_WPT_DOC_COMPLETE')}',
         CS_BY_WPT_VISUALLY_COMPLETE: '${message(code: 'de.iteratec.isr.measurand.CS_BY_WPT_VISUALLY_COMPLETE')}',
-        FIRST_INTERACTIVE: '${message(code: 'de.iteratec.isr.measurand.FIRST_INTERACTIVE')}',
-        CONSISTENTLY_INTERACTIVE: '${message(code: 'de.iteratec.isr.measurand.CONSISTENTLY_INTERACTIVE')}'
+        FIRST_CPU_IDLE: '${message(code: 'de.iteratec.isr.measurand.FIRST_CPU_IDLE')}',
+        TIME_TO_INTERACTIVE: '${message(code: 'de.iteratec.isr.measurand.TIME_TO_INTERACTIVE')}'
     };
     OpenSpeedMonitor.i18n.thresholdButtons = {
         submit: '${message(code: 'job.threshold.submit')}',

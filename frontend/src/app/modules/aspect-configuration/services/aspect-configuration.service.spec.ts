@@ -86,7 +86,7 @@ describe('AspectConfigurationService', () => {
       expect(info2.browserName).toBe("browser2");
       expect(info2.operatingSystem).toBe("Android");
       expect(info2.deviceType).toEqual({name: 'Galaxy Tab A', icon: 'tablet'});
-    }))
+    }));
 
   describe('aspect extension', () => {
     it('should not provide any extended aspects if just BrowserInfos and no PerformanceAspects exist', inject(
@@ -109,8 +109,8 @@ describe('AspectConfigurationService', () => {
           pageId: 1,
           applicationId: 1,
           browserId: 1,
-          measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-          performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
+          measurand: {kind: "selectable-measurand", id: 'DOC_COMPLETE', name: 'Document complete'},
+          performanceAspectType: {kind: "performance-aspect-type", name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
           persistent: true,
         }];
         const extendedAspects: ExtendedPerformanceAspect[] = service.extendAspects(aspects, []);
@@ -127,8 +127,8 @@ describe('AspectConfigurationService', () => {
             pageId: 1,
             applicationId: 1,
             browserId: idOfExtended,
-            measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-            performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
+            measurand: {kind: "selectable-measurand", id: 'DOC_COMPLETE', name: 'Document complete'},
+            performanceAspectType: {kind: "performance-aspect-type", name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
             persistent: true,
           },
           {
@@ -136,8 +136,8 @@ describe('AspectConfigurationService', () => {
             pageId: 1,
             applicationId: 1,
             browserId: idOfNotExtended,
-            measurand: {id: 'DOC_COMPLETE', name: 'Document complete'},
-            performanceAspectType: {name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
+            measurand: {kind: "selectable-measurand", id: 'DOC_COMPLETE', name: 'Document complete'},
+            performanceAspectType: {kind: "performance-aspect-type", name: 'PAGE_CONSTRUCTION_STARTED', icon: 'hourglass', unit: 'ms'},
             persistent: true,
           }
         ];

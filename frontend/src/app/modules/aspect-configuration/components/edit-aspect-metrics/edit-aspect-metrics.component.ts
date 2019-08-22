@@ -100,9 +100,9 @@ export class EditAspectMetricsComponent implements OnInit {
   }
 
   persistAspect() {
-    const perfAspectToCreateOrUpdate = {
+    const perfAspectToCreateOrUpdate: PerformanceAspect = {
       ...this.aspectMetricsCmp.getSelectedAspect(),
-      measurand: {name: this.metricFinderCmp.selectedMetric, id: this.metricFinderCmp.selectedMetric}
+      measurand: {kind: "selectable-measurand", name: this.metricFinderCmp.selectedMetric, id: this.metricFinderCmp.selectedMetric}
     };
     this.aspectConfService.createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate);
   }

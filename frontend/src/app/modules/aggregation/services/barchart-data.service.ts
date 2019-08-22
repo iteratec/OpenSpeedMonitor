@@ -28,6 +28,7 @@ export class BarchartDataService {
       pages: resultSelectionCommand.pageIds,
       jobGroups: resultSelectionCommand.jobGroupIds,
       measurands: remainingResultSelection.measurands,
+      performanceAspectTypes: remainingResultSelection.performanceAspectTypes,
       browsers: resultSelectionCommand.browserIds,
       deviceTypes: remainingResultSelection.deviceTypes,
       operatingSystems: remainingResultSelection.operatingSystems,
@@ -44,7 +45,7 @@ export class BarchartDataService {
           params = params.append(key, getBarchartCommand[key].toISOString());
         } else if (key === 'aggregationValue') {
           params = params.append(key, getBarchartCommand[key].toString());
-        } else {
+        } else if (getBarchartCommand[key].length > 0) {
           params = params.append(key, JSON.stringify(getBarchartCommand[key]));
         }
       }
