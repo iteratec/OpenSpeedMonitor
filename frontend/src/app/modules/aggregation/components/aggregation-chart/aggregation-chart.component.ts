@@ -225,35 +225,40 @@ export class AggregationChartComponent implements OnChanges {
     bar.join(
       enter => {
         const barElement = enter
-          .append('g')
-          .attr('class', 'bar')
-          .style('opacity', () => {return ((this.anyHighlighted && !this.measurandDataMap[measurand].highlighted) || (this.anySelected && !this.measurandDataMap[measurand].selected)) ? 0.2 : 1});
-        barElement
-          .append('rect')
-          .attr('class', 'bar-rect')
-          .attr('x', 0)
-          .attr('y', 0)
-          .attr('height', ChartCommons.BAR_BAND)
-          .attr('fill', this.measurandDataMap[measurand].color)
+            .append('g')
+            .attr('class', 'bar')
+            .style('opacity', () => {
+              return ((this.anyHighlighted && !this.measurandDataMap[measurand].highlighted) || (this.anySelected && !this.measurandDataMap[measurand].selected)) ? 0.2 : 1;
+            });
+          barElement
+            .append('rect')
+            .attr('class', 'bar-rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('height', ChartCommons.BAR_BAND)
+            .attr('fill', this.measurandDataMap[measurand].color)
+            .transition()
+            .duration(ChartCommons.TRANSITION_DURATION)
+            .attr('x', datum => this.barStart(this.xScale, datum.value))
+            .attr('y', datum => this.yScale(datum.sideLabel))
+            .attr('width', datum => this.barWidth(this.xScale, datum.value));
+          barElement
+            .append('text')
+            .attr('class', 'bar-value')
+            .attr('dominant-baseline', 'middle')
+            .style('fill', 'white')
+            .style('font-weight', 'bold')
+            .style('opacity', 0)
+            .text(datum => `${this.formatBarValue(datum.value)} ${datum.unit}`)
+            .attr('x', datum => (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10))
+            .attr('y', datum => (this.yScale(datum.sideLabel) + ChartCommons.BAR_BAND / 2))
+            .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end')
+            .style('opacity', (datum, index, groups) => ((groups[index].getComputedTextLength() + 2 * 10) > this.barWidth(this.xScale, datum.value)) ? 0 : 1);
+
+       barElement.select('.bar-value')
           .transition()
-          .duration(ChartCommons.TRANSITION_DURATION)
-          .attr('x', datum => this.barStart(this.xScale, datum.value))
-          .attr('y', datum => this.yScale(datum.sideLabel))
-          .attr('width', datum => this.barWidth(this.xScale, datum.value));
-        barElement
-          .append('text')
-          .attr('class', 'bar-value')
-          .attr('dominant-baseline', 'middle')
-          .style('fill', 'white')
-          .style('font-weight', 'bold')
-          .style('opacity', 0)
-          .transition()
-          .duration(ChartCommons.TRANSITION_DURATION)
-          .text(datum => `${this.formatBarValue(datum.value)} ${datum.unit}`)
-          .attr('x', datum => (datum.value < 0) ? (this.barStart(this.xScale, datum.value) + 10) : (this.barEnd(this.xScale, datum.value) - 10))
-          .attr('y', datum => (this.yScale(datum.sideLabel) + ChartCommons.BAR_BAND / 2))
-          .attr('text-anchor', datum => (datum.value < 0) ? 'start' : 'end')
-          .style('opacity', (datum, index, groups) => ((groups[index].getComputedTextLength() + 2 * 10) > this.barWidth(this.xScale, datum.value)) ? 0 : 1);
+          .duration(ChartCommons.TRANSITION_DURATION);
+
         return barElement;
       },
       update => {
