@@ -12,7 +12,6 @@ import {SpinnerService} from "../shared/services/spinner.service";
 })
 export class AggregationComponent implements OnInit {
 
-
   isHidden: boolean;
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
@@ -33,10 +32,7 @@ export class AggregationComponent implements OnInit {
 
   getBarchartData(): void {
     this.isHidden = false;
-    console.log("getBarchartData");
-    this.aggregationChartDataService.isLoading$.next(true);
     this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand,this.resultSelectionStore.remainingResultSelection);
-    /*this.isLoading = this.aggregationChartDataService.isLoading$.getValue();
-    console.log("getBarchartData this.isLoading: " + this.isLoading);*/
+
   }
 }

@@ -102,6 +102,7 @@ export class AggregationChartDataService {
   constructor(private barchartDataService: BarchartDataService, private spinnerService: SpinnerService ) {}
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
+    this.spinnerService.show();
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
@@ -109,6 +110,7 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartAverageData$.next(this.sortDataByMeasurandOrder(result));
+      this.spinnerService.hide();
     });
 
     this.barchartDataService.fetchBarchartData<any>(
@@ -118,7 +120,8 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
-      this.isLoading$.next(false);
+      /*this.isLoading$.next(false);*/
+
     });
   }
 
