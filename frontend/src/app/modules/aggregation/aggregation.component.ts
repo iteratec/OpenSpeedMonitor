@@ -3,6 +3,7 @@ import {BarchartDataService} from "./services/barchart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
 import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
 import {BehaviorSubject} from "rxjs";
+import {SpinnerService} from "../shared/services/spinner.service";
 
 @Component({
   selector: 'osm-aggregation',
@@ -16,7 +17,7 @@ export class AggregationComponent implements OnInit {
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
-  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, private aggregationChartDataService: AggregationChartDataService) {
+  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, private aggregationChartDataService: AggregationChartDataService, private spinnerService: SpinnerService) {
     this.aggregationChartDataService.barchartAverageData$.subscribe((data) =>{
       this.barchartAverageData$.next(data);
     });
@@ -27,12 +28,12 @@ export class AggregationComponent implements OnInit {
 
   ngOnInit() {
     this.isHidden = true;
-    console.log("isHidden");
+    this.aggregationChartDataService.isLoading$.next(false);
   }
 
   getBarchartData(): void {
     this.isHidden = false;
-    console.log("isHidden");
+    console.log("getBarchartData");
     this.aggregationChartDataService.isLoading$.next(true);
     this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand,this.resultSelectionStore.remainingResultSelection);
     /*this.isLoading = this.aggregationChartDataService.isLoading$.getValue();

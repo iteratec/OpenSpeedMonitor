@@ -15,7 +15,7 @@ export interface AggregationChartDataDTO {
   hasComparative: boolean;
   color: string;
   series: AggregationChartSeries[];
-  isLoading: boolean;
+  /*isLoading: boolean;*/
 }
 
 export class AggregationChartData implements AggregationChartDataDTO {
@@ -31,7 +31,7 @@ export class AggregationChartData implements AggregationChartDataDTO {
   hasComparative: boolean;
   color: string;
   series: AggregationChartSeries[];
-  isLoading: boolean;
+  /*isLoading: boolean;*/
 
   constructor(dto: AggregationChartDataDTO) {
     this.measurand = dto.measurand;
@@ -46,7 +46,7 @@ export class AggregationChartData implements AggregationChartDataDTO {
     this.color = dto.color;
     this.series = dto.series;
     this.aggregationValue = dto.aggregationValue;
-    this.isLoading= dto.isLoading;
+    /*this.isLoading= dto.isLoading;*/
   }
 }
 

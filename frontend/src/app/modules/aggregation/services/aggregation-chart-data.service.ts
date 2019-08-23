@@ -7,6 +7,7 @@ import {ResultSelectionCommand} from "../../result-selection/models/result-selec
 import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
 import {AggregationChartDataByMeasurand} from "../models/aggregation-chart-data.model";
 import {AggregationChartSeries} from "../models/aggregation-chart-series.model";
+import {SpinnerService} from "../../shared/services/spinner.service";
 
 @Injectable({
   providedIn: 'root'
@@ -98,7 +99,7 @@ export class AggregationChartDataService {
   descSelected:boolean = false;
 
 
-  constructor(private barchartDataService: BarchartDataService) {}
+  constructor(private barchartDataService: BarchartDataService, private spinnerService: SpinnerService ) {}
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
     this.barchartDataService.fetchBarchartData<any>(
@@ -173,7 +174,8 @@ export class AggregationChartDataService {
           highlighted: false,
           selected: false,
           hasComparative: false,
-          color: ''
+          color: '',
+          /*isLoading: false*/
         };
       });
 

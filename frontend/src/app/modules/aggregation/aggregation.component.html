@@ -2,7 +2,10 @@
 <p>
   {{ 'frontend.de.iteratec.osm.aggregation.description' | translate }}
 </p>
-
+<div class="card">
+  <h1>Loading..</h1>
+  <osm-spinner [radius]="25" [lines]="15" [width]="8" [length]="15" [opacity]="0.1" [shadow]="true"></osm-spinner>
+</div>
 <osm-aggregation-chart *ngIf="!isHidden" [isLoading]="this.aggregationChartDataService.isLoading$ | async" [barchartAverageData]="aggregationChartDataService.barchartAverageData$ | async" [barchartMedianData]="aggregationChartDataService.barchartMedianData$ | async"></osm-aggregation-chart>
 <div class="action-row">
   <div class="col-md-12">

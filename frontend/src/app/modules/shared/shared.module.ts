@@ -8,14 +8,15 @@ import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi
 import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 import {NgxSmartModalModule} from "ngx-smart-modal";
 import { SpinnerComponent } from './components/spinner/spinner.component';
-
+import { SpinnerService } from './services/spinner.service';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule.forChild(),
-    NgxSmartModalModule.forChild()
+    NgxSmartModalModule.forChild(),
   ],
+  providers: [SpinnerService],
   declarations: [
     CsiValueBaseComponent,
     CsiValueBigComponent,
