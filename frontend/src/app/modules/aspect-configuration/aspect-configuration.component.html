@@ -1,6 +1,6 @@
 <h1>{{ 'frontend.de.iteratec.osm.performance-aspects' | translate }}: {{(application$ | async)?.name}}
   - {{(page$ | async)?.name}}</h1>
-<a [routerLink]="['/applicationDashboard', (application$ | async)?.id || '']">
+<a (click)="deselectPage()" [routerLink]="['/applicationDashboard', (application$ | async)?.id || '']">
   <i class="fas fa-arrow-left"></i>
   {{ 'frontend.back.label' | translate }}
   {{(application$ | async)?.name}}

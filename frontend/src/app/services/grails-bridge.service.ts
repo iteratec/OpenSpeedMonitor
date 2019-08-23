@@ -6,7 +6,7 @@ import {NavigationEnd, Router} from "@angular/router";
 export class GrailsBridgeService {
 
   private nativeWindow: any = window;
-  globalOsmNamespace: GlobalOsmNamespace = this.nativeWindow.OpenSpeedMonitor;
+  globalOsmNamespace: any = this.nativeWindow.OpenSpeedMonitor;
 
   constructor(private router: Router) {
     router.events.subscribe((event) => {
