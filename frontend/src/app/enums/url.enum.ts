@@ -8,5 +8,6 @@ export enum URL {
   USER_TIMINGS = '/resultSelection/getUserTimings',
   HERO_TIMINGS = '/resultSelection/getHeroTimings',
   RESULT_COUNT = '/resultSelection/getResultCount',
-  AGGREGATION_BARCHART_DATA = "/aggregation/getBarchartData"
+  AGGREGATION_BARCHART_DATA = "/aggregation/getBarchartData",
+  EVENT_RESULT_DASHBOARD_LINECHART_DATA = "/eventResultDashboard/getLinechartData"
 }
