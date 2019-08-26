@@ -7,7 +7,6 @@ import {AggregationChartDataService} from "../../services/aggregation-chart-data
 import {BarchartDataService} from "../../services/barchart-data.service";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
 import {AggregationChartDataByMeasurand} from "../../models/aggregation-chart-data.model";
-import {SpinnerService} from "../../../shared/services/spinner.service";
 
 @Component({
   selector: 'osm-aggregation-chart',
@@ -48,7 +47,7 @@ export class AggregationChartComponent implements OnChanges {
   private anySelected:boolean = false;
   private clickedMeasurand:string = '';
 
-  constructor(public aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, spinnerService: SpinnerService) {
+  constructor(public aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
   }
 
   redraw() {
