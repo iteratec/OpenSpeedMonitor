@@ -36,8 +36,8 @@ import {
 import {TimeSeriesResultsDTO} from 'src/app/modules/time-series/models/time-series-results.model';
 import {TimeSeriesDataDTO} from 'src/app/modules/time-series/models/time-series-data.model';
 import {TimeSeriesDataPointDTO} from 'src/app/modules/time-series/models/time-series-data-point.model';
-import {LineChartData, LineChartDataDTO} from 'src/app/modules/time-series/models/line-chart-data.model';
-import {LineChartDataPoint, LineChartDataPointDTO} from 'src/app/modules/time-series/models/line-chart-data-value.model';
+import {LineChartData} from 'src/app/modules/time-series/models/line-chart-data.model';
+import {LineChartDataPoint} from 'src/app/modules/time-series/models/line-chart-data-value.model';
 import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 
@@ -59,40 +59,66 @@ export class LineChartService {
 
   constructor() {}
 
+  public initChart(svgElement: ElementRef): void {
+    let data: LineChartData[] = [new LineChartData()];
+
+    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
+
+    let xScale: D3ScaleTime<number, number> = this.getXScale(data);
+    let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
+
+    this.addXAxisToChart(chart, xScale);
+    this.addYAxisToChart(chart, yScale);
+  }
+
   /**
    * Draws a line chart for the given data into the given svg
    */
-  drawLineChart(svgElement: ElementRef, incomingData: TimeSeriesResultsDTO): void {
+  public drawLineChart(incomingData: TimeSeriesResultsDTO): void {
 
-    let data: LineChartDataDTO[] = this.prepareData(incomingData);
+    let data: LineChartData[] = this.prepareData(incomingData);
+    //console.log(incomingData); console.log(data);
 
     if (data.length == 0) {
       console.log("No data > No chart !");
       return;
     }
 
-    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
+    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
+    d3Select('svg#time-series-chart').transition().style('display', 'inline');
+
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
 
-    this.addXAxisToChart(chart, xScale);
-    this.addYAxisToChart(chart, yScale);
+    d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
+    d3Select('.y-axis').transition().call(this.updateYAxis, yScale);
 
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
+  private updateXAxis(transition: any, xScale: any) {
+    transition.call(
+      d3AxisBottom(xScale)
+    );
+  }
+
+  private updateYAxis(transition: any, yScale: any) {
+    transition.call(
+      d3AxisLeft(yScale)
+    );
+  }
 
   /**
    * Prepares the incoming data for drawing with D3.js
    */
-  private prepareData(incomingData: TimeSeriesResultsDTO): LineChartDataDTO[] {
+  private prepareData(incomingData: TimeSeriesResultsDTO): LineChartData[] {
 
     return incomingData.series.map((data: TimeSeriesDataDTO) => {
-      let lineChartData: LineChartDataDTO = new LineChartData();
+      let lineChartData: LineChartData = new LineChartData();
       lineChartData.key = data.identifier;
 
       lineChartData.values = data.data.map((point: TimeSeriesDataPointDTO) => {
-        let lineChartDataPoint: LineChartDataPointDTO = new LineChartDataPoint();
+        let lineChartDataPoint: LineChartDataPoint = new LineChartDataPoint();
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
         lineChartDataPoint.tooltipText = '';
@@ -111,28 +137,28 @@ export class LineChartService {
     this._width = svgElement.nativeElement.parentElement.offsetWidth - this._margin.left - this._margin.right;
     //this._height = svgElement.nativeElement.parentElement.offsetHeight - this._margin.top - this._margin.bottom;
     const svg = d3Select(svgElement.nativeElement)
+                  .attr('id', 'time-series-chart')
+                  .style('display', 'none')
                   .attr('width',  this._width  + this._margin.left + this._margin.right)
                   .attr('height', this._height + this._margin.top  + this._margin.bottom);
 
-    svg.select('g.time-series-chart').remove(); // TODO Avoid this in some way
-
     return svg.append('g') // g =  grouping element; group all other stuff into the chart
-              .attr('class', 'time-series-chart')
+              .attr('id', 'time-series-chart-drawing-area')
               .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
   }
 
   /**
    * Determine the xScale for the given data
    */
-  private getXScale(data: LineChartDataDTO[]): D3ScaleTime<number, number> {
+  private getXScale(data: LineChartData[]): D3ScaleTime<number, number> {
     return d3ScaleTime()               // Define a scale for the X-Axis
              .range([0, this._width])  // Display the X-Axis over the complete width
              .domain([                  // Use the min and max dates as the first and last points
-               d3Min(data, (dataItem: LineChartDataDTO) => { 
-                 return d3Min(dataItem.values, (point: LineChartDataPointDTO) => { return point.date; });
+               d3Min(data, (dataItem: LineChartData) => { 
+                 return d3Min(dataItem.values, (point: LineChartDataPoint) => { return point.date; });
                }),
-               d3Max(data, (dataItem: LineChartDataDTO) => { 
-                 return d3Max(dataItem.values, (point: LineChartDataPointDTO) => { return point.date; });
+               d3Max(data, (dataItem: LineChartData) => { 
+                 return d3Max(dataItem.values, (point: LineChartDataPoint) => { return point.date; });
                })
              ]);
   }
@@ -140,18 +166,18 @@ export class LineChartService {
   /**
    * Determine the yScale for the given data
    */
-  private getYScale(data: LineChartDataDTO[]): D3ScaleLinear<number, number> {
+  private getYScale(data: LineChartData[]): D3ScaleLinear<number, number> {
     return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
              .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
              .domain([                  // min and max values from the data given
-               d3Min(data, (dataItem: LineChartDataDTO) => { 
-                 return d3Min(dataItem.values, (point: LineChartDataPointDTO) => { return point.value; });
+               d3Min(data, (dataItem: LineChartData) => { 
+                 return d3Min(dataItem.values, (point: LineChartDataPoint) => { return point.value; });
                }),
-               d3Max(data, (dataItem: LineChartDataDTO) => { 
-                 return d3Max(dataItem.values, (point: LineChartDataPointDTO) => { return point.value; });
+               d3Max(data, (dataItem: LineChartData) => { 
+                 return d3Max(dataItem.values, (point: LineChartDataPoint) => { return point.value; });
                })
              ])
-             .nice();
+             //.nice();
   }
 
   /**
@@ -187,11 +213,11 @@ export class LineChartService {
    * Configuration of the line generator which does print the lines
    */
   private getLineGenerator(xScale: D3ScaleTime<number, number>,
-                           yScale: D3ScaleLinear<number, number>): D3Line<LineChartDataPointDTO> {
+                           yScale: D3ScaleLinear<number, number>): D3Line<LineChartDataPoint> {
 
-    return d3Line<LineChartDataPointDTO>()          // Setup a line generator
-             .x((point: LineChartDataPointDTO) => { return xScale(point.date); })   // ... specify the data for the X-Coordinate
-             .y((point: LineChartDataPointDTO) => { return yScale(point.value); })  // ... and for the Y-Coordinate
+    return d3Line<LineChartDataPoint>()          // Setup a line generator
+             .x((point: LineChartDataPoint) => { return xScale(point.date); })   // ... specify the data for the X-Coordinate
+             .y((point: LineChartDataPoint) => { return yScale(point.value); })  // ... and for the Y-Coordinate
              .curve(d3CurveMonotoneX);  // smooth the line
 
   }
@@ -202,20 +228,20 @@ export class LineChartService {
   private addDataLinesToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                               xScale: D3ScaleTime<number, number>,
                               yScale: D3ScaleLinear<number, number>,
-                              data: LineChartDataDTO[]): void {
+                              data: LineChartData[]): void {
 
     // Create one group per line / data entry
     let chartLineGroups = chart.selectAll('.line')  // Get all lines already drawn
-                               .data(data)          // ... for this data
+                               .data(data, (datum: LineChartData) => datum.key)          // ... for this data
                                .join('g')           // Group the path so we can add dots later to this group
-                                 .attr('class', (dataItem: LineChartDataDTO) => { return 'line line-'+dataItem.key; })
+                                 .attr('class', (dataItem: LineChartData) => { return 'line line-'+dataItem.key; })
 
     // Draw each line into the group
     chartLineGroups.append('path')  // Draw one path for every item in the data set
                      .attr('fill', 'none')
                      .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
                      .attr('stroke-width', 1.5)
-                     .attr('d', (dataItem: LineChartDataDTO) => {     // Apply a function to every item (data grouped by the key 'name') from the data
+                     .attr('d', (dataItem: LineChartData) => {     // Apply a function to every item (data grouped by the key 'name') from the data
                        return this.getLineGenerator(xScale, yScale)(dataItem.values);  // Draw the line for every value (point) of this item
                      })
                      .on('mouseover', () => {

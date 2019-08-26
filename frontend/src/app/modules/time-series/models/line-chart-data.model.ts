@@ -1,14 +1,14 @@
-import {LineChartDataPointDTO} from './line-chart-data-value.model';
+import {LineChartDataPoint} from './line-chart-data-value.model';
 
 /**
  * Representation of on point on the x-axis (key) with all data for the y-axis (values).
  */
-export interface LineChartDataDTO {
+export class LineChartData {
   key: string;
-  values: LineChartDataPointDTO[];
-}
+  values: LineChartDataPoint[];
 
-export class LineChartData implements LineChartDataDTO {
-  key: string;
-  values: LineChartDataPointDTO[];
+  constructor() {
+    this.key = "";
+    this.values = [new LineChartDataPoint()];
+  }
 }

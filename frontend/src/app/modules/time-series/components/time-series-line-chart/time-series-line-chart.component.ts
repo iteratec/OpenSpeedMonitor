@@ -5,7 +5,7 @@ import {
   SimpleChanges, ViewChild,
   Input,
   HostListener
-} from "@angular/core/";
+} from "@angular/core";
 
 import {TimeSeriesResults} from '../../models/time-series-results.model';
 import {LineChartService} from '../../services/line-chart.service';
@@ -21,7 +21,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   @Input()
   timeSeriesResults: TimeSeriesResults;
 
-  @ViewChild("svg") 
+  @ViewChild("svg")
   svgElement: ElementRef;
 
 
@@ -31,11 +31,11 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
   @HostListener('window:resize', ['$event'])
   redraw() {
-    this.lineChartService.drawLineChart(this.svgElement, this.timeSeriesResults);
+    this.lineChartService.drawLineChart(this.timeSeriesResults);
   }
 
   ngAfterContentInit(): void {
-    this.redraw();
+    this.lineChartService.initChart(this.svgElement);
   }
 
   ngOnChanges(changes: SimpleChanges): void {
