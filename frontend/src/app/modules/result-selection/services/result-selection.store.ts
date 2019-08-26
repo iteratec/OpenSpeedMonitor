@@ -88,6 +88,10 @@ export class ResultSelectionStore {
     this.setRemainingResultSelection({...this.remainingResultSelection, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
   }
 
+  setRemainingResultSelectionInterval(intervalInSeconds: number): void {
+    this.setRemainingResultSelection({...this.remainingResultSelection, interval: intervalInSeconds});
+  }
+
   setRemainingResultSelectionEnums(enums: string[], type: RemainingResultSelectionParameter): void {
     this.setRemainingResultSelection({...this.remainingResultSelection, [type]: enums});
   }

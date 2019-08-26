@@ -1,8 +1,9 @@
 import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
-import {select} from "d3-selection";
-import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
+import {select} from 'd3-selection';
 import {max} from "d3-array";
+import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
+import 'd3-transition';
 import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
 import {BarchartDataService} from "../../services/barchart-data.service";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";

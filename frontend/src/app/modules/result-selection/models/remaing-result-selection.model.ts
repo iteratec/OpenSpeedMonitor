@@ -1,4 +1,5 @@
 export interface RemainingResultSelectionDTO {
+  interval?: number;
   fromComparative?: Date;
   toComparative?: Date;
   measurands?: string[];
@@ -8,6 +9,7 @@ export interface RemainingResultSelectionDTO {
 }
 
 export class RemainingResultSelection implements RemainingResultSelectionDTO {
+  interval?: number;
   fromComparative?: Date;
   toComparative?: Date;
   measurands?: string[];
@@ -16,6 +18,7 @@ export class RemainingResultSelection implements RemainingResultSelectionDTO {
   operatingSystems?: string[];
 
   constructor (dto: RemainingResultSelectionDTO) {
+    this.interval = dto.interval;
     this.fromComparative = dto.fromComparative;
     this.toComparative = dto.toComparative;
     this.measurands = dto.measurands;

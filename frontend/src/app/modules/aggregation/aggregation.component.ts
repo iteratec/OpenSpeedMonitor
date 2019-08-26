@@ -16,7 +16,7 @@ export class AggregationComponent implements OnInit {
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
 
   constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, private aggregationChartDataService: AggregationChartDataService) {
-    this.aggregationChartDataService.barchartAverageData$.subscribe((data) =>{
+    this.aggregationChartDataService.barchartAverageData$.subscribe((data) => {
       this.barchartAverageData$.next(data);
     });
     this.aggregationChartDataService.barchartMedianData$.subscribe((data) => {
@@ -30,6 +30,6 @@ export class AggregationComponent implements OnInit {
 
   getBarchartData(): void {
     this.isHidden = false;
-    this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand,this.resultSelectionStore.remainingResultSelection);
+    this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand, this.resultSelectionStore.remainingResultSelection);
   }
 }
