@@ -44,6 +44,7 @@ export class ResultSelectionStore {
     selectedPages: 'pageIds',
     selectedAggrGroupValuesUnCached: 'measurands',
     selectedBrowsers: 'browserIds',
+    selectedLocations: 'locationIds',
     comparativeFrom: 'fromComparative',
     comparativeTo: 'toComparative',
     selectedTimeFrameInterval: 'interval'
@@ -138,6 +139,18 @@ export class ResultSelectionStore {
   }
 
   setResultSelectionCommand(newState: ResultSelectionCommand): void {
+    this.router.navigate([], {
+      queryParams: {
+        from: newState.from.toISOString(),
+        to: newState.to.toISOString(),
+        selectedFolder: newState.jobGroupIds,
+        selectedPages: newState.pageIds,
+        selectedMeasuredEventIds: newState.measuredEventIds,
+        selectedBrowsers: newState.browserIds,
+        selectedLocations: newState.locationIds,
+        selectedConnectivities: newState.selectedConnectivities
+      }, queryParamsHandling: 'merge'
+    });
     this._resultSelectionCommand$.next(newState);
     this.loadResultCount(newState);
   }
@@ -159,6 +172,14 @@ export class ResultSelectionStore {
   }
 
   private setRemainingResultSelection(newState: RemainingResultSelection): void {
+    this.router.navigate([], {
+      queryParams: {
+        ...(newState.fromComparative && {comparativeFrom: newState.fromComparative.toISOString()}),
+        ...(newState.toComparative && {comparativeTo: newState.toComparative.toISOString()}),
+        ...(newState.measurands && {selectedAggrGroupValuesUnCached: newState.measurands}),
+        ...(newState.performanceAspectTypes && {performanceAspectTypes: newState.performanceAspectTypes})
+      }, queryParamsHandling: 'merge'
+    });
     this._remainingResultSelection$.next(newState);
   }
 

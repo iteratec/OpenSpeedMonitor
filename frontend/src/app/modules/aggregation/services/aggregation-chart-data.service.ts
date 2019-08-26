@@ -107,7 +107,6 @@ export class AggregationChartDataService {
   }
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
-    console.log(this.percentileValue);
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
