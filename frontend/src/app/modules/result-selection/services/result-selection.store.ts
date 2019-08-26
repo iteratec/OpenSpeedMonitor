@@ -55,11 +55,11 @@ export class ResultSelectionStore {
 
     route.queryParams.subscribe((params: Params) => {
       if (params) {
+        params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
         validQuery = this.checkQuery(params);
       }
 
       if (validQuery) {
-        params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
         const resultSelectionCommand: ResultSelectionCommand = {
           from: new Date(params.from),
           to: new Date(params.to),
@@ -116,7 +116,15 @@ export class ResultSelectionStore {
   }
 
   private checkQuery(params: Params): boolean {
-    return false;
+    const dates: Date[] = [new Date(params.from), new Date(params.to)];
+    const datesValid: boolean = dates.every(this.isValidDate);
+    const jobGroupIdsValid: boolean = !!params.jobGroupIds;
+
+    return datesValid && jobGroupIdsValid;
+  }
+
+  private isValidDate(date: Date) {
+    return date instanceof Date && !isNaN(date.getTime())
   }
 
   private renameParamKeys = (keysMap, object) =>
