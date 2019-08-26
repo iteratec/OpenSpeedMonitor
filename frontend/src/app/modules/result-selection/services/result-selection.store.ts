@@ -15,6 +15,7 @@ import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.mod
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
 import {RemainingResultSelection, RemainingResultSelectionParameter} from "../models/remaing-result-selection.model";
+import {ActivatedRoute, Params, Router} from "@angular/router";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -38,12 +39,56 @@ export class ResultSelectionStore {
 
   reset$: Subject<void> = new Subject<void>();
 
-  constructor(private resultSelectionService: ResultSelectionService) {
-    let defaultFrom = new Date();
-    let defaultTo = new Date();
-    defaultFrom.setDate(defaultTo.getDate() - 3);
-    this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
-    this._remainingResultSelection$ = new BehaviorSubject({});
+  oldToNewChartKeyMap = {
+    selectedFolder: 'jobGroupIds',
+    selectedPages: 'pageIds',
+    selectedAggrGroupValuesUnCached: 'measurands',
+    selectedBrowsers: 'browserIds',
+    comparativeFrom: 'fromComparative',
+    comparativeTo: 'toComparative',
+    selectedTimeFrameInterval: 'interval'
+  };
+
+  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
+    let validQuery: boolean = false;
+
+    route.queryParams.subscribe((params: Params) => {
+      validQuery = this.checkQuery(params);
+
+      if (validQuery) {
+        params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
+        const resultSelectionCommand: ResultSelectionCommand = {
+          from: new Date(params.from),
+          to: new Date(params.to),
+          caller: Caller.EventResult,
+          ...(params.jobGroupIds && {jobGroupIds: [].concat(params.jobGroupIds).map(item => parseInt(<string>item))}),
+          ...(params.pageIds && {pageIds: [].concat(params.pageIds).map(item => parseInt(<string>item))}),
+          ...(params.measuredEventIds && {measuredEventIds: [].concat(params.measuredEvendIds).map(item => parseInt(<string>item))}),
+          ...(params.browserIds && {browserIds: [].concat(params.browserIds).map(item => parseInt(<string>item))}),
+          ...(params.locationIds && {locationIds: [].concat(params.locationIds).map(item => parseInt(<string>item))}),
+          ...(params.selectedConnectivities && {selectedConnectivities: [].concat(params.selectedConnectivities).map(item => parseInt(<string>item))})
+        };
+
+        const remainingResultSelection: RemainingResultSelection = {
+          ...(params.fromComparative && {fromComparative: new Date(params.fromComparative)}),
+          ...(params.toComparative && {toComparative: new Date(params.toComparative)}),
+          ...(params.measurands && {measurands: [].concat(params.measurands)}),
+          ...(params.performanceAspectTypes && {performanceAspectTypes: [].concat(params.performanceAspectTypes)})
+        };
+
+        this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>(resultSelectionCommand);
+        this._remainingResultSelection$ = new BehaviorSubject(remainingResultSelection);
+      }
+    });
+
+    if (!validQuery) {
+      let defaultFrom = new Date();
+      let defaultTo = new Date();
+      defaultFrom.setDate(defaultTo.getDate() - 3);
+
+      this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
+      this._remainingResultSelection$ = new BehaviorSubject({});
+    }
   }
 
   registerComponent(component: UiComponent): void {
@@ -66,6 +111,19 @@ export class ResultSelectionStore {
       }
     });
   }
+
+  private checkQuery(params: Params): boolean {
+    return false;
+  }
+
+  private renameParamKeys = (keysMap, object) =>
+    Object.keys(object).reduce(
+      (acc, key) => ({
+        ...acc,
+        ...{ [keysMap[key] || key]: object[key] }
+      }),
+      {}
+    );
 
   setResultSelectionCommandTimeFrame(timeFrame: Date[]): void {
     this.setResultSelectionCommand({...this.resultSelectionCommand, from: timeFrame[0], to: timeFrame[1]});

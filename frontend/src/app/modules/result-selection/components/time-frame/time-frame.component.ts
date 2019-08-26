@@ -47,15 +47,8 @@ export class TimeFrameComponent implements OnInit {
   }
 
   ngOnInit() {
-    let defaultFrom = new Date();
-    let defaultTo = new Date();
-    defaultFrom.setDate(defaultTo.getDate() - 3);
-
-    this.selectedDates = [defaultFrom, defaultTo];
-
-    this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
-
-    this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[4];
+    this.selectedDates = [this.resultSelectionStore.resultSelectionCommand.from, this.resultSelectionStore.resultSelectionCommand.to];
+    this.selectTimeFrame();
 
     if (this.showAggregation) {
       this.resultSelectionStore.setRemainingResultSelectionInterval(this.aggregationIntervalInSeconds);
