@@ -5,7 +5,7 @@ import {RemainingResultSelection} from "../../result-selection/models/remaing-re
 import {EMPTY, Observable, OperatorFunction} from "rxjs";
 import {GetBarchartCommand} from "../../aggregation/models/get-barchart-command.model";
 import {catchError} from "rxjs/operators";
-import {GetLinechartCommand} from "../models/get-line-chart-command.model";
+import {GetEventResultDataCommand} from "../models/get-line-chart-command.model";
 
 @Injectable({
   providedIn: 'root'
@@ -14,16 +14,16 @@ export class LinechartDataService {
 
   constructor(private http: HttpClient) { }
 
-  fetchLinechartData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, url: string): Observable<T> {
-    const getLinechartCommand = this.buildGetLinechartCommand(resultSelectionCommand, remainingResultSelection);
-    const params = this.createParams(getLinechartCommand);
+  fetchEventResultData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, url: string): Observable<T> {
+    const cmd: GetEventResultDataCommand = this.buildCommand(resultSelectionCommand, remainingResultSelection);
+    const params = this.createParams(cmd);
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
     )
   }
 
-  private buildGetLinechartCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): GetLinechartCommand {
-    return new GetLinechartCommand({
+  private buildCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): GetEventResultDataCommand {
+    return new GetEventResultDataCommand({
       preconfiguredDashboard: null,
       from: resultSelectionCommand.from,
       to: resultSelectionCommand.to,
