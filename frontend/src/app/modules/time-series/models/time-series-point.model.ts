@@ -1,7 +1,7 @@
 /**
  * Representation of one point on the y-axis (value) with additional informations.
  */
-export class LineChartDataPoint {
+export class TimeSeriesPoint {
   date: Date;
   value: number;
   tooltipText: string;

@@ -1,43 +1,30 @@
-import {
-  ElementRef,
-  Injectable
-} from "@angular/core/";
+import {ElementRef, Injectable} from "@angular/core/";
 
 import {
-  select as d3Select,
-  Selection as D3Selection,
   BaseType as D3BaseType,
-  ContainerElement as D3ContainerElement
+  ContainerElement as D3ContainerElement,
+  select as d3Select,
+  Selection as D3Selection
 } from 'd3-selection';
 
-import {
-  min as d3Min,
-  max as d3Max
-} from 'd3-array';
+import {max as d3Max, min as d3Min} from 'd3-array';
 
 import {
-  scaleTime as d3ScaleTime,
   scaleLinear as d3ScaleLinear,
   ScaleLinear as D3ScaleLinear,
+  scaleTime as d3ScaleTime,
   ScaleTime as D3ScaleTime,
 } from 'd3-scale';
 
-import {
-  axisBottom as d3AxisBottom,
-  axisLeft as d3AxisLeft
-} from 'd3-axis';
+import {axisBottom as d3AxisBottom, axisLeft as d3AxisLeft} from 'd3-axis';
 
-import { 
-  line as d3Line,
-  curveMonotoneX as d3CurveMonotoneX,
-  Line as D3Line
-} from 'd3-shape';
+import {curveMonotoneX as d3CurveMonotoneX, line as d3Line, Line as D3Line} from 'd3-shape';
 
-import {TimeSeriesResultsDTO} from 'src/app/modules/time-series/models/time-series-results.model';
-import {TimeSeriesDataDTO} from 'src/app/modules/time-series/models/time-series-data.model';
-import {TimeSeriesDataPointDTO} from 'src/app/modules/time-series/models/time-series-data-point.model';
-import {LineChartData} from 'src/app/modules/time-series/models/line-chart-data.model';
-import {LineChartDataPoint} from 'src/app/modules/time-series/models/line-chart-data-value.model';
+import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
+import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
+import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
+import {TimeSeries} from 'src/app/modules/time-series/models/time-series.model';
+import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-point.model';
 import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 
@@ -60,7 +47,7 @@ export class LineChartService {
   constructor() {}
 
   public initChart(svgElement: ElementRef): void {
-    let data: LineChartData[] = [new LineChartData()];
+    let data: TimeSeries[] = [new TimeSeries()];
 
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
 
@@ -74,9 +61,9 @@ export class LineChartService {
   /**
    * Draws a line chart for the given data into the given svg
    */
-  public drawLineChart(incomingData: TimeSeriesResultsDTO): void {
+  public drawLineChart(incomingData: EventResultDataDTO): void {
 
-    let data: LineChartData[] = this.prepareData(incomingData);
+    let data: TimeSeries[] = this.prepareData(incomingData);
     //console.log(incomingData); console.log(data);
 
     if (data.length == 0) {
@@ -111,14 +98,14 @@ export class LineChartService {
   /**
    * Prepares the incoming data for drawing with D3.js
    */
-  private prepareData(incomingData: TimeSeriesResultsDTO): LineChartData[] {
+  private prepareData(incomingData: EventResultDataDTO): TimeSeries[] {
 
-    return incomingData.series.map((data: TimeSeriesDataDTO) => {
-      let lineChartData: LineChartData = new LineChartData();
+    return incomingData.series.map((data: EventResultSeriesDTO) => {
+      let lineChartData: TimeSeries = new TimeSeries();
       lineChartData.key = data.identifier;
 
-      lineChartData.values = data.data.map((point: TimeSeriesDataPointDTO) => {
-        let lineChartDataPoint: LineChartDataPoint = new LineChartDataPoint();
+      lineChartData.values = data.data.map((point: EventResultPointDTO) => {
+        let lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
         lineChartDataPoint.tooltipText = '';
@@ -150,15 +137,19 @@ export class LineChartService {
   /**
    * Determine the xScale for the given data
    */
-  private getXScale(data: LineChartData[]): D3ScaleTime<number, number> {
+  private getXScale(data: TimeSeries[]): D3ScaleTime<number, number> {
     return d3ScaleTime()               // Define a scale for the X-Axis
              .range([0, this._width])  // Display the X-Axis over the complete width
              .domain([                  // Use the min and max dates as the first and last points
-               d3Min(data, (dataItem: LineChartData) => { 
-                 return d3Min(dataItem.values, (point: LineChartDataPoint) => { return point.date; });
+               d3Min(data, (dataItem: TimeSeries) => {
+                 return d3Min(dataItem.values, (point: TimeSeriesPoint) => {
+                   return point.date;
+                 });
                }),
-               d3Max(data, (dataItem: LineChartData) => { 
-                 return d3Max(dataItem.values, (point: LineChartDataPoint) => { return point.date; });
+               d3Max(data, (dataItem: TimeSeries) => {
+                 return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
+                   return point.date;
+                 });
                })
              ]);
   }
@@ -166,15 +157,19 @@ export class LineChartService {
   /**
    * Determine the yScale for the given data
    */
-  private getYScale(data: LineChartData[]): D3ScaleLinear<number, number> {
+  private getYScale(data: TimeSeries[]): D3ScaleLinear<number, number> {
     return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
              .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
              .domain([                  // min and max values from the data given
-               d3Min(data, (dataItem: LineChartData) => { 
-                 return d3Min(dataItem.values, (point: LineChartDataPoint) => { return point.value; });
+               d3Min(data, (dataItem: TimeSeries) => {
+                 return d3Min(dataItem.values, (point: TimeSeriesPoint) => {
+                   return point.value;
+                 });
                }),
-               d3Max(data, (dataItem: LineChartData) => { 
-                 return d3Max(dataItem.values, (point: LineChartDataPoint) => { return point.value; });
+               d3Max(data, (dataItem: TimeSeries) => {
+                 return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
+                   return point.value;
+                 });
                })
              ])
              //.nice();
@@ -213,11 +208,15 @@ export class LineChartService {
    * Configuration of the line generator which does print the lines
    */
   private getLineGenerator(xScale: D3ScaleTime<number, number>,
-                           yScale: D3ScaleLinear<number, number>): D3Line<LineChartDataPoint> {
+                           yScale: D3ScaleLinear<number, number>): D3Line<TimeSeriesPoint> {
 
-    return d3Line<LineChartDataPoint>()          // Setup a line generator
-             .x((point: LineChartDataPoint) => { return xScale(point.date); })   // ... specify the data for the X-Coordinate
-             .y((point: LineChartDataPoint) => { return yScale(point.value); })  // ... and for the Y-Coordinate
+    return d3Line<TimeSeriesPoint>()          // Setup a line generator
+      .x((point: TimeSeriesPoint) => {
+        return xScale(point.date);
+      })   // ... specify the data for the X-Coordinate
+      .y((point: TimeSeriesPoint) => {
+        return yScale(point.value);
+      })  // ... and for the Y-Coordinate
              .curve(d3CurveMonotoneX);  // smooth the line
 
   }
@@ -228,20 +227,22 @@ export class LineChartService {
   private addDataLinesToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                               xScale: D3ScaleTime<number, number>,
                               yScale: D3ScaleLinear<number, number>,
-                              data: LineChartData[]): void {
+                              data: TimeSeries[]): void {
 
     // Create one group per line / data entry
     let chartLineGroups = chart.selectAll('.line')  // Get all lines already drawn
-                               .data(data, (datum: LineChartData) => datum.key)          // ... for this data
+      .data(data, (datum: TimeSeries) => datum.key)          // ... for this data
                                .join('g')           // Group the path so we can add dots later to this group
-                                 .attr('class', (dataItem: LineChartData) => { return 'line line-'+dataItem.key; })
+      .attr('class', (dataItem: TimeSeries) => {
+        return 'line line-' + dataItem.key;
+      })
 
     // Draw each line into the group
     chartLineGroups.append('path')  // Draw one path for every item in the data set
                      .attr('fill', 'none')
                      .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
                      .attr('stroke-width', 1.5)
-                     .attr('d', (dataItem: LineChartData) => {     // Apply a function to every item (data grouped by the key 'name') from the data
+      .attr('d', (dataItem: TimeSeries) => {     // Apply a function to every item (data grouped by the key 'name') from the data
                        return this.getLineGenerator(xScale, yScale)(dataItem.values);  // Draw the line for every value (point) of this item
                      })
                      .on('mouseover', () => {

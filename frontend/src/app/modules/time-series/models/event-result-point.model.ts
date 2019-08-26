@@ -1,15 +1,15 @@
-export interface TimeSeriesDataPointDTO {
+export interface EventResultPointDTO {
   date: Date;
   value: number;
   agent: string;
 }
 
-export class TimeSeriesDataPoint implements TimeSeriesDataPointDTO {
+export class EventResultPoint implements EventResultPointDTO {
   date: Date;
   value: number;
   agent: string;
 
-  constructor (dto: TimeSeriesDataPointDTO) {
+  constructor(dto: EventResultPointDTO) {
     this.date = dto.date;
     this.value = dto.value;
     this.agent = dto.agent;

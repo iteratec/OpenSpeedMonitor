@@ -1,13 +1,15 @@
 import {
   AfterContentInit,
-  Component, ElementRef,
-  OnChanges,
-  SimpleChanges, ViewChild,
+  Component,
+  ElementRef,
+  HostListener,
   Input,
-  HostListener
+  OnChanges,
+  SimpleChanges,
+  ViewChild
 } from "@angular/core";
 
-import {TimeSeriesResults} from '../../models/time-series-results.model';
+import {EventResultData} from '../../models/event-result-data.model';
 import {LineChartService} from '../../services/line-chart.service';
 
 
@@ -19,7 +21,7 @@ import {LineChartService} from '../../services/line-chart.service';
 export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges {
 
   @Input()
-  timeSeriesResults: TimeSeriesResults;
+  timeSeriesResults: EventResultData;
 
   @ViewChild("svg")
   svgElement: ElementRef;

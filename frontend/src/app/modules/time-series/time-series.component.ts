@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {URL} from "../../enums/url.enum";
 import {LinechartDataService} from "./services/linechart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
-import {TimeSeriesResultsDTO, TimeSeriesResults} from './models/time-series-results.model';
+import {EventResultData, EventResultDataDTO} from './models/event-result-data.model';
 import {BehaviorSubject} from 'rxjs';
 
 @Component({
@@ -12,7 +12,7 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class TimeSeriesComponent implements OnInit {
 
-  public results$ = new BehaviorSubject<TimeSeriesResultsDTO>(new TimeSeriesResults());
+  public results$ = new BehaviorSubject<EventResultDataDTO>(new EventResultData());
 
   constructor(private linechartDataService: LinechartDataService, private resultSelectionStore: ResultSelectionStore) { }
 
@@ -20,7 +20,7 @@ export class TimeSeriesComponent implements OnInit {
   }
 
   getTimeSeriesChartData() {
-    this.linechartDataService.fetchLinechartData<TimeSeriesResultsDTO>(
+    this.linechartDataService.fetchEventResultData<EventResultDataDTO>(
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
       URL.EVENT_RESULT_DASHBOARD_LINECHART_DATA

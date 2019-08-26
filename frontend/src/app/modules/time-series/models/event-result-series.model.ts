@@ -1,19 +1,19 @@
-import {TimeSeriesDataPointDTO} from './time-series-data-point.model';
+import {EventResultPointDTO} from './event-result-point.model';
 
-export interface TimeSeriesDataDTO {
+export interface EventResultSeriesDTO {
   identifier: string;
   jobGroup: string;
   measuredEvent: string;
-  data: TimeSeriesDataPointDTO[];
+  data: EventResultPointDTO[];
 }
 
-export class TimeSeriesData implements TimeSeriesDataDTO {
+export class EventResultSeries implements EventResultSeriesDTO {
   identifier: string;
   jobGroup: string;
   measuredEvent: string;
-  data: TimeSeriesDataPointDTO[];
+  data: EventResultPointDTO[];
 
-  constructor (dto: TimeSeriesDataDTO) {
+  constructor(dto: EventResultSeriesDTO) {
     this.identifier = dto.identifier;
     this.jobGroup = dto.jobGroup;
     this.measuredEvent = dto.measuredEvent;
