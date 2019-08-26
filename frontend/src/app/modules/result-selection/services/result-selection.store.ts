@@ -15,7 +15,7 @@ import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.mod
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
 import {RemainingResultSelection, RemainingResultSelectionParameter} from "../models/remaing-result-selection.model";
-import {ActivatedRoute, Params, Router} from "@angular/router";
+import {ActivatedRoute, Params} from "@angular/router";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -50,11 +50,13 @@ export class ResultSelectionStore {
     selectedTimeFrameInterval: 'interval'
   };
 
-  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
+  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute) {
     let validQuery: boolean = false;
 
     route.queryParams.subscribe((params: Params) => {
-      validQuery = this.checkQuery(params);
+      if (params) {
+        validQuery = this.checkQuery(params);
+      }
 
       if (validQuery) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
@@ -139,18 +141,6 @@ export class ResultSelectionStore {
   }
 
   setResultSelectionCommand(newState: ResultSelectionCommand): void {
-    this.router.navigate([], {
-      queryParams: {
-        from: newState.from.toISOString(),
-        to: newState.to.toISOString(),
-        selectedFolder: newState.jobGroupIds,
-        selectedPages: newState.pageIds,
-        selectedMeasuredEventIds: newState.measuredEventIds,
-        selectedBrowsers: newState.browserIds,
-        selectedLocations: newState.locationIds,
-        selectedConnectivities: newState.selectedConnectivities
-      }, queryParamsHandling: 'merge'
-    });
     this._resultSelectionCommand$.next(newState);
     this.loadResultCount(newState);
   }
@@ -172,14 +162,6 @@ export class ResultSelectionStore {
   }
 
   private setRemainingResultSelection(newState: RemainingResultSelection): void {
-    this.router.navigate([], {
-      queryParams: {
-        ...(newState.fromComparative && {comparativeFrom: newState.fromComparative.toISOString()}),
-        ...(newState.toComparative && {comparativeTo: newState.toComparative.toISOString()}),
-        ...(newState.measurands && {selectedAggrGroupValuesUnCached: newState.measurands}),
-        ...(newState.performanceAspectTypes && {performanceAspectTypes: newState.performanceAspectTypes})
-      }, queryParamsHandling: 'merge'
-    });
     this._remainingResultSelection$.next(newState);
   }
 
