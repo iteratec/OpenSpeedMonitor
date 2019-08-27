@@ -16,5 +16,10 @@ osm-time-series-line-chart {
     text {
       fill: $color-text-light;
     }
+
+    .description {
+      font-size: 14px;
+      fill: $color-text-light;
+    }
   }
 }
