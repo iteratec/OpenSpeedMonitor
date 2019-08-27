@@ -1,8 +1,10 @@
 import {ElementRef, Injectable} from "@angular/core";
 
+import {TranslateService} from "@ngx-translate/core";
+import {take} from "rxjs/operators";
+
 import {
   select as d3Select,
-  selectAll as d3SelectAll,
   Selection as D3Selection,
   BaseType as D3BaseType,
   ContainerElement as D3ContainerElement
@@ -52,12 +54,12 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  private _margin = { top: 40, right: 70, bottom: 40, left: 40 };
+  private _margin = { top: 40, right: 70, bottom: 40, left: 60 };
   private _width  = 600 - this._margin.left - this._margin.right;
   private _height = 500 - this._margin.top - this._margin.bottom;
 
 
-  constructor() {}
+  constructor(private translationService: TranslateService) {}
 
   public initChart(svgElement: ElementRef): void {
     let data: TimeSeries[] = [new TimeSeries()];
@@ -204,6 +206,14 @@ export class LineChartService {
     chart.append('g')                   // new group for the y-axis
          .attr('class', 'axis y-axis')  // a css class to style it later
          .call(yAxis);
+
+    // Add the axis description
+    this.translationService.get("frontend.de.iteratec.osm.timeSeries.loadTimes").pipe(take(1)).subscribe(title => {
+      d3Select('.y-axis').append('text')
+                         .attr('class', 'description')
+                         .attr('transform', 'translate(-' + (this._margin.left - 20) + ', ' + (this._height/2 - this._margin.bottom) +') rotate(-90)')
+                         .text(title + ' [ms]');
+    });
   }
 
   private updateXAxis(transition: any, xScale: D3ScaleTime<number, number>) {
