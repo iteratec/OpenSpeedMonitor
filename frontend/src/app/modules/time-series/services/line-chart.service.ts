@@ -1,24 +1,37 @@
-import {ElementRef, Injectable} from "@angular/core/";
+import {ElementRef, Injectable} from "@angular/core";
 
 import {
-  BaseType as D3BaseType,
-  ContainerElement as D3ContainerElement,
   select as d3Select,
-  Selection as D3Selection
+  selectAll as d3SelectAll,
+  Selection as D3Selection,
+  BaseType as D3BaseType,
+  ContainerElement as D3ContainerElement
 } from 'd3-selection';
 
 import {max as d3Max, min as d3Min} from 'd3-array';
 
 import {
+  timeFormat as d3TimeFormat
+} from 'd3-time-format';
+
+import {
+  scaleTime as d3ScaleTime,
   scaleLinear as d3ScaleLinear,
   ScaleLinear as D3ScaleLinear,
-  scaleTime as d3ScaleTime,
-  ScaleTime as D3ScaleTime,
+  ScaleTime as D3ScaleTime
 } from 'd3-scale';
 
-import {axisBottom as d3AxisBottom, axisLeft as d3AxisLeft} from 'd3-axis';
+import {
+  axisBottom as d3AxisBottom,
+  axisLeft as d3AxisLeft,
+  axisRight as d3AxisRight
+} from 'd3-axis';
 
-import {curveMonotoneX as d3CurveMonotoneX, line as d3Line, Line as D3Line} from 'd3-shape';
+import { 
+  line as d3Line,
+  curveMonotoneX as d3CurveMonotoneX,
+  Line as D3Line
+} from 'd3-shape';
 
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
@@ -39,10 +52,10 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  // TODO Move into frontend/src/app/enums/chart-commons.enum.ts when available (see https://github.com/iteratec/OpenSpeedMonitor/pull/241/files)
-  private _margin = { top: 40, right: 30, bottom: 20, left: 40 };
+  private _margin = { top: 40, right: 70, bottom: 40, left: 40 };
   private _width  = 600 - this._margin.left - this._margin.right;
-  private _height = 600 - this._margin.top - this._margin.bottom;
+  private _height = 500 - this._margin.top - this._margin.bottom;
+
 
   constructor() {}
 
@@ -72,27 +85,17 @@ export class LineChartService {
     }
 
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    d3Select('svg#time-series-chart').transition().style('display', 'inline');
+    d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
+    d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._margin.top  + this._margin.bottom);
 
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
 
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
-    d3Select('.y-axis').transition().call(this.updateYAxis, yScale);
+    d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
 
     this.addDataLinesToChart(chart, xScale, yScale, data);
-  }
 
-  private updateXAxis(transition: any, xScale: any) {
-    transition.call(
-      d3AxisBottom(xScale)
-    );
-  }
-
-  private updateYAxis(transition: any, yScale: any) {
-    transition.call(
-      d3AxisLeft(yScale)
-    );
   }
 
   /**
@@ -125,9 +128,8 @@ export class LineChartService {
     //this._height = svgElement.nativeElement.parentElement.offsetHeight - this._margin.top - this._margin.bottom;
     const svg = d3Select(svgElement.nativeElement)
                   .attr('id', 'time-series-chart')
-                  .style('display', 'none')
                   .attr('width',  this._width  + this._margin.left + this._margin.right)
-                  .attr('height', this._height + this._margin.top  + this._margin.bottom);
+                  .attr('height', 0);
 
     return svg.append('g') // g =  grouping element; group all other stuff into the chart
               .attr('id', 'time-series-chart-drawing-area')
@@ -172,7 +174,7 @@ export class LineChartService {
                  });
                })
              ])
-             //.nice();
+             .nice();
   }
 
   /**
@@ -202,6 +204,80 @@ export class LineChartService {
     chart.append('g')                   // new group for the y-axis
          .attr('class', 'axis y-axis')  // a css class to style it later
          .call(yAxis);
+  }
+
+  private updateXAxis(transition: any, xScale: D3ScaleTime<number, number>) {
+    /**********  SOME HELPER FUNCTIONS  **********/
+    const insertLinebreakToLabels = function () {
+      d3Select(this).selectAll('g.tick text').each((_, index, nodes) => {
+        let element = d3Select(nodes[index]);
+        let lines = element.text().split(' _nl_ ');
+
+        // Reset the text as we will replace it
+        element.text('');
+
+        lines.forEach((line, index) => {
+          let tspan = element.append('tspan').text(line);
+          if (index > 0)
+              tspan.attr('x', 0).attr('dy', '15');
+        });
+      });
+    }
+
+    const timeFormat = function (ticks: Date[]) {
+      let onlyDays = true;  // Should weekday names instead of hours and minutes should be shown
+      let lastTick : Date = null;
+      // Check if every tick step is at least one day.
+      // If not set onlyDays to false
+      ticks.forEach((tick: Date) => {
+        if (lastTick) {
+          if (tick.getUTCDate() == lastTick.getUTCDate()) {
+            onlyDays = false;
+          }
+        }
+        lastTick = tick;
+      });
+
+      return (onlyDays ? "%A" : "%H:%M") + " _nl_ %Y-%m-%d"
+    }
+
+
+    /**********  MAIN FUNCTION CONTEXT  **********/
+    // Hide the ticks to avoid ugly transition
+    transition.on('start.hideTicks', function hide() {
+      d3Select(this).selectAll('g.tick text').attr('opacity', '0.0');
+    });
+
+    // Redraw the x-axis
+    transition.call(
+      d3AxisBottom(xScale)
+        .tickFormat(d3TimeFormat(timeFormat(xScale.ticks())))
+    );
+
+    // Include line breaks
+    transition.on('end.linebreak', insertLinebreakToLabels);
+
+    // Show the ticks again as now all manipulation should have been happend
+    transition.on('end.showTicks', function show() {
+      d3Select(this).selectAll('g.tick text')
+        .transition()
+          .delay(100)
+          .duration(500)
+          .attr('opacity', '1.0') 
+    });
+  }
+
+  private updateYAxis(transition: any, yScale: any, width: number, margin: any) {
+    transition.call(
+      d3AxisRight(yScale)  // axis right, because we draw the background line with this
+        .tickSize(width)   // background line over complete chart width
+    )
+    .attr('transform', 'translate(0, 0)') // move the axis to the left
+    .call(g => g.selectAll(".tick:not(:first-of-type) line")  // make all line dotted, except the one on the bottom as this will indicate the x-axis
+                .attr("stroke-opacity", 0.5)
+                .attr("stroke-dasharray", "1,1"))
+    .call(g => g.selectAll(".tick text")  // move the text a little so it does not overlap with the lines
+                .attr("x", -5));
   }
 
   /**
