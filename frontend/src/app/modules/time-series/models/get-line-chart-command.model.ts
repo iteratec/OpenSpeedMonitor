@@ -1,4 +1,4 @@
-export interface GetLinechartCommandDTO {
+export interface GetEventResultDataCommandDTO {
   preconfiguredDashboard?: number;
   from: Date;
   to: Date;
@@ -14,7 +14,7 @@ export interface GetLinechartCommandDTO {
   operatingSystems?: string[];
 }
 
-export class GetLinechartCommand implements GetLinechartCommandDTO {
+export class GetEventResultDataCommand implements GetEventResultDataCommandDTO {
   preconfiguredDashboard?: number;
   from: Date;
   to: Date;
@@ -29,7 +29,7 @@ export class GetLinechartCommand implements GetLinechartCommandDTO {
   deviceTypes?: string[];
   operatingSystems?: string[];
 
-  constructor (dto: GetLinechartCommandDTO) {
+  constructor(dto: GetEventResultDataCommandDTO) {
     this.preconfiguredDashboard = dto.preconfiguredDashboard;
     this.from = dto.from;
     this.to = dto.to;
