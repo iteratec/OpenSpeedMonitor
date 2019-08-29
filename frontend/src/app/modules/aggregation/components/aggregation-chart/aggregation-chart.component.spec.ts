@@ -6,7 +6,6 @@ import {AggregationChartDataService} from "../../services/aggregation-chart-data
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
 import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
-import {SpinnerComponent} from "../../../shared/components/spinner/spinner.component";
 
 describe('AggregationChartComponent', () => {
   let component: AggregationChartComponent;
@@ -14,7 +13,7 @@ describe('AggregationChartComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AggregationChartComponent, SpinnerComponent ],
+      declarations: [ AggregationChartComponent ],
       providers: [
         BarchartDataService,
         AggregationChartDataService,
