@@ -8,13 +8,14 @@ import {AggregationChartComponent} from './components/aggregation-chart/aggregat
 import {BarchartDataService} from "./services/barchart-data.service";
 import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
 import {FormsModule} from "@angular/forms";
+import {SpinnerComponent} from '../shared/components/spinner/spinner.component';
 
 const AggregationRoutes: Routes = [
   {path: 'show', component: AggregationComponent},
 ];
 
 @NgModule({
-  declarations: [AggregationComponent, AggregationChartComponent],
+  declarations: [AggregationComponent, AggregationChartComponent, SpinnerComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(AggregationRoutes),
