@@ -16,10 +16,11 @@ describe('AggregationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ AggregationComponent, AggregationChartComponent, SpinnerComponent ],
+      declarations: [ AggregationComponent, AggregationChartComponent ],
       imports: [
         SharedMocksModule,
-        ResultSelectionModule
+        ResultSelectionModule,
+        SpinnerComponent
       ],
       providers: [
         BarchartDataService,

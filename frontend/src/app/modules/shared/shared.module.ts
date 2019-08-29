@@ -23,7 +23,7 @@ import { SpinnerService } from './services/spinner.service';
     CsiValueMediumComponent,
     CsiValueSmallComponent,
     EmptyStateComponent,
-    SpinnerComponent,
+    SpinnerComponent
   ],
   exports: [
     CommonModule,
@@ -33,7 +33,7 @@ import { SpinnerService } from './services/spinner.service';
     CsiValueSmallComponent,
     EmptyStateComponent,
     NgxSmartModalModule,
-    SpinnerComponent,
+    SpinnerComponent
   ]
 })
 export class SharedModule {
