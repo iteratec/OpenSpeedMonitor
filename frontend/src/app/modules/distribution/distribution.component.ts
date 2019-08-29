@@ -20,11 +20,11 @@ export class DistributionComponent implements OnInit {
   }
 
   getDistributionChartData() {
-    /*this.violinChartService.fetchEventResultData<EventResultDataDTO>(
+    this.violinChartService.fetchEventResultData<EventResultDataDTO>(
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
       URL.DISTRIBUTION_LINECHART_DATA
-    ).subscribe(next => this.results$.next(next));*/
+    ).subscribe(next => this.results$.next(next));
     console.log("click");
   }
 }
