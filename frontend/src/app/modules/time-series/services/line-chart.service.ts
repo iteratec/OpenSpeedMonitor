@@ -161,12 +161,7 @@ export class LineChartService {
     return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
              .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
              .domain([                  // min and max values from the data given
-               d3Min(data, (dataItem: TimeSeries) => {
-                 return d3Min(dataItem.values, (point: TimeSeriesPoint) => {
-                   return point.value;
-                 });
-               }),
-               d3Max(data, (dataItem: TimeSeries) => {
+               0, d3Max(data, (dataItem: TimeSeries) => {
                  return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
                    return point.value;
                  });
