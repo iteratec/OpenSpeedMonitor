@@ -109,7 +109,7 @@ export class LineChartService {
 
     return incomingData.series.map((data: EventResultSeriesDTO) => {
       let lineChartData: TimeSeries = new TimeSeries();
-      lineChartData.key = data.identifier;
+      lineChartData.key = this.generateKey(data);
 
       lineChartData.values = data.data.map((point: EventResultPointDTO) => {
         let lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
@@ -121,6 +121,12 @@ export class LineChartService {
 
       return lineChartData;
     });
+  }
+
+  private generateKey(data: EventResultSeriesDTO): string {
+    return data.jobGroup
+         + data.measuredEvent
+         + data.data.length;
   }
 
   /**
@@ -146,18 +152,23 @@ export class LineChartService {
   private getXScale(data: TimeSeries[]): D3ScaleTime<number, number> {
     return d3ScaleTime()               // Define a scale for the X-Axis
              .range([0, this._width])  // Display the X-Axis over the complete width
-             .domain([                  // Use the min and max dates as the first and last points
-               d3Min(data, (dataItem: TimeSeries) => {
-                 return d3Min(dataItem.values, (point: TimeSeriesPoint) => {
-                   return point.date;
-                 });
-               }),
-               d3Max(data, (dataItem: TimeSeries) => {
-                 return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
-                   return point.date;
-                 });
-               })
-             ]);
+             .domain([this.getMinDate(data), this.getMaxDate(data)]);
+  }
+
+  private getMinDate(data: TimeSeries[]): Date {
+    return d3Min(data, (dataItem: TimeSeries) => {
+      return d3Min(dataItem.values, (point: TimeSeriesPoint) => {
+        return point.date;
+      });
+    });
+  }
+
+  private getMaxDate(data: TimeSeries[]): Date {
+    return d3Max(data, (dataItem: TimeSeries) => {
+      return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
+        return point.date;
+      });
+    });
   }
 
   /**
@@ -166,14 +177,16 @@ export class LineChartService {
   private getYScale(data: TimeSeries[]): D3ScaleLinear<number, number> {
     return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
              .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-             .domain([                  // min and max values from the data given
-               0, d3Max(data, (dataItem: TimeSeries) => {
-                 return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
-                   return point.value;
-                 });
-               })
-             ])
-             .nice();
+             .domain([0, this.getMaxValue(data)])
+             //.nice();
+  }
+
+  private getMaxValue(data: TimeSeries[]): number {
+    return d3Max(data, (dataItem: TimeSeries) => {
+      return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
+        return point.value;
+      });
+    });
   }
 
   /**
@@ -311,32 +324,39 @@ export class LineChartService {
                               xScale: D3ScaleTime<number, number>,
                               yScale: D3ScaleLinear<number, number>,
                               data: TimeSeries[]): void {
-
     // Create one group per line / data entry
-    let chartLineGroups = chart.selectAll('.line')  // Get all lines already drawn
-      .data(data, (datum: TimeSeries) => datum.key)          // ... for this data
-                               .join('g')           // Group the path so we can add dots later to this group
-      .attr('class', (dataItem: TimeSeries) => {
-        return 'line line-' + dataItem.key;
-      })
-
-    // Draw each line into the group
-    chartLineGroups.append('path')  // Draw one path for every item in the data set
-                     .attr('fill', 'none')
-                     .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
-                     .attr('stroke-width', 1.5)
-      .attr('d', (dataItem: TimeSeries) => {     // Apply a function to every item (data grouped by the key 'name') from the data
-                       return this.getLineGenerator(xScale, yScale)(dataItem.values);  // Draw the line for every value (point) of this item
-                     })
-                     .on('mouseover', () => {
-                       console.log("Mouse over line");
-                       //this.highlightLine(this);
-                     })
-                     .on('mouseout', () => {
-                       //normalizeColors();
-                     });
+    chart.selectAll('.line')                             // Get all lines already drawn
+         .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
+         .join(
+           enter => this.drawLine(enter, xScale, yScale)
+         )
+         .attr('class', (dataItem: TimeSeries) => {
+           return 'line line-' + dataItem.key;
+         })
 
      //this.addDataPointsToChart(chartLineGroups, xScale, yScale, data);
+  }
+  
+  private drawLine(selection: any,
+                   xScale: D3ScaleTime<number, number>,
+                   yScale: D3ScaleLinear<number, number>
+  ) {
+    return selection
+             .append('g')       // Group each line so we can add dots to this group latter
+               .append('path')  // Draw one path for every item in the data set
+                 .attr('fill', 'none')
+                 .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
+                 .attr('stroke-width', 1.5)
+                 .attr('d', (dataItem: TimeSeries) => {
+                   return this.getLineGenerator(xScale, yScale)(dataItem.values);
+                 })
+                 .on('mouseover', () => {
+                   console.log("Mouse over line");
+                   //this.highlightLine(this);
+                 })
+                 .on('mouseout', () => {
+                   //normalizeColors();
+                 });
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
