@@ -3,6 +3,7 @@ package de.iteratec.osm.linechart
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
@@ -37,7 +38,7 @@ class LineChartTimeSeriesService {
         }
 
         List<EventResultProjection> eventResultProjections = getResultProjecions(cmd, from, to, measurands)
-        return buildDTO(eventResultProjections, jobGroups, pages, measuredEvents)
+        return buildDTO(eventResultProjections, jobGroups, pages, measuredEvents, measurands)
     }
 
     private List<EventResultProjection> getResultProjecions(GetLinechartCommand cmd, Date from, Date to, List<SelectedMeasurand> measurands) {
@@ -64,32 +65,40 @@ class LineChartTimeSeriesService {
         return eventResultProjections
     }
 
-    private TimeSeriesChartDTO buildDTO(List<EventResultProjection> eventResultProjections, List<JobGroup> jobGroups, List<Page> pages, List<MeasuredEvent> measuredEvents) {
+    private TimeSeriesChartDTO buildDTO(List<EventResultProjection> eventResultProjections, List<JobGroup> jobGroups, List<Page> pages, List<MeasuredEvent> measuredEvents, List<SelectedMeasurand> measurands) {
         TimeSeriesChartDTO timeSeriesChartDTO = new TimeSeriesChartDTO()
         performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
-            eventResultProjections.each {EventResultProjection eventResultProjection ->
-                MeasuredEvent measuredEvent
-                Date date = (Date) eventResultProjection.jobResultDate;
-                Double value = (Double) eventResultProjection.docCompleteTimeInMillisecs;
-                JobGroup jobGroup = (JobGroup) jobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
-                String identifier = "${jobGroup.name}"
-                if (measuredEvents) {
-                    measuredEvent = (MeasuredEvent) measuredEvents.find{measuredEventEntry -> measuredEventEntry.id == eventResultProjection.measuredEventId}
-                    identifier += " | ${measuredEvent?.name}"
-                } else if (pages) {
-                    measuredEvent = (MeasuredEvent) MeasuredEvent.findById(eventResultProjection.measuredEventId)
-                    identifier += " | ${measuredEvent?.name}"
-                }
-                TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
-                if (!timeSeries) {
-                    timeSeries = new TimeSeries(identifier: identifier, jobGroup: jobGroup.name)
-                    if (measuredEvent) {
-                        timeSeries.setMeasuredEvent(measuredEvent.name)
+            eventResultProjections.each { EventResultProjection eventResultProjection ->
+                measurands.each { measurand ->
+                    MeasuredEvent measuredEvent
+                    Date date = (Date) eventResultProjection.jobResultDate
+                    Measurand measurandName = Measurand."${measurand.toString().split(':')[0]}"
+                    Double value = (Double) eventResultProjection.projectedProperties."$measurandName.eventResultField"
+                    JobGroup jobGroup = (JobGroup) jobGroups.find { jobGroup -> jobGroup.id == eventResultProjection.jobGroupId }
+                    String identifier = "${jobGroup.name} | $measurandName"
+                    if (measuredEvents) {
+                        measuredEvent = (MeasuredEvent) measuredEvents.find { measuredEventEntry -> measuredEventEntry.id == eventResultProjection.measuredEventId }
+                        identifier += " | ${measuredEvent?.name}"
+                    } else if (pages) {
+                        measuredEvent = (MeasuredEvent) MeasuredEvent.findById(eventResultProjection.measuredEventId)
+                        identifier += " | ${measuredEvent?.name}"
                     }
-                    timeSeriesChartDTO.series.add(timeSeries)
+                    TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
+                    if (!timeSeries) {
+                        timeSeries = new TimeSeries(
+                                identifier: identifier,
+                                jobGroup: jobGroup.name,
+                                measurand: measurandName,
+                                measurandLabel: Measurand."$measurandName".graphiteLabelSuffix
+                        )
+                        if (measuredEvent) {
+                            timeSeries.setMeasuredEvent(measuredEvent.name)
+                        }
+                        timeSeriesChartDTO.series.add(timeSeries)
+                    }
+                    TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
+                    timeSeries.data.add(timeSeriesDataPoint)
                 }
-                TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
-                timeSeries.data.add(timeSeriesDataPoint)
             }
         }
 
