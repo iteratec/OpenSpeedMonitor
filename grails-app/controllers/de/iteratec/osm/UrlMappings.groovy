@@ -34,6 +34,7 @@ class UrlMappings {
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
         "/aggregationDev/**?"(view: "/angularFrontend")
         "/eventResultDashboardDev/**?"(view: "/angularFrontend")
+        "/distributionDev/**?"(view: "/angularFrontend")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
         "/metricFinder/**?"(view: "/angularFrontend")
