@@ -4,42 +4,41 @@ A card to select page & measured step, browser & location, and the connectivity
 --%>
 
 <div class="card" id="select-page-location-connectivity" data-no-auto-update="${(boolean) noAutoUpdate}">
-<g:if test="${showOnlyPage}">
+<g:if test="${showOnlyPage && hideMeasuredEventForm}">
     <h2>
         <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
-        <g:if test="${!hideMeasuredEventForm}">
-            &nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
-        </g:if>
     </h2>
 </g:if>
-<g:if test="${showOnlyBrowser}">
+<g:elseif test="${showOnlyBrowser}">
     <h2>
         <g:message code="de.iteratec.osm.result.browser.label" default="Browser"/>
     </h2>
-</g:if>
+</g:elseif>
 <g:else>
     <ul class="nav nav-tabs">
         <li class="active" id="filter-navtab-page">
             <a href="#page-tab" data-toggle="tab">
                 <g:message code="de.iteratec.osm.result.page.label" default="Page"/>
                 <g:if test="${!hideMeasuredEventForm}">
-                            &nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
+                    &nbsp;|&nbsp;<g:message code="de.iteratec.osm.result.measured-event.label" default="Measured step"/>
                 </g:if>
             </a>
         </li>
-        <li id="filter-navtab-browser-and-location">
-            <a href="#browser-tab" data-toggle="tab">
-                <g:message code="browser.label" default="Browser"/><g:if
-                        test="${showLocationInBrowserTab}">&nbsp;|&nbsp;<g:message code="job.location.label"
-                                                                                   default="Location"/></g:if>
-            </a>
-        </li>
-        <g:if test="${showConnectivityTab}">
-            <li id="filter-navtab-connectivityprofile">
-                <a href="#connectivity-tab" data-toggle="tab">
-                    <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
+        <g:if test="${!showOnlyPage}">
+            <li id="filter-navtab-browser-and-location">
+                <a href="#browser-tab" data-toggle="tab">
+                    <g:message code="browser.label" default="Browser"/><g:if
+                            test="${showLocationInBrowserTab}">&nbsp;|&nbsp;<g:message code="job.location.label"
+                                                                                       default="Location"/></g:if>
                 </a>
             </li>
+            <g:if test="${showConnectivityTab}">
+                <li id="filter-navtab-connectivityprofile">
+                    <a href="#connectivity-tab" data-toggle="tab">
+                        <g:message code="de.iteratec.osm.result.connectivity.label" default="Connectivity"/>
+                    </a>
+                </li>
+            </g:if>
         </g:if>
     </ul>
 </g:else>
