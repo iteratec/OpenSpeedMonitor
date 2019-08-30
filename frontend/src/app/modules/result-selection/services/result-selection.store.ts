@@ -39,6 +39,8 @@ export class ResultSelectionStore {
 
   reset$: Subject<void> = new Subject<void>();
 
+  validQuery: boolean = false;
+
   oldToNewChartKeyMap = {
     selectedFolder: 'jobGroupIds',
     selectedPages: 'pageIds',
@@ -51,15 +53,13 @@ export class ResultSelectionStore {
   };
 
   constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute) {
-    let validQuery: boolean = false;
-
     route.queryParams.subscribe((params: Params) => {
       if (params) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
-        validQuery = this.checkQuery(params);
+        this.validQuery = this.checkQuery(params);
       }
 
-      if (validQuery) {
+      if (this.validQuery) {
         const resultSelectionCommand: ResultSelectionCommand = {
           from: new Date(params.from),
           to: new Date(params.to),
@@ -84,7 +84,7 @@ export class ResultSelectionStore {
       }
     });
 
-    if (!validQuery) {
+    if (!this.validQuery) {
       let defaultFrom = new Date();
       let defaultTo = new Date();
       defaultFrom.setDate(defaultTo.getDate() - 3);

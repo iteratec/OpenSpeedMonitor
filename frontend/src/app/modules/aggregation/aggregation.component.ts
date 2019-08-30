@@ -26,6 +26,9 @@ export class AggregationComponent implements OnInit {
 
   ngOnInit() {
     this.isHidden = true;
+    if (this.resultSelectionStore.validQuery) {
+      this.getBarchartData();
+    }
   }
 
   getBarchartData(): void {
