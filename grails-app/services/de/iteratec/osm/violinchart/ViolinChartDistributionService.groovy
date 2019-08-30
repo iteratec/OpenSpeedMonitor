@@ -7,7 +7,6 @@ import de.iteratec.osm.distributionData.ViolinChartDTO
 import de.iteratec.osm.distributionData.ViolinDataPoint
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
@@ -32,71 +31,61 @@ class ViolinChartDistributionService {
         if (cmd.pages) {
             pages = Page.findAllByIdInList(cmd.pages)
         }
-        List<MeasuredEvent> measuredEvents = null
-        if (cmd.measuredEvents) {
-            measuredEvents = MeasuredEvent.findAllByIdInList(cmd.measuredEvents)
-        }
-        List<SelectedMeasurand> measurands = cmd.measurands.collect {
-            new SelectedMeasurand(it, CachedView.UNCACHED)
-        }
-
-        List<EventResultProjection> eventResultProjections = getResultProjecions(cmd, from, to, measurands)
-        return buildDTO(eventResultProjections, jobGroups, pages, measuredEvents)
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
+        List<EventResultProjection> distributions = getResultProjecions(cmd, from, to, selectedMeasurand)
+        return buildDTO(distributions, jobGroups, pages, selectedMeasurand/*, measuredEvents*/)
     }
 
-    private List<EventResultProjection> getResultProjecions(GetViolinchartCommand cmd, Date from, Date to, List<SelectedMeasurand> measurands) {
+    private List<EventResultProjection> getResultProjecions(GetViolinchartCommand cmd, Date from, Date to, selectedMeasurand) {
         EventResultQueryBuilder queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
              return new EventResultQueryBuilder()
                     .withJobResultDateBetween(from, to)
                     .withJobGroupIdsIn(cmd.jobGroups as List)
                     .withPageIdsIn(cmd.pages as List)
-                    .withLocationIdsIn(cmd.locations as List)
-                    .withBrowserIdsIn(cmd.browsers as List)
-                    .withMeasuredEventIdsIn(cmd.measuredEvents as List)
-                    .withSelectedMeasurands(measurands)
-
-            /*performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - append connectivities', 2) {
-                appendConnectivity(queryBuildera, queryParams)
-            }
-            performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - append trims', 2) {
-                appendTrims(queryBuildera, queryParams)
-            }*/
+                    .withSelectedMeasurands([selectedMeasurand])
         }
-        List<EventResultProjection> eventResultProjections = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
-            queryBuilder.getRawData()
+        List<EventResultProjection> distributions = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
+            queryBuilder.getRawData(EventResultQueryBuilder.MetaDataSet.NONE)
         }
-        return eventResultProjections
+        return distributions
     }
 
-    private ViolinChartDTO buildDTO(List<EventResultProjection> eventResultProjections, List<JobGroup> jobGroups, List<Page> pages, List<MeasuredEvent> measuredEvents) {
+    private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, selectedMeasurand) {
+        /*List<EventResultProjection> distributions = new EventResultQueryBuilder()
+                .withJobResultDateBetween(from,to)
+                .withSelectedMeasurands([selectedMeasurand])
+                .withPageIn(allPages)
+                .withJobGroupIn(allJobGroups)
+                .getRawData(EventResultQueryBuilder.MetaDataSet.NONE)*/
         ViolinChartDTO violinChartDTO = new ViolinChartDTO()
-        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for ViolinChart", 1) {
-            eventResultProjections.each {EventResultProjection eventResultProjection ->
-                MeasuredEvent measuredEvent
-                Date date = (Date) eventResultProjection.jobResultDate;
-                Double value = (Double) eventResultProjection.docCompleteTimeInMillisecs;
-                JobGroup jobGroup = (JobGroup) jobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
-                String identifier = "${jobGroup.name}"
-                if (measuredEvents) {
-                    measuredEvent = (MeasuredEvent) measuredEvents.find{measuredEventEntry -> measuredEventEntry.id == eventResultProjection.measuredEventId}
-                    identifier += " | ${measuredEvent?.name}"
-                } else if (pages) {
-                    measuredEvent = (MeasuredEvent) MeasuredEvent.findById(eventResultProjection.measuredEventId)
-                    identifier += " | ${measuredEvent?.name}"
-                }
-                Violin violin = violinChartDTO.series.find({ it.identifier == identifier })
-                if (!violin) {
-                    violin = new Violin(identifier: identifier, jobGroup: jobGroup.name)
-                    if (measuredEvent) {
-                        violin.setMeasuredEvent(measuredEvent.name)
-                    }
-                    violinChartDTO.series.add(violin)
-                }
-                ViolinDataPoint violinDataPoint = new ViolinDataPoint(date: date, value: value)
-                violin.data.add(violinDataPoint)
-            }
-        }
+        if(distributions.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
+            performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
+                distributions.each {EventResultProjection eventResultProjection ->
+                    if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
 
-        return violinChartDTO
+                        JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
+                        Page page = allPages.find{page -> page.id == eventResultProjection.pageId}
+                        String identifier = "${page} | ${jobGroup.name}"
+                        Violin violin = violinChartDTO.series.find({ it.identifier == identifier })
+                        if (!violin) {
+                            violin = new Violin(identifier: identifier, jobGroup: jobGroup.name, page: page);
+                            violinChartDTO.series.add(violin);
+                            /*violinChartDTO.series.add(new Violin(page: page, jobGroup: jobGroup.name, identifier: identifier))*/
+                        }
+/*                        def newTrace = violinChartDTO.series.get(identifier)
+                        newTrace.data.add(selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"))*/
+
+
+                        double value = selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}");
+
+                        /*ViolinDataPoint violinDataPoint = new ViolinDataPoint(value: value)*/
+                        violin.data.add(value)
+                    }
+                }
+            }
+            return violinChartDTO
+        }else {
+            return null
+        }
     }
 }

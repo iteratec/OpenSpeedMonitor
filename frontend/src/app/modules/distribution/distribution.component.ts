@@ -23,7 +23,7 @@ export class DistributionComponent implements OnInit {
     this.violinChartService.fetchEventResultData<EventResultDataDTO>(
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
-      URL.DISTRIBUTION_LINECHART_DATA
+      URL.DISTRIBUTION_VIOLINCHART_DATA
     ).subscribe(next => this.results$.next(next));
     console.log("click");
   }

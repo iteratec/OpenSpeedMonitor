@@ -21,9 +21,9 @@ class GetViolinchartCommand implements Validateable {
     Long interval = 0
 
     @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['measurands'])
+        return new JsonSlurper().parseText(source['measurand'])
     })
-    List<String> measurands = []
+    String measurand = ""
 
     @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['jobGroups'])
@@ -35,35 +35,7 @@ class GetViolinchartCommand implements Validateable {
     })
     List<Long> pages = []
 
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['measuredEvents'])
-    })
-    List<Long> measuredEvents = []
 
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['browsers'])
-    })
-    List<Long> browsers = []
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['locations'])
-    })
-    List<Long> locations = []
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['connectivities'])
-    })
-    List<Long> connectivities = []
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['deviceTypes'])
-    })
-    List<String> deviceTypes = []
-
-    @BindUsing({ obj, source ->
-        return new JsonSlurper().parseText(source['operatingSystems'])
-    })
-    List<String> operatingSystems = []
 
     static constraints = {
         preconfiguredDashboard(nullable: true)
@@ -80,8 +52,8 @@ class GetViolinchartCommand implements Validateable {
             }
         })
         interval(nullable: true)
-        measurands(nullable: false, validator: { List<String> measurands, GetViolinchartCommand cmd ->
-            if (measurands.isEmpty()) {
+        measurand(nullable: false, validator: { String measurand, GetViolinchartCommand cmd ->
+            if (measurand.isEmpty()) {
                 return false
             }
         })
@@ -91,15 +63,9 @@ class GetViolinchartCommand implements Validateable {
             }
         })
         pages(nullable: true, validator: { List<Long> pages, GetViolinchartCommand cmd ->
-            if (!pages && !cmd.measuredEvents) {
+            if (!pages) {
                 return false
             }
         })
-        measuredEvents(nullable: true)
-        browsers(nullable: true)
-        locations(nullable: true)
-        connectivities(nullable: true)
-        deviceTypes(nullable: true)
-        operatingSystems(nullable: true)
     }
 }

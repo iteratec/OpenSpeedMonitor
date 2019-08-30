@@ -3,7 +3,7 @@ export interface GetViolinchartCommandDTO {
   from: Date;
   to: Date;
   interval: number;
-  measurands: string[];
+  measurand: string;
   jobGroups: number[];
   pages?: number[];
   measuredEvents?: number[];
@@ -19,7 +19,7 @@ export class GetViolinchartCommand implements GetViolinchartCommandDTO {
   from: Date;
   to: Date;
   interval: number;
-  measurands: string[];
+  measurand: string;
   jobGroups: number[];
   pages?: number[];
   measuredEvents?: number[];
@@ -34,7 +34,7 @@ export class GetViolinchartCommand implements GetViolinchartCommandDTO {
     this.from = dto.from;
     this.to = dto.to;
     this.interval = dto.interval;
-    this.measurands = dto.measurands;
+    this.measurand = dto.measurand;
     this.jobGroups = dto.jobGroups;
     this.pages = dto.pages;
     this.measuredEvents = dto.measuredEvents;
