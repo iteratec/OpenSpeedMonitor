@@ -74,8 +74,8 @@ describe('TimeFrameComponent', () => {
     showComparativeSelection.click();
     fixture.detectChanges();
 
-    expect(component.timeFrameInSeconds).toEqual(component.selectableTimeFramesInSeconds[4]);
-    expect(getTimeFrameInMilliseconds(component.selectedComparativeDates)).toEqual(timeInMilliseconds[4]);
+    expect(component.timeFrameInSeconds).toEqual(component.selectableTimeFramesInSeconds[0]);
+    expect(getTimeFrameInMilliseconds(component.selectedComparativeDates)).toEqual(timeInMilliseconds[0]);
     expect(component.selectedComparativeDates[1] === component.selectedDates[0]);
 
     component.timeFrameInSeconds = component.selectableTimeFramesInSeconds[1];

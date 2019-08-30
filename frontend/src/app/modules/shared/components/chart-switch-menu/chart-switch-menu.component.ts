@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
-import {ChartSwitchMenuEntry} from "../../models/chart-switch-menu-entry.model";
+import {ChartSwitchMenuEntry} from "../../../result-selection/models/chart-switch-menu-entry.model";
 
 @Component({
   selector: 'osm-menu',

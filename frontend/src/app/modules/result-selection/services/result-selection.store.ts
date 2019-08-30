@@ -15,7 +15,7 @@ import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.mod
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
 import {RemainingResultSelection, RemainingResultSelectionParameter} from "../models/remaing-result-selection.model";
-import {ActivatedRoute, Params} from "@angular/router";
+import {ActivatedRoute, Params, Router} from "@angular/router";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -52,7 +52,7 @@ export class ResultSelectionStore {
     selectedTimeFrameInterval: 'interval'
   };
 
-  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute) {
+  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
     route.queryParams.subscribe((params: Params) => {
       if (params) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
@@ -92,6 +92,26 @@ export class ResultSelectionStore {
       this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
       this._remainingResultSelection$ = new BehaviorSubject({});
     }
+  }
+
+  writeQueryParams(additionalParams?: Params) {
+    this.router.navigate([], {
+      queryParams: {
+        from: this.resultSelectionCommand.from.toISOString(),
+        to: this.resultSelectionCommand.to.toISOString(),
+        selectedFolder: this.resultSelectionCommand.jobGroupIds,
+        selectedPages: this.resultSelectionCommand.pageIds,
+        selectedMeasuredEventIds: this.resultSelectionCommand.measuredEventIds,
+        selectedBrowsers: this.resultSelectionCommand.browserIds,
+        selectedLocations: this.resultSelectionCommand.locationIds,
+        selectedConnectivities: this.resultSelectionCommand.selectedConnectivities,
+        ...(this.remainingResultSelection.fromComparative && {comparativeFrom: this.remainingResultSelection.fromComparative.toISOString()}),
+        ...(this.remainingResultSelection.toComparative && {comparativeTo: this.remainingResultSelection.toComparative.toISOString()}),
+        ...(this.remainingResultSelection.measurands && {selectedAggrGroupValuesUnCached: this.remainingResultSelection.measurands}),
+        ...(this.remainingResultSelection.performanceAspectTypes && {performanceAspectTypes: this.remainingResultSelection.performanceAspectTypes}),
+        ...additionalParams
+      }
+    })
   }
 
   registerComponent(component: UiComponent): void {

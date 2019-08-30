@@ -8,6 +8,7 @@ import {RemainingResultSelection} from "../../result-selection/models/remaing-re
 import {AggregationChartDataByMeasurand} from "../models/aggregation-chart-data.model";
 import {AggregationChartSeries} from "../models/aggregation-chart-series.model";
 import {ActivatedRoute, Params, Router} from "@angular/router";
+import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
 
 @Injectable({
   providedIn: 'root'
@@ -97,7 +98,7 @@ export class AggregationChartDataService {
   ascSelected:boolean = true;
   descSelected:boolean = false;
 
-  constructor(private barchartDataService: BarchartDataService, private route: ActivatedRoute, private router: Router) {
+  constructor(private barchartDataService: BarchartDataService, private route: ActivatedRoute, private router: Router, private resultSelectionStore: ResultSelectionStore) {
     route.queryParams.subscribe((params: Params) => {
       this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
       this.aggregationType = params.selectedAggregationValue ? params.selectedAggregationValue : this.aggregationType;
@@ -107,26 +108,14 @@ export class AggregationChartDataService {
   }
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
-    this.router.navigate([], {
-      queryParams: {
-        from: resultSelectionCommand.from.toISOString(),
-        to: resultSelectionCommand.to.toISOString(),
-        selectedFolder: resultSelectionCommand.jobGroupIds,
-        selectedPages: resultSelectionCommand.pageIds,
-        selectedMeasuredEventIds: resultSelectionCommand.measuredEventIds,
-        selectedBrowsers: resultSelectionCommand.browserIds,
-        selectedLocations: resultSelectionCommand.locationIds,
-        selectedConnectivities: resultSelectionCommand.selectedConnectivities,
-        ...(remainingResultSelection.fromComparative && {comparativeFrom: remainingResultSelection.fromComparative.toISOString()}),
-        ...(remainingResultSelection.toComparative && {comparativeTo: remainingResultSelection.toComparative.toISOString()}),
-        ...(remainingResultSelection.measurands && {selectedAggrGroupValuesUnCached: remainingResultSelection.measurands}),
-        ...(remainingResultSelection.performanceAspectTypes && {performanceAspectTypes: remainingResultSelection.performanceAspectTypes}),
-        selectedFilter: this.selectedFilter,
-        selectedAggregationValue: this.aggregationType,
-        selectedPercentile: this.percentileValue,
-        stackBars: this.stackBars ? 1 : 0
-      }
-    });
+    const additionalParams: Params = {
+      selectedFilter: this.selectedFilter,
+      selectedAggregationValue: this.aggregationType,
+      selectedPercentile: this.percentileValue,
+      stackBars: this.stackBars ? 1 : 0
+    };
+
+    this.resultSelectionStore.writeQueryParams(additionalParams);
 
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
