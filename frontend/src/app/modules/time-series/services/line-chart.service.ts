@@ -20,6 +20,8 @@ import {axisBottom as d3AxisBottom, axisLeft as d3AxisLeft} from 'd3-axis';
 
 import {curveMonotoneX as d3CurveMonotoneX, line as d3Line, Line as D3Line} from 'd3-shape';
 
+import 'd3-transition';
+
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
 import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
