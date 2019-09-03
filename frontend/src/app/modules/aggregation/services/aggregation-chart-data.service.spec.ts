@@ -4,6 +4,7 @@ import {BarchartDataService} from "./barchart-data.service";
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
+import {ResultSelectionService} from 'src/app/modules/result-selection/services/result-selection.service';
 
 describe('AggregationChartDataService', () => {
   beforeEach(() =>
@@ -11,7 +12,8 @@ describe('AggregationChartDataService', () => {
       providers: [
         BarchartDataService,
         ResultSelectionStore,
-        AggregationChartDataService
+        AggregationChartDataService,
+        ResultSelectionService
       ],
       imports: [
         HttpClientTestingModule,
@@ -19,7 +21,7 @@ describe('AggregationChartDataService', () => {
       ]
     }));
 
-  fit('should be created', () => {
+  it('should be created', () => {
     const service: AggregationChartDataService = TestBed.get(AggregationChartDataService);
     expect(service).toBeTruthy();
   });

@@ -52,7 +52,7 @@ export class ResultSelectionStore {
     selectedTimeFrameInterval: 'interval'
   };
 
-  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
+  constructor(private resultSelectionService: ResultSelectionService, route: ActivatedRoute, private router: Router) {
     route.queryParams.subscribe((params: Params) => {
       if (params) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
