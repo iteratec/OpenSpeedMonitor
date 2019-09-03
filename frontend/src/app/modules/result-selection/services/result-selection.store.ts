@@ -165,7 +165,7 @@ export class ResultSelectionStore {
     this.userTimings$.next({...this.userTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
       .subscribe(next => {
-      next.map(userTiming => userTiming.kind = "selectable-measurand");
+      next.forEach((userTiming: SelectableMeasurand) => userTiming.kind = 'selectable-measurand');
       const groupName: string = "User Timings";
       let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
@@ -180,7 +180,7 @@ export class ResultSelectionStore {
     this.heroTimings$.next({...this.heroTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
       .subscribe(next => {
-      next.map(heroTiming => heroTiming.kind = "selectable-measurand");
+      next.forEach((heroTiming: SelectableMeasurand) => heroTiming.kind = 'selectable-measurand');
       const groupName: string = "Hero Timings";
       let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
