@@ -4,7 +4,6 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.GetViolinchartCommand
 import de.iteratec.osm.distributionData.Violin
 import de.iteratec.osm.distributionData.ViolinChartDTO
-import de.iteratec.osm.distributionData.ViolinDataPoint
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.SelectedMeasurand
@@ -33,7 +32,7 @@ class ViolinChartDistributionService {
         }
         SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
         List<EventResultProjection> distributions = getResultProjecions(cmd, from, to, selectedMeasurand)
-        return buildDTO(distributions, jobGroups, pages, selectedMeasurand/*, measuredEvents*/)
+        return buildDTO(distributions, jobGroups, pages, selectedMeasurand)
     }
 
     private List<EventResultProjection> getResultProjecions(GetViolinchartCommand cmd, Date from, Date to, selectedMeasurand) {
@@ -51,12 +50,6 @@ class ViolinChartDistributionService {
     }
 
     private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, selectedMeasurand) {
-        /*List<EventResultProjection> distributions = new EventResultQueryBuilder()
-                .withJobResultDateBetween(from,to)
-                .withSelectedMeasurands([selectedMeasurand])
-                .withPageIn(allPages)
-                .withJobGroupIn(allJobGroups)
-                .getRawData(EventResultQueryBuilder.MetaDataSet.NONE)*/
         ViolinChartDTO violinChartDTO = new ViolinChartDTO()
         if(distributions.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
@@ -70,15 +63,8 @@ class ViolinChartDistributionService {
                         if (!violin) {
                             violin = new Violin(identifier: identifier, jobGroup: jobGroup.name, page: page);
                             violinChartDTO.series.add(violin);
-                            /*violinChartDTO.series.add(new Violin(page: page, jobGroup: jobGroup.name, identifier: identifier))*/
                         }
-/*                        def newTrace = violinChartDTO.series.get(identifier)
-                        newTrace.data.add(selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"))*/
-
-
                         double value = selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}");
-
-                        /*ViolinDataPoint violinDataPoint = new ViolinDataPoint(value: value)*/
                         violin.data.add(value)
                     }
                 }

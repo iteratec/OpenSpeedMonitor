@@ -4,7 +4,7 @@ export interface DistributionDataDTO {
   series: DistributionDTO[];
 }
 
-export class EventResultData implements DistributionDataDTO {
+export class DistributionData implements DistributionDataDTO {
   series: DistributionDTO[];
 
   constructor() {

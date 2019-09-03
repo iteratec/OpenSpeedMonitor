@@ -5,7 +5,6 @@ import de.iteratec.osm.distributionData.ViolinDataPoint
 class Violin {
     String identifier = ""
     String jobGroup = ""
-    /*String measuredEvent = ""*/
     String page = ""
     List data = []
 }

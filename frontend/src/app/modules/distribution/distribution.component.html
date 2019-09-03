@@ -4,22 +4,24 @@
 </p>
 <div class="action-row">
   <div class="col-md-12">
-    <osm-result-selection-submit [applicationsRequired]="true" [measurandsRequired]="true" (submit)="getDistributionChartData()"></osm-result-selection-submit>
+    <osm-result-selection-submit [applicationsRequired]="true" [measurandsRequired]="true" [pagesRequired]="true" (submit)="getDistributionChartData()"></osm-result-selection-submit>
   </div>
 </div>
 <div class="row">
   <div class="col-md-12">
     <div class="action-row">
-
       <div class="col-md-4">
         <osm-result-selection-time-frame [showComparativeTimeFrame]="true"></osm-result-selection-time-frame>
-        <osm-result-selection-measurands [multipleMeasurands]="true"></osm-result-selection-measurands>
+        <osm-result-selection-measurands [multipleMeasurands]="false"></osm-result-selection-measurands>
       </div>
       <div class="col-md-3">
         <osm-result-selection-application></osm-result-selection-application>
       </div>
       <div class="col-md-5">
-        <osm-result-selection-page-location-connectivity [showPageSelection]="true" [showBrowserSelection]="true"></osm-result-selection-page-location-connectivity>
+        <osm-result-selection-page-location-connectivity [showPageSelection]="true"
+                                                         [showBrowserSelection]="true"
+                                                         [pageRequired]="true">
+        </osm-result-selection-page-location-connectivity>
       </div>
       <div class="col-md-12">
         <osm-result-selection-reset></osm-result-selection-reset>
