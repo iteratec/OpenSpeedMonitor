@@ -5,6 +5,6 @@ class TimeSeries {
     String jobGroup = ""
     String measuredEvent = ""
     String measurand = ""
-    String measurandLabel = ""
+    String performanceAspectType = ""
     List<TimeSeriesDataPoint> data = []
 }

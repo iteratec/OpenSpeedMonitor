@@ -37,6 +37,7 @@ export class LinechartDataService {
       connectivities: resultSelectionCommand.selectedConnectivities,
       deviceTypes: remainingResultSelection.deviceTypes,
       operatingSystems: remainingResultSelection.operatingSystems,
+      performanceAspectTypes: remainingResultSelection.performanceAspectTypes
     });
   }
 

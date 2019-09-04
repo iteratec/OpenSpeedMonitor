@@ -159,6 +159,10 @@ class EventResultDashboardController {
         }
 
         TimeSeriesChartDTO timeSeriesChartDTO = lineChartTimeSeriesService.getTimeSeriesFor(cmd)
+        if (!timeSeriesChartDTO.any { it.series.size() != 0 }) {
+            ControllerUtils.sendObjectAsJSON(response, [:])
+            return
+        }
         ControllerUtils.sendObjectAsJSON(response, timeSeriesChartDTO)
     }
 
