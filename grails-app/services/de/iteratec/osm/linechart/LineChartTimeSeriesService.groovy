@@ -98,11 +98,12 @@ class LineChartTimeSeriesService {
                 }
 
                 measurands.unique().each { measurand ->
-                    Measurand measurandName = Measurand."${measurand.name}"
-                    Double value = (Double) eventResultProjection.projectedProperties."$measurandName.eventResultField"
+                    String dataBaseRelevantName = measurand.getDatabaseRelevantName()
+                    String measurandName = measurand.getName()
+                    Double value = (Double) eventResultProjection.projectedProperties."$dataBaseRelevantName"
                     String identifierMeasurand = identifier + " | $measurandName"
                     buildSeries(jobGroup, value, identifierMeasurand, date, measuredEvent, timeSeriesChartDTO)
-                    timeSeriesChartDTO.series.find{ it.identifier == identifierMeasurand }.measurand = measurandName.toString()
+                    timeSeriesChartDTO.series.find{ it.identifier == identifierMeasurand }.measurand = measurandName
                 }
 
                 performanceAspectTypes.each { performanceAspectType ->
