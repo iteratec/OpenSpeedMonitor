@@ -364,12 +364,17 @@ export class AggregationChartDataService {
       sidelabel =  datum.page;
     } else if (jobGroups.length > 1 && pages.length === 1) {
       sidelabel = datum.jobGroup;
-    } else if(pages.length ===1&&jobGroups.length===1){
+    } else if(pages.length === 1 && jobGroups.length === 1){
       sidelabel = '';
     }
-    if(browsers.length > 1){
-      sidelabel = `${sidelabel}, ${datum.browser}`
+    if(browsers.length > 1) {
+      if (sidelabel.length > 0) {
+        sidelabel = `${sidelabel}, ${datum.browser}`
+      } else if (sidelabel.length === 0) {
+        sidelabel = datum.browser
+      }
     }
+
     return sidelabel
   }
 
