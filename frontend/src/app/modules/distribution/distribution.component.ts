@@ -20,6 +20,9 @@ export class DistributionComponent {
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
       URL.DISTRIBUTION_VIOLINCHART_DATA
-    ).subscribe(next => this.results$.next(next));
+    ).subscribe(next => {
+      this.results$.next(next);
+      console.log("next" + JSON.stringify(next));
+    });
   }
 }

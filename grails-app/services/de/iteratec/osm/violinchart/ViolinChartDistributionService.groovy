@@ -30,26 +30,22 @@ class ViolinChartDistributionService {
         if (cmd.pages) {
             pages = Page.findAllByIdInList(cmd.pages)
         }
-        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
+        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurands[0], CachedView.UNCACHED)
         List<EventResultProjection> distributions = getResultProjecions(cmd, from, to, selectedMeasurand)
         return buildDTO(distributions, jobGroups, pages, selectedMeasurand)
     }
 
     private List<EventResultProjection> getResultProjecions(GetViolinchartCommand cmd, Date from, Date to, selectedMeasurand) {
-        EventResultQueryBuilder queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
-             return new EventResultQueryBuilder()
-                    .withJobResultDateBetween(from, to)
-                    .withJobGroupIdsIn(cmd.jobGroups as List)
-                    .withPageIdsIn(cmd.pages as List)
-                    .withSelectedMeasurands([selectedMeasurand])
-        }
-        List<EventResultProjection> distributions = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
-            queryBuilder.getRawData(EventResultQueryBuilder.MetaDataSet.NONE)
-        }
+        List<EventResultProjection> distributions =  new EventResultQueryBuilder()
+                .withJobResultDateBetween(from, to)
+                .withJobGroupIdsIn(cmd.jobGroups as List)
+                .withPageIdsIn(cmd.pages as List)
+                .withSelectedMeasurands([selectedMeasurand])
+                .getRawData(EventResultQueryBuilder.MetaDataSet.NONE)
         return distributions
     }
 
-    private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, selectedMeasurand) {
+    private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, SelectedMeasurand selectedMeasurand) {
         ViolinChartDTO violinChartDTO = new ViolinChartDTO()
         if(distributions.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
             performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
@@ -70,8 +66,9 @@ class ViolinChartDistributionService {
                 }
             }
             return violinChartDTO
-        }else {
+        } else {
             return null
         }
     }
+
 }
