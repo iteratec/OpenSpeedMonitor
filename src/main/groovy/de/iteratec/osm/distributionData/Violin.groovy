@@ -6,5 +6,6 @@ class Violin {
     String identifier = ""
     String jobGroup = ""
     String page = ""
+    String performanceAspectType = ""
     List data = []
 }

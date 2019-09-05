@@ -26,6 +26,11 @@ class GetViolinchartCommand implements Validateable {
     List <String> measurands = []
 
     @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['performanceAspectTypes'])
+    })
+    List<String> performanceAspectTypes = []
+
+    @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['jobGroups'])
     })
     List<Long> jobGroups = []
@@ -52,11 +57,12 @@ class GetViolinchartCommand implements Validateable {
             }
         })
         interval(nullable: true)
-        measurands(nullable: false, validator: { List<String> measurands, GetViolinchartCommand cmd ->
+       /* measurands(nullable: false, validator: { List<String> measurands, GetViolinchartCommand cmd ->
             if (measurands.isEmpty()) {
                 return false
             }
-        })
+        })*/
+        measurands(nullable: true)
         jobGroups(nullable: false, validator: { List<Long> jobGroups, GetViolinchartCommand cmd ->
             if (jobGroups.isEmpty()) {
                 return false

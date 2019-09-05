@@ -12,6 +12,8 @@ export interface GetViolinchartCommandDTO {
   connectivities?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
+  performanceAspectTypes?: string[];
+
 }
 
 export class GetViolinchartCommand implements GetViolinchartCommandDTO {
@@ -28,6 +30,7 @@ export class GetViolinchartCommand implements GetViolinchartCommandDTO {
   connectivities?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
+  performanceAspectTypes?: string[];
 
   constructor(dto: GetViolinchartCommandDTO) {
     this.preconfiguredDashboard = dto.preconfiguredDashboard;
@@ -43,5 +46,7 @@ export class GetViolinchartCommand implements GetViolinchartCommandDTO {
     this.connectivities = dto.connectivities;
     this.deviceTypes = dto.deviceTypes;
     this.operatingSystems = dto.operatingSystems;
+    this.performanceAspectTypes = dto.performanceAspectTypes;
+
   }
 }

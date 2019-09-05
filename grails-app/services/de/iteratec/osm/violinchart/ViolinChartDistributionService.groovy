@@ -3,6 +3,7 @@ package de.iteratec.osm.violinchart
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.GetViolinchartCommand
 import de.iteratec.osm.distributionData.Violin
+import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.distributionData.ViolinChartDTO
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
@@ -10,6 +11,7 @@ import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.result.PerformanceAspectType
 import grails.gorm.transactions.Transactional
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
@@ -30,45 +32,87 @@ class ViolinChartDistributionService {
         if (cmd.pages) {
             pages = Page.findAllByIdInList(cmd.pages)
         }
-        SelectedMeasurand selectedMeasurand = new SelectedMeasurand(cmd.measurands[0], CachedView.UNCACHED)
-        List<EventResultProjection> distributions = getResultProjecions(cmd, from, to, selectedMeasurand)
-        return buildDTO(distributions, jobGroups, pages, selectedMeasurand)
+        List<SelectedMeasurand> measurands = cmd.measurands.collect {
+            new SelectedMeasurand(it, CachedView.UNCACHED)
+        }
+
+        List<PerformanceAspectType> performanceAspectTypes = []
+        if (cmd.performanceAspectTypes) {
+            performanceAspectTypes = cmd.performanceAspectTypes.collect{it.toString().toUpperCase() as PerformanceAspectType}
+        }
+
+        List<EventResultProjection> distributions = getResultProjecions(cmd, from, to, measurands, performanceAspectTypes)
+        return buildDTO(distributions, jobGroups, pages, measurands, performanceAspectTypes)
     }
 
-    private List<EventResultProjection> getResultProjecions(GetViolinchartCommand cmd, Date from, Date to, selectedMeasurand) {
+    private List<EventResultProjection> getResultProjecions(GetViolinchartCommand cmd, Date from, Date to, List<SelectedMeasurand>  measurands, List<PerformanceAspectType> performanceAspectTypes) {
         List<EventResultProjection> distributions =  new EventResultQueryBuilder()
                 .withJobResultDateBetween(from, to)
                 .withJobGroupIdsIn(cmd.jobGroups as List)
                 .withPageIdsIn(cmd.pages as List)
-                .withSelectedMeasurands([selectedMeasurand])
+                .withSelectedMeasurands(measurands)
+                .withPerformanceAspects(performanceAspectTypes)
                 .getRawData(EventResultQueryBuilder.MetaDataSet.NONE)
         return distributions
     }
 
-    private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, SelectedMeasurand selectedMeasurand) {
+    private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
         ViolinChartDTO violinChartDTO = new ViolinChartDTO()
-        if(distributions.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
-            performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
-                distributions.each {EventResultProjection eventResultProjection ->
-                    if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
+        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
+            distributions.each {EventResultProjection eventResultProjection ->
+                JobGroup jobGroup = (JobGroup) allJobGroups.find { jobGroup -> jobGroup.id == eventResultProjection.jobGroupId }
+                Page page = (Page) allPages.find{page -> page.id == eventResultProjection.pageId}
+                String identifier = "${page} | ${jobGroup.name}"
+                Violin violin = violinChartDTO.series.find({ it.identifier == identifier })
 
-                        JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}
-                        Page page = allPages.find{page -> page.id == eventResultProjection.pageId}
-                        String identifier = "${page} | ${jobGroup.name}"
-                        Violin violin = violinChartDTO.series.find({ it.identifier == identifier })
-                        if (!violin) {
-                            violin = new Violin(identifier: identifier, jobGroup: jobGroup.name, page: page);
-                            violinChartDTO.series.add(violin);
-                        }
-                        double value = selectedMeasurand.normalizeValue(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}");
-                        violin.data.add(value)
+
+                if (measurands){
+                    String measurandName = measurands.first().getDatabaseRelevantName()
+                    Double value = (Double) eventResultProjection.projectedProperties."$measurandName"
+                    if (!violin) {
+                        violin = new Violin(identifier: identifier, jobGroup: jobGroup.name, page: page);
+                        violinChartDTO.series.add(violin);
                     }
+                    violin.data.add(value)
                 }
+
+                if (performanceAspectTypes) {
+                    String performanceAspectType = performanceAspectTypes.first();
+                    Double value = (Double) eventResultProjection.projectedProperties."$performanceAspectType"
+                    if (!violin) {
+                        violin = new Violin(identifier: identifier, jobGroup: jobGroup.name, page: page);
+                        violinChartDTO.series.add(violin);
+                    }
+                    violin.data.add(value)
+                }
+
+
             }
-            return violinChartDTO
-        } else {
-            return null
+            /*violinChartDTO.series.any {
+                if (it.data.findAll{it.value == null}.size() == it.data.size()){
+                    violinChartDTO.series.remove(it)
+                }
+            }*/
         }
+        return violinChartDTO
     }
 
 }
+
+
+/*
+private void buildSeries(JobGroup jobGroup, Double value, String identifier, Date date, MeasuredEvent measuredEvent, TimeSeriesChartDTO timeSeriesChartDTO){
+    TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
+    if (!timeSeries) {
+        timeSeries = new TimeSeries(
+                identifier: identifier,
+                jobGroup: jobGroup.name
+        )
+        if (measuredEvent) {
+            timeSeries.setMeasuredEvent(measuredEvent.name)
+        }
+        timeSeriesChartDTO.series.add(timeSeries)
+    }
+    TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
+    timeSeries.data.add(timeSeriesDataPoint)
+}*/
