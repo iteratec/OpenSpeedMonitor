@@ -88,6 +88,10 @@ export class ResultSelectionStore {
     this.setRemainingResultSelection({...this.remainingResultSelection, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
   }
 
+  setRemainingResultSelectionInterval(intervalInSeconds: number): void {
+    this.setRemainingResultSelection({...this.remainingResultSelection, interval: intervalInSeconds});
+  }
+
   setRemainingResultSelectionEnums(enums: string[], type: RemainingResultSelectionParameter): void {
     this.setRemainingResultSelection({...this.remainingResultSelection, [type]: enums});
   }
@@ -143,9 +147,10 @@ export class ResultSelectionStore {
             isLoading: false,
             name: "frontend.de.iteratec.isr.measurand.group." + group.name,
             values: group.values.map(measurand => ({
+              kind: "selectable-measurand",
               name: "frontend.de.iteratec.isr.measurand." + measurand.name,
               id: measurand.id
-            }))
+            } as SelectableMeasurand))
           };
           let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
           if (concerningSubject$) {
@@ -160,6 +165,7 @@ export class ResultSelectionStore {
     this.userTimings$.next({...this.userTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
       .subscribe(next => {
+      next.map(userTiming => userTiming.kind = "selectable-measurand");
       const groupName: string = "User Timings";
       let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
@@ -174,6 +180,7 @@ export class ResultSelectionStore {
     this.heroTimings$.next({...this.heroTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
       .subscribe(next => {
+      next.map(heroTiming => heroTiming.kind = "selectable-measurand");
       const groupName: string = "Hero Timings";
       let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,

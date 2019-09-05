@@ -8,6 +8,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.DeviceType
 import de.iteratec.osm.result.OperatingSystem
+import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
@@ -52,26 +53,33 @@ class BarchartAggregationService {
             toComparative = cmd.toComparative.toDate()
         }
 
-        return aggregateWithComparativesForMeasurandOrUserTiming(measurands, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.aggregationValue, cmd.browsers, deviceTypes, operatingSystems)
+        List<PerformanceAspectType> performanceAspectTypes = []
+        if (cmd.performanceAspectTypes) {
+            performanceAspectTypes = cmd.performanceAspectTypes.collect{it.toString().toUpperCase() as PerformanceAspectType}
+        }
+
+        return aggregateWithComparativesForMeasurandOrUserTiming(measurands, from, to, fromComparative, toComparative, allJobGroups, allPages, cmd.aggregationValue, cmd.browsers, deviceTypes, operatingSystems, performanceAspectTypes)
     }
 
     List<BarchartAggregation> aggregateWithComparativesForMeasurandOrUserTiming(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, Date fromComparative, Date toComparative,
                                                                                 List<JobGroup> allJobGroups, List<Page> allPages, String selectedAggregationValue, List<Long> browserIds,
-                                                                                List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems) {
-        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems)
+                                                                                List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems, List<PerformanceAspectType> performanceAspectTypes) {
+        List<BarchartAggregation> aggregations = aggregateFor(selectedMeasurands, from, to, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems, performanceAspectTypes)
         List<BarchartAggregation> comparatives = []
         if (fromComparative && toComparative) {
-            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems)
+            comparatives = aggregateFor(selectedMeasurands, fromComparative, toComparative, allJobGroups, allPages, selectedAggregationValue, browserIds, deviceTypes, operatingSystems, performanceAspectTypes)
         }
         return mergeAggregationsWithComparatives(aggregations, comparatives)
     }
 
     List<BarchartAggregation> aggregateFor(List<SelectedMeasurand> selectedMeasurands, Date from, Date to, List<JobGroup> jobGroups, List<Page> pages,
-                                           String selectedAggregationValue, List<Long> browserIds, List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems) {
-        if (!selectedMeasurands) {
+                                           String selectedAggregationValue, List<Long> browserIds, List<DeviceType> deviceTypes, List<OperatingSystem> operatingSystems, List<PerformanceAspectType> performanceAspectTypes) {
+        if (!selectedMeasurands && !performanceAspectTypes) {
             return []
         }
-        selectedMeasurands.unique({ a, b -> a.name <=> b.name })
+        if (selectedMeasurands) {
+            selectedMeasurands.unique({ a, b -> a.name <=> b.name })
+        }
 
         EventResultQueryBuilder queryBuilder = new EventResultQueryBuilder()
                 .withJobResultDateBetween(from, to)
@@ -96,6 +104,11 @@ class BarchartAggregationService {
             queryBuilder = queryBuilder.withOperatingSystems(operatingSystems)
         }
 
+        if (performanceAspectTypes) {
+            performanceAspectTypes.unique()
+            queryBuilder = queryBuilder.withPerformanceAspects(performanceAspectTypes)
+        }
+
         List<EventResultProjection> eventResultProjections = []
         switch (selectedAggregationValue) {
             case 'avg':
@@ -110,7 +123,7 @@ class BarchartAggregationService {
                     e.printStackTrace()
                 }
         }
-        return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages)
+        return createListForEventResultProjection(selectedAggregationValue, selectedMeasurands, eventResultProjections, jobGroups, pages, performanceAspectTypes)
     }
 
     List<PageComparisonAggregation> getBarChartAggregationsFor(GetPageComparisonDataCommand cmd) {
@@ -136,7 +149,7 @@ class BarchartAggregationService {
         }
 
         SelectedMeasurand measurand = new SelectedMeasurand(cmd.measurand, CachedView.UNCACHED)
-        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue, browsers, deviceTypes, operatingSystems)
+        List<BarchartAggregation> aggregations = aggregateFor([measurand], cmd.from.toDate(), cmd.to.toDate(), jobGroups, pages, cmd.selectedAggregationValue, browsers, deviceTypes, operatingSystems, [])
         cmd.selectedPageComparisons.each { comparison ->
             PageComparisonAggregation pageComparisonAggregation = new PageComparisonAggregation()
             pageComparisonAggregation.baseAggregation = aggregations.find { aggr -> aggr.jobGroup.id == (comparison.firstJobGroupId as long) && aggr.page.id == (comparison.firstPageId as long) }
@@ -157,7 +170,7 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages, List<PerformanceAspectType> performanceAspectTypes) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }
@@ -165,10 +178,28 @@ class BarchartAggregationService {
             Browser browser = Browser.findById(aggregation.browserId)
             DeviceType deviceType = aggregation?.deviceType
             OperatingSystem operatingSystem = aggregation?.operatingSystem
+            result += performanceAspectTypes.collect { PerformanceAspectType aspectType ->
+                new BarchartAggregation(
+                        value: aggregation."${aspectType.name()}",
+                        unit: aspectType.unit.label,
+                        measurandLabel: i18nService.msg("frontend.de.iteratec.osm.performance-aspect.${aspectType.name()}", aspectType.name()),
+                        measurandName: aspectType.name(),
+                        measurandGroup: null,
+                        jobGroup: jobGroup,
+                        page: page,
+                        browser: browser ?: null,
+                        aggregationValue: selectedAggregationValue,
+                        deviceType: deviceType?.deviceTypeLabel,
+                        operatingSystem: operatingSystem?.OSLabel
+                )
+            }
             result += selectedMeasurands.collect { SelectedMeasurand selected ->
                 new BarchartAggregation(
                         value: selected.normalizeValue(aggregation."${selected.getDatabaseRelevantName()}"),
-                        selectedMeasurand: selected,
+                        unit: selected.getMeasurandGroup().unit.label,
+                        measurandLabel: i18nService.msg("de.iteratec.isr.measurand.${selected.name}", selected.name),
+                        measurandName: selected.name,
+                        measurandGroup: selected.getMeasurandGroup(),
                         jobGroup: jobGroup,
                         page: page,
                         browser: browser ?: null,

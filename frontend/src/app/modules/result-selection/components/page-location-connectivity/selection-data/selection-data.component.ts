@@ -23,7 +23,7 @@ export class SelectionDataComponent implements OnInit {
   @Input() childType: ResultSelectionCommandParameter;
   @Input() parentType: ResultSelectionCommandParameter;
   @Input() showChildSelection: boolean = true;
-  @Input() parentSelectionOptional: boolean = true;
+  @Input() parentRequired: boolean = false;
 
   parentSelection$ = new BehaviorSubject<number[]>([]);
   parentSelection: number[] = [];
@@ -68,8 +68,8 @@ export class SelectionDataComponent implements OnInit {
     this.resultSelectionStore.setResultSelectionCommandIds(this.childSelection, this.childType);
   }
 
-  determineOpacity(selectionLength: number, parentSelectionOptional: boolean): number {
-    if (!parentSelectionOptional || selectionLength > 0) {
+  determineOpacity(selectionLength: number): number {
+    if (this.parentRequired || selectionLength > 0) {
       return 1;
     } else {
       return 0.5;

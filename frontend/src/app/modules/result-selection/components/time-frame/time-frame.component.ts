@@ -25,10 +25,10 @@ export class TimeFrameComponent implements OnInit {
   calendarEventSubscription: Subscription;
 
   selectableTimeFramesInSeconds: number[] = [-1, 3600, 43200, 86400, 259200, 604800, 1209600, 2419200];
-  timeFrameInSeconds: number = -1;
+  timeFrameInSeconds: number = this.selectableTimeFramesInSeconds[0];
 
   selectableAggregationIntervalsInSeconds: number[] = [-1, 60, 1440, 10080];
-  aggregationIntervalInSeconds: number = -1;
+  aggregationIntervalInSeconds: number = this.selectableAggregationIntervalsInSeconds[0];
 
   selectedDates: Date[];
   selectedComparativeDates: Date[];
@@ -56,13 +56,16 @@ export class TimeFrameComponent implements OnInit {
     this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
 
     this.timeFrameInSeconds = this.selectableTimeFramesInSeconds[4];
+
+    if (this.showAggregation) {
+      this.resultSelectionStore.setRemainingResultSelectionInterval(this.aggregationIntervalInSeconds);
+    }
   }
 
   selectTimeFrame(): void {
     if (this.timeFrameInSeconds != this.selectableTimeFramesInSeconds[0]) {
-      let from = new Date();
       let to = new Date();
-      from.setSeconds(to.getSeconds() - this.timeFrameInSeconds);
+      let from = new Date(to.getTime() - this.timeFrameInSeconds * 1000);
       this.selectedDates = [from, to];
 
       if (this.comparativeSelectionActive) {
@@ -167,6 +170,10 @@ export class TimeFrameComponent implements OnInit {
     this.comparativeSelectionActive = !this.comparativeSelectionActive;
     this.resultSelectionStore.setRemainingResultSelectionComparativeTimeFrame([null, null]);
 
+  }
+
+  selectInterval() {
+    this.resultSelectionStore.setRemainingResultSelectionInterval(this.aggregationIntervalInSeconds);
   }
 }
 

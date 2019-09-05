@@ -1,8 +1,9 @@
 import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
-import {select} from "d3-selection";
-import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
+import {select} from 'd3-selection';
 import {max} from "d3-array";
+import {ScaleBand, scaleBand, ScaleLinear, scaleLinear} from "d3-scale";
+import 'd3-transition';
 import {AggregationChartDataService} from "../../services/aggregation-chart-data.service";
 import {BarchartDataService} from "../../services/barchart-data.service";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
@@ -47,7 +48,7 @@ export class AggregationChartComponent implements OnChanges {
   private anySelected:boolean = false;
   private clickedMeasurand:string = '';
 
-  constructor(private aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
+  constructor(public aggregationChartDataService: AggregationChartDataService, private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore) {
   }
 
   redraw() {
@@ -125,9 +126,9 @@ export class AggregationChartComponent implements OnChanges {
         .style('opacity', 0),
       update => update,
       exit => exit
-        .style('opacity', 0)
         .transition()
         .duration(ChartCommons.TRANSITION_DURATION)
+        .style('opacity', 0)
         .remove()
     )
       .attr('x', this.svgWidth / 2)

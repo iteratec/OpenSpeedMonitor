@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MeasurandGroup, SelectableMeasurand} from "../../../../models/measurand.model";
+import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../models/measurand.model";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
@@ -15,20 +15,21 @@ import {RemainingResultSelectionParameter} from "../../models/remaing-result-sel
   styleUrls: ['./measurands.component.scss']
 })
 export class MeasurandsComponent implements OnInit {
+  aspectTypes$:BehaviorSubject<PerformanceAspectType[]> = new BehaviorSubject<PerformanceAspectType[]>([]);
   measurands$: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>> = new BehaviorSubject({
     isLoading: false,
     data: []
   });
-  aspectTypes$:BehaviorSubject<PerformanceAspectType[]> = new BehaviorSubject<PerformanceAspectType[]>([]);
 
-  selectedMeasurands: SelectableMeasurand[] = [];
-  defaultValue: SelectableMeasurand;
+  selectedMeasurands: (Measurand)[] = [];
+  defaultValue: PerformanceAspectType;
   addingComparativeTimeFrameDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   @Input() multipleMeasurands = false;
   @Input() addingMeasurandsDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private resultSelectionStore: ResultSelectionStore, private performanceAspectService: PerformanceAspectService) {
+    this.aspectTypes$ = this.performanceAspectService.aspectTypes$;
     this.measurands$.next({
       ...this.measurands$.getValue(),
       data: [
@@ -50,36 +51,35 @@ export class MeasurandsComponent implements OnInit {
     });
   }
 
-  selectMeasurand(index: number, measurand: SelectableMeasurand) {
+  selectMeasurand(index: number, measurand: Measurand): void {
     this.selectedMeasurands[index] = measurand;
-    this.setMeasurandIds();
+    this.setResultSelection();
   }
 
-  addMeasurandField() {
+  addMeasurandField(): void {
     this.selectedMeasurands.push(this.defaultValue);
-    this.setMeasurandIds();
+    this.setResultSelection();
     this.addingComparativeTimeFrameDisabled$.next(true);
   }
 
-  removeMeasurandField(index: number) {
+  removeMeasurandField(index: number): void {
     this.selectedMeasurands.splice(index, 1);
-    this.setMeasurandIds();
+    this.setResultSelection();
     if (this.selectedMeasurands.length == 1) {
       this.addingComparativeTimeFrameDisabled$.next(false);
     }
   }
 
-  trackByFn(index: number, item: any) {
+  trackByFn(index: number, item: any): number {
     return index;
   }
 
-  setDefaultValue() {
-    this.resultSelectionStore.loadTimes$.subscribe((next: MeasurandGroup) => {
-      this.defaultValue = next.values[0];
+  setDefaultValue(): void {
+    this.performanceAspectService.aspectTypes$.subscribe((next: PerformanceAspectType[]) => {
+      this.defaultValue = next[0];
       this.selectedMeasurands = [this.defaultValue];
-      this.aspectTypes$ = this.performanceAspectService.aspectTypes$;
       if (this.defaultValue) {
-        this.setMeasurandIds();
+        this.setResultSelection();
       }
     });
   }
@@ -97,9 +97,23 @@ export class MeasurandsComponent implements OnInit {
     )
   }
 
-  private setMeasurandIds() {
+  private setResultSelection(): void {
     this.resultSelectionStore.setRemainingResultSelectionEnums(
-      this.selectedMeasurands.map((measurand: SelectableMeasurand) => measurand.id),
+      this.selectedMeasurands.filter((item: Measurand) => {
+        if (item) {
+          return item.kind === "performance-aspect-type"
+        }
+        return false
+      }).map((performanceAspectType: PerformanceAspectType) => performanceAspectType.name),
+      RemainingResultSelectionParameter.PERFORMANCE_ASPECT_TYPES
+    );
+    this.resultSelectionStore.setRemainingResultSelectionEnums(
+      this.selectedMeasurands.filter((item: Measurand) => {
+        if (item) {
+          return item.kind === "selectable-measurand"
+        }
+        return false;
+      }).map((measurand: SelectableMeasurand) => measurand.id),
       RemainingResultSelectionParameter.MEASURANDS
     );
   }
