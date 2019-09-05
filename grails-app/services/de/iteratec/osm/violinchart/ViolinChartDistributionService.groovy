@@ -3,7 +3,6 @@ package de.iteratec.osm.violinchart
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.GetViolinchartCommand
 import de.iteratec.osm.distributionData.Violin
-import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.distributionData.ViolinChartDTO
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
@@ -64,8 +63,6 @@ class ViolinChartDistributionService {
                 Page page = (Page) allPages.find{page -> page.id == eventResultProjection.pageId}
                 String identifier = "${page} | ${jobGroup.name}"
                 Violin violin = violinChartDTO.series.find({ it.identifier == identifier })
-
-
                 if (measurands){
                     String measurandName = measurands.first().getDatabaseRelevantName()
                     Double value = (Double) eventResultProjection.projectedProperties."$measurandName"
@@ -85,34 +82,10 @@ class ViolinChartDistributionService {
                     }
                     violin.data.add(value)
                 }
-
-
             }
-            /*violinChartDTO.series.any {
-                if (it.data.findAll{it.value == null}.size() == it.data.size()){
-                    violinChartDTO.series.remove(it)
-                }
-            }*/
         }
         return violinChartDTO
     }
 
 }
 
-
-/*
-private void buildSeries(JobGroup jobGroup, Double value, String identifier, Date date, MeasuredEvent measuredEvent, TimeSeriesChartDTO timeSeriesChartDTO){
-    TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
-    if (!timeSeries) {
-        timeSeries = new TimeSeries(
-                identifier: identifier,
-                jobGroup: jobGroup.name
-        )
-        if (measuredEvent) {
-            timeSeries.setMeasuredEvent(measuredEvent.name)
-        }
-        timeSeriesChartDTO.series.add(timeSeries)
-    }
-    TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
-    timeSeries.data.add(timeSeriesDataPoint)
-}*/

@@ -13,7 +13,6 @@ export interface GetViolinchartCommandDTO {
   deviceTypes?: string[];
   operatingSystems?: string[];
   performanceAspectTypes?: string[];
-
 }
 
 export class GetViolinchartCommand implements GetViolinchartCommandDTO {

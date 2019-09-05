@@ -103,7 +103,7 @@ class DistributionChartController extends ExceptionHandlerController {
     }
 
     /**
-     * Rest Method for ajax call.
+     * Rest Method for Angular
      * @param cmd The requested data.
      * @return TimeSeriesChartDTO as JSON or string message if an error occurred
      */

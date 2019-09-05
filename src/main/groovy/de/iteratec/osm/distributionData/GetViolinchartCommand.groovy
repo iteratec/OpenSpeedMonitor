@@ -57,11 +57,6 @@ class GetViolinchartCommand implements Validateable {
             }
         })
         interval(nullable: true)
-       /* measurands(nullable: false, validator: { List<String> measurands, GetViolinchartCommand cmd ->
-            if (measurands.isEmpty()) {
-                return false
-            }
-        })*/
         measurands(nullable: true)
         jobGroups(nullable: false, validator: { List<Long> jobGroups, GetViolinchartCommand cmd ->
             if (jobGroups.isEmpty()) {

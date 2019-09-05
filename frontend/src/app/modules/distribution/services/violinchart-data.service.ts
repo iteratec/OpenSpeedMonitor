@@ -15,7 +15,6 @@ export class ViolinchartDataService {
 
   fetchDistributionData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, url: string): Observable<T> {
     const cmd: GetViolinchartCommand = this.buildCommand(resultSelectionCommand, remainingResultSelection);
-    console.log("cmd: " + JSON.stringify(cmd));
     const params = this.createParams(cmd);
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
