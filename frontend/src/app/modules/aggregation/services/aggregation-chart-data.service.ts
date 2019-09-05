@@ -15,6 +15,7 @@ export class AggregationChartDataService {
 
   allMeasurandDataMap: AggregationChartDataByMeasurand = {};
   filterRules  = {};
+  i18nMap: {comparativeDeterioration:string, comparativeImprovement: string, jobGroup: string, measurand: string, page: string};
   series: AggregationChartSeries[] = [];
   selectedFilter:string = 'asc';
   aggregationValue:string = 'avg';
@@ -24,6 +25,7 @@ export class AggregationChartDataService {
   dataForHeader:string = '';
   uniqueSideLabels:string[] = [];
   aggregationType:string = 'avg';
+  hasComparativeData: boolean = false;
 
   loadingTimeColors:Array<string> = [
     "#1660A7",
@@ -139,8 +141,10 @@ export class AggregationChartDataService {
       data = this.barchartAverageData$.getValue();
     }
     this.filterRules = data.filterRules;
+    this.i18nMap = data.i18nMap;
     this.aggregationValue = data.series[0].aggregationValue !== undefined ? data.series[0].aggregationValue : this.aggregationValue;
     this.series = data.series;
+    this.hasComparativeData = data.hasComparativeData;
     this.setMeasurandDataMap(data.series);
     Object.keys(this.allMeasurandDataMap).forEach((measurand) => {
       this.sortSeriesByFilterRule(this.allMeasurandDataMap[measurand]);
@@ -148,13 +152,18 @@ export class AggregationChartDataService {
     this.setDataForScoreBar();
     this.setDataForHeader();
     this.setUniqueSideLabels();
-    this.createEmptyBarsForMissingData();
+    if(!this.hasComparativeData) {
+      this.createEmptyBarsForMissingData();
+    }
   }
 
   public setMeasurandDataMap(series: AggregationChartSeries[]): void{
     let measurands: string[] = [];
     let measurandDataMap: AggregationChartDataByMeasurand = {};
     if(series) {
+      if(this.hasComparativeData){
+        series = this.setComparativeData(series);
+      }
       series.forEach(datum => {
         datum.sideLabel = this.setDataForSideLabel(series, datum);
       });
@@ -184,13 +193,18 @@ export class AggregationChartDataService {
         measurandData.unit= firstSerie.unit;
         measurandData.highlighted = false;
         measurandData.selected = false;
-        measurandData.hasComparative =false;
-
-        let unit = measurandData.unit;
-        let colorScales ={};
-        let hasComparative = measurandData.hasComparative;
-        colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, hasComparative);
-        measurandData.color = colorScales[unit](measurands.indexOf(measurand));
+        measurandData.hasComparative = this.hasComparativeData;
+        measurandData.isImprovement = firstSerie.isImprovement;
+        measurandData.isDeterioration = firstSerie.isDeterioration;
+        if(measurandData.isImprovement || measurandData.isDeterioration){
+          let color = this.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
+          measurandData.color = color.toString();
+        }else {
+          let unit = measurandData.unit;
+          let colorScales = {};
+          colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, this.hasComparativeData);
+          measurandData.color = colorScales[unit](measurands.indexOf(measurand));
+        }
       });
     }
     this.allMeasurandDataMap = measurandDataMap;
@@ -350,6 +364,33 @@ export class AggregationChartDataService {
       array.push(i);
     }
     return array;
+  }
+
+  public setComparativeData(series: AggregationChartSeries[]){
+    let comparativeData: AggregationChartSeries[] = [];
+    series.forEach(datum => {
+      let difference = datum.value - datum.valueComparative;
+      let isImprovement = (datum.measurandGroup === "PERCENTAGES") ? difference > 0 : difference < 0;
+      let measurandSuffix = isImprovement ? "improvement" : "deterioration";
+      let label = isImprovement ? (this.i18nMap.comparativeImprovement || "improvement") : (this.i18nMap.comparativeDeterioration || "deterioration");
+      comparativeData.push({
+        measurand: datum.measurand + "_" + measurandSuffix,
+        aggregationValue: datum.aggregationValue,
+        jobGroup: datum.jobGroup,
+        measurandGroup: datum.measurandGroup,
+        measurandLabel: label,
+        page: datum.page,
+        value: difference,
+        unit: datum.unit,
+        sideLabel: datum.sideLabel,
+        browser: datum.browser,
+        deviceType: datum.deviceType,
+        operatingSystem: datum.operatingSystem,
+        isImprovement: isImprovement,
+        isDeterioration: !isImprovement
+      });
+    });
+    return series.concat(comparativeData);
   }
 
   private setDataForSideLabel(series: AggregationChartSeries[], datum: AggregationChartSeries): string {
