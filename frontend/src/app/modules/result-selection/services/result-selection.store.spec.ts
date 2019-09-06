@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ResultSelectionStore } from './result-selection.store';
 import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {ResultSelectionService} from "./result-selection.service";
+import {RouterTestingModule} from "@angular/router/testing";
 
 describe('ResultSelectionStore', () => {
   beforeEach(() => TestBed.configureTestingModule({
@@ -11,7 +12,8 @@ describe('ResultSelectionStore', () => {
       ResultSelectionService
     ],
     imports: [
-      HttpClientTestingModule
+      HttpClientTestingModule,
+      RouterTestingModule
     ]
   }));
 

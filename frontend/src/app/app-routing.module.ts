@@ -33,6 +33,10 @@ const appRoutes: Routes = [
     loadChildren: './modules/time-series/time-series.module#TimeSeriesModule'
   },
   {
+    path: 'distributionDev',
+    loadChildren: './modules/distribution/distribution.module#DistributionModule'
+  },
+  {
     path: '',
     loadChildren: './modules/landing/landing.module#LandingModule',
     pathMatch: 'full'
