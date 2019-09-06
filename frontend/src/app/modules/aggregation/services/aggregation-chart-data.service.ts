@@ -7,6 +7,8 @@ import {ResultSelectionCommand} from "../../result-selection/models/result-selec
 import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
 import {AggregationChartDataByMeasurand} from "../models/aggregation-chart-data.model";
 import {AggregationChartSeries} from "../models/aggregation-chart-series.model";
+import {ActivatedRoute, Params, Router} from "@angular/router";
+import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
 
 @Injectable({
   providedIn: 'root'
@@ -98,10 +100,25 @@ export class AggregationChartDataService {
   ascSelected:boolean = true;
   descSelected:boolean = false;
 
-
-  constructor(private barchartDataService: BarchartDataService) {}
+  constructor(private barchartDataService: BarchartDataService, private route: ActivatedRoute, private router: Router, private resultSelectionStore: ResultSelectionStore) {
+    route.queryParams.subscribe((params: Params) => {
+      this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
+      this.aggregationType = params.selectedAggregationValue ? params.selectedAggregationValue : this.aggregationType;
+      this.stackBars = params.stackBars == 1;
+      this.percentileValue = params.selectedPercentile ? parseInt(params.selectedPercentile) : this.percentileValue;
+    });
+  }
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
+    const additionalParams: Params = {
+      selectedFilter: this.selectedFilter,
+      selectedAggregationValue: this.aggregationType,
+      selectedPercentile: this.percentileValue,
+      stackBars: this.stackBars ? 1 : 0
+    };
+
+    this.resultSelectionStore.writeQueryParams(additionalParams);
+
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
