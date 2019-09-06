@@ -121,8 +121,6 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
-      /*this.isLoading$.next(false);*/
-
     });
   }
 
@@ -179,7 +177,6 @@ export class AggregationChartDataService {
           selected: false,
           hasComparative: false,
           color: '',
-          /*isLoading: false*/
         };
       });
 

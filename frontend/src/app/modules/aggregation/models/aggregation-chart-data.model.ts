@@ -1,6 +1,4 @@
 import {AggregationChartSeries} from "./aggregation-chart-series.model";
-import {BehaviorSubject} from "rxjs";
-import {Loading} from "../../../models/loading.model";
 
 export interface AggregationChartDataDTO {
   measurand: string;
@@ -15,7 +13,6 @@ export interface AggregationChartDataDTO {
   hasComparative: boolean;
   color: string;
   series: AggregationChartSeries[];
-  /*isLoading: boolean;*/
 }
 
 export class AggregationChartData implements AggregationChartDataDTO {
@@ -31,7 +28,6 @@ export class AggregationChartData implements AggregationChartDataDTO {
   hasComparative: boolean;
   color: string;
   series: AggregationChartSeries[];
-  /*isLoading: boolean;*/
 
   constructor(dto: AggregationChartDataDTO) {
     this.measurand = dto.measurand;
@@ -46,7 +42,6 @@ export class AggregationChartData implements AggregationChartDataDTO {
     this.color = dto.color;
     this.series = dto.series;
     this.aggregationValue = dto.aggregationValue;
-    /*this.isLoading= dto.isLoading;*/
   }
 }
 
