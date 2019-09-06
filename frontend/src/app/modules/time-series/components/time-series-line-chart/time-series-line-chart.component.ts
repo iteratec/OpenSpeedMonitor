@@ -6,7 +6,8 @@ import {
   Input,
   OnChanges,
   SimpleChanges,
-  ViewChild
+  ViewChild,
+  ViewEncapsulation
 } from "@angular/core";
 
 import {EventResultData} from '../../models/event-result-data.model';
@@ -15,6 +16,7 @@ import {LineChartService} from '../../services/line-chart.service';
 
 @Component({
   selector: 'osm-time-series-line-chart',
+  encapsulation: ViewEncapsulation.None,  // needed! otherwise the scss style do not apply to svg content (see https://stackoverflow.com/questions/36214546/styles-in-component-for-d3-js-do-not-show-in-angular-2/36214723#36214723)
   templateUrl: './time-series-line-chart.component.html',
   styleUrls: [ './time-series-line-chart.component.scss' ]
 })
