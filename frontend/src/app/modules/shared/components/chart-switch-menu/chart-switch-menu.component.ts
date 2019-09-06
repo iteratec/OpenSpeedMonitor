@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {Router} from "@angular/router";
-import {ChartSwitchMenuEntry} from "../../models/chart-switch-menu-entry.model";
+import {ActivatedRoute, Router} from "@angular/router";
+import {ChartSwitchMenuEntry} from "../../../result-selection/models/chart-switch-menu-entry.model";
 
 @Component({
   selector: 'osm-menu',
@@ -18,7 +18,13 @@ export class ChartSwitchMenuComponent implements OnInit {
     {baseUrl: "/tabularResultPresentation/listResults", label: "frontend.de.iteratec.osm.results.resultList", icon: "fas fa-th-list"}
   ];
 
-  constructor(private router: Router) { }
+  queryString: string = '';
+
+  constructor(private router: Router, private route: ActivatedRoute) {
+    route.queryParams.subscribe(() => {
+      this.queryString = window.location.search;
+    });
+  }
 
   ngOnInit() {
   }
