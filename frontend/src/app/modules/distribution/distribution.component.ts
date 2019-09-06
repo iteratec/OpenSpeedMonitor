@@ -22,7 +22,6 @@ export class DistributionComponent {
       URL.DISTRIBUTION_VIOLINCHART_DATA
     ).subscribe(next => {
       this.results$.next(next);
-      console.log("next" + JSON.stringify(next));
     });
   }
 }
