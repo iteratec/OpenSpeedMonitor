@@ -12,12 +12,13 @@ export interface AggregationChartSeriesDTO {
   browser?: string;
   deviceType?: string;
   operatingSystem?: string;
+  isImprovement ?: boolean;
+  isDeterioration ?: boolean;
 }
 
 export class AggregationChartSeries implements AggregationChartSeriesDTO {
   measurand: string;
   aggregationValue: string | number;
-
   jobGroup: string;
   measurandGroup: string;
   measurandLabel: string;
@@ -29,6 +30,8 @@ export class AggregationChartSeries implements AggregationChartSeriesDTO {
   deviceType?: string;
   valueComparative?: number;
   operatingSystem?: string;
+  isImprovement ?: boolean;
+  isDeterioration ?: boolean;
 
   constructor(dto: AggregationChartSeriesDTO) {
     this.measurand = dto.measurand;
@@ -44,6 +47,8 @@ export class AggregationChartSeries implements AggregationChartSeriesDTO {
     this.aggregationValue = dto.aggregationValue;
     this.unit = dto.unit;
     this.sideLabel = dto.sideLabel;
+    this.isDeterioration = dto.isDeterioration;
+    this.isImprovement = dto.isImprovement;
   }
 }
 
