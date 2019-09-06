@@ -15,6 +15,7 @@ import {MeasurandGroup, SelectableMeasurand} from "../../../models/measurand.mod
 import {ResultSelectionService} from "./result-selection.service";
 import {UiComponent} from "../../../enums/ui-component.enum";
 import {RemainingResultSelection, RemainingResultSelectionParameter} from "../models/remaing-result-selection.model";
+import {ActivatedRoute, Params, Router} from "@angular/router";
 
 @Injectable()
 export class ResultSelectionStore {
@@ -38,12 +39,79 @@ export class ResultSelectionStore {
 
   reset$: Subject<void> = new Subject<void>();
 
-  constructor(private resultSelectionService: ResultSelectionService) {
-    let defaultFrom = new Date();
-    let defaultTo = new Date();
-    defaultFrom.setDate(defaultTo.getDate() - 3);
-    this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
-    this._remainingResultSelection$ = new BehaviorSubject({});
+  validQuery: boolean = false;
+
+  oldToNewChartKeyMap = {
+    selectedFolder: 'jobGroupIds',
+    selectedPages: 'pageIds',
+    selectedAggrGroupValuesUnCached: 'measurands',
+    selectedBrowsers: 'browserIds',
+    selectedLocations: 'locationIds',
+    comparativeFrom: 'fromComparative',
+    comparativeTo: 'toComparative',
+    selectedTimeFrameInterval: 'interval'
+  };
+
+  constructor(private resultSelectionService: ResultSelectionService, route: ActivatedRoute, private router: Router) {
+    route.queryParams.subscribe((params: Params) => {
+      if (params) {
+        params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
+        this.validQuery = this.checkQuery(params);
+      }
+
+      if (this.validQuery) {
+        const resultSelectionCommand: ResultSelectionCommand = {
+          from: new Date(params.from),
+          to: new Date(params.to),
+          caller: Caller.EventResult,
+          ...(params.jobGroupIds && {jobGroupIds: [].concat(params.jobGroupIds).map(item => parseInt(<string>item))}),
+          ...(params.pageIds && {pageIds: [].concat(params.pageIds).map(item => parseInt(<string>item))}),
+          ...(params.measuredEventIds && {measuredEventIds: [].concat(params.measuredEvendIds).map(item => parseInt(<string>item))}),
+          ...(params.browserIds && {browserIds: [].concat(params.browserIds).map(item => parseInt(<string>item))}),
+          ...(params.locationIds && {locationIds: [].concat(params.locationIds).map(item => parseInt(<string>item))}),
+          ...(params.selectedConnectivities && {selectedConnectivities: [].concat(params.selectedConnectivities).map(item => parseInt(<string>item))})
+        };
+
+        const remainingResultSelection: RemainingResultSelection = {
+          ...(params.fromComparative && {fromComparative: new Date(params.fromComparative)}),
+          ...(params.toComparative && {toComparative: new Date(params.toComparative)}),
+          ...(params.measurands && {measurands: [].concat(params.measurands)}),
+          ...(params.performanceAspectTypes && {performanceAspectTypes: [].concat(params.performanceAspectTypes)})
+        };
+
+        this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>(resultSelectionCommand);
+        this._remainingResultSelection$ = new BehaviorSubject(remainingResultSelection);
+      }
+    });
+
+    if (!this.validQuery) {
+      let defaultFrom = new Date();
+      let defaultTo = new Date();
+      defaultFrom.setDate(defaultTo.getDate() - 3);
+
+      this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
+      this._remainingResultSelection$ = new BehaviorSubject({});
+    }
+  }
+
+  writeQueryParams(additionalParams?: Params) {
+    this.router.navigate([], {
+      queryParams: {
+        from: this.resultSelectionCommand.from.toISOString(),
+        to: this.resultSelectionCommand.to.toISOString(),
+        selectedFolder: this.resultSelectionCommand.jobGroupIds,
+        selectedPages: this.resultSelectionCommand.pageIds,
+        selectedMeasuredEventIds: this.resultSelectionCommand.measuredEventIds,
+        selectedBrowsers: this.resultSelectionCommand.browserIds,
+        selectedLocations: this.resultSelectionCommand.locationIds,
+        selectedConnectivities: this.resultSelectionCommand.selectedConnectivities,
+        ...(this.remainingResultSelection.fromComparative && {comparativeFrom: this.remainingResultSelection.fromComparative.toISOString()}),
+        ...(this.remainingResultSelection.toComparative && {comparativeTo: this.remainingResultSelection.toComparative.toISOString()}),
+        ...(this.remainingResultSelection.measurands && {selectedAggrGroupValuesUnCached: this.remainingResultSelection.measurands}),
+        ...(this.remainingResultSelection.performanceAspectTypes && {performanceAspectTypes: this.remainingResultSelection.performanceAspectTypes}),
+        ...additionalParams
+      }
+    })
   }
 
   registerComponent(component: UiComponent): void {
@@ -66,6 +134,27 @@ export class ResultSelectionStore {
       }
     });
   }
+
+  private checkQuery(params: Params): boolean {
+    const dates: Date[] = [new Date(params.from), new Date(params.to)];
+    const datesValid: boolean = dates.every(this.isValidDate);
+    const jobGroupIdsValid: boolean = !!params.jobGroupIds;
+
+    return datesValid && jobGroupIdsValid;
+  }
+
+  private isValidDate(date: Date) {
+    return date instanceof Date && !isNaN(date.getTime())
+  }
+
+  private renameParamKeys = (keysMap, object) =>
+    Object.keys(object).reduce(
+      (acc, key) => ({
+        ...acc,
+        ...{ [keysMap[key] || key]: object[key] }
+      }),
+      {}
+    );
 
   setResultSelectionCommandTimeFrame(timeFrame: Date[]): void {
     this.setResultSelectionCommand({...this.resultSelectionCommand, from: timeFrame[0], to: timeFrame[1]});
@@ -165,6 +254,7 @@ export class ResultSelectionStore {
     this.userTimings$.next({...this.userTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
       .subscribe(next => {
+      next.map(userTiming => userTiming.kind = "selectable-measurand");
       const groupName: string = "User Timings";
       let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
@@ -179,6 +269,7 @@ export class ResultSelectionStore {
     this.heroTimings$.next({...this.heroTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
       .subscribe(next => {
+      next.map(heroTiming => heroTiming.kind = "selectable-measurand");
       const groupName: string = "Hero Timings";
       let responseWithLoadingState: MeasurandGroup = {
         isLoading: false,
