@@ -4,7 +4,7 @@
       {{ chart.label | translate }} (Dev)
     </span>
     <ng-template #showIcon>
-      <a [href]="chart.baseUrl" class="btn">
+      <a [href]="chart.baseUrl + queryString" class="btn">
         <i [ngClass]="chart.icon"></i>
       </a>
     </ng-template>
