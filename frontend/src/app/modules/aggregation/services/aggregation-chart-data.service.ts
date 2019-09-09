@@ -94,7 +94,6 @@ export class AggregationChartDataService {
 
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  isLoading$: BehaviorSubject<any> = new BehaviorSubject<any>(true);
   ascSelected:boolean = true;
   descSelected:boolean = false;
 

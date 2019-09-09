@@ -24,3 +24,12 @@
     opacity: 1;
   }
 }
+
+.spinner-container {
+  position: absolute;
+  min-width: 100%;
+  min-height: 100%;
+  background: white;
+  opacity: 0.5;
+  z-index: 10;
+}

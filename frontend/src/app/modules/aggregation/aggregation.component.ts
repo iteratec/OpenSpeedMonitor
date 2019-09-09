@@ -26,7 +26,6 @@ export class AggregationComponent implements OnInit {
 
   ngOnInit() {
     this.isHidden = true;
-    this.aggregationChartDataService.isLoading$.next(false);
   }
 
   getBarchartData(): void {

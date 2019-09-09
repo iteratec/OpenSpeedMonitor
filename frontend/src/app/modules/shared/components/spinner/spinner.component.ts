@@ -65,13 +65,10 @@ export class SpinnerComponent implements OnInit, OnDestroy {
   startSpinner() {
     this.show = true;
     this.spinner.spin(this.element.firstChild);
-    this.element.parentElement.classList.add( "parentSpinner");
-
   }
 
   stopSpinner() {
     this.show = false;
     this.spinner.stop();
-    this.element.parentElement.classList.remove("parentSpinner");
   }
 }
