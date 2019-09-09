@@ -210,13 +210,20 @@ export class AggregationChartDataService {
         measurandData.unit= firstSerie.unit;
         measurandData.highlighted = false;
         measurandData.selected = false;
-        measurandData.hasComparative = false;
+        measurandData.hasComparative = this.hasComparativeData;
+        measurandData.isImprovement = firstSerie.isImprovement;
+        measurandData.isDeterioration = firstSerie.isDeterioration;
 
-        let unit = measurandData.unit;
-        let colorScales ={};
-        let hasComparative = measurandData.hasComparative;
-        colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, hasComparative);
-        measurandData.color = colorScales[unit](measurands.indexOf(measurand));
+        if(measurandData.isImprovement || measurandData.isDeterioration){
+          let color = this.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
+          measurandData.color = color.toString();
+        } else {
+          let unit = measurandData.unit;
+          let colorScales = {};
+          let hasComparative = measurandData.hasComparative;
+          colorScales[unit] = colorScales[unit] || this.getColorscaleForMeasurandGroup(unit, hasComparative);
+          measurandData.color = colorScales[unit](measurands.indexOf(measurand));
+        }
       });
     }
     this.allMeasurandDataMap = measurandDataMap;
