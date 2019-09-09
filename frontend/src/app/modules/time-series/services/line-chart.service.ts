@@ -35,6 +35,8 @@ import {
   Line as D3Line
 } from 'd3-shape';
 
+import 'd3-transition';
+
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
 import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
