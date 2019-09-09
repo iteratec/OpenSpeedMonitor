@@ -1,6 +1,5 @@
 import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
-import { Spinner } from 'spin.js/spin';
-import { SpinnerOptions } from 'spin.js/SpinnerOptions';
+import { Spinner, SpinnerOptions } from 'spin.js';
 import { Subscription } from 'rxjs';
 import {SpinnerService} from "../../services/spinner.service";
 
