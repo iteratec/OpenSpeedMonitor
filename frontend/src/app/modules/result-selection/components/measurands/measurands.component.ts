@@ -1,13 +1,14 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../models/measurand.model";
-import {BehaviorSubject, combineLatest, Observable} from "rxjs";
+import {BehaviorSubject, combineLatest, interval, Observable, Subject} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {map} from 'rxjs/operators';
+import {combineAll, map, take, takeUntil, takeWhile, tap, toArray} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
 import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {RemainingResultSelectionParameter} from "../../models/remaing-result-selection.model";
+import {PerformanceAspectTypes} from "../../../../enums/performance-aspect-types.enum";
 
 @Component({
   selector: 'osm-result-selection-measurands',
@@ -41,7 +42,11 @@ export class MeasurandsComponent implements OnInit {
         this.resultSelectionStore.percentages$
       ]
     });
-    this.setDefaultValue();
+    if (this.resultSelectionStore.validQuery) {
+      this.loadResultSelection();
+    } else {
+      this.setDefaultValue();
+    }
   }
 
   ngOnInit() {
@@ -95,6 +100,39 @@ export class MeasurandsComponent implements OnInit {
     ).pipe(
         map(next => next.map(item => item.isLoading).some(value => value))
     )
+  }
+
+  private loadResultSelection(): void {
+    let allMeasurands: SelectableMeasurand[];
+    let performanceAspects: PerformanceAspectType[];
+    const finishedLoading$: Subject<void> = new Subject<void>();
+
+    this.loadingState().pipe(takeUntil(finishedLoading$)).subscribe(loading => {
+      if (!loading) {
+        performanceAspects = [...this.aspectTypes$.getValue()];
+        allMeasurands = [
+          ...this.resultSelectionStore.loadTimes$.getValue().values,
+          ...this.resultSelectionStore.userTimings$.getValue().values,
+          ...this.resultSelectionStore.heroTimings$.getValue().values,
+          ...this.resultSelectionStore.requestCounts$.getValue().values,
+          ...this.resultSelectionStore.requestSizes$.getValue().values,
+          ...this.resultSelectionStore.percentages$.getValue().values
+        ];
+
+        const selectedPerformanceAspectTypes = (performanceAspects && this.resultSelectionStore.remainingResultSelection.performanceAspectTypes) ?
+          [...performanceAspects.filter(aspect => this.resultSelectionStore.remainingResultSelection.performanceAspectTypes.includes(aspect.name))] : [];
+        const selectedMeasurandsx = (allMeasurands && this.resultSelectionStore.remainingResultSelection.measurands) ?
+          [...allMeasurands.filter(measurand => this.resultSelectionStore.remainingResultSelection.measurands.includes(measurand.id))] : [];
+
+
+        this.selectedMeasurands = [
+          ...selectedPerformanceAspectTypes,
+          ...selectedMeasurandsx
+        ];
+
+        finishedLoading$.next();
+      }
+    });
   }
 
   private setResultSelection(): void {
