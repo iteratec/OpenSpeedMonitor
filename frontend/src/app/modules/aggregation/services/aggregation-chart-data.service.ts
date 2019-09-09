@@ -213,6 +213,7 @@ export class AggregationChartDataService {
         measurandData.hasComparative = this.hasComparativeData;
         measurandData.isImprovement = firstSerie.isImprovement;
         measurandData.isDeterioration = firstSerie.isDeterioration;
+
         if(measurandData.isImprovement || measurandData.isDeterioration){
           let color = this.getColorscaleForTrafficlight()(measurandData.isImprovement ? "good" : "bad");
           measurandData.color = color.toString();
