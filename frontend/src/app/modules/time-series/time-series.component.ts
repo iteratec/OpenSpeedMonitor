@@ -26,5 +26,4 @@ export class TimeSeriesComponent implements OnInit {
       URL.EVENT_RESULT_DASHBOARD_LINECHART_DATA
     ).subscribe(next => this.results$.next(next));
   }
-
 }
