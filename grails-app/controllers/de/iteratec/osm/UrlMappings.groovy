@@ -211,5 +211,12 @@ class UrlMappings {
             controller = "eventResultDashboard"
             action = [GET: "getLinechartData"]
         }
+
+        // DistributionController //////////////////////////////////////////
+
+        "/distribution/getViolinchartData" {
+            controller = "distribution"
+            action = [GET: "getDistributionChartData"]
+        }
     }
 }
