@@ -6,6 +6,9 @@ import de.iteratec.osm.csi.Page
 import de.iteratec.osm.distributionData.DistributionChartDTO
 import de.iteratec.osm.distributionData.DistributionTrace
 import de.iteratec.osm.distributionData.GetDistributionCommand
+import de.iteratec.osm.distributionData.GetViolinchartCommand
+import de.iteratec.osm.distributionData.ViolinChartDTO
+import de.iteratec.osm.violinchart.ViolinChartDistributionService
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobDaoService
 import de.iteratec.osm.measurement.schedule.JobGroup
@@ -31,6 +34,7 @@ class DistributionChartController extends ExceptionHandlerController {
     JobGroupService jobGroupService
     JobDaoService jobDaoService
     EventResultDashboardService eventResultDashboardService
+    ViolinChartDistributionService violinChartDistributionService
     I18nService i18nService
     PageService pageService
     OsmConfigCacheService osmConfigCacheService
@@ -96,6 +100,23 @@ class DistributionChartController extends ExceptionHandlerController {
 //        distributionChartDTO.filterRules = filteringAndSortingDataService.createFilterRules(allPages, allJobGroups)
 
         ControllerUtils.sendObjectAsJSON(response, distributionChartDTO)
+    }
+
+    /**
+     * Rest Method for Angular
+     * @param cmd The requested data.
+     * @return TimeSeriesChartDTO as JSON or string message if an error occurred
+     */
+    @RestAction
+    def getViolinchartData(GetViolinchartCommand cmd) {
+        if (cmd.hasErrors()) {
+            ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST,
+                    "Invalid parameters: " + cmd.getErrors().fieldErrors.collect { it.field }.join(", "))
+            return
+        }
+
+        ViolinChartDTO violinChartDTO = violinChartDistributionService.getDistributionFor(cmd)
+        ControllerUtils.sendObjectAsJSON(response, violinChartDTO)
     }
 
     /**
