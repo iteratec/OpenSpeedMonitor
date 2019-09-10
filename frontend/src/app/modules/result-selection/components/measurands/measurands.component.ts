@@ -8,6 +8,7 @@ import {UiComponent} from "../../../../enums/ui-component.enum";
 import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {RemainingResultSelectionParameter} from "../../models/remaing-result-selection.model";
+import {PerformanceAspectTypes} from "../../../../enums/performance-aspect-types.enum";
 
 @Component({
   selector: 'osm-result-selection-measurands',
