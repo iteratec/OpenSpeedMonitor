@@ -7,11 +7,14 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionService} from "../../services/result-selection.service";
 import {By} from "@angular/platform-browser";
 import {MeasurandGroup} from "../../../../models/measurand.model";
+import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
+import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
 
 describe('MeasurandsComponent', () => {
   let component: MeasurandsComponent;
   let fixture: ComponentFixture<MeasurandsComponent>;
   let resultSelectionStore: ResultSelectionStore;
+  let performanceAspectService: PerformanceAspectService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -28,8 +31,30 @@ describe('MeasurandsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MeasurandsComponent);
     resultSelectionStore = TestBed.get(ResultSelectionStore);
+    performanceAspectService = TestBed.get(PerformanceAspectService);
     component = fixture.componentInstance;
     component.multipleMeasurands = true;
+
+    const performanceAspectTypes: PerformanceAspectType[] = [
+      {
+        icon: "fas fa-hourglass-start",
+        name: "PAGE_CONSTRUCTION_STARTED",
+        unit: "ms",
+        kind: "performance-aspect-type"
+      },
+      {
+        icon: "fas fa-eye",
+        name: "PAGE_SHOWS_USEFUL_CONTENT",
+        unit: "ms",
+        kind: "performance-aspect-type"
+      },
+      {
+        icon: "fas fa-hand-pointer",
+        name: "PAGE_IS_USABLE",
+        unit: "ms",
+        kind: "performance-aspect-type"
+      }
+    ];
 
     const loadTimes: MeasurandGroup = {
       isLoading: false,
@@ -52,6 +77,7 @@ describe('MeasurandsComponent', () => {
         }
       ]
     };
+    performanceAspectService.aspectTypes$.next(performanceAspectTypes);
     resultSelectionStore.loadTimes$.next(loadTimes);
     fixture.detectChanges();
   });
