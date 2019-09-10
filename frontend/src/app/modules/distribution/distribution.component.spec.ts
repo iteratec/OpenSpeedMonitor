@@ -5,6 +5,7 @@ import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
+import {ViolinchartDataService} from "./services/violinchart-data.service";
 
 describe('DistributionComponent', () => {
   let component: DistributionComponent;
@@ -19,7 +20,8 @@ describe('DistributionComponent', () => {
       ],
       providers: [
         OsmLangService,
-        GrailsBridgeService
+        GrailsBridgeService,
+        ViolinchartDataService,
       ]
     })
     .compileComponents();
