@@ -53,8 +53,8 @@ export class MeasurandsComponent implements OnInit {
       this.loadResultSelection();
     } else {
       this.defaultValue$
-        .pipe(takeWhile((performanceAspectType: PerformanceAspectType) => performanceAspectType === undefined, true))
-        .subscribe((performanceAspectType: PerformanceAspectType) => this.setDefaultValue(performanceAspectType));
+        .pipe(takeWhile((measurand: Measurand) => measurand === undefined, true))
+        .subscribe((measurand: Measurand) => this.setDefaultValue(measurand));
     }
   }
 
@@ -82,7 +82,7 @@ export class MeasurandsComponent implements OnInit {
   }
 
   getDefaultValue(): void {
-    this.performanceAspectService.aspectTypes$.subscribe((next: PerformanceAspectType[]) => {
+    this.aspectTypes$.subscribe((next: PerformanceAspectType[]) => {
       this.defaultValue$.next(next[0]);
     });
   }
