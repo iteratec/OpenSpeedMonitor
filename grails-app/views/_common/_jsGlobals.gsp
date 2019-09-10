@@ -61,6 +61,7 @@
         },
         eventResultDashboardShowAll: "${createLink(action: 'showAll', controller: 'eventResultDashboard')}",
         aggregationShow: "${createLink(action: 'show', controller: 'aggregation')}",
+        aggregationShowDev: "/aggregationDev/show",
         aggregationGetData: "${createLink(controller: 'aggregation', action: 'getBarchartData')}",
         tabularResultPresentation: "${createLink(action: 'listResults', controller: 'tabularResultPresentation')}",
         getPagesForMeasuredEvents: "${createLink(action: 'getPagesForMeasuredEvents', controller: 'page')}",
