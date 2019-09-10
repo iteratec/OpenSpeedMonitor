@@ -140,6 +140,21 @@ export class LineChartService {
               .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
   }
 
+  public startResize(svgElement: ElementRef): void {
+    d3Select(svgElement.nativeElement).transition().duration(100).style('opacity', 0.0);
+  }
+
+  public resizeChart(svgElement: ElementRef): void {
+    this._width = svgElement.nativeElement.parentElement.offsetWidth - this._margin.left - this._margin.right;
+
+    d3Select(svgElement.nativeElement)
+      .attr('width',  this._width  + this._margin.left + this._margin.right)
+  }
+
+  public endResize(svgElement: ElementRef): void {
+    d3Select(svgElement.nativeElement).transition().duration(50).style('opacity', 1.0);
+  }
+
   /**
    * Determine the xScale for the given data
    */
