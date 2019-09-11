@@ -1,14 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../models/measurand.model";
-import {BehaviorSubject, combineLatest, interval, Observable, Subject} from "rxjs";
+import {BehaviorSubject, combineLatest, Observable, Subject} from "rxjs";
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
-import {combineAll, map, take, takeUntil, takeWhile, tap, toArray} from 'rxjs/operators';
+import {map, takeUntil, takeWhile} from 'rxjs/operators';
 import {UiComponent} from "../../../../enums/ui-component.enum";
 import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {RemainingResultSelectionParameter} from "../../models/remaing-result-selection.model";
-import {PerformanceAspectTypes} from "../../../../enums/performance-aspect-types.enum";
 
 @Component({
   selector: 'osm-result-selection-measurands',
@@ -23,7 +22,7 @@ export class MeasurandsComponent implements OnInit {
   });
 
   selectedMeasurands: (Measurand)[] = [];
-  defaultValue: PerformanceAspectType;
+  defaultValue$: BehaviorSubject<Measurand> = new BehaviorSubject(null);
   addingComparativeTimeFrameDisabled$: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   @Input() multipleMeasurands = false;
@@ -42,11 +41,7 @@ export class MeasurandsComponent implements OnInit {
         this.resultSelectionStore.percentages$
       ]
     });
-    if (this.resultSelectionStore.validQuery) {
-      this.loadResultSelection();
-    } else {
-      this.setDefaultValue();
-    }
+    this.getDefaultValue();
   }
 
   ngOnInit() {
@@ -54,6 +49,13 @@ export class MeasurandsComponent implements OnInit {
     this.loadingState().subscribe(next => {
       this.measurands$.next({...this.measurands$.getValue(), isLoading: next});
     });
+    if (this.resultSelectionStore.validQuery) {
+      this.loadResultSelection();
+    } else {
+      this.defaultValue$
+        .pipe(takeWhile((measurand: Measurand) => measurand === undefined, true))
+        .subscribe((measurand: Measurand) => this.setDefaultValue(measurand));
+    }
   }
 
   selectMeasurand(index: number, measurand: Measurand): void {
@@ -62,7 +64,7 @@ export class MeasurandsComponent implements OnInit {
   }
 
   addMeasurandField(): void {
-    this.selectedMeasurands.push(this.defaultValue);
+    this.selectedMeasurands.push(this.defaultValue$.getValue());
     this.setResultSelection();
     this.addingComparativeTimeFrameDisabled$.next(true);
   }
@@ -79,14 +81,17 @@ export class MeasurandsComponent implements OnInit {
     return index;
   }
 
-  setDefaultValue(): void {
-    this.performanceAspectService.aspectTypes$.subscribe((next: PerformanceAspectType[]) => {
-      this.defaultValue = next[0];
-      this.selectedMeasurands = [this.defaultValue];
-      if (this.defaultValue) {
-        this.setResultSelection();
-      }
+  getDefaultValue(): void {
+    this.aspectTypes$.subscribe((next: PerformanceAspectType[]) => {
+      this.defaultValue$.next(next[0]);
     });
+  }
+
+  setDefaultValue(defaultValue: Measurand): void {
+    if (defaultValue) {
+      this.selectedMeasurands = [defaultValue];
+      this.setResultSelection();
+    }
   }
 
   private loadingState(): Observable<boolean> {
