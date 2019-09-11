@@ -60,6 +60,7 @@ class AggregationUtil {
     }
 
     static def getPercentile(List<Number> data, int percentage) {
+        data = data.findAll {it != null}
         int index = (data.size() * (percentage.toFloat() / 100f)).toInteger()
         index = Math.min(data.size() - 1, Math.max(0, index))
         return getPercentileByIndex(data, index)
