@@ -48,6 +48,7 @@ jobs:
     - name: "gebTests"
       script:
         - whereis google-chrome-stable
+        - google-chrome-stable --version
         - whereis chromedriver
         - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
     - name: "jasmineTests"
