@@ -25,6 +25,7 @@ notifications:
 
 # Install ChromeDriver
 install:
+  - sudo apt install -y dpkg
   - wget -N https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -P ~/
   - sudo dpkg -i ~/google-chrome*.deb
   - rm ~/google-chrome*.deb
