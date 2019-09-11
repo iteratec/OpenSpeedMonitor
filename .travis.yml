@@ -26,7 +26,7 @@ notifications:
 # Install ChromeDriver
 install:
   - wget -N https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -P ~/
-  - sudo dpkg -i google-chrome*.deb
+  - sudo dpkg -i ~/google-chrome*.deb
   - rm ~/google-chrome*.deb
   - curl https://chromedriver.storage.googleapis.com/LATEST_RELEASE | xargs -I % wget -N https://chromedriver.storage.googleapis.com/%/chromedriver_linux64.zip -P ~/
   - unzip ~/chromedriver_linux64.zip -d ~/
