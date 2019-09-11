@@ -50,6 +50,7 @@ jobs:
         - whereis google-chrome-stable
         - google-chrome-stable --version
         - whereis chromedriver
+        - chromedriver --version
         - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
     - name: "jasmineTests"
       script:
