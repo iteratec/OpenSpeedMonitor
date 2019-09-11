@@ -84,11 +84,6 @@ class GetLinechartCommand implements Validateable {
             }
         })
         interval(nullable: true)
-        /*measurands(nullable: false, validator: { List<String> measurands, GetLinechartCommand cmd ->
-            if (!measurands) {
-                return false
-            }
-        })*/
 
         jobGroups(nullable: false, validator: { List<Long> jobGroups, GetLinechartCommand cmd ->
             if (jobGroups.isEmpty()) {

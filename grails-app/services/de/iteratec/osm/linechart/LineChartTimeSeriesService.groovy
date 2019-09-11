@@ -3,7 +3,6 @@ package de.iteratec.osm.linechart
 import de.iteratec.osm.csi.Page
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
-import de.iteratec.osm.result.Measurand
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
@@ -46,11 +45,11 @@ class LineChartTimeSeriesService {
 
         print(performanceAspectTypes)
 
-        List<EventResultProjection> eventResultProjections = getResultProjecions(cmd, from, to, measurands, performanceAspectTypes)
+        List<EventResultProjection> eventResultProjections = getResultProjections(cmd, from, to, measurands, performanceAspectTypes)
         return buildDTO(eventResultProjections, jobGroups, pages, measuredEvents, measurands, performanceAspectTypes)
     }
 
-    private List<EventResultProjection> getResultProjecions(GetLinechartCommand cmd, Date from, Date to, List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
+    private List<EventResultProjection> getResultProjections(GetLinechartCommand cmd, Date from, Date to, List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
         EventResultQueryBuilder queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
             return new EventResultQueryBuilder()
                     .withJobResultDateBetween(from, to)
@@ -67,13 +66,6 @@ class LineChartTimeSeriesService {
                     queryBuilder.withPerformanceAspects(performanceAspectTypes)
                 }
             }
-
-            /*performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - append connectivities', 2) {
-                appendConnectivity(queryBuildera, queryParams)
-            }
-            performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - append trims', 2) {
-                appendTrims(queryBuildera, queryParams)
-            }*/
 
         List<EventResultProjection> eventResultProjections = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
             queryBuilder.getRawData()
