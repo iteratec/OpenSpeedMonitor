@@ -28,7 +28,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   @ViewChild("svg")
   svgElement: ElementRef;
 
-  private _resizeTimeout: NodeJS.Timeout;
+  private _resizeTimeoutId: number;
 
   constructor(
     private lineChartService: LineChartService
@@ -39,8 +39,8 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
     this.lineChartService.startResize(this.svgElement);
 
     // Wati until the resize is done before redrawing the chart
-    clearTimeout(this._resizeTimeout);
-    this._resizeTimeout = setTimeout(() => {
+    clearTimeout(this._resizeTimeoutId);
+    this._resizeTimeoutId = window.setTimeout(() => {
       this.lineChartService.resizeChart(this.svgElement);
       this.redraw();
 
