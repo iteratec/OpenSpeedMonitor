@@ -178,7 +178,7 @@ export class LineChartService {
     return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
              .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
              .domain([0, this.getMaxValue(data)])
-             //.nice();
+             .nice();
   }
 
   private getMaxValue(data: TimeSeries[]): number {
