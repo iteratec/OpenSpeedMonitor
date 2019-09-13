@@ -1,8 +1,7 @@
 import {ElementRef, Injectable} from "@angular/core";
-
 import {TranslateService} from "@ngx-translate/core";
 import {take} from "rxjs/operators";
-
+/*import {select} from 'd3-selection';*/
 import {
   select as d3Select,
   Selection as D3Selection,
@@ -45,6 +44,7 @@ import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-po
 import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 import {stringify} from "querystring";
+import {ChartCommons} from "../../../enums/chart-commons.enum";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -147,9 +147,6 @@ export class LineChartService {
 
     const contentGroup = svg.append('g')
       .attr('class', 'chart-content-group');
-
-    /*const legendGroup = svg.append('g')
-      .attr('class', 'chart-legend-group');*/
 
     return contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
               .attr('id', 'time-series-chart-drawing-area')
@@ -392,9 +389,72 @@ export class LineChartService {
     contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
       .attr('class', 'legend-group');
 
+    const legendGroup = d3Select(".chart-content-group").selectAll('.chart-legend-group').data([1]);
+    legendGroup.join(
+      enter => enter
+        .append('g')
+        .attr('class', 'chart-legend-group')
+        .style('cursor', 'pointer'),
+      update => update,
+      exit => exit.remove()
+    )
+      .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')');
+
+    let keys = [];
+
     data.map(data => {
+      keys.push(data.key);
       console.log("data.key: "+ data.key);
     });
+
+    const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(keys);
+    /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement);*/
+    /*const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
+    legendEntry.join(
+      enter => {
+        const legendElement = enter
+          .append('g')
+          .attr('class', 'legend-entry')
+          .style('opacity', 0.9);
+        legendElement
+          .append('rect')
+          .attr('class', 'legend-rect')
+          .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr("rx", 2)
+          .attr("ry", 2)
+          .attr("ry", 2)
+          .attr('fill', 'blue');
+        legendElement
+          .append('text')
+          .attr('class', 'legend-text')
+          .attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
+          .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+          .text(datum => datum);
+        return legendElement;
+      },
+      update => {
+        update
+          .transition()
+          .duration(ChartCommons.TRANSITION_DURATION)
+          .style('opacity', 0.9);
+        return update;
+        },
+      exit => exit
+        .transition()
+        .duration(ChartCommons.TRANSITION_DURATION)
+        .style('opacity', 0)
+        .remove()
+    )
+      /*.attr('transform', (datum, index) => `translate(${maxEntryGroupSize * (index % maxEntriesInRow)}, 0)`)
+      .on('mouseover', (datum) => this.onMouseOver(datum))
+      .on('mouseout', (datum) => this.onMouseOut(datum))
+      .on('click', (datum) => this.onMouseClick(datum));*/
+
+
+
+
+
 
     /*const legendGroup = select(contentGroupSelector).selectAll('.chart-legend-group').data([1]);*/
     /*legendGroup.join(
