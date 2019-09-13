@@ -32,9 +32,9 @@ class UrlMappings {
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/applicationDashboard/**?"(view: "/angularFrontend")
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
-        "/aggregation/getBarchartData"(controller: "aggregation/getBarchartData")
         "/aggregationDev/**?"(view: "/angularFrontend")
         "/eventResultDashboardDev/**?"(view: "/angularFrontend")
+        "/distributionDev/**?"(view: "/angularFrontend")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
         "/queueDashboard"(view: "/angularFrontend")
         "/metricFinder/**?"(view: "/angularFrontend")
@@ -202,7 +202,21 @@ class UrlMappings {
 
         "/aggregation/getBarchartData" {
             controller = "aggregation"
-            action = "getBarchartData"
+            action = [GET: "getBarchartData"]
+        }
+
+        // EventResultDashboardController //////////////////////////////////////////
+
+        "/eventResultDashboard/getLinechartData" {
+            controller = "eventResultDashboard"
+            action = [GET: "getLinechartData"]
+        }
+
+        // DistributionController //////////////////////////////////////////
+
+        "/distribution/getViolinchartData" {
+            controller = "distribution"
+            action = [GET: "getDistributionChartData"]
         }
     }
 }

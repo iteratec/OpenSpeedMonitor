@@ -2,7 +2,7 @@
   <div class="aggregation-chart">
     <osm-spinner></osm-spinner>
     <div class="filter-dropdown-group">
-      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="stack-bars-switch">
+      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="stack-bars-switch" *ngIf="!isHidden">
         <label class="btn btn-sm btn-default" id="switch-beside-button"
                [class.active]="!aggregationChartDataService.stackBars" (click)="changeStackBars(beside.value); redraw()">
           <input #beside type="radio" name="stackBars" [value]="false">
@@ -32,7 +32,7 @@
       <input class="btn btn-sm btn-default perc-element" id="percentage-field" type="number" placeholder="%"
              [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="1" max="100" style="max-width: 5em;" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
       <input class="form-control perc-element perc-slider" id="percentage-slider" type="range"
-             [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="5" max="100" step="5" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
+             [(ngModel)]="percentileValue" (mouseup)="reloadPercentile()" min="5" max="100" step="5" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
 
       <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle perc-element"
               data-toggle="dropdown"
