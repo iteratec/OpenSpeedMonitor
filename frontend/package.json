@@ -26,7 +26,7 @@
     "@ngx-translate/core": "^11.0.1",
     "@ngx-translate/http-loader": "^4.0.0",
     "core-js": "^3.0.1",
-    "d3": "^5.9.2",
+    "d3": "^5.11.0",
     "ng-pick-datetime": "^7.0.0",
     "ngx-smart-modal": "^7.1.1",
     "rxjs": "^6.4.0",

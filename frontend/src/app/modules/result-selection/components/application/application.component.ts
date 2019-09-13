@@ -3,6 +3,7 @@ import {SelectableApplication} from 'src/app/models/application.model';
 import {ResultSelectionStore} from "../../services/result-selection.store";
 import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
 import {UiComponent} from "../../../../enums/ui-component.enum";
+import {ActivatedRoute, Params} from "@angular/router";
 
 @Component({
     selector: 'osm-result-selection-application',
@@ -19,7 +20,7 @@ export class ApplicationComponent {
   selectedTag: string = '';
   unfilteredSelectedApplications: number[] = [];
 
-  constructor(private resultSelectionStore: ResultSelectionStore) {
+  constructor(private resultSelectionStore: ResultSelectionStore, private route: ActivatedRoute) {
     this.resultSelectionStore.applications$.subscribe(applications => {
       this.updateApplicationsAndTags(applications.data);
     });
@@ -27,7 +28,10 @@ export class ApplicationComponent {
 
   ngOnInit() {
     this.resultSelectionStore.registerComponent(UiComponent.APPLICATION);
-    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection())
+    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection());
+    if (this.resultSelectionStore.resultSelectionCommand.jobGroupIds) {
+      this.selectedApplications = this.resultSelectionStore.resultSelectionCommand.jobGroupIds;
+    }
   }
 
   onSelectionChange() {
@@ -67,7 +71,7 @@ export class ApplicationComponent {
   private updateTags(applications: SelectableApplication[]) {
     if (applications) {
       this.selectableTags = applications.map(value => value.tags).reduce((a, b) =>
-         a.concat(b), []).filter((v, i, a) => 
+         a.concat(b), []).filter((v, i, a) =>
          a.indexOf(v) === i);
     } else {
       this.selectableTags = [];

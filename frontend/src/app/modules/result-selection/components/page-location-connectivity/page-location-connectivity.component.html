@@ -28,7 +28,8 @@
     <div class="tab-pane active">
       <osm-selection-data *ngIf="showPageSelection" [hidden]="activeTab !== ActiveTab.PageAndEvent" [parentChildData$]="eventsAndPages$" [showChildSelection]="showMeasuredStepSelection"
                           [childType]="ResultSelectionCommandParameter.MEASURED_EVENTS"
-                          [parentType]="ResultSelectionCommandParameter.PAGES">
+                          [parentType]="ResultSelectionCommandParameter.PAGES"
+                          [parentRequired]="pageRequired">
       </osm-selection-data>
       <osm-selection-data *ngIf="showBrowserSelection" [hidden]="activeTab !== ActiveTab.BrowserAndLocation" [parentChildData$]="locationsAndBrowsers$" [showChildSelection]="showLocationSelection"
                           [childType]="ResultSelectionCommandParameter.LOCATIONS"

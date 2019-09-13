@@ -1,6 +1,6 @@
 <div class="form-group">
   <select id="result-selection-parent-selection" class="form-control" multiple="multiple" [(ngModel)]="parentSelection"
-          (ngModelChange)="filterSelectableItems(parentSelection)" [style.opacity]="determineOpacity(parentSelection.length, parentSelectionOptional)">
+          (ngModelChange)="filterSelectableItems(parentSelection)" [style.opacity]="determineOpacity(parentSelection.length)">
     <ng-container *ngIf="(uniqueParents$ | async)?.length > 0; else noResults">
       <option *ngFor="let parent of uniqueParents$ | async" [value]="parent.id">{{parent.name}}</option>
     </ng-container>
@@ -10,7 +10,7 @@
       </option>
     </ng-template>
   </select>
-  <div *ngIf="parentSelectionOptional" class="checkbox-inline" (click)="selectAllParentsCheckbox.checked = true; parentSelection = []; filterSelectableItems(parentSelection)">
+  <div *ngIf="!parentRequired" class="checkbox-inline" (click)="selectAllParentsCheckbox.checked = true; parentSelection = []; filterSelectableItems(parentSelection)">
     <input id="selectAllParentsCheckbox" #selectAllParentsCheckbox type="checkbox"
            [checked]="parentSelection.length < 1">
     {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.parentSelection.selectAll.' + parentType | translate }}

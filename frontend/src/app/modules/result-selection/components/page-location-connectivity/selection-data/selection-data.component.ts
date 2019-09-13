@@ -23,7 +23,7 @@ export class SelectionDataComponent implements OnInit {
   @Input() childType: ResultSelectionCommandParameter;
   @Input() parentType: ResultSelectionCommandParameter;
   @Input() showChildSelection: boolean = true;
-  @Input() parentSelectionOptional: boolean = true;
+  @Input() parentRequired: boolean = false;
 
   parentSelection$ = new BehaviorSubject<number[]>([]);
   parentSelection: number[] = [];
@@ -56,7 +56,8 @@ export class SelectionDataComponent implements OnInit {
       })
     );
 
-    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection())
+    this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection());
+    this.handleQueryParams();
   }
 
   filterSelectableItems(selectedParents: number[]): void {
@@ -68,8 +69,8 @@ export class SelectionDataComponent implements OnInit {
     this.resultSelectionStore.setResultSelectionCommandIds(this.childSelection, this.childType);
   }
 
-  determineOpacity(selectionLength: number, parentSelectionOptional: boolean): number {
-    if (!parentSelectionOptional || selectionLength > 0) {
+  determineOpacity(selectionLength: number): number {
+    if (this.parentRequired || selectionLength > 0) {
       return 1;
     } else {
       return 0.5;
@@ -104,5 +105,14 @@ export class SelectionDataComponent implements OnInit {
     return items.sort((a, b) => {
       return a.name.localeCompare(b.name);
     })
+  }
+
+  private handleQueryParams(): void {
+    if (this.resultSelectionStore.resultSelectionCommand[this.parentType]) {
+      this.parentSelection = this.resultSelectionStore.resultSelectionCommand[this.parentType];
+      if (this.showChildSelection && this.resultSelectionStore.resultSelectionCommand[this.childType]) {
+        this.childSelection = this.resultSelectionStore.resultSelectionCommand[this.childType];
+      }
+    }
   }
 }

@@ -39,4 +39,7 @@ export class AspectConfigurationComponent implements OnInit {
     });
   }
 
+  deselectPage() {
+    this.aspectConfService.selectedPage$.next({id: -1, name: ""});
+  }
 }

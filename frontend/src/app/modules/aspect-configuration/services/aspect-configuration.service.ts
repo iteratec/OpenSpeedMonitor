@@ -1,6 +1,13 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {catchError, map, mergeMap, switchMap, withLatestFrom} from "rxjs/operators";
+import {
+  catchError,
+  filter,
+  map,
+  mergeMap,
+  switchMap,
+  withLatestFrom
+} from "rxjs/operators";
 import {BehaviorSubject, combineLatest, EMPTY, Observable, ReplaySubject} from "rxjs";
 import {Page} from "../../../models/page.model";
 import {BrowserInfoDto} from "../../../models/browser.model";
@@ -109,6 +116,7 @@ export class AspectConfigurationService {
   private getPerfAspectParams(): Observable<any> {
     return combineLatest(this.applicationService.selectedApplication$, this.selectedPage$)
       .pipe(
+        filter(([application, page]: [Application, Page]) => page.id !== -1 && page.name !== ""),
         mergeMap(([application, page]: [Application, Page]) => {
           const params = this.createLocationParams(application, page);
           return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(
