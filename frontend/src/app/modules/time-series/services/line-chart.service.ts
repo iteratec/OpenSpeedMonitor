@@ -44,6 +44,7 @@ import {TimeSeries} from 'src/app/modules/time-series/models/time-series.model';
 import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-point.model';
 import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
+import {stringify} from "querystring";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -90,7 +91,7 @@ export class LineChartService {
 
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
-    d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._margin.top  + this._margin.bottom);
+    d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._height + this._margin.top  + this._margin.bottom);
 
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
@@ -99,6 +100,7 @@ export class LineChartService {
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
 
     this.addDataLinesToChart(chart, xScale, yScale, data);
+    this.addIdentifierLegendsToChart(data)
 
   }
 
@@ -136,12 +138,20 @@ export class LineChartService {
 
     this._width = svgElement.nativeElement.parentElement.offsetWidth - this._margin.left - this._margin.right;
     //this._height = svgElement.nativeElement.parentElement.offsetHeight - this._margin.top - this._margin.bottom;
-    const svg = d3Select(svgElement.nativeElement)
-                  .attr('id', 'time-series-chart')
+   const svg = d3Select(svgElement.nativeElement)
+                  .attr('id', 'time-series-svg')
                   .attr('width',  this._width  + this._margin.left + this._margin.right)
                   .attr('height', 0);
 
-    return svg.append('g') // g =  grouping element; group all other stuff into the chart
+    /*const contentGroupSelector: string = '.chart-content-group';*/
+
+    const contentGroup = svg.append('g')
+      .attr('class', 'chart-content-group');
+
+    /*const legendGroup = svg.append('g')
+      .attr('class', 'chart-legend-group');*/
+
+    return contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
               .attr('id', 'time-series-chart-drawing-area')
               .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
   }
@@ -372,6 +382,31 @@ export class LineChartService {
                  .on('mouseout', () => {
                    //normalizeColors();
                  });
+  }
+
+  private  addIdentifierLegendsToChart(data: TimeSeries[]) {
+    /*console.log("data.keys(): " + JSON.stringify(data.keys()));*/
+
+    const contentGroup = d3Select(".chart-content-group");
+
+    contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
+      .attr('class', 'legend-group');
+
+    data.map(data => {
+      console.log("data.key: "+ data.key);
+    });
+
+    /*const legendGroup = select(contentGroupSelector).selectAll('.chart-legend-group').data([1]);*/
+    /*legendGroup.join(
+      enter => enter
+        .append('g')
+        .attr('class', 'chart-legend-group')
+        .style('cursor', 'pointer'),
+      update => update,
+      exit => exit.remove()
+    )
+      .attr('transform', `translate(0, ${this.legendPosY})`);*/
+
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
