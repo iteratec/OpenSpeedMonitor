@@ -387,7 +387,7 @@ export class LineChartService {
     const contentGroup = d3Select(".chart-content-group");
 
     contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
-      .attr('class', 'legend-group');
+      .attr('class', 'chart-legend-group');
 
     const legendGroup = d3Select(".chart-content-group").selectAll('.chart-legend-group').data([1]);
     legendGroup.join(
