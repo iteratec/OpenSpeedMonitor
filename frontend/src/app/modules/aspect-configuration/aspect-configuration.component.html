@@ -7,7 +7,7 @@
   {{ 'frontend.de.iteratec.osm.dashboard' | translate }}
 </a>
 <div class="grid-container">
-  <div *ngFor="let aspectType of (aspectTypes$ | async)" class="card">
+  <div *ngFor="let aspectType of (aspectTypes$ | async)?.data" class="card">
     <osm-aspect-metrics [application]="application$ | async" [page]="page$ | async"
                         [actualType]="aspectType" class="aspect-inspect"></osm-aspect-metrics>
   </div>
