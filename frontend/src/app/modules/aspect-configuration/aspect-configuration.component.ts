@@ -7,6 +7,7 @@ import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../models/per
 import {Application} from "../../models/application.model";
 import {AspectConfigurationService} from "./services/aspect-configuration.service";
 import {PerformanceAspectService} from "../../services/performance-aspect.service";
+import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-aspect-configuration',
@@ -19,7 +20,7 @@ export class AspectConfigurationComponent implements OnInit {
   page$: Observable<Page>;
 
   performanceAspects$: Observable<ExtendedPerformanceAspect[]>;
-  aspectTypes$: Observable<PerformanceAspectType[]>;
+  aspectTypes$: Observable<ResponseWithLoadingState<PerformanceAspectType[]>>;
 
   constructor(
     private route: ActivatedRoute,

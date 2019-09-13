@@ -20,6 +20,7 @@ import {
 import {Application} from "../../../models/application.model";
 import {LocationDto} from "../../application-dashboard/models/location.model";
 import {PerformanceAspectService} from "../../../services/performance-aspect.service";
+import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
 
 @Injectable({
   providedIn: 'root'
@@ -107,8 +108,8 @@ export class AspectConfigurationService {
 
   public initSelectedAspectType(typeName: string) {
     this.perfAspectService.aspectTypes$.pipe(
-      map((types: PerformanceAspectType[]) => {
-        return types.find((type: PerformanceAspectType) => type.name == typeName)
+      map((types: ResponseWithLoadingState<PerformanceAspectType[]>) => {
+        return types.data.find((type: PerformanceAspectType) => type.name == typeName)
       })
     ).subscribe((type: PerformanceAspectType) => this.selectedAspectType$.next(type));
   }
