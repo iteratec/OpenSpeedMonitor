@@ -391,6 +391,7 @@ export class AggregationChartComponent implements OnChanges {
           .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
           .attr("rx", 2)
           .attr("ry", 2)
+          .attr("ry", 2)
           .attr('fill', datum => this.measurandDataMap[datum].color);
         legendElement
           .append('text')
