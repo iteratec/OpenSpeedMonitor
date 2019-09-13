@@ -10,6 +10,7 @@ import {Csi} from "../../models/csi.model";
 import {FailingJobStatistic} from "./models/failing-job-statistic.model";
 import {PerformanceAspectService} from "../../services/performance-aspect.service";
 import {PerformanceAspectType} from "../../models/perfomance-aspect.model";
+import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -26,7 +27,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
   isLoading$: Observable<boolean>;
   failingJobStatistic$: Observable<FailingJobStatistic>;
   selectedApplication$: Observable<Application>;
-  aspectTypes$: Observable<PerformanceAspectType[]>;
+  aspectTypes$: Observable<ResponseWithLoadingState<PerformanceAspectType[]>>;
 
   constructor(
     private route: ActivatedRoute,

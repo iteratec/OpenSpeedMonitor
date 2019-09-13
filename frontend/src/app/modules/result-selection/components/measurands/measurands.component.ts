@@ -15,11 +15,21 @@ import {RemainingResultSelectionParameter} from "../../models/remaing-result-sel
   styleUrls: ['./measurands.component.scss']
 })
 export class MeasurandsComponent implements OnInit {
-  aspectTypes$:BehaviorSubject<PerformanceAspectType[]> = new BehaviorSubject<PerformanceAspectType[]>([]);
+  aspectTypes$:BehaviorSubject<ResponseWithLoadingState<PerformanceAspectType[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
   measurands$: BehaviorSubject<ResponseWithLoadingState<BehaviorSubject<MeasurandGroup>[]>> = new BehaviorSubject({
     isLoading: false,
     data: []
   });
+
+  loadTimes$: BehaviorSubject<MeasurandGroup>;
+  userTimings$: BehaviorSubject<MeasurandGroup>;
+  heroTimings$: BehaviorSubject<MeasurandGroup>;
+  requestCounts$: BehaviorSubject<MeasurandGroup>;
+  requestSizes$: BehaviorSubject<MeasurandGroup>;
+  percentages$: BehaviorSubject<MeasurandGroup>;
 
   selectedMeasurands: (Measurand)[] = [];
   defaultValue$: BehaviorSubject<Measurand> = new BehaviorSubject(null);
@@ -30,15 +40,22 @@ export class MeasurandsComponent implements OnInit {
 
   constructor(private resultSelectionStore: ResultSelectionStore, private performanceAspectService: PerformanceAspectService) {
     this.aspectTypes$ = this.performanceAspectService.aspectTypes$;
+    this.loadTimes$ = this.resultSelectionStore.loadTimes$;
+    this.userTimings$ = this.resultSelectionStore.userTimings$;
+    this.heroTimings$ = this.resultSelectionStore.heroTimings$;
+    this.requestCounts$ = this.resultSelectionStore.requestCounts$;
+    this.requestSizes$ = this.resultSelectionStore.requestSizes$;
+    this.percentages$ = this.resultSelectionStore.percentages$;
+
     this.measurands$.next({
       ...this.measurands$.getValue(),
       data: [
-        this.resultSelectionStore.loadTimes$,
-        this.resultSelectionStore.userTimings$,
-        this.resultSelectionStore.heroTimings$,
-        this.resultSelectionStore.requestCounts$,
-        this.resultSelectionStore.requestSizes$,
-        this.resultSelectionStore.percentages$
+        this.loadTimes$,
+        this.userTimings$,
+        this.heroTimings$,
+        this.requestCounts$,
+        this.requestSizes$,
+        this.percentages$
       ]
     });
     this.getDefaultValue();
@@ -82,8 +99,8 @@ export class MeasurandsComponent implements OnInit {
   }
 
   getDefaultValue(): void {
-    this.aspectTypes$.subscribe((next: PerformanceAspectType[]) => {
-      this.defaultValue$.next(next[0]);
+    this.aspectTypes$.subscribe((next: ResponseWithLoadingState<PerformanceAspectType[]>) => {
+      this.defaultValue$.next(next.data[0]);
     });
   }
 
@@ -96,14 +113,15 @@ export class MeasurandsComponent implements OnInit {
 
   private loadingState(): Observable<boolean> {
     return combineLatest(
-      this.resultSelectionStore.loadTimes$,
-      this.resultSelectionStore.userTimings$,
-      this.resultSelectionStore.heroTimings$,
-      this.resultSelectionStore.requestCounts$,
-      this.resultSelectionStore.requestSizes$,
-      this.resultSelectionStore.percentages$
+      this.aspectTypes$,
+      this.loadTimes$,
+      this.userTimings$,
+      this.heroTimings$,
+      this.requestCounts$,
+      this.requestSizes$,
+      this.percentages$
     ).pipe(
-        map(next => next.map(item => item.isLoading).some(value => value))
+      map((next: [ResponseWithLoadingState<PerformanceAspectType[]> | MeasurandGroup]) => next.map(item  => item.isLoading).some(value => value))
     )
   }
 
@@ -114,14 +132,14 @@ export class MeasurandsComponent implements OnInit {
 
     this.loadingState().pipe(takeUntil(finishedLoading$)).subscribe(loading => {
       if (!loading) {
-        performanceAspects = [...this.aspectTypes$.getValue()];
+        performanceAspects = [...this.aspectTypes$.getValue().data];
         allMeasurands = [
-          ...this.resultSelectionStore.loadTimes$.getValue().values,
-          ...this.resultSelectionStore.userTimings$.getValue().values,
-          ...this.resultSelectionStore.heroTimings$.getValue().values,
-          ...this.resultSelectionStore.requestCounts$.getValue().values,
-          ...this.resultSelectionStore.requestSizes$.getValue().values,
-          ...this.resultSelectionStore.percentages$.getValue().values
+          ...this.loadTimes$.getValue().values,
+          ...this.userTimings$.getValue().values,
+          ...this.heroTimings$.getValue().values,
+          ...this.requestCounts$.getValue().values,
+          ...this.requestSizes$.getValue().values,
+          ...this.percentages$.getValue().values
         ];
 
         const selectedPerformanceAspectTypes = (performanceAspects && this.resultSelectionStore.remainingResultSelection.performanceAspectTypes) ?
