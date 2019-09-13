@@ -4,6 +4,16 @@ osm-time-series-line-chart {
   visibility: hidden;
 }
 
+/*.aggregation-chart {
+  position: relative;
+  width: 100%;
+}*/
+
+svg.time-series-svg {
+  width: 100%;
+  height: 100%;
+}
+
 #time-series-chart-drawing-area {
   .axis {
     .domain {
