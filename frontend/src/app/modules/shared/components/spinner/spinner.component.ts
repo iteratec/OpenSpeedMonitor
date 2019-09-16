@@ -11,7 +11,7 @@ import {SpinnerService} from "../../services/spinner.service";
 export class SpinnerComponent implements OnInit, OnDestroy {
 
   private spinner: any;
-  private show: boolean = false;
+  public show: boolean = false;
   private element: any = null;
   private subscription: Subscription = null;
 
