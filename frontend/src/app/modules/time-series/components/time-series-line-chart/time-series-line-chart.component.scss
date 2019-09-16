@@ -22,4 +22,9 @@ osm-time-series-line-chart {
       fill: $color-text-light;
     }
   }
+
+  .marker-line {
+    stroke: $color-contour-medium;
+    stroke-width: 1px;
+  }
 }

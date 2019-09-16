@@ -4,6 +4,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {take} from "rxjs/operators";
 
 import {
+  mouse as d3Mouse,
   select as d3Select,
   Selection as D3Selection,
   BaseType as D3BaseType,
@@ -345,11 +346,9 @@ export class LineChartService {
          .join(
            enter => this.drawLine(enter, xScale, yScale)
          )
-         .attr('class', (dataItem: TimeSeries) => {
-           return 'line line-' + dataItem.key;
-         })
+         .attr('class', 'line')
 
-     //this.addDataPointsToChart(chartLineGroups, xScale, yScale, data);
+     this.addMouseMarkerLineToChart(chart, data);
   }
   
   private drawLine(selection: any,
@@ -374,44 +373,46 @@ export class LineChartService {
                  });
   }
 
-  //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
-  //                             xScale: D3ScaleTime<number, number>,
-  //                             yScale: D3ScaleLinear<number, number>,
-  //                             data: LineChartDataDTO[]): void {
+  private addMouseMarkerLineToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, data: TimeSeries[]) : void {
+    let markerGroup = chart.append('g')
+                           .attr('class', 'marker-line-group');
 
-  //  let chartLineDotGroups = chartLineGroups.selectAll('.dots')
-  //                 .data((data: LineChartDataDTO) => { return data.values; })  // Reduce the data to the data points per line
-  //                 .join('g')
-  //                   .attr('class', 'dot');
+    // Append the marker line, initialy hidden
+    markerGroup.append('path')
+               .attr('class', 'marker-line')
+               .style('opacity', '1');
 
-  //  chartLineDotGroups.append('circle')
-  //                     .attr('fill', '#2E3440') // TODO Colors
-  //                     .attr('stroke', '#5E81AC') // TODO Colors
-  //                     .attr('stroke-width', 1.5)
-  //                     .attr('cx', (point: LineChartDataPointDTO) => { return xScale(point.date); })
-  //                     .attr('cy', (point: LineChartDataPointDTO) => { return yScale(point.value); })
-  //                     .attr('r', 4)
-  //                     .on('mouseover', (data, index) => {
-  //                       // TODO: Add the class identifier to the element 'entry.id-index'
-  //                       // console.log(d3.select(this))
-  //                       //highlightLine(this)
-  //                       // let element = d3.select(this.parentNode).select('.dot-desc');
-  //                       // element.style('visibility', 'visible');
-  //                     })
-  //                     .on('mouseout', (data, index) => {
-  //                       // let element = d3.select(this.parentNode).select('.dot-desc');
-  //                       // element.style('visibility', 'hidden');
-  //                     });
-  //}
+    let lines = document.getElementsByClassName('line');
 
+    let markerPerLine = markerGroup.selectAll('.marker-per-line')
+                                   .data(data)
+                                   .enter()
+                                     .append('g')
+                                     .attr('class', 'marker-per-line');
 
-  //private highlightLine (element: TimeSeriesResults) {
-  //    d3SelectAll('.line > path').attr('stroke', '#D8DEE9');
-  //    d3Select(element).attr('stroke', (item) => { return colors(item.key); });
+    markerPerLine.append('circle')
+                 .attr('class', 'marker-circle')
+                 .attr('r', 7)
+                 .style('stroke', (d, index: number) => { return getColorScheme()[index]; })
+                 .style('opacity', '1');
 
-  //    // Dots
-  //    d3SelectAll('.dots > circle').attr('stroke', '#D8DEE9');
-  //    d3Select(element.parentNode).selectAll('circle').attr('stroke', (item) => { return colors(item.id); });
-  //  };
-  //
+    markerPerLine.append('svg:rect')
+                 .attr('class', 'marker-tooltip');
+
+    let markerEventCatcher = markerGroup.append('svg:rect')
+                                        .attr('width', this._width)
+                                        .attr('height', this._height)
+                                        .attr('pointer-events', 'all');
+
+    let svgHeight = this._height;
+    markerEventCatcher.on('mousemove', function(datum, index, nodes: D3ContainerElement[]) {
+      let mouseCoordinates = d3Mouse(nodes[index]);
+      d3Select('.marker-line')
+        .attr('d', function() {
+          let d = "M" + mouseCoordinates[0] + "," + svgHeight;
+          d += " " + mouseCoordinates[0] + "," + 0;
+          return d;
+        });
+    });
+  }
 }
