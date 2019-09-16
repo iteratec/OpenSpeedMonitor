@@ -7,20 +7,23 @@ import {CsiValueMediumComponent} from "./components/csi-value/csi-value-medium/c
 import {CsiValueSmallComponent} from "./components/csi-value/csi-value-small/csi-value-small.component";
 import {EmptyStateComponent} from './components/empty-state/empty-state.component';
 import {NgxSmartModalModule} from "ngx-smart-modal";
-
+import { SpinnerComponent } from './components/spinner/spinner.component';
+import { SpinnerService } from './services/spinner.service';
 
 @NgModule({
   imports: [
     CommonModule,
     TranslateModule.forChild(),
-    NgxSmartModalModule.forChild()
+    NgxSmartModalModule.forChild(),
   ],
+  providers: [SpinnerService],
   declarations: [
     CsiValueBaseComponent,
     CsiValueBigComponent,
     CsiValueMediumComponent,
     CsiValueSmallComponent,
     EmptyStateComponent,
+    SpinnerComponent
   ],
   exports: [
     CommonModule,
@@ -30,6 +33,7 @@ import {NgxSmartModalModule} from "ngx-smart-modal";
     CsiValueSmallComponent,
     EmptyStateComponent,
     NgxSmartModalModule,
+    SpinnerComponent
   ]
 })
 export class SharedModule {
