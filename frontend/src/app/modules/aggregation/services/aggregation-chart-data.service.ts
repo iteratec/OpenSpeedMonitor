@@ -7,6 +7,7 @@ import {ResultSelectionCommand} from "../../result-selection/models/result-selec
 import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
 import {AggregationChartDataByMeasurand} from "../models/aggregation-chart-data.model";
 import {AggregationChartSeries} from "../models/aggregation-chart-series.model";
+import {SpinnerService} from "../../shared/services/spinner.service";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
 
@@ -100,7 +101,7 @@ export class AggregationChartDataService {
   ascSelected:boolean = true;
   descSelected:boolean = false;
 
-  constructor(private barchartDataService: BarchartDataService, private route: ActivatedRoute, private router: Router, private resultSelectionStore: ResultSelectionStore) {
+  constructor(private barchartDataService: BarchartDataService, private route: ActivatedRoute, private router: Router, private resultSelectionStore: ResultSelectionStore, private spinnerService: SpinnerService) {
     route.queryParams.subscribe((params: Params) => {
       this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
       this.aggregationType = params.selectedAggregationValue ? params.selectedAggregationValue : this.aggregationType;
@@ -110,6 +111,8 @@ export class AggregationChartDataService {
   }
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
+    this.spinnerService.show();
+
     const additionalParams: Params = {
       selectedFilter: this.selectedFilter,
       selectedAggregationValue: this.aggregationType,
@@ -126,6 +129,7 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartAverageData$.next(this.sortDataByMeasurandOrder(result));
+      this.spinnerService.hide();
     });
 
     this.barchartDataService.fetchBarchartData<any>(

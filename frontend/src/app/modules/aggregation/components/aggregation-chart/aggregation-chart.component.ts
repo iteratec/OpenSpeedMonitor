@@ -539,7 +539,6 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.redraw();
+      this.redraw();
   }
-
 }
