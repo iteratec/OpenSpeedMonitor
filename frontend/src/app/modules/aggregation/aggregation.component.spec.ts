@@ -7,6 +7,7 @@ import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
 import {AggregationChartComponent} from "./components/aggregation-chart/aggregation-chart.component";
+import {SharedModule} from '../shared/shared.module';
 
 describe('AggregationComponent', () => {
   let component: AggregationComponent;
@@ -16,8 +17,9 @@ describe('AggregationComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ AggregationComponent, AggregationChartComponent ],
       imports: [
+        SharedModule,
         SharedMocksModule,
-        ResultSelectionModule
+        ResultSelectionModule,
       ],
       providers: [
         BarchartDataService,

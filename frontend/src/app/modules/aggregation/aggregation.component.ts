@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output} from '@angular/core';
 import {BarchartDataService} from "./services/barchart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
 import {BehaviorSubject} from "rxjs";

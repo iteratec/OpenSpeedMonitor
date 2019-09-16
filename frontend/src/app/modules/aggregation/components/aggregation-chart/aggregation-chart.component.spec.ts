@@ -6,6 +6,7 @@ import {AggregationChartDataService} from "../../services/aggregation-chart-data
 import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
 import {ResultSelectionStore} from "../../../result-selection/services/result-selection.store";
 import {ResultSelectionService} from "../../../result-selection/services/result-selection.service";
+import {SharedModule} from "../../../shared/shared.module";
 
 describe('AggregationChartComponent', () => {
   let component: AggregationChartComponent;
@@ -20,7 +21,7 @@ describe('AggregationChartComponent', () => {
         ResultSelectionStore,
         ResultSelectionService
       ],
-      imports: [SharedMocksModule]
+      imports: [SharedMocksModule, SharedModule]
     })
     .compileComponents();
   }));
