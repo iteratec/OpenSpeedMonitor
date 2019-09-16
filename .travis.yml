@@ -38,38 +38,40 @@ install:
 
 jobs:
   include:
-    - stage: Tests
-      name: "unitTests"
-      script:
-        - ./gradlew -x jasmineRun -x angularTests test
-    - name: "integrationTests"
-      script:
-        - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
-    - name: "gebTests"
-      script:
-        - whereis google-chrome-stable
-        - google-chrome-stable --version
-        - whereis chromedriver
-        - chromedriver --version
-        - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
-    - name: "jasmineTests"
-      script:
-        - ./gradlew jasmineRun
-    - name: "angularTests"
-      script:
-        - ./gradlew angularTests
+#    - stage: Tests
+#      name: "unitTests"
+#      script:
+#        - ./gradlew -x jasmineRun -x angularTests test
+#    - name: "integrationTests"
+#      script:
+#        - ./gradlew integrationTest --tests "de.iteratec.osm.**"  --stacktrace
+#    - name: "gebTests"
+#      script:
+#        - whereis google-chrome-stable
+#        - google-chrome-stable --version
+#        - whereis chromedriver
+#        - chromedriver --version
+#        - ./gradlew integrationTest --tests "geb.**.*"  --stacktrace
+#    - name: "jasmineTests"
+#      script:
+#        - ./gradlew jasmineRun
+#    - name: "angularTests"
+#      script:
+#        - ./gradlew angularTests
     - stage: Build and Push Docker Image for Develop
-      if: branch = develop
+      if: branch = fix/travis_deloyment_issues
       script: skip # You do not want to run the tests again
       deploy:
+        skip_cleanup: true
         provider: script
         script:
+          echo "START BUILDING APPLICATION" &&
           groovy scripts/ci/building/set_new_versionnumber_travis_dev &&
           ./gradlew assemble &&
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
-          docker build -t iteratec/openspeedmonitor:develop . &&
-          docker push iteratec/openspeedmonitor:develop &&
-          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS &&
+#          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin &&
+#          docker build -t iteratec/openspeedmonitor:develop . &&
+#          docker push iteratec/openspeedmonitor:develop &&
+#          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS &&
           git stash -u  # in order to prevent double checking of cached resources
         on:
           branch: develop
@@ -90,7 +92,7 @@ jobs:
           branch: release
 after_deploy: # set deployment key
   - >-
-    openssl aes-256-cbc 
+    openssl aes-256-cbc
     -K $encrypted_0e6b9eee7eaa_key
     -iv $encrypted_0e6b9eee7eaa_iv
     -in scripts/ci/github_deploy_key.enc
