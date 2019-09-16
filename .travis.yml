@@ -74,7 +74,7 @@ jobs:
 #          curl --user $BAMBOO_TU_USERNAME:$BAMBOO_TU_PASSWORD -X POST -d "$STAGE_NAME&ExecuteAllStages" $BAMBOO_BUILD_ADDRESS &&
           git stash -u  # in order to prevent double checking of cached resources
         on:
-          branch: develop
+          branch: fix/travis_deloyment_issues
     - stage: Build and Push Docker Image for Release
       if: branch = release
       script: skip
