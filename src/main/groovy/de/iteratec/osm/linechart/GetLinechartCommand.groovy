@@ -25,6 +25,11 @@ class GetLinechartCommand implements Validateable {
     List<String> measurands = []
 
     @BindUsing({ obj, source ->
+        return new JsonSlurper().parseText(source['performanceAspectTypes'])
+    })
+    List<String> performanceAspectTypes = []
+
+    @BindUsing({ obj, source ->
         return new JsonSlurper().parseText(source['jobGroups'])
     })
     List<Long> jobGroups = []
@@ -79,11 +84,7 @@ class GetLinechartCommand implements Validateable {
             }
         })
         interval(nullable: true)
-        measurands(nullable: false, validator: { List<String> measurands, GetLinechartCommand cmd ->
-            if (measurands.isEmpty()) {
-                return false
-            }
-        })
+
         jobGroups(nullable: false, validator: { List<Long> jobGroups, GetLinechartCommand cmd ->
             if (jobGroups.isEmpty()) {
                 return false
@@ -100,5 +101,7 @@ class GetLinechartCommand implements Validateable {
         connectivities(nullable: true)
         deviceTypes(nullable: true)
         operatingSystems(nullable: true)
+        measurands(nullable: true)
+        performanceAspectTypes(nullable: true)
     }
 }
