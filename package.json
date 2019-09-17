@@ -52,8 +52,8 @@
     "prettycron": "0.10.0",
     "reductio": "0.6.3",
     "save-svg-as-png": "1.1.0",
-    "spin.js": "^2.0.1",
     "sticky-table-headers": "0.1.24",
-    "tag-it": "HirokiDaido/tag-it"
+    "tag-it": "HirokiDaido/tag-it",
+    "spin.js": "^2.0.1"
   }
 }

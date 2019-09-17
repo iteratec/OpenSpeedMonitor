@@ -9,6 +9,7 @@ import {By} from "@angular/platform-browser";
 import {MeasurandGroup} from "../../../../models/measurand.model";
 import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
 import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
+import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
 
 describe('MeasurandsComponent', () => {
   let component: MeasurandsComponent;
@@ -35,26 +36,29 @@ describe('MeasurandsComponent', () => {
     component = fixture.componentInstance;
     component.multipleMeasurands = true;
 
-    const performanceAspectTypes: PerformanceAspectType[] = [
-      {
-        icon: "fas fa-hourglass-start",
-        name: "PAGE_CONSTRUCTION_STARTED",
-        unit: "ms",
-        kind: "performance-aspect-type"
-      },
-      {
-        icon: "fas fa-eye",
-        name: "PAGE_SHOWS_USEFUL_CONTENT",
-        unit: "ms",
-        kind: "performance-aspect-type"
-      },
-      {
-        icon: "fas fa-hand-pointer",
-        name: "PAGE_IS_USABLE",
-        unit: "ms",
-        kind: "performance-aspect-type"
-      }
-    ];
+    const performanceAspectTypes: ResponseWithLoadingState<PerformanceAspectType[]> = {
+      isLoading: false,
+      data: [
+        {
+          icon: "fas fa-hourglass-start",
+          name: "PAGE_CONSTRUCTION_STARTED",
+          unit: "ms",
+          kind: "performance-aspect-type"
+        },
+        {
+          icon: "fas fa-eye",
+          name: "PAGE_SHOWS_USEFUL_CONTENT",
+          unit: "ms",
+          kind: "performance-aspect-type"
+        },
+        {
+          icon: "fas fa-hand-pointer",
+          name: "PAGE_IS_USABLE",
+          unit: "ms",
+          kind: "performance-aspect-type"
+        }
+      ]
+    };
 
     const loadTimes: MeasurandGroup = {
       isLoading: false,
