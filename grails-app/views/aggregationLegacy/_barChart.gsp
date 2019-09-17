@@ -65,4 +65,4 @@
         <svg id="aggregation-svg" class="d3chart" width="100%"></svg>
     </div>
 </div>
-<g:render template="/aggregation/adjustBarchartModal"/>
+<g:render template="/aggregationLegacy/adjustBarchartModal"/>
