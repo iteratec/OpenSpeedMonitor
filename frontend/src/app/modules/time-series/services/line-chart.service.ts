@@ -6,12 +6,13 @@ import {take} from "rxjs/operators";
 import {
   mouse as d3Mouse,
   select as d3Select,
+  selectAll as d3SelectAll,
   Selection as D3Selection,
   BaseType as D3BaseType,
   ContainerElement as D3ContainerElement
 } from 'd3-selection';
 
-import {max as d3Max, min as d3Min} from 'd3-array';
+import {bisector as d3Bisector, max as d3Max, min as d3Min} from 'd3-array';
 
 import {
   timeFormat as d3TimeFormat
@@ -345,74 +346,159 @@ export class LineChartService {
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
          .join(
            enter => this.drawLine(enter, xScale, yScale)
-         )
-         .attr('class', 'line')
+         );
 
-     this.addMouseMarkerLineToChart(chart, data);
+     this.addDataPointMarkersToChart(chart, xScale, yScale, data);
+     this.addMouseMarkerToChart(chart, xScale, data);
   }
-  
+
   private drawLine(selection: any,
                    xScale: D3ScaleTime<number, number>,
-                   yScale: D3ScaleLinear<number, number>
-  ) {
+                   yScale: D3ScaleLinear<number, number>): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> {
+
     return selection
              .append('g')       // Group each line so we can add dots to this group latter
+             .attr('class', 'line')
                .append('path')  // Draw one path for every item in the data set
                  .attr('fill', 'none')
                  .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
                  .attr('stroke-width', 1.5)
                  .attr('d', (dataItem: TimeSeries) => {
                    return this.getLineGenerator(xScale, yScale)(dataItem.values);
-                 })
-                 .on('mouseover', () => {
-                   console.log("Mouse over line");
-                   //this.highlightLine(this);
-                 })
-                 .on('mouseout', () => {
-                   //normalizeColors();
                  });
   }
 
-  private addMouseMarkerLineToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, data: TimeSeries[]) : void {
+  private addDataPointMarkersToChart(chart,
+                                xScale: D3ScaleTime<number, number>,
+                                yScale: D3ScaleLinear<number, number>,
+                                data: TimeSeries[]) : void {
+
+    let lineIndex = 0;
+    chart.selectAll('.line').append('g').selectAll('.dot')
+      .data((d, index) => { lineIndex = index; return data[index].values })
+      .enter()
+        .append('circle')
+        .attr('class', 'dot')
+           .attr('stroke-width', 1.5)
+           .attr('stroke', (dot: TimeSeriesPoint) => { return getColorScheme()[lineIndex]; })
+           .attr('fill', 'none')
+           .attr('r', 3)
+           .style('opacity', '0')
+           .attr('cx', (timeSeriesPoint: TimeSeriesPoint) => { return xScale(timeSeriesPoint.date); })
+           .attr('cy', (timeSeriesPoint: TimeSeriesPoint) => { return yScale(timeSeriesPoint.value); })
+
+  }
+
+  private addMouseMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, 
+                                xScale: D3ScaleTime<number, number>,
+                                data: TimeSeries[]) : void {
+
     let markerGroup = chart.append('g')
-                           .attr('class', 'marker-line-group');
+                           .attr('class', 'marker-group');
 
     // Append the marker line, initialy hidden
     markerGroup.append('path')
                .attr('class', 'marker-line')
-               .style('opacity', '1');
+               .style('opacity', '0');
 
-    let lines = document.getElementsByClassName('line');
+    // DOTS and Tooltips
+//    let markerDescGroup = markerGroup.selectAll('.marker-desc-group')
+//                                   .data(data)
+//                                   .enter()
+//                                     .append('g')
+//                                     .attr('class', 'marker-desc-group');
+//
+//    markerDescGroup.append('circle')
+//                 .attr('class', 'marker-circle')
+//                 .attr('r', 7)
+//                 .style('stroke', (d, index: number) => { return getColorScheme()[index]; })
+//                 .style('opacity', '0');
+//
+//    markerDescGroup.append('svg:rect')
+//                 .attr('class', 'marker-tooltip')
+//                 .style('opacity', '0');
+//
+//
 
-    let markerPerLine = markerGroup.selectAll('.marker-per-line')
-                                   .data(data)
-                                   .enter()
-                                     .append('g')
-                                     .attr('class', 'marker-per-line');
-
-    markerPerLine.append('circle')
-                 .attr('class', 'marker-circle')
-                 .attr('r', 7)
-                 .style('stroke', (d, index: number) => { return getColorScheme()[index]; })
-                 .style('opacity', '1');
-
-    markerPerLine.append('svg:rect')
-                 .attr('class', 'marker-tooltip');
-
+    // Watcher for mouse events
     let markerEventCatcher = markerGroup.append('svg:rect')
                                         .attr('width', this._width)
                                         .attr('height', this._height)
+                                        .attr('fill', 'none')
                                         .attr('pointer-events', 'all');
 
-    let svgHeight = this._height;
-    markerEventCatcher.on('mousemove', function(datum, index, nodes: D3ContainerElement[]) {
-      let mouseCoordinates = d3Mouse(nodes[index]);
-      d3Select('.marker-line')
-        .attr('d', function() {
-          let d = "M" + mouseCoordinates[0] + "," + svgHeight;
-          d += " " + mouseCoordinates[0] + "," + 0;
-          return d;
-        });
+    markerEventCatcher.on('mouseover', this.showMarker);
+    markerEventCatcher.on('mouseout', this.hideMarker);
+    markerEventCatcher.on('mousemove', (_, index, nodes: D3ContainerElement[]) => this.moveMarker(nodes[index], this._height));
+  }
+
+  private showMarker() {
+    d3Select('.marker-line').style('opacity', '1');
+    d3Select('.marker-tooltip').style('opacity', '1');
+  }
+
+  private hideMarker() {
+    d3Select('.marker-line').style('opacity', '0');
+    d3SelectAll('.dot').style('opacity', '0');
+    d3Select('.marker-tooltip').style('opacity', '0');
+  }
+
+  private moveMarker(node: D3ContainerElement, containerHeight: number) {
+
+    const mouseCoordinates = d3Mouse(node);
+    const mouseX = mouseCoordinates[0];
+
+    var dotBefore: D3Selection<D3BaseType, {}, null, undefined>,
+        dotAfter: D3Selection<D3BaseType, {}, null, undefined>;
+
+    d3SelectAll('.dot').attr('fill', 'none').style('opacity', '0').each((_, index, circles) => {
+      const dot = d3Select(circles[index]);
+      const dotX = +dot.attr('cx');
+      if (mouseX > dotX && (dotBefore === undefined || dotX > +dotBefore.attr('cx')) )  dotBefore = dot;
+      if (mouseX < dotX && (dotAfter === undefined || dotX < +dotAfter.attr('cx')) )    dotAfter = dot;
     });
+
+    const nearestDot = (mouseX - +dotBefore.attr('cx') < +dotAfter.attr('cx') - mouseX) ? dotBefore : dotAfter;
+    nearestDot.attr('fill', 'red').style('opacity', '1');
+
+    d3Select('.marker-line')
+      .attr('d', function() {
+        let d = "M" + nearestDot.attr('cx') + "," + containerHeight;
+        d += " " + nearestDot.attr('cx') + "," + 0;
+        return d;
+      });
+
+    //d3SelectAll('.marker-desc-group').attr('transform', (d, index, n) => this.moveMarkerDesc(mouseCoordinates, index, xScale));
+  }
+
+  private moveMarkerDesc(mouseCoordinates,
+                         index: number,
+                         xScale: D3ScaleTime<number, number>) {
+
+    const lines = document.getElementsByClassName('line');
+    const line = lines[index] as SVGGeometryElement;
+
+    if (!line) return;
+
+    let pos: SVGPoint;
+
+    let beginning = 0,
+        end = line.getTotalLength(),
+        target = null;
+
+
+    while(true) {
+      target = Math.floor((beginning + end) / 2);
+      pos = line.getPointAtLength(target);
+      if ((target === end || target === beginning) && pos.x !== mouseCoordinates[0]) {
+          break;
+      }
+
+      if (pos.x > mouseCoordinates[0])      end = target;
+      else if (pos.x < mouseCoordinates[0]) beginning = target;
+      else break; //position found
+    }
+
+    return "translate(" + mouseCoordinates[0] + "," + pos.y +")";
   }
 }
