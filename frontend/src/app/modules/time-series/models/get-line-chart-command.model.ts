@@ -3,7 +3,7 @@ export interface GetEventResultDataCommandDTO {
   from: Date;
   to: Date;
   interval: number;
-  measurands: string[];
+  measurands?: string[];
   jobGroups: number[];
   pages?: number[];
   measuredEvents?: number[];
@@ -12,6 +12,7 @@ export interface GetEventResultDataCommandDTO {
   connectivities?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
+  performanceAspectTypes?: string[];
 }
 
 export class GetEventResultDataCommand implements GetEventResultDataCommandDTO {
@@ -19,7 +20,7 @@ export class GetEventResultDataCommand implements GetEventResultDataCommandDTO {
   from: Date;
   to: Date;
   interval: number;
-  measurands: string[];
+  measurands?: string[];
   jobGroups: number[];
   pages?: number[];
   measuredEvents?: number[];
@@ -28,6 +29,7 @@ export class GetEventResultDataCommand implements GetEventResultDataCommandDTO {
   connectivities?: number[];
   deviceTypes?: string[];
   operatingSystems?: string[];
+  performanceAspectTypes?: string[];
 
   constructor(dto: GetEventResultDataCommandDTO) {
     this.preconfiguredDashboard = dto.preconfiguredDashboard;
@@ -43,5 +45,6 @@ export class GetEventResultDataCommand implements GetEventResultDataCommandDTO {
     this.connectivities = dto.connectivities;
     this.deviceTypes = dto.deviceTypes;
     this.operatingSystems = dto.operatingSystems;
+    this.performanceAspectTypes = dto.performanceAspectTypes;
   }
 }

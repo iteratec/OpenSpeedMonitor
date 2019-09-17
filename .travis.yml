@@ -62,6 +62,7 @@ jobs:
       if: branch = develop
       script: skip # You do not want to run the tests again
       deploy:
+        skip_cleanup: true
         provider: script
         script:
           groovy scripts/ci/building/set_new_versionnumber_travis_dev &&
@@ -90,7 +91,7 @@ jobs:
           branch: release
 after_deploy: # set deployment key
   - >-
-    openssl aes-256-cbc 
+    openssl aes-256-cbc
     -K $encrypted_0e6b9eee7eaa_key
     -iv $encrypted_0e6b9eee7eaa_iv
     -in scripts/ci/github_deploy_key.enc
