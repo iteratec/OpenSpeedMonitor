@@ -33,29 +33,8 @@ export class SelectionDataComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.childData$ = combineLatest(this.parentChildData$, this.parentSelection$).pipe(
-      map(([parentChildData, selectedParents]: [ResponseWithLoadingState<(Location | MeasuredEvent)[]>, number[]]) => {
-        let selectableData: (Location | MeasuredEvent)[] = parentChildData.data;
-        if (selectedParents && selectedParents.length) {
-          selectableData = selectableData.filter(item => selectedParents.includes(item.parent.id));
-          this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
-        }
-        return SelectionDataComponent.sortAlphabetically(selectableData);
-      })
-    );
-
-    this.uniqueParents$ = this.parentChildData$.pipe(
-      map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
-        if (this.parentType !== ResultSelectionCommandParameter.CONNECTIVITIES) {
-          let parents: (Browser | Page)[] = next.data.map(value => value.parent);
-          let uniqueParents: (Browser | Page)[] = SelectionDataComponent.getUniqueElements(parents);
-          return SelectionDataComponent.sortAlphabetically(uniqueParents);
-        } else {
-          return SelectionDataComponent.sortAlphabetically(next.data);
-        }
-      })
-    );
-
+    this.childData$ = this.getChildData();
+    this.uniqueParents$ = this.getUniqueParents();
     this.resultSelectionStore.reset$.subscribe(() => this.resetResultSelection());
     this.handleQueryParams();
   }
@@ -77,6 +56,33 @@ export class SelectionDataComponent implements OnInit {
     }
   }
 
+  private getChildData(): Observable<(Location | MeasuredEvent)[]> {
+    return combineLatest(this.parentChildData$, this.parentSelection$).pipe(
+      map(([parentChildData, selectedParents]: [ResponseWithLoadingState<(Location | MeasuredEvent)[]>, number[]]) => {
+        let selectableData: (Location | MeasuredEvent)[] = parentChildData.data;
+        if (selectedParents && selectedParents.length) {
+          selectableData = selectableData.filter(item => selectedParents.includes(item.parent.id));
+          this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
+        }
+        return this.sortAlphabetically(selectableData);
+      })
+    );
+  }
+
+  private getUniqueParents(): Observable<(Browser | Page | Connectivity)[]> {
+    return this.parentChildData$.pipe(
+      map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
+        if (this.parentType !== ResultSelectionCommandParameter.CONNECTIVITIES) {
+          let parents: (Browser | Page)[] = next.data.map(value => value.parent);
+          let uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
+          return this.sortAlphabetically(uniqueParents);
+        } else {
+          return this.sortAlphabetically(next.data);
+        }
+      })
+    );
+  }
+
   private resetResultSelection() {
     if (this.parentSelection.length > 0) {
       this.parentSelection = [];
@@ -86,7 +92,7 @@ export class SelectionDataComponent implements OnInit {
     }
   }
 
-  private static getUniqueElements(items: (Browser | Page)[]): (Browser | Page)[] {
+  private getUniqueElements(items: (Browser | Page)[]): (Browser | Page)[] {
     let map = new Map();
     let parentElements = [];
     for (let item of items) {
@@ -101,7 +107,7 @@ export class SelectionDataComponent implements OnInit {
     return parentElements;
   }
 
-  private static sortAlphabetically<T extends { name: string }>(items: T[]): T[] {
+  private sortAlphabetically<T extends { name: string }>(items: T[]): T[] {
     return items.sort((a, b) => {
       return a.name.localeCompare(b.name);
     })
