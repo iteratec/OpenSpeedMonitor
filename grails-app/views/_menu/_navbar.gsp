@@ -57,12 +57,12 @@
                                 <g:message code="eventResultDashboard.label" default="Time Series"/>
                         </g:link>
                     </li>
-                    <li class="${controllerName.equals('aggregation') ? 'active' : ''}" id="aggregationMainMenu">
-                        <g:link controller="aggregationLegacy" action="show"
-                                title="${message(code:'de.iteratec.isocsi.aggregationChart', default:'Aggregation')}">
+                    <li class="${controllerName.equals('aggregation') ? 'active' : ''}" id="aggregationMainMenu"
+                        data-active-matches="/aggregation/show/?.*">
+                        <a href="${createLink(uri: '/aggregation/show')}">
                             <i class="fas fa-chart-bar"></i>
                             <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/>
-                        </g:link>
+                        </a>
                     </li>
                     <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">
                         <g:link controller="distributionChart" action="show"
