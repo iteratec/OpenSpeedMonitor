@@ -284,7 +284,7 @@ grails:
                             {pattern: '/detailAnalysis/**',                             access: ['permitAll']},
                             {pattern: '/distributionChart/**',                          access: ['permitAll']},
                             {pattern: '/aggregation/**',                                access: ['permitAll']},
-                            {pattern: '/aggregationDev/**',                             access: ['permitAll']},
+                            {pattern: '/aggregationLegacy/**',                          access: ['permitAll']},
                             {pattern: '/eventResultDashboardDev/**',                    access: ['permitAll']},
                             {pattern: '/distributionDev/**',                            access: ['permitAll']},
                             {pattern: '/pageComparison/**',                             access: ['permitAll']},
