@@ -62,8 +62,8 @@ export class SelectionDataComponent implements OnInit {
         let selectableData: (Location | MeasuredEvent)[] = parentChildData.data;
         if (selectedParents && selectedParents.length) {
           selectableData = selectableData.filter(item => selectedParents.includes(item.parent.id));
-          this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
         }
+        this.childSelection = selectableData.filter(item => this.childSelection.includes(item.id)).map(item => item.id);
         return this.sortAlphabetically(selectableData);
       })
     );
