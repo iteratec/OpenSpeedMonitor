@@ -1,8 +1,13 @@
 <h1>
   <span *ngFor="let chart of chartSwitchMenu">
-    <span *ngIf="router.url.startsWith(chart.baseUrl); else showIcon">
-      {{ chart.label | translate }} (Dev)
+    <span *ngIf="router.url.startsWith(chart.baseUrl); else showDev">
+      {{ chart.label | translate }}
     </span>
+    <ng-template #showDev>
+      <span *ngIf="router.url.startsWith(chart.devUrl); else showIcon">
+        {{ chart.label | translate }} {{ router.url.includes('Dev/') ? '(Dev)' : '' }}
+      </span>
+    </ng-template>
     <ng-template #showIcon>
       <a [href]="chart.baseUrl + queryString" class="btn">
         <i [ngClass]="chart.icon"></i>

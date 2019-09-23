@@ -32,7 +32,7 @@ class UrlMappings {
         "/systeminfo"(view: "/siteinfo/systeminfo")
         "/applicationDashboard/**?"(view: "/angularFrontend")
         "/applicationDashboard/rest/$action"(controller: "applicationDashboard")
-        "/aggregationDev/**?"(view: "/angularFrontend")
+        "/aggregation/**?"(view: "/angularFrontend")
         "/eventResultDashboardDev/**?"(view: "/angularFrontend")
         "/distributionDev/**?"(view: "/angularFrontend")
         "/queueDashboard/rest/$action"(controller: "queueDashboard")
