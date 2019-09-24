@@ -427,11 +427,11 @@ export class LineChartService {
       .data((timeSeries: TimeSeries, index: number, nodes: SVGGElement[]) => { return timeSeries.values; })
       .enter()
         .append('circle')
-        .attr('class', 'dot')
-        .attr('stroke-width', 1)
+        .attr('class', (dot: TimeSeriesPoint) => 'dot dot-x-'+xScale(dot.date).toString().replace('.', '_'))
+        .attr('stroke-width', 2)
         .attr('stroke', lineColor)
-        .attr('fill', 'none')
-        .attr('r', 3)
+        .attr('fill', 'white')
+        .attr('r', 5)
         .style('opacity', '0')
         .attr('cx', (dot: TimeSeriesPoint) => { return xScale(dot.date); })
         .attr('cy', (dot: TimeSeriesPoint) => { return yScale(dot.value); })
@@ -463,7 +463,6 @@ export class LineChartService {
 
   private showMarker() {
     d3Select('.marker-line').style('opacity', '1');
-    d3SelectAll('.dot').style('opacity', '1');
   }
 
   private hideMarker() {
@@ -475,6 +474,8 @@ export class LineChartService {
     const mouseCoordinates = d3Mouse(node);
     const mouseX = mouseCoordinates[0];
     const mouseXDatum = xScale.invert(mouseX);
+
+    console.log(this.xAxisCluster);
 
     const bisect = d3Bisector((timestamp: string) => timestamp).left;
     const clusterKeys = Object.keys(this.xAxisCluster);
@@ -503,5 +504,15 @@ export class LineChartService {
         d += " " + pointX + "," + 0;
         return d;
       });
+
+    this.findDotsOnMarkerAndShow(pointX, xScale);
+  }
+
+  private findDotsOnMarkerAndShow(pointX: number, xScale: D3ScaleTime<number, number>) {
+    // Hide all dots before showing the current ones
+    d3SelectAll('.dot').style('opacity', '0');
+
+    const cx = pointX.toString().replace('.', '_');
+    d3SelectAll('.dot-x-'+cx).style('opacity', '1');
   }
 }
