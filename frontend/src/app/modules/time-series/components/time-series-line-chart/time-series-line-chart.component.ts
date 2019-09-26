@@ -50,6 +50,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
   redraw() {
     this.lineChartService.drawLineChart(this.timeSeriesResults);
+    this.lineChartService.drawLegends(this.timeSeriesResults)
   }
 
   ngAfterContentInit(): void {

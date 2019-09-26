@@ -45,6 +45,7 @@ import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 import {stringify} from "querystring";
 import {ChartCommons} from "../../../enums/chart-commons.enum";
+import {TimeSeriesLegend} from "../models/time-series-legend.model";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -68,6 +69,10 @@ export class LineChartService {
 
   private _legendGroupTop = this._margin.top + this._height + 50;
   private _legendGroupLeft = this._margin.left;
+  private anyHighlighted:boolean = false;
+  private anySelected:boolean = false;
+
+  private legendDataMap;
 
   constructor(private translationService: TranslateService) {}
 
@@ -99,6 +104,7 @@ export class LineChartService {
   public drawLineChart(incomingData: EventResultDataDTO): void {
 
     let data: TimeSeries[] = this.prepareData(incomingData);
+    /*const labels = incomingData.series.map(el =>  el.identifier);*/
     //console.log(incomingData); console.log(data);
 
     if (data.length == 0) {
@@ -117,9 +123,27 @@ export class LineChartService {
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
 
     this.addDataLinesToChart(chart, xScale, yScale, data);
-    this.addIdentifierLegendsToChart(chart, incomingData)
-
   }
+
+  public drawLegends(incomingData: EventResultDataDTO): void {
+    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
+    this.initLegendData(incomingData)
+    this.addIdentifierLegendsToChart(chart, incomingData)
+  }
+
+  private initLegendData(incomingData:EventResultDataDTO){
+    let labelDataMap= {};
+    let labels = incomingData.series.map(el =>  el.identifier);
+    labels.map(label =>{
+      labelDataMap[label] = {
+        text: label,
+        selected: false
+      }
+    });
+    this.legendDataMap= labelDataMap;
+  }
+
+
 
   /**
    * Prepares the incoming data for drawing with D3.js
@@ -362,6 +386,7 @@ export class LineChartService {
                               xScale: D3ScaleTime<number, number>,
                               yScale: D3ScaleLinear<number, number>,
                               data: TimeSeries[]): void {
+    chart.selectAll('.line').remove();
     // Create one group per line / data entry
     chart.selectAll('.line')                             // Get all lines already drawn
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
@@ -398,7 +423,7 @@ export class LineChartService {
   }
 
   private  addIdentifierLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-                                        data: EventResultDataDTO) {
+                                       incomingData: EventResultDataDTO) {
 
     const contentGroup = d3Select(".time-series-svg");
 
@@ -418,9 +443,8 @@ export class LineChartService {
     )
       .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')');
 
-    const labels = data.series.map(el =>  el.identifier);
 
-    const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(labels);
+    const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
     /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement, keys);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
     const maxEntriesInRow = this._width/10;
@@ -429,7 +453,7 @@ export class LineChartService {
         const legendElement = enter
           .append('g')
           .attr('class', 'legend-entry')
-          .style('opacity', 0.9);
+          .style('opacity', (datum)=>{return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1});
         legendElement
           .append('rect')
           .attr('class', 'legend-rect')
@@ -461,6 +485,9 @@ export class LineChartService {
         .remove()
     )
       .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)
+      .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
+      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))
+      /*.on('click', (datum) => this.onMouseClick(datum));*/
 
   }
 
@@ -484,6 +511,24 @@ export class LineChartService {
         this.remove();
       });
     return widths;
+  }
+
+  private onMouseOver(label: string, incomingData:EventResultDataDTO): void {
+    if(this.anySelected===false) {
+      this.anyHighlighted = true;
+      this.legendDataMap[label].highlighted = true;
+      this.drawLineChart(incomingData);
+      /*this.renderLegendGroup('.legend-content-group');*/
+    }
+  }
+
+  private onMouseOut(label: string, incomingData:EventResultDataDTO): void {
+    if(this.anyHighlighted === true) {
+      this.anyHighlighted = false;
+      this.legendDataMap[label].highlighted = false;
+      this.drawLineChart(incomingData);
+      /*this.renderLegendGroup('.legend-content-group');*/
+    }
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
