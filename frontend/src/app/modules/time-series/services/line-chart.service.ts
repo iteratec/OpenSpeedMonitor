@@ -29,7 +29,7 @@ import {
   axisRight as d3AxisRight
 } from 'd3-axis';
 
-import { 
+import {
   line as d3Line,
   curveMonotoneX as d3CurveMonotoneX,
   Line as D3Line
@@ -298,7 +298,7 @@ export class LineChartService {
         .transition()
           .delay(100)
           .duration(500)
-          .attr('opacity', '1.0') 
+          .attr('opacity', '1.0')
     });
   }
 
@@ -339,6 +339,7 @@ export class LineChartService {
                               xScale: D3ScaleTime<number, number>,
                               yScale: D3ScaleLinear<number, number>,
                               data: TimeSeries[]): void {
+    chart.selectAll('.line').remove();
     // Create one group per line / data entry
     chart.selectAll('.line')                             // Get all lines already drawn
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
@@ -351,7 +352,7 @@ export class LineChartService {
 
      //this.addDataPointsToChart(chartLineGroups, xScale, yScale, data);
   }
-  
+
   private drawLine(selection: any,
                    xScale: D3ScaleTime<number, number>,
                    yScale: D3ScaleLinear<number, number>
