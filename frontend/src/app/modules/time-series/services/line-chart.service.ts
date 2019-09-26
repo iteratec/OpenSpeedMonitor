@@ -107,13 +107,13 @@ export class LineChartService {
 
     this.addDataLinesToChart(chart, xScale, yScale, data);
 
-    this.bringMouseMarkerToTheFront(xScale);
+    this.bringMouseMarkerToTheFront(xScale, yScale);
   }
 
-  private bringMouseMarkerToTheFront(xScale: D3ScaleTime<number, number>) {
+  private bringMouseMarkerToTheFront(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
     const markerGroup = d3Select('#marker-group').remove();
     d3Select('#time-series-chart-drawing-area').append(() => { return markerGroup.node(); });
-    this._mouseEventCatcher.on('mousemove', (_, index, nodes: D3ContainerElement[]) => this.moveMarker(nodes[index], xScale, this._height));
+    this._mouseEventCatcher.on('mousemove', (_, index, nodes: D3ContainerElement[]) => this.moveMarker(nodes[index], xScale, yScale, this._height));
   }
 
   /**
@@ -420,18 +420,14 @@ export class LineChartService {
   }
 
   private addDataPointMarkersToChart(lineGroup: D3Selection<any, TimeSeries, D3BaseType, {}>, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) : void {
-    // Save the line color so we can adjust the dot colors to the line colors
-    const lineColor = lineGroup.attr('stroke');
-    console.log('linecolor', lineColor);
     lineGroup.append('g').selectAll('.dot')
-      .data((timeSeries: TimeSeries, index: number, nodes: SVGGElement[]) => { return timeSeries.values; })
+      .data((timeSeries: TimeSeries) => { return timeSeries.values; })
       .enter()
         .append('circle')
         .attr('class', (dot: TimeSeriesPoint) => 'dot dot-x-'+xScale(dot.date).toString().replace('.', '_'))
         .attr('stroke-width', 2)
-        .attr('stroke', lineColor)
         .attr('fill', 'white')
-        .attr('r', 5)
+        .attr('r', 2)
         .style('opacity', '0')
         .attr('cx', (dot: TimeSeriesPoint) => { return xScale(dot.date); })
         .attr('cy', (dot: TimeSeriesPoint) => { return yScale(dot.value); })
@@ -470,12 +466,10 @@ export class LineChartService {
     d3SelectAll('.dot').style('opacity', '0');
   }
 
-  private moveMarker(node: D3ContainerElement, xScale: D3ScaleTime<number, number>, containerHeight: number) {
+  private moveMarker(node: D3ContainerElement, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>, containerHeight: number) {
     const mouseCoordinates = d3Mouse(node);
     const mouseX = mouseCoordinates[0];
     const mouseXDatum = xScale.invert(mouseX);
-
-    console.log(this.xAxisCluster);
 
     const bisect = d3Bisector((timestamp: string) => timestamp).left;
     const clusterKeys = Object.keys(this.xAxisCluster);
@@ -505,14 +499,32 @@ export class LineChartService {
         return d;
       });
 
-    this.findDotsOnMarkerAndShow(pointX, xScale);
+    const visibleDots = this.findDotsOnMarkerAndShow(pointX, xScale);
+
+    const mouseY = mouseCoordinates[1];
+    this.highlightNearestDot(visibleDots, mouseY, yScale);
   }
 
   private findDotsOnMarkerAndShow(pointX: number, xScale: D3ScaleTime<number, number>) {
     // Hide all dots before showing the current ones
-    d3SelectAll('.dot').style('opacity', '0');
+    d3SelectAll('.dot').attr('r', 2).style('opacity', '0');
 
     const cx = pointX.toString().replace('.', '_');
-    d3SelectAll('.dot-x-'+cx).style('opacity', '1');
+    return d3SelectAll('.dot-x-'+cx).style('opacity', '1');
+  }
+
+  private highlightNearestDot(visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, mouseY: number, yScale: D3ScaleLinear<number, number>) {
+    var nearestDot;
+    var minDistance;
+    visibleDots.each((_, index: number, nodes: []) => {
+      const cy = parseFloat(d3Select(nodes[index]).attr('cy'));
+      const distance = Math.abs(mouseY - cy);
+      if (minDistance === undefined || distance < minDistance) {
+        nearestDot = nodes[index];
+        minDistance = distance;
+      }
+    });
+
+    d3Select(nearestDot).attr('r', 5);
   }
 }
