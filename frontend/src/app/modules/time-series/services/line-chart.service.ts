@@ -1,6 +1,7 @@
 import {ElementRef, Injectable} from "@angular/core";
 import {TranslateService} from "@ngx-translate/core";
 import {take} from "rxjs/operators";
+
 import {
   select as d3Select,
   Selection as D3Selection,
@@ -56,9 +57,6 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-
-
-
 
   private _margin = { top: 40, right: 70, bottom: 40, left: 60 };
   private _width  = 600 - this._margin.left - this._margin.right;
@@ -162,11 +160,11 @@ export class LineChartService {
                   .attr('width',  this._chartContainerWidth  + this._chartContainerMargin.left + this._chartContainerMargin.right)
                   .attr('height', 0);
 
-    /*const contentGroup = svg.append('g')
-      .attr('class', 'chart-content-group')
-      .attr('transform', 'translate(' + this._chartContainerMargin.left + ', ' + this._chartContainerMargin.top + ')');*/
 
-    return svg.append('g') // g =  grouping element; group all other stuff into the chart
+    const contentGroup = svg.append('g')
+      .attr('class', 'chart-content-group');
+
+    return contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
               .attr('id', 'time-series-chart-drawing-area')
               .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
   }
@@ -408,6 +406,7 @@ export class LineChartService {
       .attr('class', 'chart-legend-group')
       .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop })`);
 
+
     const legendGroup = d3Select(".chart-content-group").selectAll('.chart-legend-group').data([1]);
     legendGroup.join(
       enter => enter
@@ -416,15 +415,10 @@ export class LineChartService {
         .style('cursor', 'pointer'),
       update => update,
       exit => exit.remove()
-    );
+    )
+      .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')');
 
     const labels = data.series.map(el =>  el.identifier);
-
-
-    /*data.map(data => {
-      keys.push(data.values);
-      console.log("data.val: "+ data.identifier);
-    });*/
 
     const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(labels);
     /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement, keys);
@@ -444,7 +438,7 @@ export class LineChartService {
           .attr("rx", 2)
           .attr("ry", 2)
           .attr("ry", 2)
-          .attr('fill', 'blue');
+          .attr('fill', (d, index: number) => { return getColorScheme()[index]; });
         legendElement
           .append('text')
           .attr('class', 'legend-text')
