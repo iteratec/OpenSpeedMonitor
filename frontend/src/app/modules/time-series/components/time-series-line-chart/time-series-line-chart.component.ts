@@ -55,6 +55,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
   ngAfterContentInit(): void {
     this.lineChartService.initChart(this.svgElement);
+    this.lineChartService.initLegendData(this.timeSeriesResults)
   }
 
   ngOnChanges(changes: SimpleChanges): void {

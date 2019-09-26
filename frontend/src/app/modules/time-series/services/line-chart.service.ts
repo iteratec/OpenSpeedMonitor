@@ -71,8 +71,9 @@ export class LineChartService {
   private _legendGroupLeft = this._margin.left;
   private anyHighlighted:boolean = false;
   private anySelected:boolean = false;
+  private clickedLabel:string = '';
 
-  private legendDataMap;
+  private legendDataMap = {};
 
   constructor(private translationService: TranslateService) {}
 
@@ -127,11 +128,10 @@ export class LineChartService {
 
   public drawLegends(incomingData: EventResultDataDTO): void {
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    this.initLegendData(incomingData)
     this.addIdentifierLegendsToChart(chart, incomingData)
   }
 
-  private initLegendData(incomingData:EventResultDataDTO){
+  public initLegendData(incomingData:EventResultDataDTO){
     let labelDataMap= {};
     let labels = incomingData.series.map(el =>  el.identifier);
     labels.map(label =>{
