@@ -1,7 +1,6 @@
 import {ElementRef, Injectable} from "@angular/core";
 import {TranslateService} from "@ngx-translate/core";
 import {take} from "rxjs/operators";
-/*import {select} from 'd3-selection';*/
 import {
   select as d3Select,
   Selection as D3Selection,
@@ -9,7 +8,7 @@ import {
   ContainerElement as D3ContainerElement
 } from 'd3-selection';
 
-import {max as d3Max, min as d3Min} from 'd3-array';
+import {max, max as d3Max, min as d3Min} from 'd3-array';
 
 import {
   timeFormat as d3TimeFormat
@@ -28,7 +27,7 @@ import {
   axisRight as d3AxisRight
 } from 'd3-axis';
 
-import { 
+import {
   line as d3Line,
   curveMonotoneX as d3CurveMonotoneX,
   Line as D3Line
@@ -57,10 +56,20 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
+
+
+
+
   private _margin = { top: 40, right: 70, bottom: 40, left: 60 };
   private _width  = 600 - this._margin.left - this._margin.right;
   private _height = 500 - this._margin.top - this._margin.bottom;
 
+  private _chartContainerMargin =  { top: 40, right: 70, bottom: 40, left: 60 };
+  private _chartContainerWidth = 700 - this._chartContainerMargin.left - this._chartContainerMargin.right;
+  private _chartContainerHeight = 600 - this._chartContainerMargin.top - this._chartContainerMargin.bottom;
+
+  private _legendGroupTop = this._margin.top + this._height + 50;
+  private _legendGroupLeft = this._margin.left;
 
   constructor(private translationService: TranslateService) {}
 
@@ -74,6 +83,16 @@ export class LineChartService {
 
     this.addXAxisToChart(chart, xScale);
     this.addYAxisToChart(chart, yScale);
+
+    console.log("this._chartContainerMargin.top: " + this._chartContainerMargin.top);
+    console.log("this._chartContainerMargin.left: " + this._chartContainerMargin.left);
+    console.log("this._chartContainerHeight: " + this._chartContainerHeight);
+    console.log("drawing-area _margin.top: " + this._margin.top);
+    console.log("drawing-area _margin.left: " + this._margin.left);
+    console.log("drawing-area this.__height: " + this._height);
+    console.log("_legendGroupTop: " + this._legendGroupTop);
+    console.log("_legendGroupLeft: " + this._legendGroupLeft);
+
   }
 
   /**
@@ -91,7 +110,7 @@ export class LineChartService {
 
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
-    d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._height + this._margin.top  + this._margin.bottom);
+    d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._chartContainerHeight);  //TODO fix containers height
 
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
@@ -100,7 +119,7 @@ export class LineChartService {
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
 
     this.addDataLinesToChart(chart, xScale, yScale, data);
-    this.addIdentifierLegendsToChart(data)
+    this.addIdentifierLegendsToChart(chart, incomingData)
 
   }
 
@@ -138,17 +157,16 @@ export class LineChartService {
 
     this._width = svgElement.nativeElement.parentElement.offsetWidth - this._margin.left - this._margin.right;
     //this._height = svgElement.nativeElement.parentElement.offsetHeight - this._margin.top - this._margin.bottom;
-   const svg = d3Select(svgElement.nativeElement)
+    const svg = d3Select(svgElement.nativeElement)
                   .attr('id', 'time-series-svg')
-                  .attr('width',  this._width  + this._margin.left + this._margin.right)
+                  .attr('width',  this._chartContainerWidth  + this._chartContainerMargin.left + this._chartContainerMargin.right)
                   .attr('height', 0);
 
-    /*const contentGroupSelector: string = '.chart-content-group';*/
+    /*const contentGroup = svg.append('g')
+      .attr('class', 'chart-content-group')
+      .attr('transform', 'translate(' + this._chartContainerMargin.left + ', ' + this._chartContainerMargin.top + ')');*/
 
-    const contentGroup = svg.append('g')
-      .attr('class', 'chart-content-group');
-
-    return contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
+    return svg.append('g') // g =  grouping element; group all other stuff into the chart
               .attr('id', 'time-series-chart-drawing-area')
               .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
   }
@@ -305,7 +323,7 @@ export class LineChartService {
         .transition()
           .delay(100)
           .duration(500)
-          .attr('opacity', '1.0') 
+          .attr('opacity', '1.0')
     });
   }
 
@@ -358,7 +376,7 @@ export class LineChartService {
 
      //this.addDataPointsToChart(chartLineGroups, xScale, yScale, data);
   }
-  
+
   private drawLine(selection: any,
                    xScale: D3ScaleTime<number, number>,
                    yScale: D3ScaleLinear<number, number>
@@ -381,13 +399,14 @@ export class LineChartService {
                  });
   }
 
-  private  addIdentifierLegendsToChart(data: TimeSeries[]) {
-    /*console.log("data.keys(): " + JSON.stringify(data.keys()));*/
+  private  addIdentifierLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+                                        data: EventResultDataDTO) {
 
-    const contentGroup = d3Select(".chart-content-group");
+    const contentGroup = d3Select(".time-series-svg");
 
     contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
-      .attr('class', 'chart-legend-group');
+      .attr('class', 'chart-legend-group')
+      .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop })`);
 
     const legendGroup = d3Select(".chart-content-group").selectAll('.chart-legend-group').data([1]);
     legendGroup.join(
@@ -397,19 +416,20 @@ export class LineChartService {
         .style('cursor', 'pointer'),
       update => update,
       exit => exit.remove()
-    )
-      .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')');
+    );
 
-    let keys = [];
+    const labels = data.series.map(el =>  el.identifier);
 
-    data.map(data => {
-      keys.push(data.key);
-      console.log("data.key: "+ data.key);
-    });
 
-    const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(keys);
-    /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement);*/
-    /*const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
+    /*data.map(data => {
+      keys.push(data.values);
+      console.log("data.val: "+ data.identifier);
+    });*/
+
+    const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(labels);
+    /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement, keys);
+    const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
+    const maxEntriesInRow = this._width/10;
     legendEntry.join(
       enter => {
         const legendElement = enter
@@ -446,27 +466,30 @@ export class LineChartService {
         .style('opacity', 0)
         .remove()
     )
-      /*.attr('transform', (datum, index) => `translate(${maxEntryGroupSize * (index % maxEntriesInRow)}, 0)`)
-      .on('mouseover', (datum) => this.onMouseOver(datum))
-      .on('mouseout', (datum) => this.onMouseOut(datum))
-      .on('click', (datum) => this.onMouseClick(datum));*/
+      .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)
 
+  }
 
+  calculateMaxEntryGroupWidth(svgForEstimation: SVGElement, keys: string[]): number {
+    /*let dataMap = keys;
+    const labels = Object.keys(dataMap).map(measurand => dataMap[measurand].label);*/
+    const labelWidths = this.getTextWidths(svgForEstimation, keys);
+    return max(labelWidths) + 10 + 20 + 5;
+  }
 
-
-
-
-    /*const legendGroup = select(contentGroupSelector).selectAll('.chart-legend-group').data([1]);*/
-    /*legendGroup.join(
-      enter => enter
-        .append('g')
-        .attr('class', 'chart-legend-group')
-        .style('cursor', 'pointer'),
-      update => update,
-      exit => exit.remove()
-    )
-      .attr('transform', `translate(0, ${this.legendPosY})`);*/
-
+  getTextWidths(svgForEstimation: SVGElement, texts: string[]): number[] {
+    const widths = [];
+    d3Select(svgForEstimation).selectAll('.invisible-text-to-measure')
+      .data(texts)
+      .enter()
+      .append("text")
+      .attr("opacity", 0)
+      .text((d) =>  d.toString())
+      .each(function () {
+        widths.push(this.getComputedTextLength());
+        this.remove();
+      });
+    return widths;
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
