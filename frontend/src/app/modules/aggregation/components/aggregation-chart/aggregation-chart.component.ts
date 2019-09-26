@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, ViewEncapsulation} from '@angular/core';
 import {ChartCommons} from "../../../../enums/chart-commons.enum";
 import {select} from 'd3-selection';
 import {max} from "d3-array";
