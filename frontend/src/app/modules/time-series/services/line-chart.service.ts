@@ -62,7 +62,6 @@ export class LineChartService {
   private _margin = { top: 40, right: 70, bottom: 40, left: 60 };
   private _width  = 600 - this._margin.left - this._margin.right;
   private _height = 500 - this._margin.top - this._margin.bottom;
-  private idleTimeout;
   private brush;
 
 
@@ -326,7 +325,6 @@ export class LineChartService {
    */
   private getLineGenerator(xScale: D3ScaleTime<number, number>,
                            yScale: D3ScaleLinear<number, number>): D3Line<TimeSeriesPoint> {
-    console.log(xScale.ticks());
     return d3Line<TimeSeriesPoint>()          // Setup a line generator
       .x((point: TimeSeriesPoint) => {
         return xScale(point.date);
@@ -377,8 +375,10 @@ export class LineChartService {
   private resetChart(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>){
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('g#time-series-chart-drawing-area').selectAll('.line').each((data, index, nodes) => {
-      d3Select(nodes[index]).transition()
-        .attr('d', (dataItem: TimeSeries) => this.getLineGenerator(xScale,yScale)(dataItem.values))
+      d3Select(nodes[index])
+        .transition()
+        .duration(500)
+        .attr('d', (dataItem: TimeSeries) => this.getLineGenerator(xScale,yScale)(dataItem.values));
     })
   }
 
@@ -387,27 +387,25 @@ export class LineChartService {
     let extent = d3Event.selection;
     // If no selection, back to initial coordinate. Otherwise, update X axis domain
     if(!extent){
-      if (!this.idleTimeout) return this.idleTimeout = setTimeout(this.idleTimeout = null, 350); // This allows to wait a little bit
-      //xScale = this.getXScale(data);
-
+      return
     }else{
-      xScale.domain([ xScale.invert(extent[0]), xScale.invert(extent[1]) ]);
-      selection.select(".brush").call(this.brush.move, null);
-      d3Select('.x-axis').transition().call(this.updateXAxis, xScale);// This remove the grey brush area as soon as the selection has been don
-      selection.selectAll('.line').each((data, index, nodes) => {
+      let minDate = xScale.invert(extent[0]);
+      let maxDate = xScale.invert(extent[1]);
+      xScale.domain([ minDate, maxDate ]);
+      selection.select(".brush").call(this.brush.move, null); // This remove the grey brush area
+      d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
+      selection.selectAll('.line').each((_, index, nodes) => {
         d3Select(nodes[index])
           .transition()
           .attr('d', (dataItem: TimeSeries) => {
-            /*let newDataItem = dataItem.values.map((point: TimeSeriesPoint) => {
-              point.date
-            })*/
-            console.log(xScale.ticks());
-            return this.getLineGenerator(xScale,yScale)(dataItem.values);
+            let newDataValues = dataItem.values.filter((point) => {
+              return point.date <= maxDate && point.date >= minDate;
+            });
+            return this.getLineGenerator(xScale,yScale)(newDataValues);
           })
         }
       )
     }
-
   }
 
   private drawLine(selection: any,
