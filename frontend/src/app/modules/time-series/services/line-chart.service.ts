@@ -415,7 +415,23 @@ export class LineChartService {
     chart.selectAll('.line')                             // Get all lines already drawn
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
          .join(
-           enter => this.drawLine(enter, xScale, yScale)
+           enter => this.drawLine(enter, xScale, yScale),
+           update => {
+             update
+               .transition()
+               .duration(ChartCommons.TRANSITION_DURATION)
+               .style('opacity', (d) => {
+                 console.log("timeline d: " + JSON.stringify(d));
+                 return ((this.anyHighlighted && !this.legendDataMap[d].highlighted) || (this.anySelected && !this.legendDataMap[d].selected)) ? 0.2 : 1
+               });
+             return update;
+           },
+           exit => exit
+             .transition()
+             .duration(ChartCommons.TRANSITION_DURATION)
+             .style('opacity', 0)
+             .remove()
+
          )
          .attr('class', (dataItem: TimeSeries) => {
            return 'line line-' + dataItem.key;
@@ -434,6 +450,9 @@ export class LineChartService {
                  .attr('fill', 'none')
                  .attr('stroke', (d, index: number) => { return  getColorScheme()[index]; /*console.log("d: " + JSON.stringify(d));*/ /*this.legendDataMap[d].color*/ /*this.legendDataMap[d].color; getColorScheme()[index];*/ })
                  .attr('stroke-width', 1.5)
+                  .style('opacity', (d) => {
+                    return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 0.2 : 1;
+                  })
                  .attr('d', (dataItem: TimeSeries) => {
                    return this.getLineGenerator(xScale, yScale)(dataItem.values);
                  })
