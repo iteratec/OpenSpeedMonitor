@@ -13,7 +13,8 @@
       (!measurandsRequired || (measurandsOrPerformanceAspectsSelected$ | async))">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.longProcessingTime' | translate }}
   </p>
-  <p id="unavailable-data" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
+  <p id="unavailable-data" class="bg-danger get-barchart-data-warnings"
+     *ngIf="(resultCount$ | async) == 0  || !(dataAvailable$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
   </p>
   <p id="no-application-selected" class="bg-danger get-barchart-data-warnings"

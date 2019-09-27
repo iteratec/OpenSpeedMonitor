@@ -2,7 +2,7 @@
 <p>
   {{ 'frontend.de.iteratec.osm.aggregation.description' | translate }}
 </p>
-<osm-aggregation-chart *ngIf="!isHidden" [barchartAverageData]="barchartAverageData$ | async"
+<osm-aggregation-chart *ngIf="showChart" [barchartAverageData]="barchartAverageData$ | async"
                        [barchartMedianData]="barchartMedianData$ | async"></osm-aggregation-chart>
 <div class="action-row">
   <div class="col-md-12">
