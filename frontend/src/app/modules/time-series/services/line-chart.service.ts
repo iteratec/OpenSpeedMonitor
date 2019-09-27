@@ -578,7 +578,9 @@ export class LineChartService {
   }
 
   private onMouseClick(labelKey: string, incomingData:EventResultDataDTO): void{
-    console.log("on click")
+    console.log("on click");
+    document.addEventListener('keydown', this.onKeyPressed);
+    document.addEventListener('keyup', this.onKeyPressed);
     if(this.anySelected === false) {
       this.anySelected = true;
       this.legendDataMap[labelKey].selected = true;
@@ -592,22 +594,15 @@ export class LineChartService {
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     }
+  }
 
+  private onKeyPressed(event):void {
 
+    if(event.which=="17") {
+      console.log("cntrlIsPressed");
+    }
+      cntrlIsPressed = true;
 
-
-
-    /*let labelKey = this.legendDataMap[label].key;
-    // Determine if current line is visible
-    var active   = label.active ? false : true,
-      newOpacity = active ? 0 : 1;
-    // Hide or show the elements based on the ID
-    console.log("labelKey: "+ labelKey);
-    d3Select("#tag"+labelKey.replace(/\s+/g, ''))
-      .transition().duration(100)
-      .style("opacity", newOpacity);
-    // Update whether or not the elements are active
-    /!*label.active = active;*!/*/
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
