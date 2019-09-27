@@ -374,10 +374,9 @@ export class LineChartService {
 
   private resetChart(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>){
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
-    d3Select('g#time-series-chart-drawing-area').selectAll('.line').each((data, index, nodes) => {
+    d3Select('g#time-series-chart-drawing-area').selectAll('.line')
+      .each((data, index, nodes) => {
       d3Select(nodes[index])
-        .transition()
-        .duration(500)
         .attr('d', (dataItem: TimeSeries) => this.getLineGenerator(xScale,yScale)(dataItem.values));
     })
   }
