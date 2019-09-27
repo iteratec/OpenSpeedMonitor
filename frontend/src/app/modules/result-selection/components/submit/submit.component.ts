@@ -15,6 +15,7 @@ export class SubmitComponent implements OnInit {
   pagesOrMeasuredEventsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   measurandsOrPerformanceAspectsSelected$: BehaviorSubject<boolean> = new BehaviorSubject(false);
   resultCount$: Observable<number>;
+  dataAvailable$: Observable<boolean>;
 
   @Input() applicationsRequired: boolean = false;
   @Input() pagesRequired: boolean = false;
@@ -23,6 +24,7 @@ export class SubmitComponent implements OnInit {
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
     this.resultCount$ = this.resultSelectionStore.resultCount$;
+    this.dataAvailable$ = this.resultSelectionStore.dataAvailable$;
   }
 
   ngOnInit() {

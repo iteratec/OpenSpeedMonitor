@@ -51,6 +51,7 @@ export class ResultSelectionStore {
   requestSizes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   percentages$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  dataAvailable$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   reset$: Subject<void> = new Subject<void>();
 
@@ -188,6 +189,7 @@ export class ResultSelectionStore {
   }
 
   setResultSelectionCommand(newState: ResultSelectionCommand): void {
+    this.dataAvailable$.next(true);
     this._resultSelectionCommand$.next(newState);
     this.loadResultCount(newState);
   }
@@ -213,6 +215,7 @@ export class ResultSelectionStore {
   }
 
   private setRemainingResultSelection(newState: RemainingResultSelection): void {
+    this.dataAvailable$.next(true);
     this._remainingResultSelection$.next(newState);
   }
 
