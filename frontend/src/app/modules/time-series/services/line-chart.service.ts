@@ -395,6 +395,7 @@ export class LineChartService {
                               data: TimeSeries[]): void {
     chart.selectAll('.line').remove();
 
+
     if (this.anyHighlighted) {
       data = data.filter(obj => {
         return obj.key === this.hoveredLabel
@@ -407,7 +408,6 @@ export class LineChartService {
       });
     }
 
-    console.log("data: " + JSON.stringify(data));
     // Create one group per line / data entry
     chart.selectAll('.line')                             // Get all lines already drawn
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
@@ -506,9 +506,9 @@ export class LineChartService {
         .remove()
     )
       .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)
-      .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
-      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))
-      /*.on('click', (datum) => this.onMouseClick(datum));*/
+/*      .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
+      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))*/
+      .on('click', (datum) => this.onMouseClick(datum, incomingData));
 
   }
 
@@ -552,6 +552,39 @@ export class LineChartService {
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     }
+  }
+
+  private onMouseClick(label: string, incomingData:EventResultDataDTO): void{
+    console.log("on click")
+    if(this.anySelected === false) {
+      this.anySelected = true;
+      this.legendDataMap[label].selected = true;
+      this.clickedLabel = this.legendDataMap[label].key;;
+      this.drawLineChart(incomingData);
+      this.drawLegends(incomingData);
+    } else {
+      this.anySelected = false;
+      this.legendDataMap[label].selected = false;
+      this.clickedLabel = "";
+      this.drawLineChart(incomingData);
+      this.drawLegends(incomingData);
+    }
+
+
+
+
+
+    /*let labelKey = this.legendDataMap[label].key;
+    // Determine if current line is visible
+    var active   = label.active ? false : true,
+      newOpacity = active ? 0 : 1;
+    // Hide or show the elements based on the ID
+    console.log("labelKey: "+ labelKey);
+    d3Select("#tag"+labelKey.replace(/\s+/g, ''))
+      .transition().duration(100)
+      .style("opacity", newOpacity);
+    // Update whether or not the elements are active
+    /!*label.active = active;*!/*/
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
