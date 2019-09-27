@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {scaleOrdinal} from "d3-scale";
 import {URL} from "../../../enums/url.enum";
 import {BarchartDataService} from "./barchart-data.service";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, combineLatest, Subject} from "rxjs";
 import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
 import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
 import {AggregationChartDataByMeasurand} from "../models/aggregation-chart-data.model";
@@ -10,6 +10,7 @@ import {AggregationChartSeries} from "../models/aggregation-chart-series.model";
 import {SpinnerService} from "../../shared/services/spinner.service";
 import {ActivatedRoute, Params, Router} from "@angular/router";
 import {ResultSelectionStore} from "../../result-selection/services/result-selection.store";
+import {take, takeUntil} from "rxjs/operators";
 
 @Injectable({
   providedIn: 'root'
@@ -115,7 +116,9 @@ export class AggregationChartDataService {
   }
 
   getBarchartData(resultSelectionCommand: ResultSelectionCommand,remainingResultSelection: RemainingResultSelection): void {
-    this.spinnerService.show();
+    this.spinnerService.showSpinner('aggregation-chart-spinner');
+    const finishedLoadingAvg$: Subject<void> = new Subject<void>();
+    const finishedLoadingPercentile$: Subject<void> = new Subject<void>();
 
     const additionalParams: Params = {
       selectedFilter: this.selectedFilter,
@@ -126,6 +129,10 @@ export class AggregationChartDataService {
 
     this.resultSelectionStore.writeQueryParams(additionalParams);
 
+    combineLatest(finishedLoadingAvg$, finishedLoadingPercentile$).subscribe(() => {
+      this.spinnerService.hideSpinner('aggregation-chart-spinner');
+    });
+
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
       remainingResultSelection,
@@ -133,7 +140,7 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartAverageData$.next(this.sortDataByMeasurandOrder(result));
-      this.spinnerService.hide();
+      finishedLoadingAvg$.next();
     });
 
     this.barchartDataService.fetchBarchartData<any>(
@@ -143,6 +150,7 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
+      finishedLoadingPercentile$.next();
     });
   }
 

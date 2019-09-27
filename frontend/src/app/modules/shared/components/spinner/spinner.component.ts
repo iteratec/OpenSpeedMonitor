@@ -1,6 +1,5 @@
-import { Component, OnInit, ElementRef, OnDestroy } from '@angular/core';
+import {Component, OnInit, ElementRef, OnDestroy, Input} from '@angular/core';
 import { Spinner, SpinnerOptions } from 'spin.js';
-import { Subscription } from 'rxjs';
 import {SpinnerService} from "../../services/spinner.service";
 
 @Component({
@@ -10,10 +9,10 @@ import {SpinnerService} from "../../services/spinner.service";
 })
 export class SpinnerComponent implements OnInit, OnDestroy {
 
-  private spinner: any;
+  private spinner: Spinner;
+  @Input() spinnerId: string;
   public show: boolean = false;
-  private element: any = null;
-  private subscription: Subscription = null;
+  private element: any = undefined;
 
   constructor(private spinnerElement: ElementRef, private spinnerService: SpinnerService) {
     this.element = spinnerElement.nativeElement;
@@ -21,12 +20,11 @@ export class SpinnerComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.initSpinner();
-    this.createServiceSubscription();
   }
 
-  private createServiceSubscription() {
-    this.subscription = this.spinnerService.spinnerObservable.subscribe(show => {
-      if (show) {
+  private createServiceSubscription(): void {
+    this.spinnerService.activeSpinner$.subscribe((activeSpinner: Set<string>) => {
+      if (activeSpinner.has(this.spinnerId)) {
         this.startSpinner();
       } else {
         this.stopSpinner();
@@ -34,7 +32,7 @@ export class SpinnerComponent implements OnInit, OnDestroy {
     });
   }
 
-  private initSpinner() {
+  private initSpinner(): void {
     let options: SpinnerOptions  = {
       lines: 13             // The number of lines to draw
       , length: 10            // The length of each line
@@ -54,19 +52,19 @@ export class SpinnerComponent implements OnInit, OnDestroy {
       , position: 'absolute'  // Element positioning
     };
     this.spinner = new Spinner(options);
-    this.startSpinner();
+    this.createServiceSubscription();
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.spinnerService.activeSpinner$.unsubscribe();
   }
 
-  startSpinner() {
+  private startSpinner(): void {
     this.show = true;
     this.spinner.spin(this.element.firstChild);
   }
 
-  stopSpinner() {
+  private stopSpinner(): void {
     this.show = false;
     this.spinner.stop();
   }
