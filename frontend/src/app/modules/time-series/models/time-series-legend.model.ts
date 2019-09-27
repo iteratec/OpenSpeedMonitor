@@ -3,6 +3,7 @@
  */
 export class TimeSeriesLegend {
   text: string;
+  key: string;
   selected: boolean;
   highlighted: boolean;
   constructor() {}

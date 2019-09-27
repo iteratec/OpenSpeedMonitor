@@ -72,6 +72,7 @@ export class LineChartService {
   private anyHighlighted:boolean = false;
   private anySelected:boolean = false;
   private clickedLabel:string = '';
+  private hoveredLabel:string = '';
 
   private legendDataMap = {};
 
@@ -104,6 +105,8 @@ export class LineChartService {
    */
   public drawLineChart(incomingData: EventResultDataDTO): void {
 
+    console.log("legendDataMap: " + JSON.stringify(this.legendDataMap));
+    console.log("this.hoveredLabel: " + this.hoveredLabel);
     let data: TimeSeries[] = this.prepareData(incomingData);
     /*const labels = incomingData.series.map(el =>  el.identifier);*/
     //console.log(incomingData); console.log(data);
@@ -131,15 +134,19 @@ export class LineChartService {
     this.addIdentifierLegendsToChart(chart, incomingData)
   }
 
-  public initLegendData(incomingData:EventResultDataDTO){
+  public initLegendData(incomingData: EventResultDataDTO){
+    /*let data: TimeSeries[] = this.prepareData(incomingData);*/
     let labelDataMap= {};
-    let labels = incomingData.series.map(el =>  el.identifier);
-    labels.map(label =>{
+    let labels = incomingData.series.map((data: EventResultSeriesDTO) =>  {
+      let label = data.identifier;
       labelDataMap[label] = {
         text: label,
+        key: this.generateKey(data),
         selected: false
       }
+
     });
+
     this.legendDataMap= labelDataMap;
   }
 
@@ -387,6 +394,20 @@ export class LineChartService {
                               yScale: D3ScaleLinear<number, number>,
                               data: TimeSeries[]): void {
     chart.selectAll('.line').remove();
+
+    if (this.anyHighlighted) {
+      data = data.filter(obj => {
+        return obj.key === this.hoveredLabel
+      });
+    }
+
+    if (this.anySelected) {
+      data = data.filter(obj => {
+        return obj.key !== this.clickedLabel
+      });
+    }
+
+    console.log("data: " + JSON.stringify(data));
     // Create one group per line / data entry
     chart.selectAll('.line')                             // Get all lines already drawn
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
@@ -517,8 +538,9 @@ export class LineChartService {
     if(this.anySelected===false) {
       this.anyHighlighted = true;
       this.legendDataMap[label].highlighted = true;
+      this.hoveredLabel =  this.legendDataMap[label].key;
       this.drawLineChart(incomingData);
-      /*this.renderLegendGroup('.legend-content-group');*/
+      this.drawLegends(incomingData);
     }
   }
 
@@ -526,8 +548,9 @@ export class LineChartService {
     if(this.anyHighlighted === true) {
       this.anyHighlighted = false;
       this.legendDataMap[label].highlighted = false;
+      this.hoveredLabel = "";
       this.drawLineChart(incomingData);
-      /*this.renderLegendGroup('.legend-content-group');*/
+      this.drawLegends(incomingData);
     }
   }
 
