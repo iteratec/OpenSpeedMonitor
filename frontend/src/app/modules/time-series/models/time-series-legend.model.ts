@@ -6,5 +6,6 @@ export class TimeSeriesLegend {
   key: string;
   selected: boolean;
   highlighted: boolean;
+  color: string;
   constructor() {}
 }

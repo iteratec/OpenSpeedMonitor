@@ -137,16 +137,19 @@ export class LineChartService {
   public initLegendData(incomingData: EventResultDataDTO){
     /*let data: TimeSeries[] = this.prepareData(incomingData);*/
     let labelDataMap= {};
-    let labels = incomingData.series.map((data: EventResultSeriesDTO) =>  {
+    let colors = getColorScheme();
+    incomingData.series.forEach((data: EventResultSeriesDTO, index) =>  {
       let label = data.identifier;
-      labelDataMap[label] = {
+      let key = this.generateKey(data);
+      labelDataMap[key] = {
         text: label,
-        key: this.generateKey(data),
-        selected: false
+        key: key,
+        selected: false,
+        color: colors[index]      // TODO: cover the case when nLines > ncolors
       }
 
     });
-
+    console.log("labelDataMap key: " + JSON.stringify(Object.keys(labelDataMap)[2]));
     this.legendDataMap= labelDataMap;
   }
 
@@ -396,7 +399,7 @@ export class LineChartService {
     chart.selectAll('.line').remove();
 
 
-    if (this.anyHighlighted) {
+    /*if (this.anyHighlighted) {
       data = data.filter(obj => {
         return obj.key === this.hoveredLabel
       });
@@ -406,7 +409,7 @@ export class LineChartService {
       data = data.filter(obj => {
         return obj.key !== this.clickedLabel
       });
-    }
+    }*/
 
     // Create one group per line / data entry
     chart.selectAll('.line')                             // Get all lines already drawn
@@ -429,7 +432,7 @@ export class LineChartService {
              .append('g')       // Group each line so we can add dots to this group latter
                .append('path')  // Draw one path for every item in the data set
                  .attr('fill', 'none')
-                 .attr('stroke', (d, index: number) => { return getColorScheme()[index]; })
+                 .attr('stroke', (d, index: number) => { return  getColorScheme()[index]; /*console.log("d: " + JSON.stringify(d));*/ /*this.legendDataMap[d].color*/ /*this.legendDataMap[d].color; getColorScheme()[index];*/ })
                  .attr('stroke-width', 1.5)
                  .attr('d', (dataItem: TimeSeries) => {
                    return this.getLineGenerator(xScale, yScale)(dataItem.values);
@@ -445,7 +448,7 @@ export class LineChartService {
 
   private  addIdentifierLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                                        incomingData: EventResultDataDTO) {
-
+    chart.selectAll('.legend-entry').remove();
     const contentGroup = d3Select(".time-series-svg");
 
     contentGroup.append('g') // g =  grouping element; group all other stuff into the chart
@@ -468,6 +471,7 @@ export class LineChartService {
     const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
     /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement, keys);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
+
     const maxEntriesInRow = this._width/10;
     legendEntry.join(
       enter => {
@@ -489,14 +493,14 @@ export class LineChartService {
           .attr('class', 'legend-text')
           .attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
           .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
-          .text(datum => datum);
+          .text(datum => this.legendDataMap[datum].text);
         return legendElement;
       },
       update => {
         update
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
-          .style('opacity', 0.9);
+          .style('opacity', (datum)=>{return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1});
         return update;
         },
       exit => exit
@@ -506,8 +510,8 @@ export class LineChartService {
         .remove()
     )
       .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)
-/*      .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
-      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))*/
+      .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
+      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))
       .on('click', (datum) => this.onMouseClick(datum, incomingData));
 
   }
@@ -534,37 +538,37 @@ export class LineChartService {
     return widths;
   }
 
-  private onMouseOver(label: string, incomingData:EventResultDataDTO): void {
+  private onMouseOver(labelKey: string, incomingData:EventResultDataDTO): void {
     if(this.anySelected===false) {
       this.anyHighlighted = true;
-      this.legendDataMap[label].highlighted = true;
-      this.hoveredLabel =  this.legendDataMap[label].key;
+      this.legendDataMap[labelKey].highlighted = true;
+      this.hoveredLabel =  this.legendDataMap[labelKey];
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     }
   }
 
-  private onMouseOut(label: string, incomingData:EventResultDataDTO): void {
+  private onMouseOut(labelKey: string, incomingData:EventResultDataDTO): void {
     if(this.anyHighlighted === true) {
       this.anyHighlighted = false;
-      this.legendDataMap[label].highlighted = false;
+      this.legendDataMap[labelKey].highlighted = false;
       this.hoveredLabel = "";
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     }
   }
 
-  private onMouseClick(label: string, incomingData:EventResultDataDTO): void{
+  private onMouseClick(labelKey: string, incomingData:EventResultDataDTO): void{
     console.log("on click")
     if(this.anySelected === false) {
       this.anySelected = true;
-      this.legendDataMap[label].selected = true;
-      this.clickedLabel = this.legendDataMap[label].key;;
+      this.legendDataMap[labelKey].selected = true;
+      this.clickedLabel = this.legendDataMap[labelKey];
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     } else {
       this.anySelected = false;
-      this.legendDataMap[label].selected = false;
+      this.legendDataMap[labelKey].selected = false;
       this.clickedLabel = "";
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
