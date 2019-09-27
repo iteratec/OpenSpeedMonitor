@@ -16,13 +16,16 @@
   <p id="unavailable-data" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) == 0">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noDataAvailable' | translate }}
   </p>
-  <p id="no-application-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && applicationsRequired && !(applicationsSelected$ | async)">
+  <p id="no-application-selected" class="bg-danger get-barchart-data-warnings"
+     *ngIf="(resultCount$ | async) != 0 && applicationsRequired && !(applicationsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noApplicationSelected' | translate }}
   </p>
-  <p id="no-page-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && pagesRequired && !(pagesOrMeasuredEventsSelected$ | async)">
+  <p id="no-page-selected" class="bg-danger get-barchart-data-warnings"
+     *ngIf="(resultCount$ | async) != 0 && pagesRequired && !(pagesOrMeasuredEventsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noPageSelected' | translate }}
   </p>
-  <p id="no-measurand-selected" class="bg-danger get-barchart-data-warnings" *ngIf="(resultCount$ | async) != 0 && measurandsRequired && !(measurandsOrPerformanceAspectsSelected$ | async)">
+  <p id="no-measurand-selected" class="bg-danger get-barchart-data-warnings"
+     *ngIf="(resultCount$ | async) != 0 && measurandsRequired && !(measurandsOrPerformanceAspectsSelected$ | async)">
     {{ 'frontend.de.iteratec.osm.resultSelection.warning.noMeasurandSelected' | translate }}
   </p>
 </div>
