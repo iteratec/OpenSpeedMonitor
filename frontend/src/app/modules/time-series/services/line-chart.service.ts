@@ -4,6 +4,7 @@ import {take} from "rxjs/operators";
 
 import {
   select as d3Select,
+  event as d3Event,
   Selection as D3Selection,
   BaseType as D3BaseType,
   ContainerElement as D3ContainerElement
@@ -73,7 +74,7 @@ export class LineChartService {
   private anySelected:boolean = false;
   private clickedLabel:string = '';
   private hoveredLabel:string = '';
-
+  private keyIsPressed:boolean = false;
   private legendDataMap = {};
 
   constructor(private translationService: TranslateService) {}
@@ -105,8 +106,8 @@ export class LineChartService {
    */
   public drawLineChart(incomingData: EventResultDataDTO): void {
 
-    console.log("legendDataMap: " + JSON.stringify(this.legendDataMap));
-    console.log("this.hoveredLabel: " + this.hoveredLabel);
+    /*console.log("legendDataMap: " + JSON.stringify(this.legendDataMap));
+    console.log("this.hoveredLabel: " + this.hoveredLabel);*/
     let data: TimeSeries[] = this.prepareData(incomingData);
     /*const labels = incomingData.series.map(el =>  el.identifier);*/
     //console.log(incomingData); console.log(data);
@@ -420,10 +421,7 @@ export class LineChartService {
              update
                .transition()
                .duration(ChartCommons.TRANSITION_DURATION)
-               .style('opacity', (d) => {
-                 console.log("timeline d: " + JSON.stringify(d));
-                 return ((this.anyHighlighted && !this.legendDataMap[d].highlighted) || (this.anySelected && !this.legendDataMap[d].selected)) ? 0.2 : 1
-               });
+               .style('opacity', (d) => {return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 0.2 : 1;});
              return update;
            },
            exit => exit
@@ -451,7 +449,11 @@ export class LineChartService {
                  .attr('stroke', (d, index: number) => { return  getColorScheme()[index]; /*console.log("d: " + JSON.stringify(d));*/ /*this.legendDataMap[d].color*/ /*this.legendDataMap[d].color; getColorScheme()[index];*/ })
                  .attr('stroke-width', 1.5)
                   .style('opacity', (d) => {
-                    return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 0.2 : 1;
+                    if(!this.keyIsPressed) {
+                      return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 0.2 : 1;
+                    } else{
+                      return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 1 : 0.2;
+                    }
                   })
                  .attr('d', (dataItem: TimeSeries) => {
                    return this.getLineGenerator(xScale, yScale)(dataItem.values);
@@ -486,7 +488,8 @@ export class LineChartService {
     )
       .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')');
 
-
+    d3Select("body").on("keydown", () => this.onKeyDown(incomingData));
+    d3Select("body").on("keyup", ()=> this.onKeyUp(incomingData));
     const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
     /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement, keys);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
@@ -497,7 +500,13 @@ export class LineChartService {
         const legendElement = enter
           .append('g')
           .attr('class', 'legend-entry')
-          .style('opacity', (datum)=>{return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1});
+          .style('opacity', (datum)=>{
+            if (this.keyIsPressed) {
+              return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1;
+            }else {
+              return 0.2
+            }
+          });
         legendElement
           .append('rect')
           .attr('class', 'legend-rect')
@@ -519,7 +528,14 @@ export class LineChartService {
         update
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
-          .style('opacity', (datum)=>{return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1});
+          .style('opacity', (datum)=>{
+            if (this.keyIsPressed) {
+              return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1;
+            }else {
+              return 0.2
+            }
+
+          });
         return update;
         },
       exit => exit
@@ -531,6 +547,8 @@ export class LineChartService {
       .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)
       .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
       .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))
+/*      .on('keydown', () => this.onKeyDown)
+      .on('keyUp', () => this.onKeyUp)*/
       .on('click', (datum) => this.onMouseClick(datum, incomingData));
 
   }
@@ -558,12 +576,16 @@ export class LineChartService {
   }
 
   private onMouseOver(labelKey: string, incomingData:EventResultDataDTO): void {
+    /*document.addEventListener('keydown', this.onKeyPressed);
+    document.addEventListener('keyup', this.onKeyReleased);*/
+
     if(this.anySelected===false) {
       this.anyHighlighted = true;
       this.legendDataMap[labelKey].highlighted = true;
       this.hoveredLabel =  this.legendDataMap[labelKey];
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
+
     }
   }
 
@@ -579,8 +601,7 @@ export class LineChartService {
 
   private onMouseClick(labelKey: string, incomingData:EventResultDataDTO): void{
     console.log("on click");
-    document.addEventListener('keydown', this.onKeyPressed);
-    document.addEventListener('keyup', this.onKeyPressed);
+
     if(this.anySelected === false) {
       this.anySelected = true;
       this.legendDataMap[labelKey].selected = true;
@@ -596,13 +617,22 @@ export class LineChartService {
     }
   }
 
-  private onKeyPressed(event):void {
-
-    if(event.which=="17") {
-      console.log("cntrlIsPressed");
+  private onKeyDown(incomingData:EventResultDataDTO ):void {
+    if(d3Event.shiftKey && this.anyHighlighted) {
+      console.log("keyIsPressed");
+      this.keyIsPressed = true;
+      this.drawLineChart(incomingData);
+      this.drawLegends(incomingData);
     }
-      cntrlIsPressed = true;
+  }
 
+  private onKeyUp(incomingData: EventResultDataDTO):void {
+    if(!d3Event.shiftKey ) {
+      console.log("keyIsReleased");
+      this.keyIsPressed = false;
+      this.drawLineChart(incomingData);
+      this.drawLegends(incomingData);
+    }
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
