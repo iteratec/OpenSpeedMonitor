@@ -106,11 +106,7 @@ export class LineChartService {
    */
   public drawLineChart(incomingData: EventResultDataDTO): void {
 
-    /*console.log("legendDataMap: " + JSON.stringify(this.legendDataMap));
-    console.log("this.hoveredLabel: " + this.hoveredLabel);*/
     let data: TimeSeries[] = this.prepareData(incomingData);
-    /*const labels = incomingData.series.map(el =>  el.identifier);*/
-    //console.log(incomingData); console.log(data);
 
     if (data.length == 0) {
       console.log("No data > No chart !");
@@ -138,23 +134,18 @@ export class LineChartService {
   public initLegendData(incomingData: EventResultDataDTO){
     /*let data: TimeSeries[] = this.prepareData(incomingData);*/
     let labelDataMap= {};
-    let colors = getColorScheme();
-    incomingData.series.forEach((data: EventResultSeriesDTO, index) =>  {
+    incomingData.series.forEach((data: EventResultSeriesDTO) =>  {
       let label = data.identifier;
       let key = this.generateKey(data);
       labelDataMap[key] = {
         text: label,
         key: key,
         selected: false,
-        color: colors[index]      // TODO: cover the case when nLines > ncolors
       }
 
     });
-    console.log("labelDataMap key: " + JSON.stringify(Object.keys(labelDataMap)[2]));
     this.legendDataMap= labelDataMap;
   }
-
-
 
   /**
    * Prepares the incoming data for drawing with D3.js
@@ -399,19 +390,6 @@ export class LineChartService {
                               data: TimeSeries[]): void {
     chart.selectAll('.line').remove();
 
-
-    /*if (this.anyHighlighted) {
-      data = data.filter(obj => {
-        return obj.key === this.hoveredLabel
-      });
-    }
-
-    if (this.anySelected) {
-      data = data.filter(obj => {
-        return obj.key !== this.clickedLabel
-      });
-    }*/
-
     // Create one group per line / data entry
     chart.selectAll('.line')                             // Get all lines already drawn
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
@@ -421,7 +399,6 @@ export class LineChartService {
              update
                .transition()
                .duration(ChartCommons.TRANSITION_DURATION)
-               .style('opacity', (d) => {return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 0.2 : 1;});
              return update;
            },
            exit => exit
@@ -429,7 +406,6 @@ export class LineChartService {
              .duration(ChartCommons.TRANSITION_DURATION)
              .style('opacity', 0)
              .remove()
-
          )
          .attr('class', (dataItem: TimeSeries) => {
            return 'line line-' + dataItem.key;
@@ -499,14 +475,7 @@ export class LineChartService {
       enter => {
         const legendElement = enter
           .append('g')
-          .attr('class', 'legend-entry')
-          .style('opacity', (datum)=>{
-            if (this.keyIsPressed) {
-              return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1;
-            }else {
-              return 0.2
-            }
-          });
+          .attr('class', 'legend-entry');
         legendElement
           .append('rect')
           .attr('class', 'legend-rect')
@@ -529,10 +498,10 @@ export class LineChartService {
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
           .style('opacity', (datum)=>{
-            if (this.keyIsPressed) {
+            if(!this.keyIsPressed) {
               return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1;
-            }else {
-              return 0.2
+            } else{
+              return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 1 : 0.2;
             }
 
           });
