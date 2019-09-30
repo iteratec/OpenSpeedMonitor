@@ -7,7 +7,7 @@ import {SpinnerService} from "../../services/spinner.service";
   templateUrl: './spinner.component.html',
   styleUrls: ['./spinner.component.scss']
 })
-export class SpinnerComponent implements OnInit, OnDestroy {
+export class SpinnerComponent implements OnInit {
 
   private spinner: Spinner;
   @Input() spinnerId: string;
@@ -53,10 +53,6 @@ export class SpinnerComponent implements OnInit, OnDestroy {
     };
     this.spinner = new Spinner(options);
     this.createServiceSubscription();
-  }
-
-  ngOnDestroy() {
-    this.spinnerService.activeSpinner$.unsubscribe();
   }
 
   private startSpinner(): void {

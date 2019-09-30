@@ -130,6 +130,7 @@ export class AggregationChartDataService {
 
     combineLatest(finishedLoadingAvg$, finishedLoadingPercentile$).subscribe(() => {
       this.spinnerService.hideSpinner('aggregation-chart-spinner');
+      this.hideChartIfNoDataAvailable();
     });
 
     this.barchartDataService.fetchBarchartData<any>(
@@ -475,5 +476,15 @@ export class AggregationChartDataService {
       });
     });
     return dataForLabels;
+  }
+
+  private hideChartIfNoDataAvailable(): void {
+    if (Object.keys(this.barchartAverageData$.getValue()).length < 1 && Object.keys(this.barchartMedianData$.getValue()).length < 1
+      && this.barchartAverageData$.getValue().length != 0 && this.barchartMedianData$.getValue().length != 0) {
+      this.resultSelectionStore.dataAvailable$.next(false);
+      this.router.navigate([], {
+        replaceUrl: true
+      });
+    }
   }
 }

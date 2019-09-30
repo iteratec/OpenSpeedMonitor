@@ -21,7 +21,10 @@ export class AggregationComponent implements OnInit {
     });
     this.aggregationChartDataService.barchartMedianData$.subscribe((data) => {
       this.barchartMedianData$.next(data);
-    })
+    });
+    this.resultSelectionStore.dataAvailable$.subscribe((dataAvailable: boolean) => {
+      this.showChart = this.showChart && dataAvailable;
+    });
   }
 
   ngOnInit() {
