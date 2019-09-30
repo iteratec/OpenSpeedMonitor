@@ -74,11 +74,7 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   redraw(): void {
-    if (Object.keys(this.barchartAverageData).length < 1 && Object.keys(this.barchartMedianData).length < 1 && this.barchartAverageData.length != 0 && this.barchartMedianData.length != 0) {
-      this.resultSelectionStore.dataAvailable$.next(false);
-      return;
-    }
-    if (Object.keys(this.barchartAverageData).length < 1 || Object.keys(this.barchartMedianData).length < 1 || this.barchartAverageData.length < 1 && this.barchartMedianData.length < 1) {
+    if (Object.keys(this.barchartAverageData).length < 1 || Object.keys(this.barchartMedianData).length < 1) {
       return;
     }
 
