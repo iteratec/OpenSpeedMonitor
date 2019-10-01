@@ -31,7 +31,7 @@ import {
   axisRight as d3AxisRight
 } from 'd3-axis';
 
-import { 
+import {
   line as d3Line,
   Line as D3Line
 } from 'd3-shape';
@@ -316,7 +316,7 @@ export class LineChartService {
         .transition()
           .delay(100)
           .duration(500)
-          .attr('opacity', '1.0') 
+          .attr('opacity', '1.0')
     });
   }
 
@@ -365,7 +365,7 @@ export class LineChartService {
              this.addDataPointsToXAxisCluster(enter);
              const lineSelection: any = this.drawLine(enter, xScale, yScale);
 
-             const lineGroup = lineSelection.select(function() { return this.parentNode; });
+             const lineGroup = lineSelection.select(function() { return (<SVGPathElement>this).parentNode; });
              this.addDataPointMarkersToChart(lineGroup, xScale, yScale);
 
              return lineSelection;
@@ -464,7 +464,7 @@ export class LineChartService {
   }
 
   private addTooltipBoxToChart() {
-    this._markerTooltip = d3Select('#time-series-chart').select(function() { return this.parentNode; }).append('div')
+    this._markerTooltip = d3Select('#time-series-chart').select(function() { return (<SVGElement>this).parentNode; }).append('div')
       .attr('id', 'marker-tooltip')
       .style('opacity', '0.9');
   }
