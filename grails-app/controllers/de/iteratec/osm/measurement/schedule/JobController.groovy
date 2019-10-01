@@ -405,7 +405,7 @@ class JobController {
      */
     def getCiScript(String jobId){
         Job job = Job.findById(Long.parseLong(jobId))
-        
+
         render ciPipeService.getCiIntegrationScriptFor(job)
     }
 
@@ -523,6 +523,6 @@ class JobController {
 
     def showLastAggregationForJob(Long id) {
         Job job = Job.get(id)
-        redirect(controller: 'aggregation', action: 'show', params: jobService.createAggregationParamsFor(job))
+        redirect(controller: 'aggregationLegacy', action: 'show', params: jobService.createAggregationParamsFor(job))
     }
 }

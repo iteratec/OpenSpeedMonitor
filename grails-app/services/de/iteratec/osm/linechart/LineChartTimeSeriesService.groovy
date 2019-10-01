@@ -1,6 +1,9 @@
 package de.iteratec.osm.linechart
 
 import de.iteratec.osm.csi.Page
+import de.iteratec.osm.measurement.environment.Browser
+import de.iteratec.osm.measurement.environment.Location
+import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
 import de.iteratec.osm.result.MeasuredEvent
@@ -25,28 +28,37 @@ class LineChartTimeSeriesService {
         if (cmd.jobGroups) {
             jobGroups = JobGroup.findAllByIdInList(cmd.jobGroups)
         }
-        List<Page> pages = null
-        if (cmd.pages) {
-            pages = Page.findAllByIdInList(cmd.pages)
-        }
         List<MeasuredEvent> measuredEvents = null
         if (cmd.measuredEvents) {
             measuredEvents = MeasuredEvent.findAllByIdInList(cmd.measuredEvents)
         }
-        List<SelectedMeasurand> measurands = cmd.measurands.collect {
-            new SelectedMeasurand(it, CachedView.UNCACHED)
+        List<Page> pages = null
+        if (cmd.pages) {
+            pages = Page.findAllByIdInList(cmd.pages)
         }
-
-        List<PerformanceAspectType> performanceAspectTypes = []
+        List<Location> locations = null
+        if (cmd.locations) {
+            locations = Location.findAllByIdInList(cmd.locations)
+        }
+        List<Browser> browsers = null
+        if (cmd.browsers) {
+            browsers = Browser.findAllByIdInList(cmd.browsers)
+        }
+        List<ConnectivityProfile> connectivityProfiles = null
+        if (cmd.connectivities) {
+            connectivityProfiles = ConnectivityProfile.findAllByIdInList(cmd.connectivities)
+        }
+        List<SelectedMeasurand> measurands = null
+        if (cmd.measurands) {
+            measurands = cmd.measurands.collect { new SelectedMeasurand(it, CachedView.UNCACHED) }.unique()
+        }
+        List<PerformanceAspectType> performanceAspectTypes = null
         if (cmd.performanceAspectTypes) {
-            performanceAspectTypes = cmd.performanceAspectTypes.collect{it.toString().toUpperCase() as PerformanceAspectType}
+            performanceAspectTypes = cmd.performanceAspectTypes.collect{it.toString().toUpperCase() as PerformanceAspectType}.unique()
         }
-
-
-        print(performanceAspectTypes)
 
         List<EventResultProjection> eventResultProjections = getResultProjections(cmd, from, to, measurands, performanceAspectTypes)
-        return buildDTO(eventResultProjections, jobGroups, pages, measuredEvents, measurands, performanceAspectTypes)
+        return buildDTO(eventResultProjections, jobGroups, measuredEvents, pages, locations, browsers, connectivityProfiles, measurands, performanceAspectTypes)
     }
 
     private List<EventResultProjection> getResultProjections(GetLinechartCommand cmd, Date from, Date to, List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
@@ -54,18 +66,18 @@ class LineChartTimeSeriesService {
             return new EventResultQueryBuilder()
                     .withJobResultDateBetween(from, to)
                     .withJobGroupIdsIn(cmd.jobGroups as List)
+                    .withMeasuredEventIdsIn(cmd.measuredEvents as List)
                     .withPageIdsIn(cmd.pages as List)
                     .withLocationIdsIn(cmd.locations as List)
                     .withBrowserIdsIn(cmd.browsers as List)
-                    .withMeasuredEventIdsIn(cmd.measuredEvents as List)
+                    .withConnectivity(cmd.connectivities as List, null, false)
                     .withSelectedMeasurands(measurands)
         }
-            if (performanceAspectTypes) {
-                performanceAspectTypes.unique()
-                queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
-                    queryBuilder.withPerformanceAspects(performanceAspectTypes)
-                }
+        if (performanceAspectTypes) {
+            queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
+                queryBuilder.withPerformanceAspects(performanceAspectTypes)
             }
+        }
 
         List<EventResultProjection> eventResultProjections = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
             queryBuilder.getRawData()
@@ -73,7 +85,10 @@ class LineChartTimeSeriesService {
         return eventResultProjections
     }
 
-    private TimeSeriesChartDTO buildDTO(List<EventResultProjection> eventResultProjections, List<JobGroup> jobGroups, List<Page> pages, List<MeasuredEvent> measuredEvents, List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
+    private TimeSeriesChartDTO buildDTO(List<EventResultProjection> eventResultProjections, List<JobGroup> jobGroups,
+                                        List<MeasuredEvent> measuredEvents, List<Page> pages, List<Location> locations,
+                                        List<Browser> browsers, List<ConnectivityProfile> connectivityProfiles,
+                                        List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
         TimeSeriesChartDTO timeSeriesChartDTO = new TimeSeriesChartDTO()
         performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
             eventResultProjections.each { EventResultProjection eventResultProjection ->
@@ -88,20 +103,33 @@ class LineChartTimeSeriesService {
                     measuredEvent = (MeasuredEvent) MeasuredEvent.findById(eventResultProjection.measuredEventId)
                     identifier += " | ${measuredEvent?.name}"
                 }
+                Location location
+                if (locations) {
+                    location = (Location) locations.find { locationEntry -> locationEntry.id == eventResultProjection.locationId }
+                    identifier += " | ${location?.uniqueIdentifierForServer}"
+                } else if (browsers) {
+                    location = (Location) Location.findById(eventResultProjection.locationId)
+                    identifier += " | ${location?.uniqueIdentifierForServer}"
+                }
+                ConnectivityProfile connectivity
+                if (connectivityProfiles) {
+                    connectivity = (ConnectivityProfile) connectivityProfiles.find { connectivityProfile -> connectivityProfile.name == eventResultProjection.connectivityProfile }
+                    identifier += " | ${connectivity?.name}"
+                }
 
-                measurands.unique().each { measurand ->
+                measurands.each { measurand ->
                     String dataBaseRelevantName = measurand.getDatabaseRelevantName()
                     String measurandName = measurand.getName()
-                    Double value = (Double) eventResultProjection.projectedProperties."$dataBaseRelevantName"
+                    Double value = (Double) eventResultProjection."$dataBaseRelevantName"
                     String identifierMeasurand = identifier + " | $measurandName"
-                    buildSeries(jobGroup, value, identifierMeasurand, date, measuredEvent, timeSeriesChartDTO)
+                    buildSeries(value, identifierMeasurand, date, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
                     timeSeriesChartDTO.series.find{ it.identifier == identifierMeasurand }.measurand = measurandName
                 }
 
                 performanceAspectTypes.each { performanceAspectType ->
-                    Double value = (Double) eventResultProjection.projectedProperties."$performanceAspectType"
+                    Double value = (Double) eventResultProjection."$performanceAspectType"
                     String identifierAspect = identifier + " | $performanceAspectType"
-                    buildSeries(jobGroup, value, identifierAspect, date, measuredEvent, timeSeriesChartDTO)
+                    buildSeries(value, identifierAspect, date, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
                     timeSeriesChartDTO.series.find{ it.identifier == identifierAspect }.performanceAspectType = performanceAspectType.toString()
                 }
             }
@@ -114,7 +142,8 @@ class LineChartTimeSeriesService {
         return timeSeriesChartDTO
     }
 
-    private void buildSeries(JobGroup jobGroup, Double value, String identifier, Date date, MeasuredEvent measuredEvent, TimeSeriesChartDTO timeSeriesChartDTO){
+    private void buildSeries(Double value, String identifier, Date date, JobGroup jobGroup, MeasuredEvent measuredEvent,
+                             Location location, ConnectivityProfile connectivity, TimeSeriesChartDTO timeSeriesChartDTO) {
         TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
         if (!timeSeries) {
             timeSeries = new TimeSeries(
@@ -123,6 +152,12 @@ class LineChartTimeSeriesService {
             )
             if (measuredEvent) {
                 timeSeries.setMeasuredEvent(measuredEvent.name)
+            }
+            if (location) {
+                timeSeries.setLocation(location.label)
+            }
+            if (connectivity) {
+                timeSeries.setConnectivity(connectivity.name)
             }
             timeSeriesChartDTO.series.add(timeSeries)
         }

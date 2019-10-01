@@ -24,11 +24,26 @@ export class ResultSelectionStore {
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
   _remainingResultSelection$: BehaviorSubject<RemainingResultSelection>;
 
-  applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({isLoading: false, data: []});
-  applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({isLoading: false, data: []});
-  eventsAndPages$: BehaviorSubject<ResponseWithLoadingState<MeasuredEvent[]>> = new BehaviorSubject({isLoading: false, data: []});
-  locationsAndBrowsers$: BehaviorSubject<ResponseWithLoadingState<Location[]>> = new BehaviorSubject({isLoading: false, data: []});
-  connectivities$: BehaviorSubject<ResponseWithLoadingState<Connectivity[]>> = new BehaviorSubject({isLoading: false, data: []});
+  applications$: BehaviorSubject<ResponseWithLoadingState<SelectableApplication[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
+  applicationsAndPages$: BehaviorSubject<ResponseWithLoadingState<ApplicationWithPages[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
+  eventsAndPages$: BehaviorSubject<ResponseWithLoadingState<MeasuredEvent[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
+  locationsAndBrowsers$: BehaviorSubject<ResponseWithLoadingState<Location[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
+  connectivities$: BehaviorSubject<ResponseWithLoadingState<Connectivity[]>> = new BehaviorSubject({
+    isLoading: false,
+    data: []
+  });
   loadTimes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   userTimings$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   heroTimings$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
@@ -36,6 +51,7 @@ export class ResultSelectionStore {
   requestSizes$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   percentages$: BehaviorSubject<MeasurandGroup> = new BehaviorSubject({isLoading: false, name: "", values: []});
   resultCount$: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  dataAvailable$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
 
   reset$: Subject<void> = new Subject<void>();
 
@@ -89,7 +105,11 @@ export class ResultSelectionStore {
       let defaultTo = new Date();
       defaultFrom.setDate(defaultTo.getDate() - 3);
 
-      this._resultSelectionCommand$ = new BehaviorSubject({from: defaultFrom, to: defaultTo, caller: Caller.EventResult});
+      this._resultSelectionCommand$ = new BehaviorSubject({
+        from: defaultFrom,
+        to: defaultTo,
+        caller: Caller.EventResult
+      });
       this._remainingResultSelection$ = new BehaviorSubject({});
     }
   }
@@ -151,7 +171,7 @@ export class ResultSelectionStore {
     Object.keys(object).reduce(
       (acc, key) => ({
         ...acc,
-        ...{ [keysMap[key] || key]: object[key] }
+        ...{[keysMap[key] || key]: object[key]}
       }),
       {}
     );
@@ -169,12 +189,17 @@ export class ResultSelectionStore {
   }
 
   setResultSelectionCommand(newState: ResultSelectionCommand): void {
+    this.dataAvailable$.next(true);
     this._resultSelectionCommand$.next(newState);
     this.loadResultCount(newState);
   }
 
   setRemainingResultSelectionComparativeTimeFrame(timeFrame: Date[]): void {
-    this.setRemainingResultSelection({...this.remainingResultSelection, fromComparative: timeFrame[0], toComparative: timeFrame[1]});
+    this.setRemainingResultSelection({
+      ...this.remainingResultSelection,
+      fromComparative: timeFrame[0],
+      toComparative: timeFrame[1]
+    });
   }
 
   setRemainingResultSelectionInterval(intervalInSeconds: number): void {
@@ -190,6 +215,7 @@ export class ResultSelectionStore {
   }
 
   private setRemainingResultSelection(newState: RemainingResultSelection): void {
+    this.dataAvailable$.next(true);
     this._remainingResultSelection$.next(newState);
   }
 
@@ -230,54 +256,54 @@ export class ResultSelectionStore {
     this.percentages$.next({...this.percentages$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<MeasurandGroup[]>(resultSelectionCommand, URL.MEASURANDS)
       .subscribe((groups: MeasurandGroup[]) => {
-      if (groups) {
-        groups.forEach((group: MeasurandGroup) => {
-          let responseWithLoadingState: MeasurandGroup = {
-            isLoading: false,
-            name: "frontend.de.iteratec.isr.measurand.group." + group.name,
-            values: group.values.map(measurand => ({
-              kind: "selectable-measurand",
-              name: "frontend.de.iteratec.isr.measurand." + measurand.name,
-              id: measurand.id
-            } as SelectableMeasurand))
-          };
-          let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
-          if (concerningSubject$) {
-            concerningSubject$.next(responseWithLoadingState);
-          }
-        });
-      }
-    });
+        if (groups) {
+          groups.forEach((group: MeasurandGroup) => {
+            let responseWithLoadingState: MeasurandGroup = {
+              isLoading: false,
+              name: "frontend.de.iteratec.isr.measurand.group." + group.name,
+              values: group.values.map(measurand => ({
+                kind: "selectable-measurand",
+                name: "frontend.de.iteratec.isr.measurand." + measurand.name,
+                id: measurand.id
+              } as SelectableMeasurand))
+            };
+            let concerningSubject$ = this.getDefaultSubjectByMeasurandGroup(group.name);
+            if (concerningSubject$) {
+              concerningSubject$.next(responseWithLoadingState);
+            }
+          });
+        }
+      });
   }
 
   private loadUserTimings(resultSelectionCommand: ResultSelectionCommand): void {
     this.userTimings$.next({...this.userTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.USER_TIMINGS)
       .subscribe(next => {
-      next.forEach((userTiming: SelectableMeasurand) => userTiming.kind = 'selectable-measurand');
-      const groupName: string = "User Timings";
-      let responseWithLoadingState: MeasurandGroup = {
-        isLoading: false,
-        name: groupName,
-        values: next
-      };
-      this.userTimings$.next(responseWithLoadingState);
-    });
+        next.forEach((userTiming: SelectableMeasurand) => userTiming.kind = 'selectable-measurand');
+        const groupName: string = "User Timings";
+        let responseWithLoadingState: MeasurandGroup = {
+          isLoading: false,
+          name: groupName,
+          values: next
+        };
+        this.userTimings$.next(responseWithLoadingState);
+      });
   }
 
   private loadHeroTimings(resultSelectionCommand: ResultSelectionCommand): void {
     this.heroTimings$.next({...this.heroTimings$.getValue(), isLoading: true});
     this.resultSelectionService.fetchResultSelectionData<SelectableMeasurand[]>(resultSelectionCommand, URL.HERO_TIMINGS)
       .subscribe(next => {
-      next.forEach((heroTiming: SelectableMeasurand) => heroTiming.kind = 'selectable-measurand');
-      const groupName: string = "Hero Timings";
-      let responseWithLoadingState: MeasurandGroup = {
-        isLoading: false,
-        name: groupName,
-        values: next
-      };
-      this.heroTimings$.next(responseWithLoadingState);
-    });
+        next.forEach((heroTiming: SelectableMeasurand) => heroTiming.kind = 'selectable-measurand');
+        const groupName: string = "Hero Timings";
+        let responseWithLoadingState: MeasurandGroup = {
+          isLoading: false,
+          name: groupName,
+          values: next
+        };
+        this.heroTimings$.next(responseWithLoadingState);
+      });
   }
 
   private loadResultCount(resultSelectionCommand: ResultSelectionCommand): void {
