@@ -113,7 +113,6 @@ export class ResultSelectionStore {
         caller: Caller.EventResult
       };
       this._resultSelectionCommand$.next(resultSelectionCommand);
-      this._remainingResultSelection$ = new BehaviorSubject({});
     }
   }
 
