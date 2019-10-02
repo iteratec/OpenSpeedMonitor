@@ -552,12 +552,16 @@ export class LineChartService {
     const tooltipText = this.generateTooltipText(nearestDot, visibleDots, highlightedDate);
     tooltip.html(tooltipText.outerHTML);
 
-
     // TODO: Positioning of the tooltip must be left or right of the box, depending on the space left
+    const tooltipWidth: number = (<HTMLDivElement>tooltip.node()).getBoundingClientRect().width;
+    const nearestDotXPosition: number = parseFloat(nearestDot.attr('cx'));
+
     const top = parseFloat(nearestDot.attr('cy')) + this._margin.top;
-    const left = parseFloat(nearestDot.attr('cx')) + this._margin.left + 50;
+    const left = ( tooltipWidth + nearestDotXPosition > this._width ) ?
+      (nearestDotXPosition - tooltipWidth + this._margin.right + 10) : nearestDotXPosition + this._margin.left + 50;
     tooltip.style('top', top+'px');
     tooltip.style('left', left+ 'px');
+
   }
 
   private generateTooltipText(nearestDot: D3Selection<any, unknown, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date): HTMLTableElement {
@@ -569,13 +573,13 @@ export class LineChartService {
 
     visibleDots
       .sort((a: TimeSeriesPoint, b: TimeSeriesPoint) => {
-        console.log(a,b);
+        // console.log(a,b);
         if (a.value > b.value) return -1
         else if (a.value < b.value) return 1
         else return 0;
       })
       .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
-        console.log(timeSeriesPoint, index, nodes[index]);
+        // console.log(timeSeriesPoint, index, nodes[index]);
         tableBody.append(this.generateTooltipDatapointRow(timeSeriesPoint, nodes[index], nearestDot));
       });
 

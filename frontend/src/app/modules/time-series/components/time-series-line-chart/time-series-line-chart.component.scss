@@ -7,19 +7,22 @@ osm-time-series-line-chart {
     position: absolute;
     text-align: left;
     padding: 5px;
-    font: 12px sans-serif;
+    font: 10pt sans-serif;
     color: white;
-    background: black;
+    background: rgba(0, 0, 0, 0.7);
     border: 0px;
     border-radius: 3px;
     pointer-events: none;
 
     tr.active {
-      background: lightgray;
+      background: rgba(255, 255, 255, 0.35);
     }
 
     td {
       padding-right: 10px;
+      i {
+        padding-right: 5px;
+      }
     }
   }
 
