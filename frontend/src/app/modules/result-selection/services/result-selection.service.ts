@@ -11,26 +11,29 @@ export class ResultSelectionService {
   }
 
   fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get<T>(url, {params: params}).pipe(
-      this.handleError()
-    )
+    if (resultSelectionCommand.from && resultSelectionCommand.to) {
+      const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
+      return this.http.get<T>(url, {params: params}).pipe(
+        this.handleError()
+      )
+    }
+    return new Observable<T>();
   }
 
   private createParamsFromResultSelectionCommand(resultSelectionCommand: ResultSelectionCommand) {
-    let params = new HttpParams();
+    let params = new HttpParams()
+      .set('from', resultSelectionCommand.from.toISOString())
+      .set('to', resultSelectionCommand.to.toISOString())
+      .set('caller', Caller[resultSelectionCommand.caller]);
 
     Object.keys(resultSelectionCommand).forEach(key => {
+      if (key === 'from' || key === 'to' || key === 'caller') {
+        return;
+      }
       if (resultSelectionCommand[key].length > 0) {
-        if (key === 'from' || key === 'to') {
-          params.append(key, resultSelectionCommand[key].toISOString())
-        } else if (key === 'caller') {
-          params.append(key, Caller[resultSelectionCommand[key]])
-        } else {
-          resultSelectionCommand[key].forEach(id => {
-            params = params.append(key, id.toString())
-          });
-        }
+        resultSelectionCommand[key].forEach(id => {
+          params = params.append(key, id.toString())
+        });
       }
     });
 
