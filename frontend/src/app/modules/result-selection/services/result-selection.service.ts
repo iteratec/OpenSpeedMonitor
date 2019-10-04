@@ -18,19 +18,19 @@ export class ResultSelectionService {
   }
 
   private createParamsFromResultSelectionCommand(resultSelectionCommand: ResultSelectionCommand) {
-    let params = new HttpParams()
-      .set('from', resultSelectionCommand.from.toISOString())
-      .set('to', resultSelectionCommand.to.toISOString())
-      .set('caller', Caller[resultSelectionCommand.caller]);
+    let params = new HttpParams();
 
     Object.keys(resultSelectionCommand).forEach(key => {
-      if (key === 'from' || key === 'to' || key === 'caller') {
-        return;
-      }
       if (resultSelectionCommand[key].length > 0) {
-        resultSelectionCommand[key].forEach(id => {
-          params = params.append(key, id.toString())
-        });
+        if (key === 'from' || key === 'to') {
+          params.append(key, resultSelectionCommand[key].toISOString())
+        } else if (key === 'caller') {
+          params.append(key, Caller[resultSelectionCommand[key]])
+        } else {
+          resultSelectionCommand[key].forEach(id => {
+            params = params.append(key, id.toString())
+          });
+        }
       }
     });
 
