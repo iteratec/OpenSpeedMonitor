@@ -140,7 +140,7 @@ export class LineChartService {
       labelDataMap[key] = {
         text: label,
         key: key,
-        selected: false,
+        show: true,
       }
 
     });
@@ -395,12 +395,7 @@ export class LineChartService {
          .data(data, (datum: TimeSeries) => datum.key)   // ... for this data
          .join(
            enter => this.drawLine(enter, xScale, yScale),
-           update => {
-             update
-               .transition()
-               .duration(ChartCommons.TRANSITION_DURATION)
-             return update;
-           },
+           update =>update,
            exit => exit
              .transition()
              .duration(ChartCommons.TRANSITION_DURATION)
@@ -408,6 +403,7 @@ export class LineChartService {
              .remove()
          )
          .attr('class', (dataItem: TimeSeries) => {
+
            return 'line line-' + dataItem.key;
          })
 
@@ -425,11 +421,12 @@ export class LineChartService {
                  .attr('stroke', (d, index: number) => { return  getColorScheme()[index]; /*console.log("d: " + JSON.stringify(d));*/ /*this.legendDataMap[d].color*/ /*this.legendDataMap[d].color; getColorScheme()[index];*/ })
                  .attr('stroke-width', 1.5)
                   .style('opacity', (d) => {
-                    if(!this.keyIsPressed) {
+                    return  ( this.legendDataMap[d.key].show) ? 1 : 0.2;
+                    /*if(!this.keyIsPressed) {
                       return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 0.2 : 1;
                     } else{
                       return ((this.anyHighlighted && !this.legendDataMap[d.key].highlighted) || (this.anySelected && !this.legendDataMap[d.key].selected)) ? 1 : 0.2;
-                    }
+                    }*/
                   })
                  .attr('d', (dataItem: TimeSeries) => {
                    return this.getLineGenerator(xScale, yScale)(dataItem.values);
@@ -464,8 +461,8 @@ export class LineChartService {
     )
       .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')');
 
-    d3Select("body").on("keydown", () => this.onKeyDown(incomingData));
-    d3Select("body").on("keyup", ()=> this.onKeyUp(incomingData));
+    /*d3Select("body").on("keydown", () => this.onKeyDown(incomingData));
+    d3Select("body").on("keyup", ()=> this.onKeyUp(incomingData));*/
     const legendEntry = d3Select('.chart-legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
     /*const maxEntryGroupSize = this.calculateMaxEntryGroupWidth(this.svgElement.nativeElement, keys);
     const maxEntriesInRow = Math.floor(this.svgWidth / maxEntryGroupSize);*/
@@ -498,11 +495,12 @@ export class LineChartService {
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
           .style('opacity', (datum)=>{
-            if(!this.keyIsPressed) {
+            return  (this.legendDataMap[datum].show) ? 1 : 0.2;
+            /*if(!this.keyIsPressed) {
               return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1;
             } else{
               return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 1 : 0.2;
-            }
+            }*/
 
           });
         return update;
@@ -513,11 +511,9 @@ export class LineChartService {
         .style('opacity', 0)
         .remove()
     )
-      .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)
+      .attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)/*
       .on('mouseover', (datum) => this.onMouseOver(datum, incomingData))
-      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))
-/*      .on('keydown', () => this.onKeyDown)
-      .on('keyUp', () => this.onKeyUp)*/
+      .on('mouseout', (datum) => this.onMouseOut(datum, incomingData))*/
       .on('click', (datum) => this.onMouseClick(datum, incomingData));
 
   }
@@ -568,25 +564,52 @@ export class LineChartService {
     }
   }
 
-  private onMouseClick(labelKey: string, incomingData:EventResultDataDTO): void{
-    console.log("on click");
+    private onMouseClick(labelKey: string, incomingData:EventResultDataDTO): void{
 
-    if(this.anySelected === false) {
+    if (d3Event.metaKey) {
+      this.legendDataMap[labelKey].show?this.legendDataMap[labelKey].show = false : this.legendDataMap[labelKey].show = true;
+    } else {
+
+      Object.keys(this.legendDataMap).forEach((legend) => {
+        console.log("legend: " + JSON.stringify(legend));
+        if (legend === labelKey)  {
+          this.legendDataMap[legend].show = true; console.log("true");
+          console.log("legend: " + JSON.stringify(legend));
+        } else {
+          this.legendDataMap[legend].show = false; console.log("false");
+          console.log("legend: " + JSON.stringify(legend));
+        }
+      });
+      console.log("this.legendDataMap: " + JSON.stringify(this.legendDataMap));
+
+
+      /*for (let legend in this.legendDataMap) {
+        if (legend === labelKey)  {
+          this.legendDataMap[labelKey].show = true
+          console.log()
+        } else {
+          this.legendDataMap[labelKey].show = false;
+        }
+      }*/
+    }
+      this.drawLineChart(incomingData);
+      this.drawLegends(incomingData);
+
+
+    /*if(this.anySelected === false) {
       this.anySelected = true;
       this.legendDataMap[labelKey].selected = true;
-      this.clickedLabel = this.legendDataMap[labelKey];
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     } else {
       this.anySelected = false;
       this.legendDataMap[labelKey].selected = false;
-      this.clickedLabel = "";
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
-    }
+    }*/
   }
 
-  private onKeyDown(incomingData:EventResultDataDTO ):void {
+/*  private onKeyDown(incomingData:EventResultDataDTO ):void {
     if(d3Event.shiftKey && this.anyHighlighted) {
       console.log("keyIsPressed");
       this.keyIsPressed = true;
@@ -602,7 +625,7 @@ export class LineChartService {
       this.drawLineChart(incomingData);
       this.drawLegends(incomingData);
     }
-  }
+  }*/
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
   //                             xScale: D3ScaleTime<number, number>,
