@@ -69,6 +69,8 @@ export class ResultSelectionStore {
   };
 
   constructor(private resultSelectionService: ResultSelectionService, route: ActivatedRoute, private router: Router) {
+    this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>({});
+    this._remainingResultSelection$ = new BehaviorSubject<RemainingResultSelection>({});
     route.queryParams.subscribe((params: Params) => {
       if (params) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
@@ -95,8 +97,8 @@ export class ResultSelectionStore {
           ...(params.performanceAspectTypes && {performanceAspectTypes: [].concat(params.performanceAspectTypes)})
         };
 
-        this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>(resultSelectionCommand);
-        this._remainingResultSelection$ = new BehaviorSubject(remainingResultSelection);
+        this._resultSelectionCommand$.next(resultSelectionCommand);
+        this._remainingResultSelection$.next(remainingResultSelection);
       }
     });
 
@@ -105,12 +107,12 @@ export class ResultSelectionStore {
       let defaultTo = new Date();
       defaultFrom.setDate(defaultTo.getDate() - 3);
 
-      this._resultSelectionCommand$ = new BehaviorSubject({
+      const resultSelectionCommand: ResultSelectionCommand = {
         from: defaultFrom,
         to: defaultTo,
         caller: Caller.EventResult
-      });
-      this._remainingResultSelection$ = new BehaviorSubject({});
+      };
+      this._resultSelectionCommand$.next(resultSelectionCommand);
     }
   }
 
