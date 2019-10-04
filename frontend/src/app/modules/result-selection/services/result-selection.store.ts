@@ -66,10 +66,15 @@ export class ResultSelectionStore {
     selectedTimeFrameInterval: 'interval'
   };
 
-  constructor(private resultSelectionService: ResultSelectionService, route: ActivatedRoute, private router: Router) {
-    this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>({});
+  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
+    this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>({caller: Caller.EventResult});
     this._remainingResultSelection$ = new BehaviorSubject<RemainingResultSelection>({});
-    route.queryParams.subscribe((params: Params) => {
+
+    this.readQueryParams();
+  }
+
+  readQueryParams(): void {
+    this.route.queryParams.subscribe((params: Params) => {
       if (params) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
         this.validQuery = this.checkQuery(params);
@@ -99,22 +104,9 @@ export class ResultSelectionStore {
         this._remainingResultSelection$.next(remainingResultSelection);
       }
     });
-
-    if (!this.validQuery) {
-      let defaultFrom = new Date();
-      let defaultTo = new Date();
-      defaultFrom.setDate(defaultTo.getDate() - 3);
-
-      const resultSelectionCommand: ResultSelectionCommand = {
-        from: defaultFrom,
-        to: defaultTo,
-        caller: Caller.EventResult
-      };
-      this._resultSelectionCommand$.next(resultSelectionCommand);
-    }
   }
 
-  writeQueryParams(additionalParams?: Params) {
+  writeQueryParams(additionalParams?: Params): void {
     this.router.navigate([], {
       queryParams: {
         from: this.resultSelectionCommand.from.toISOString(),
