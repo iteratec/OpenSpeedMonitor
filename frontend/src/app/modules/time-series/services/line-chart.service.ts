@@ -62,10 +62,13 @@ export class LineChartService {
   private _width  = 600 - this._margin.left - this._margin.right;
   private _height = 500 - this._margin.top - this._margin.bottom;
   private _labelHeight = 75;
+  private legendsPerRow = 3;
 
   private _legendGroupTop = this._margin.top + this._height + 50;
   private _legendGroupLeft = this._margin.left;
   private legendDataMap = {};
+
+
 
   constructor(private translationService: TranslateService) {}
 
@@ -427,10 +430,12 @@ export class LineChartService {
 
     TimeSeriesSVG.append('g') // apendo  legend group
       .attr('class', 'legend-group')
-      .attr('layout-css', 'flex: 1; flexDirection: row; justifyContent: space-around;')
+      /*.attr('style', 'height: 3em; display: flex; flex-direction: row')*/
+      /*.attr('layout-css', 'flex: 1; flexDirection: row; justifyContent: space-around;')*/
       .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop })`)
 
     const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
+
 
 
     const maxEntriesInRow = this._width/10;
@@ -438,9 +443,11 @@ export class LineChartService {
       enter => {
         const legendElement = enter
           .append('g')
-          .attr('layout-css', 'flex: 1;')
-          .attr('layout-css', 'width: 100;')
-          .attr('class', 'legend-entry');
+          /*.attr('layout-css', 'flex: 1;')
+          .attr('layout-css', 'width: 100;')*/
+          .attr('class', 'legend-entry')
+          /*.attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
+          .attr('y', ChartCommons.COLOR_PREVIEW_SIZE);*/
         legendElement
           .append('rect')
           .attr('class', 'legend-rect')
@@ -453,7 +460,7 @@ export class LineChartService {
         legendElement
           .append('text')
           .attr('class', 'legend-text')
-          .attr('x', ChartCommons.COLOR_PREVIEW_SIZE + ChartCommons.COLOR_PREVIEW_MARGIN)
+          .attr('x', 10 + 5)
           .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
           .text(datum => this.legendDataMap[datum].text);
         return legendElement;
@@ -464,12 +471,6 @@ export class LineChartService {
           .duration(ChartCommons.TRANSITION_DURATION)
           .style('opacity', (datum)=>{
             return  (this.legendDataMap[datum].show) ? 1 : 0.2;
-            /*if(!this.keyIsPressed) {
-              return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 0.2 : 1;
-            } else{
-              return ((this.anyHighlighted && !this.legendDataMap[datum].highlighted) || (this.anySelected && !this.legendDataMap[datum].selected)) ? 1 : 0.2;
-            }*/
-
           });
         return update;
         },
@@ -479,9 +480,23 @@ export class LineChartService {
         .style('opacity', 0)
         .remove()
     )
-      /*.attr('transform', (datum, index) => `translate(${300*(index % maxEntriesInRow)}, 0)`)*/
-      .on('click', (datum) => this.onMouseClick(datum, incomingData));
+      /*.attr('transform', (datum, index) => `translate(${500*(index % this.legendsPerRow)}, 0)`)*/
+      .attr("transform", this.position)
+      /*.attr("transform", function(d,i) {  "translate(10," + (i * 20) +")" })*/
+  .on('click', (datum) => this.onMouseClick(datum, incomingData));
 
+  }
+
+
+  private position(d,i) {
+    var c = 3;   // number of columns
+    var h = 20;  // height of each entry
+    var w = 550; // width of each entry (so you can position the next column)
+    var tx = 10; // tx/ty are essentially margin values
+    var ty = 10;
+    var x = i % c * w + tx;
+    var y = Math.floor(i / c) * h + ty;
+    return "translate(" + x + "," + y + ")";
   }
 
   calculateMaxEntryGroupWidth(svgForEstimation: SVGElement, keys: string[]): number {
