@@ -60,7 +60,7 @@ export class LineChartService {
 
   private _margin = { top: 40, right: 70, bottom: 40, left: 60 };
   private _width  = 600 - this._margin.left - this._margin.right;
-  private _height = 500 - this._margin.top - this._margin.bottom;
+  private _height = 700 - this._margin.top - this._margin.bottom;
   private _labelHeight = 75;
   private _legendGroupTop = this._margin.top + this._height + 50;
   private _legendGroupLeft = this._margin.left;
@@ -73,10 +73,8 @@ export class LineChartService {
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
-
     this.addXAxisToChart(chart, xScale);
     this.addYAxisToChart(chart, yScale);
-
   }
 
   /**
@@ -85,7 +83,6 @@ export class LineChartService {
   public drawLineChart(incomingData: EventResultDataDTO): void {
 
     let data: TimeSeries[] = this.prepareData(incomingData);
-
     if (data.length == 0) {
       console.log("No data > No chart !");
       return;
@@ -94,24 +91,23 @@ export class LineChartService {
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
     d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._height + this._labelHeight + this._margin.top  + this._margin.bottom);  //TODO fix containers height
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
-
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
-
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
-  public drawLegends(incomingData: EventResultDataDTO): void {
-    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    this.addIdentifierLegendsToChart(chart, incomingData)
+  public initLegendData(){
+    const TimeSeriesSVG = d3Select("#time-series-svg");
+    TimeSeriesSVG.append('g')
+      .attr('class', 'legend-group')
+      .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop })`)
   }
 
-  public initLegendData(incomingData: EventResultDataDTO){
-    /*let data: TimeSeries[] = this.prepareData(incomingData);*/
-    let labelDataMap= {};
+  public drawLegends(incomingData: EventResultDataDTO): void {
+    let labelDataMap= {}
+    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     incomingData.series.forEach((data: EventResultSeriesDTO) =>  {
       let label = data.identifier;
       let key = this.generateKey(data);
@@ -120,9 +116,9 @@ export class LineChartService {
         key: key,
         show: true,
       }
-
     });
     this.legendDataMap= labelDataMap;
+    this.addIdentifierLegendsToChart(chart, incomingData)
   }
 
   /**
@@ -411,15 +407,8 @@ export class LineChartService {
 
   private  addIdentifierLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                                        incomingData: EventResultDataDTO) {
-
     chart.selectAll('.legend-entry').remove();
-    const TimeSeriesSVG = d3Select("#time-series-svg");
     const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
-
-    TimeSeriesSVG.append('g') // apendo  legend group
-      .attr('class', 'legend-group')
-      .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop })`)
-
     legendEntry.join(
       enter => {
         const legendElement = enter
@@ -463,7 +452,7 @@ export class LineChartService {
 
   private position(d,i) {
     var c = 3;   // number of columns
-    var h = 20;  // height of each entry
+    var h = 17;  // height of each entry
     var w = 550; // width of each entry (so you can position the next column)
     var tx = 10; // tx/ty are essentially margin values
     var ty = 10;
