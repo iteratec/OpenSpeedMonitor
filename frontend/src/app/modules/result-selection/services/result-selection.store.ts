@@ -19,8 +19,6 @@ import {ActivatedRoute, Params, Router} from "@angular/router";
 
 @Injectable()
 export class ResultSelectionStore {
-  from: Date;
-  to: Date;
   _resultSelectionCommand$: BehaviorSubject<ResultSelectionCommand>;
   _remainingResultSelection$: BehaviorSubject<RemainingResultSelection>;
 
@@ -68,10 +66,15 @@ export class ResultSelectionStore {
     selectedTimeFrameInterval: 'interval'
   };
 
-  constructor(private resultSelectionService: ResultSelectionService, route: ActivatedRoute, private router: Router) {
-    this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>({});
+  constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
+    this._resultSelectionCommand$ = new BehaviorSubject<ResultSelectionCommand>({caller: Caller.EventResult});
     this._remainingResultSelection$ = new BehaviorSubject<RemainingResultSelection>({});
-    route.queryParams.subscribe((params: Params) => {
+
+    this.readQueryParams();
+  }
+
+  readQueryParams(): void {
+    this.route.queryParams.subscribe((params: Params) => {
       if (params) {
         params = this.renameParamKeys(this.oldToNewChartKeyMap, params);
         this.validQuery = this.checkQuery(params);
@@ -101,22 +104,9 @@ export class ResultSelectionStore {
         this._remainingResultSelection$.next(remainingResultSelection);
       }
     });
-
-    if (!this.validQuery) {
-      let defaultFrom = new Date();
-      let defaultTo = new Date();
-      defaultFrom.setDate(defaultTo.getDate() - 3);
-
-      const resultSelectionCommand: ResultSelectionCommand = {
-        from: defaultFrom,
-        to: defaultTo,
-        caller: Caller.EventResult
-      };
-      this._resultSelectionCommand$.next(resultSelectionCommand);
-    }
   }
 
-  writeQueryParams(additionalParams?: Params) {
+  writeQueryParams(additionalParams?: Params): void {
     this.router.navigate([], {
       queryParams: {
         from: this.resultSelectionCommand.from.toISOString(),
@@ -157,27 +147,6 @@ export class ResultSelectionStore {
     });
   }
 
-  private checkQuery(params: Params): boolean {
-    const dates: Date[] = [new Date(params.from), new Date(params.to)];
-    const datesValid: boolean = dates.every(this.isValidDate);
-    const jobGroupIdsValid: boolean = !!params.jobGroupIds;
-
-    return datesValid && jobGroupIdsValid;
-  }
-
-  private isValidDate(date: Date) {
-    return date instanceof Date && !isNaN(date.getTime())
-  }
-
-  private renameParamKeys = (keysMap, object) =>
-    Object.keys(object).reduce(
-      (acc, key) => ({
-        ...acc,
-        ...{[keysMap[key] || key]: object[key]}
-      }),
-      {}
-    );
-
   setResultSelectionCommandTimeFrame(timeFrame: Date[]): void {
     this.setResultSelectionCommand({...this.resultSelectionCommand, from: timeFrame[0], to: timeFrame[1]});
   }
@@ -215,6 +184,27 @@ export class ResultSelectionStore {
   get remainingResultSelection(): RemainingResultSelection {
     return this._remainingResultSelection$.getValue();
   }
+
+  private checkQuery(params: Params): boolean {
+    const dates: Date[] = [new Date(params.from), new Date(params.to)];
+    const datesValid: boolean = dates.every(this.isValidDate);
+    const jobGroupIdsValid: boolean = !!params.jobGroupIds;
+
+    return datesValid && jobGroupIdsValid;
+  }
+
+  private isValidDate(date: Date) {
+    return date instanceof Date && !isNaN(date.getTime())
+  }
+
+  private renameParamKeys = (keysMap, object) =>
+    Object.keys(object).reduce(
+      (acc, key) => ({
+        ...acc,
+        ...{[keysMap[key] || key]: object[key]}
+      }),
+      {}
+    );
 
   private setRemainingResultSelection(newState: RemainingResultSelection): void {
     this.dataAvailable$.next(true);
