@@ -89,6 +89,7 @@ export class LineChartService {
       return;
     }
 
+
     this._labelGroupHeight = data.length * this._labelHeight;
 
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
@@ -101,16 +102,13 @@ export class LineChartService {
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
-  public initLegendData(){
+  public initLegendData(incomingData: EventResultDataDTO){
     const TimeSeriesSVG = d3Select("#time-series-svg");
+    let labelDataMap= {}
     TimeSeriesSVG.append('g')
       .attr('class', 'legend-group')
       .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop })`)
-  }
 
-  public drawLegends(incomingData: EventResultDataDTO): void {
-    let labelDataMap= {}
-    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     incomingData.series.forEach((data: EventResultSeriesDTO) =>  {
       let label = data.identifier;
       let key = this.generateKey(data);
@@ -120,8 +118,12 @@ export class LineChartService {
         show: true,
       }
     });
-    this.legendDataMap= labelDataMap;
-    this.addIdentifierLegendsToChart(chart, incomingData)
+    this.legendDataMap=labelDataMap;
+  }
+
+  public drawLegends(incomingData: EventResultDataDTO): void {
+    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
+    this.addLegendsToChart(chart, incomingData)
   }
 
   /**
@@ -391,10 +393,10 @@ export class LineChartService {
              .append('g')       // Group each line so we can add dots to this group latter
                .append('path')  // Draw one path for every item in the data set
                  .attr('fill', 'none')
-                 .attr('stroke', (d, index: number) => { return  getColorScheme()[index]; /*console.log("d: " + JSON.stringify(d));*/ /*this.legendDataMap[d].color*/ /*this.legendDataMap[d].color; getColorScheme()[index];*/ })
+                 .attr('stroke', (d, index: number) => { return  getColorScheme()[index]; })
                  .attr('stroke-width', 1.5)
                   .style('opacity', (d) => {
-                    return  ( this.legendDataMap[d.key].show) ? 1 : 0.1;
+                    return  ( this.legendDataMap[d.key].show) ? 1 : 0.2;
                   })
                  .attr('d', (dataItem: TimeSeries) => {
                    return this.getLineGenerator(xScale, yScale)(dataItem.values);
@@ -408,7 +410,7 @@ export class LineChartService {
                  });
   }
 
-  private  addIdentifierLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+  private  addLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                                        incomingData: EventResultDataDTO) {
     chart.selectAll('.legend-entry').remove();
     const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
@@ -439,7 +441,7 @@ export class LineChartService {
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
           .style('opacity', (datum)=>{
-            return  (this.legendDataMap[datum].show) ? 1 : 0.1;
+            return  (this.legendDataMap[datum].show) ? 1 : 0.2;
           });
         return update;
         },
@@ -476,8 +478,8 @@ export class LineChartService {
         }
       });
     }
-    this.drawLineChart(incomingData);
     this.drawLegends(incomingData);
+    this.drawLineChart(incomingData);
   }
 
   //private addDataPointsToChart(chartLineGroups: D3Selection<any, LineChartDataDTO, D3ContainerElement, {}>,
