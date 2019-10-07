@@ -49,7 +49,6 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   }
 
   redraw() {
-    /*this.lineChartService.initLegendData(this.timeSeriesResults);*/
     this.lineChartService.drawLegends(this.timeSeriesResults);
     this.lineChartService.drawLineChart(this.timeSeriesResults);
   }

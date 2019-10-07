@@ -60,8 +60,9 @@ export class LineChartService {
 
   private _margin = { top: 40, right: 70, bottom: 40, left: 60 };
   private _width  = 600 - this._margin.left - this._margin.right;
-  private _height = 700 - this._margin.top - this._margin.bottom;
-  private _labelHeight = 75;
+  private _height = 550 - this._margin.top - this._margin.bottom;
+  private _labelGroupHeight;
+  private _labelHeight = ChartCommons.COLOR_PREVIEW_SIZE;
   private _legendGroupTop = this._margin.top + this._height + 50;
   private _legendGroupLeft = this._margin.left;
   private legendDataMap = {};
@@ -88,8 +89,10 @@ export class LineChartService {
       return;
     }
 
+    this._labelGroupHeight = data.length * this._labelHeight;
+
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
-    d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._height + this._labelHeight + this._margin.top  + this._margin.bottom);  //TODO fix containers height
+    d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._height + this._labelGroupHeight + this._margin.top  + this._margin.bottom);
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
@@ -417,7 +420,7 @@ export class LineChartService {
         legendElement
           .append('rect')
           .attr('class', 'legend-rect')
-          .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr('height', this._labelHeight)
           .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
           .attr("rx", 2)
           .attr("ry", 2)
@@ -427,7 +430,7 @@ export class LineChartService {
           .append('text')
           .attr('class', 'legend-text')
           .attr('x', 10 + 5)
-          .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+          .attr('y', this._labelHeight)
           .text(datum => this.legendDataMap[datum].text);
         return legendElement;
       },
@@ -446,18 +449,18 @@ export class LineChartService {
         .style('opacity', 0)
         .remove()
     )
-      .attr("transform", this.position)
+      .attr("transform", (datum,index) => this.position(datum, index))
       .on('click', (datum) => this.onMouseClick(datum, incomingData));
   }
 
-  private position(d,i) {
+  private position(datum,index) {
     var c = 3;   // number of columns
-    var h = 17;  // height of each entry
+    var h = this._labelHeight + 10;  // height of each entry + margin
     var w = 550; // width of each entry (so you can position the next column)
     var tx = 10; // tx/ty are essentially margin values
     var ty = 10;
-    var x = i % c * w + tx;
-    var y = Math.floor(i / c) * h + ty;
+    var x = index % c * w + tx;
+    var y = Math.floor(index / c) * h + ty;
     return "translate(" + x + "," + y + ")";
   }
 
@@ -467,9 +470,9 @@ export class LineChartService {
     } else {
       Object.keys(this.legendDataMap).forEach((legend) => {
         if (legend === labelKey)  {
-          this.legendDataMap[legend].show = true; console.log("true");
+          this.legendDataMap[legend].show = true;
         } else {
-          this.legendDataMap[legend].show = false; console.log("false");
+          this.legendDataMap[legend].show = false;
         }
       });
     }
