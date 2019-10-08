@@ -89,9 +89,7 @@ export class LineChartService {
       return;
     }
 
-
     this._labelGroupHeight = data.length * this._labelHeight;
-
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
     d3Select('svg#time-series-svg').transition().duration(500).attr('height', this._height + this._labelGroupHeight + this._margin.top  + this._margin.bottom);
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
@@ -99,9 +97,13 @@ export class LineChartService {
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
+    this.addLegendsToChart(chart, incomingData);
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
+  /**
+   * Initialize Label's Datamap after the incoming data is received
+   */
   public initLegendData(incomingData: EventResultDataDTO){
     const TimeSeriesSVG = d3Select("#time-series-svg");
     let labelDataMap= {}
@@ -119,11 +121,6 @@ export class LineChartService {
       }
     });
     this.legendDataMap=labelDataMap;
-  }
-
-  public drawLegends(incomingData: EventResultDataDTO): void {
-    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    this.addLegendsToChart(chart, incomingData)
   }
 
   /**
@@ -159,7 +156,6 @@ export class LineChartService {
   private createChart(svgElement: ElementRef): D3Selection<D3BaseType, {}, D3ContainerElement, {}> {
 
     this._width = svgElement.nativeElement.parentElement.offsetWidth - this._margin.left - this._margin.right;
-    //this._height = svgElement.nativeElement.parentElement.offsetHeight - this._margin.top - this._margin.bottom;
     const svg = d3Select(svgElement.nativeElement)
                   .attr('id', 'time-series-svg')
                   .attr('width',  this._width  + this._margin.left + this._margin.right)
@@ -355,7 +351,6 @@ export class LineChartService {
         return yScale(point.value);
       })  // ... and for the Y-Coordinate
              .curve(d3CurveMonotoneX);  // smooth the line
-
   }
 
   /**
@@ -427,7 +422,7 @@ export class LineChartService {
           .attr("rx", 2)
           .attr("ry", 2)
           .attr("ry", 2)
-          .attr('fill', (d, index: number) => { return getColorScheme()[index]; });
+          .attr('fill', (d, index: number) => { return getColorScheme()[index]});
         legendElement
           .append('text')
           .attr('class', 'legend-text')
@@ -478,7 +473,6 @@ export class LineChartService {
         }
       });
     }
-    this.drawLegends(incomingData);
     this.drawLineChart(incomingData);
   }
 
