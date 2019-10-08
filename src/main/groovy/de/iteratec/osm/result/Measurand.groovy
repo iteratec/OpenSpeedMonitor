@@ -26,6 +26,7 @@ enum Measurand{
     CSS_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "cssTotalBytes", "css-total", "css"),
     HTML_TOTAL_BYTES(MeasurandGroup.REQUEST_SIZES, "htmlTotalBytes", "html-total", "html"),
     FIRST_MEANINGFUL_PAINT(MeasurandGroup.LOAD_TIMES, "firstMeaningfulPaint", "first-meaningful-paint", "firstMeaningfulPaint"),
+    FIRST_PAINT(MeasurandGroup.LOAD_TIMES, "firstPaint", "first-paint", "firstPaint"),
     FIRST_CONTENTFUL_PAINT(MeasurandGroup.LOAD_TIMES, "firstContentfulPaint", "first-contentful-paint", "firstContentfulPaint")
 
     private MeasurandGroup group

@@ -104,7 +104,7 @@ OpenSpeedMonitor.ChartModules.UrlHandling.ChartSwitch = (function () {
         var params = $.param(updatedMap, true);
         var showLinks = true;
         updateUrl("#timeSeriesWithDataLink", OpenSpeedMonitor.urls.eventResultDashboardShowAll + "?" + params, showLinks);
-        updateUrl("#aggregationWithDataLink", OpenSpeedMonitor.urls.aggregationShowDev + "?" + params, showLinks);
+        updateUrl("#aggregationWithDataLink", OpenSpeedMonitor.urls.aggregationShow + "?" + params, showLinks);
         updateUrl("#distributionWithDataLink", OpenSpeedMonitor.urls.distributionChartShow + "?" + params, showLinks);
         updateUrl("#detailAnalysisWithDataLink", OpenSpeedMonitor.urls.detailAnalysisShow + "?" + params, showLinks);
         updateUrl("#resultListWithDataLink", OpenSpeedMonitor.urls.tabularResultPresentation + "?" + params, showLinks);

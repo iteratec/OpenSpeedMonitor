@@ -11,10 +11,13 @@ export class ResultSelectionService {
   }
 
   fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
-    const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
-    return this.http.get<T>(url, {params: params}).pipe(
-      this.handleError()
-    )
+    if (resultSelectionCommand.from && resultSelectionCommand.to) {
+      const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
+      return this.http.get<T>(url, {params: params}).pipe(
+        this.handleError()
+      )
+    }
+    return new Observable<T>();
   }
 
   private createParamsFromResultSelectionCommand(resultSelectionCommand: ResultSelectionCommand) {

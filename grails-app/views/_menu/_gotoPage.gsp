@@ -34,7 +34,7 @@
                 <g:message code="eventResultDashboard.label" default="Time Series"/></g:link>
         </li>
         <li class="controller">
-            <g:link controller="aggregation" action="showAll"><i class="fas fa-chart-bar"></i>
+            <g:link controller="aggregationLegacy" action="showAll"><i class="fas fa-chart-bar"></i>
                 <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/></g:link>
         </li>
         <li class="controller">
