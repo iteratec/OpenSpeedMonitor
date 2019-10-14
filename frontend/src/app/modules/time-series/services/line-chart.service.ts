@@ -545,14 +545,12 @@ export class LineChartService {
   }
 
   private showTooltip(nearestDot: D3Selection<any, unknown, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date) {
-    // TODO: Styling of the tooltip needs some love (see frontend/src/app/modules/time-series/components/time-series-line-chart/time-series-line-chart.component.scss)
     const tooltip = d3Select('#marker-tooltip');
     const svg = d3Select('#time-series-chart');
 
     const tooltipText = this.generateTooltipText(nearestDot, visibleDots, highlightedDate);
     tooltip.html(tooltipText.outerHTML);
 
-    // TODO: Positioning of the tooltip must be left or right of the box, depending on the space left
     const tooltipWidth: number = (<HTMLDivElement>tooltip.node()).getBoundingClientRect().width;
     const nearestDotXPosition: number = parseFloat(nearestDot.attr('cx'));
 
