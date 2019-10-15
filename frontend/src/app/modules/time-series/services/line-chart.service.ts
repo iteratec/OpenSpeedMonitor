@@ -523,7 +523,7 @@ export class LineChartService {
   }
 
   private onMouseClick(labelKey: string, incomingData: EventResultDataDTO): void {
-    if (d3Event.metaKey) {
+    if (d3Event.metaKey || d3Event.ctrlKey) {
       this.legendDataMap[labelKey].show ? this.legendDataMap[labelKey].show = false : this.legendDataMap[labelKey].show = true;
     } else {
       Object.keys(this.legendDataMap).forEach((legend) => {
