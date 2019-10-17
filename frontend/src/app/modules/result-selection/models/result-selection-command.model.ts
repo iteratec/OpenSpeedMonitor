@@ -1,6 +1,6 @@
 export interface ResultSelectionCommandDTO {
-  from: Date;
-  to: Date;
+  from?: Date;
+  to?: Date;
   caller?: Caller;
   jobGroupIds?: number[];
   pageIds?: number[];
@@ -11,8 +11,8 @@ export interface ResultSelectionCommandDTO {
 }
 
 export class ResultSelectionCommand implements ResultSelectionCommandDTO {
-  from: Date;
-  to: Date;
+  from?: Date;
+  to?: Date;
   caller?: Caller;
   jobGroupIds?: number[];
   pageIds?: number[];

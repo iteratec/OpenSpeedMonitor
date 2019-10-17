@@ -6,18 +6,19 @@ import {BehaviorSubject} from "rxjs";
 })
 export class SpinnerService {
 
-  private spinner$ = new BehaviorSubject<boolean>(false);
+  activeSpinner$ = new BehaviorSubject<Set<string>>(new Set<string>());
 
   constructor() { }
-  get spinnerObservable() {
-    return this.spinner$.asObservable();
+
+  showSpinner(spinnerId: string): void {
+    let activeSpinner: Set<string> = this.activeSpinner$.getValue();
+    activeSpinner.add(spinnerId);
+    this.activeSpinner$.next(activeSpinner);
   }
 
-  show() {
-    this.spinner$.next(true);
-  }
-
-  hide() {
-    this.spinner$.next(false);
+  hideSpinner(spinnerId: string): void {
+    let activeSpinner: Set<string> = this.activeSpinner$.getValue();
+    activeSpinner.delete(spinnerId);
+    this.activeSpinner$.next(activeSpinner);
   }
 }

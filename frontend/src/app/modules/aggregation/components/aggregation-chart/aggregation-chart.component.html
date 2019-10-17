@@ -1,6 +1,6 @@
 <div class="card">
   <div class="aggregation-chart">
-    <osm-spinner></osm-spinner>
+    <osm-spinner [spinnerId]="'aggregation-chart-spinner'"></osm-spinner>
     <div class="filter-dropdown-group">
       <div class="btn-group pull-left perc-element" data-toggle="buttons" id="stack-bars-switch" *ngIf="!isHidden">
         <label class="btn btn-sm btn-default" id="switch-beside-button"
@@ -64,12 +64,13 @@
           </li>
         </ng-container>
       </ul>
-    </div>
 
-    <div class="in-chart-buttons">
-      <a data-toggle="modal" role="button" title="Download as PNG">
-        <i class="fas fa-download"></i>
-      </a>
+      <div class="in-chart-buttons">
+        <a data-toggle="modal" role="button" title="Download as PNG">
+          <i class="fas fa-download"></i>
+        </a>
+      </div>
+
     </div>
 
     <div class="svg-container">

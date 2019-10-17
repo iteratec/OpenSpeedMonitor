@@ -1,17 +1,17 @@
-/* 
+/*
 * OpenSpeedMonitor (OSM)
 * Copyright 2014 iteratec GmbH
-* 
-* Licensed under the Apache License, Version 2.0 (the "License"); 
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
-* 
+*
 * 	http://www.apache.org/licenses/LICENSE-2.0
-* 
-* Unless required by applicable law or agreed to in writing, software 
-* distributed under the License is distributed on an "AS IS" BASIS, 
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
-* See the License for the specific language governing permissions and 
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
 * limitations under the License.
 */
 
@@ -281,6 +281,30 @@ class PersistingNewEventResultsSpec extends Specification implements BuildDataTe
 
         erBothTwo.firstCpuIdleInMillisecs == 11430
         erBothTwo.timeToInteractiveInMillisecs == 11430
+    }
+
+    void "first paint gets persisted correctly"() {
+        setup: "given a result with first paint"
+        File file = new File("src/test/resources/WptResultXmls/firstPaint.xml")
+        WptResultXml xmlResult = new WptResultXml(new XmlSlurper().parse(file))
+        WebPageTestServer wptServer = WebPageTestServer.build()
+        Location.build(uniqueIdentifierForServer: xmlResult.responseNode.data.location.toString(), wptServer: wptServer)
+        Job job = Job.build(label: "ExampleJob Chrome firstPaint")
+        JobResult.build(job: job, testId: xmlResult.testId, jobResultStatus: JobResultStatus.SUCCESS, wptServerBaseurl: wptServer.baseUrl)
+        service.timeToCsMappingService = Stub(TimeToCsMappingService) {
+            getCustomerSatisfactionInPercent(_) >> { value -> value }
+        }
+
+        when: "the service creates new event results from the XML result"
+        service.listenToResult(xmlResult, wptServer, job.id)
+        List<EventResult> eventResults = EventResult.list()
+        EventResult firstEventResult = eventResults.find { it.oneBasedStepIndexInJourney == 1 }
+        EventResult secondEventResult = eventResults.find { it.oneBasedStepIndexInJourney == 2 }
+
+
+        then: "there is one EventResult with just first cpu idle and two with first cpu idle AND time to interactive"
+        firstEventResult.firstPaint == 605
+        secondEventResult.firstPaint == 502
     }
 
     void "check CSI value creation"() {

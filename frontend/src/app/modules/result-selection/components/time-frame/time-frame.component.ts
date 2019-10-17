@@ -57,8 +57,19 @@ export class TimeFrameComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.selectedDates = [this.resultSelectionStore.resultSelectionCommand.from, this.resultSelectionStore.resultSelectionCommand.to];
-    this.selectTimeFrame();
+    if (this.resultSelectionStore.validQuery) {
+      this.selectedDates = [this.resultSelectionStore.resultSelectionCommand.from, this.resultSelectionStore.resultSelectionCommand.to];
+      this.selectTimeFrame();
+
+    } else {
+      let defaultFrom = new Date();
+      let defaultTo = new Date();
+      defaultFrom.setDate(defaultTo.getDate() - 3);
+      this.selectedDates = [defaultFrom, defaultTo];
+      this.timeFrameInSeconds = TIME_FRAME_IN_SECONDS.THREE_DAYS;
+
+      this.resultSelectionStore.setResultSelectionCommandTimeFrame(this.selectedDates);
+    }
 
     if (this.showAggregation) {
       this.resultSelectionStore.setRemainingResultSelectionInterval(this.aggregationIntervalInSeconds);
@@ -101,8 +112,8 @@ export class TimeFrameComponent implements OnInit {
 
     comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
 
-    let calculatedTimeFrameInSecondes = this.calculateTimeFrameInSeconds(from, to);
-    comparativeFrom.setSeconds(comparativeTo.getSeconds() - calculatedTimeFrameInSecondes);
+    let calculatedTimeFrameInSeconds = this.calculateTimeFrameInSeconds(from, to);
+    comparativeFrom.setSeconds(comparativeTo.getSeconds() - calculatedTimeFrameInSeconds);
 
     this.selectedComparativeDates = [comparativeFrom, comparativeTo];
   }
@@ -112,12 +123,12 @@ export class TimeFrameComponent implements OnInit {
     let to = new Date(this.selectedDates[1]);
 
     // Remove seconds and millisecond
-    from.setSeconds(0,0);
-    to.setSeconds(0,0);
+    from.setSeconds(0, 0);
+    to.setSeconds(0, 0);
 
-    let calculatedTimeFrameInSecondes = this.calculateTimeFrameInSeconds(from, to);
-    if (this.isValidTimeFrameUntilNow(calculatedTimeFrameInSecondes)) {
-      this.timeFrameInSeconds = calculatedTimeFrameInSecondes;
+    let calculatedTimeFrameInSeconds = this.calculateTimeFrameInSeconds(from, to);
+    if (this.isValidTimeFrameUntilNow(calculatedTimeFrameInSeconds)) {
+      this.timeFrameInSeconds = calculatedTimeFrameInSeconds;
     } else {
       this.timeFrameInSeconds = TIME_FRAME_IN_SECONDS.MANUAL_SELECTION;
     }
@@ -125,13 +136,13 @@ export class TimeFrameComponent implements OnInit {
 
   private calculateTimeFrameInSeconds(from: Date, to: Date): number {
     let timeZoneOffsetInSeconds = (to.getTimezoneOffset() - from.getTimezoneOffset()) * 60;
-    return to.getTime()/1000 - from.getTime()/1000 - timeZoneOffsetInSeconds;
+    return to.getTime() / 1000 - from.getTime() / 1000 - timeZoneOffsetInSeconds;
   }
 
-  private isValidTimeFrameUntilNow(calculatedTimeFrameInSecondes: number): boolean {
+  private isValidTimeFrameUntilNow(calculatedTimeFrameInSeconds: number): boolean {
     let to = new Date(this.selectedDates[1]);
     to.setHours(23, 59, 0, 0);
-    return to >= this.max && this.selectableTimeFramesInSeconds.find(value => value == calculatedTimeFrameInSecondes) != undefined
+    return to >= this.max && this.selectableTimeFramesInSeconds.find(value => value == calculatedTimeFrameInSeconds) != undefined
   }
 
   updateFromDate(calendar: CalendarType): void {
