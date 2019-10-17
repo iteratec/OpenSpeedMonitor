@@ -225,12 +225,13 @@ export class LineChartService {
 
   private getLegendHeight(): number {
     let maximumLabelWidth: number = 1;
+    let labels = Object.keys(this.legendDataMap);
 
     d3Select('g#time-series-chart-legend')
       .append('g')
       .attr('id', 'renderToCalculateMaxWidth')
       .selectAll('.renderToCalculateMaxWidth')
-      .data(Object.keys(this.legendDataMap))
+      .data(labels)
       .enter()
       .append('text')
       .attr('class', 'legend-text')
@@ -245,11 +246,10 @@ export class LineChartService {
 
     d3Select('g#renderToCalculateMaxWidth').remove();
 
-    maximumLabelWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
-    this._legendGroupColumnWidth = maximumLabelWidth;
-    this._legendGroupColumns = Math.floor(this._width / maximumLabelWidth);
+    this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
+    this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
 
-    return Math.ceil(Object.keys(this.legendDataMap).length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
+    return Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
   }
 
   private getMaxValue(data: TimeSeries[]): number {
