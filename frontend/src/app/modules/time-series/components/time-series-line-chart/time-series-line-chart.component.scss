@@ -6,20 +6,21 @@ osm-time-series-line-chart {
   #marker-tooltip {
     position: absolute;
     text-align: left;
-    padding: 5px;
     font: 10pt sans-serif;
     color: white;
     background: rgba(0, 0, 0, 0.7);
-    border: 0px;
+    border: 1px solid rgba(0, 0, 0, 0.4);
     border-radius: 3px;
     pointer-events: none;
 
     tr.active {
-      background: rgba(255, 255, 255, 0.35);
+      background: rgba(255, 255, 255, 0.75);
+      color: black;
     }
 
     td {
-      padding-right: 10px;
+      padding: 0.2em 0.75em 0.2em 0.75em;
+
       i {
         padding-right: 5px;
       }
@@ -35,7 +36,7 @@ osm-time-series-line-chart {
       line {
         stroke: $color-contour-medium;
       }
-      
+
       text {
         fill: $color-text-light;
       }
