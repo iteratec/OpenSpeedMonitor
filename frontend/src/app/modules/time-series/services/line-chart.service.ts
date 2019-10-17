@@ -118,7 +118,7 @@ export class LineChartService {
     this.addBrush(chart, xScale, yScale, data);
     this.addLegendsToChart(chart, incomingData);
     this.addDataLinesToChart(chart, xScale, yScale, data);
-    
+
     this.bringMouseMarkerToTheFront(xScale, yScale);
   }
 
@@ -127,7 +127,7 @@ export class LineChartService {
     d3Select('#time-series-chart-drawing-area').append(() => { return markerGroup.node(); });
     this._mouseEventCatcher.on('mousemove', (_, index, nodes: D3ContainerElement[]) => this.moveMarker(nodes[index], xScale, yScale, this._height));
   }
-  
+
   /**
    * Set the data for the legend after the incoming data is received
    */
@@ -405,7 +405,7 @@ export class LineChartService {
         }
       )
   }
-  
+
   private addDataPointsToXAxisCluster(enter: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>) {
     enter.each((timeSeries: TimeSeries) => {
       timeSeries.values.forEach((timeSeriesPoint: TimeSeriesPoint) => {
@@ -497,8 +497,8 @@ export class LineChartService {
       // colorize (in reverse order as d3 adds new line before the existing ones ...
       .attr('stroke', (_, index: number, nodes: []) => { return getColorScheme()[nodes.length - index - 1]; })
       // fade in
-      .transition().duration(500).style('opacity', (d) => {
-        return (this.legendDataMap[d.key].show) ? '1' : '0.2';
+      .transition().duration(500).style('opacity', (timeSeries: TimeSeries) => {
+        return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.2';
       });
 
     return resultingSelection;
@@ -689,7 +689,7 @@ export class LineChartService {
     lineColorDot.className = 'fas fa-circle';
     lineColorDot.style.color = nodeSelection.style('stroke');
     value.append(lineColorDot);
-    if (timeSeriesPoint.value !== undefined) {
+    if (timeSeriesPoint.value !== undefined && timeSeriesPoint.value !== null) {
       value.append(timeSeriesPoint.value.toString());
     }
 
@@ -718,8 +718,8 @@ export class LineChartService {
           .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
           .attr("rx", 2)
           .attr("ry", 2)
-          .attr('fill', (d, index: number) => {
-            return getColorScheme()[index]
+          .attr('fill', (key: string, index: number) => {
+            return getColorScheme()[incomingData.series.length - index - 1]
           });
         legendElement
           .append('text')
