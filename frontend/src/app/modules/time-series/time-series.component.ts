@@ -26,4 +26,16 @@ export class TimeSeriesComponent implements OnInit {
       URL.EVENT_RESULT_DASHBOARD_LINECHART_DATA
     ).subscribe(next => this.results$.next(next));
   }
+
+  getEvents() {
+    this.linechartDataService.fetchEvents<any>(
+      this.resultSelectionStore.resultSelectionCommand,
+      URL.EVENTS
+    ).subscribe(next => console.log(next));
+  }
+
+  getData() {
+    this.getTimeSeriesChartData();
+    this.getEvents();
+  }
 }
