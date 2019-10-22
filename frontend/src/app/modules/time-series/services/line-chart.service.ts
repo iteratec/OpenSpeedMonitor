@@ -457,7 +457,7 @@ export class LineChartService {
   }
 
   private updateChart(selection: any, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
-    //selected boundaries
+    // selected boundaries
     let extent = d3Event.selection;
     // If no selection, back to initial coordinate. Otherwise, update X axis domain
     if (!extent) {
@@ -664,13 +664,11 @@ export class LineChartService {
 
     visibleDots
       .sort((a: TimeSeriesPoint, b: TimeSeriesPoint) => {
-        // console.log(a,b);
         if (a.value > b.value) return -1;
         else if (a.value < b.value) return 1;
         else return 0;
       })
       .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
-        // console.log(timeSeriesPoint, index, nodes[index]);
         tableBody.append(this.generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDot));
       });
 
