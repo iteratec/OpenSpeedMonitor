@@ -2,26 +2,61 @@
 
 osm-time-series-line-chart {
   visibility: hidden;
-}
 
-#time-series-chart-drawing-area {
-  .axis {
-    .domain {
-      display: none;
+  #marker-tooltip {
+    position: absolute;
+    text-align: left;
+    font: 10pt sans-serif;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+    pointer-events: none;
+
+    tr.active {
+      background: rgba(255, 255, 255, 0.75);
+      color: black;
     }
 
-    line {
+    td {
+      padding: 0.2em 0.75em 0.2em 0.75em;
+
+      i {
+        padding-right: 5px;
+      }
+    }
+  }
+
+  #time-series-chart-drawing-area {
+    .axis {
+      .domain {
+        display: none;
+      }
+
+      line {
+        stroke: $color-contour-medium;
+      }
+
+      text {
+        fill: $color-text-light;
+      }
+
+      .description {
+        font-size: 14px;
+        fill: $color-text-light;
+      }
+    }
+
+    .marker-line {
       stroke: $color-contour-medium;
+      stroke-width: 1px;
     }
 
-    text {
-      fill: $color-text-light;
+    circle.dot {
+      stroke-width: 2px;
+      fill: white;
     }
 
-    .description {
-      font-size: 14px;
-      fill: $color-text-light;
-    }
   }
 }
 
