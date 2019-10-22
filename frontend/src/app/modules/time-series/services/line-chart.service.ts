@@ -71,7 +71,7 @@ export class LineChartService {
   private legendDataMap = {};
   private brush;
 
-  // Map that holds all points clustered by there x-axis values
+  // Map that holds all points clustered by their x-axis values
   private _xAxisCluster: any = {};
 
   // Mouse events
