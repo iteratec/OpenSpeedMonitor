@@ -5,13 +5,14 @@ import {RouterModule, Routes} from "@angular/router";
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
 import {SharedModule} from "../shared/shared.module";
 import {ViolinchartDataService} from "./services/violinchart-data.service";
+import { ViolinChartComponent } from './components/violin-chart/violin-chart.component';
 
 const DistributionRoutes: Routes = [
   {path: 'show', component: DistributionComponent},
 ];
 
 @NgModule({
-  declarations: [DistributionComponent],
+  declarations: [DistributionComponent, ViolinChartComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(DistributionRoutes),

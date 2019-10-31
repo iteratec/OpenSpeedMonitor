@@ -2,6 +2,9 @@
 <p>
   {{ 'frontend.de.iteratec.osm.distribution.description' | translate }}
 </p>
+
+<osm-violin-chart [dataInput]="this.results$"></osm-violin-chart>
+
 <div class="action-row">
   <div class="col-md-12">
     <osm-result-selection-submit [applicationsRequired]="true" [measurandsRequired]="true" [pagesRequired]="true" (submit)="getDistributionChartData()"></osm-result-selection-submit>

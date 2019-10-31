@@ -1,0 +1,13 @@
+#svg-container {
+  position: relative;
+
+  #y-axis_left_label {
+    left: 45px;
+    position: absolute;
+    white-space: nowrap;
+    transform: translate(-50%, 0%) rotate(-90deg);
+    top: 50%;
+  }
+}
+
+
