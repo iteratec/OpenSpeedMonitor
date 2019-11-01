@@ -106,7 +106,7 @@ export class LineChartService {
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
     this.brush = d3BrushX().extent([[0,0], [this._width, this._height]]);
-    this.addBrush(chart, xScale, yScale, data);
+    this.addBrush(chart, xScale, yScale, data, incomingData.events);
     this.addEventMarkerToChart(chart, xScale, incomingData.events);
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
@@ -123,8 +123,7 @@ export class LineChartService {
       .style('opacity', '0.9');
   }
 
-  private addEventMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, events: import("../models/event.model").EventDTO[]) {
-    console.log(events);
+  private addEventMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, events: EventDTO[]) {
     let eventMarkerLine = d3Select('#event-marker-group').selectAll('line').data(events);
     let eventMarkerCircle = d3Select('#event-marker-group').selectAll('circle').data(events);
 
@@ -440,22 +439,24 @@ export class LineChartService {
   private addBrush(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                    xScale: D3ScaleTime<number, number>,
                    yScale: D3ScaleLinear<number, number>,
-                   data: TimeSeries[]){
+                   data: TimeSeries[],
+                   events: EventDTO[]){
     chart.selectAll('.brush')
       .remove();
-    this.brush.on('end', () => this.updateChart(chart, xScale, yScale));
+    this.brush.on('end', () => this.updateChart(chart, xScale, yScale, events));
     chart.append('g')
       .attr('class', 'brush')
       .data([1])
       .call(this.brush)
       .on('dblclick', () => {
         xScale.domain([this.getMinDate(data), this.getMaxDate(data)]);
-        this.resetChart(xScale, yScale);
+        this.resetChart(chart, xScale, yScale, events);
       });
   }
 
-  private resetChart(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>){
+  private resetChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>, events: EventDTO[]){
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
+    this.addEventMarkerToChart(chart, xScale, events);
     d3Select('g#time-series-chart-drawing-area').selectAll('.line')
       .each((data, index, nodes) => {
       d3Select(nodes[index])
@@ -463,7 +464,7 @@ export class LineChartService {
     })
   }
 
-  private updateChart( selection: any, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
+  private updateChart( selection: any, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>, events: EventDTO[]) {
     //selected boundaries
     let extent = d3Event.selection;
     // If no selection, back to initial coordinate. Otherwise, update X axis domain
@@ -475,6 +476,7 @@ export class LineChartService {
       xScale.domain([ minDate, maxDate ]);
       selection.select(".brush").call(this.brush.move, null); // This remove the grey brush area
       d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
+      this.addEventMarkerToChart(selection, xScale, events);
       selection.selectAll('.line').each((_, index, nodes) => {
         d3Select(nodes[index])
           .transition()
