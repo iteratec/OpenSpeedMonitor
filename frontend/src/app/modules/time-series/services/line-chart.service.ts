@@ -43,6 +43,7 @@ import {brushX as d3BrushX} from 'd3-brush';
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
 import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
+import {EventDTO} from 'src/app/modules/time-series/models/event.model';
 import {TimeSeries} from 'src/app/modules/time-series/models/time-series.model';
 import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-point.model';
 import {parseDate} from 'src/app/utils/date.util';
@@ -77,6 +78,9 @@ export class LineChartService {
 
     this.addXAxisToChart(chart, xScale);
     this.addYAxisToChart(chart, yScale);
+
+    this.addEventMarkerGroupToChart(chart);
+    this.addEventMarkerTooltipBoxToChart(chart);
   }
 
   /**
@@ -103,9 +107,87 @@ export class LineChartService {
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
     this.brush = d3BrushX().extent([[0,0], [this._width, this._height]]);
     this.addBrush(chart, xScale, yScale, data);
+    this.addEventMarkerToChart(chart, xScale, incomingData.events);
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
+  private addEventMarkerGroupToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>) {
+    chart.append('g').attr('id', 'event-marker-group');
+  }
+
+  private addEventMarkerTooltipBoxToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>) {
+    d3Select('#time-series-chart').select(function () {
+      return (<SVGElement>this).parentNode;
+    }).append('div')
+      .attr('id', 'event-marker-tooltip')
+      .style('opacity', '0.9');
+  }
+
+  private addEventMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, events: import("../models/event.model").EventDTO[]) {
+    console.log(events);
+    let eventMarkerLine = d3Select('#event-marker-group').selectAll('line').data(events);
+    let eventMarkerCircle = d3Select('#event-marker-group').selectAll('circle').data(events);
+
+    eventMarkerLine.join(
+      enter => enter.append('line').attr('class', 'event-marker-line')
+    )
+    .attr('x1', (event: EventDTO) => { return xScale(parseDate(event.eventDate)); })
+    .attr('y1', 0)
+    .attr('x2', (event: EventDTO) => { return xScale(parseDate(event.eventDate)); })
+    .attr('y2', this._height);
+
+    eventMarkerCircle.join(
+      enter => enter
+                 .append('circle')
+                 .attr('class', 'event-marker-dot')
+                 .on('mouseover', (event: EventDTO, index: number, nodes: []) => this.showEventMarkerTooltip(event, index, nodes))
+                 .on('mouseout', () => d3Select('#event-marker-tooltip').style('opacity', 0))
+    )
+    .attr('cx', (event: EventDTO) => { return xScale(parseDate(event.eventDate)); })
+    .attr('cy', this._height)
+    .attr('r', 8);
+  }
+
+  private showEventMarkerTooltip(event: EventDTO, index: number, nodes: []): D3Selection<SVGCircleElement, EventDTO, D3BaseType, unknown> {
+    let eventMarkerTooltipBox = d3Select('#event-marker-tooltip');
+    eventMarkerTooltipBox.style('opacity', '0.9');
+    eventMarkerTooltipBox.html(this.createEventMarkerTooltipContent(event).outerHTML);
+
+    let circle = d3Select(nodes[index]);
+    const top = parseFloat(circle.attr('cy')) + this._margin.top;
+
+    const tooltipWidth: number = (<HTMLDivElement>eventMarkerTooltipBox.node()).getBoundingClientRect().width;
+    const xPos = parseFloat(circle.attr('cx'));
+    const left = (tooltipWidth + xPos > this._width) ? xPos - tooltipWidth + this._margin.right + 10 : xPos + this._margin.left + 50;
+    eventMarkerTooltipBox.style('top', top + 'px');
+    eventMarkerTooltipBox.style('left', left + 'px');
+
+    return nodes[index];
+  }
+
+  private createEventMarkerTooltipContent(event: EventDTO): HTMLDivElement {
+    const container: HTMLDivElement = document.createElement('div');
+    container.className = 'gridContainer';
+
+    const dateItem = document.createElement('div');
+    dateItem.append(event.eventDate.toLocaleString());
+    container.append(dateItem);
+
+    const shortNameItem = document.createElement('div');
+    const shortNameParagraph = document.createElement('p');
+    shortNameParagraph.style.fontWeight = 'bold';
+    shortNameParagraph.append(event.shortName + ':');
+    shortNameItem.append(shortNameParagraph);
+    container.append(shortNameItem);
+
+    const descriptionItem = document.createElement('div');
+    const descriptionParagraph = document.createElement('p');
+    descriptionParagraph.append(event.description);
+    descriptionItem.append(descriptionParagraph);
+    container.append(descriptionItem);
+
+    return container;
+  }
 
   /**
    * Prepares the incoming data for drawing with D3.js

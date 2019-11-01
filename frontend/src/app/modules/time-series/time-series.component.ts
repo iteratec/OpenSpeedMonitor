@@ -3,7 +3,8 @@ import {URL} from "../../enums/url.enum";
 import {LinechartDataService} from "./services/linechart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
 import {EventResultData, EventResultDataDTO} from './models/event-result-data.model';
-import {BehaviorSubject} from 'rxjs';
+import {EventDTO} from './models/event.model';
+import {BehaviorSubject, forkJoin} from 'rxjs';
 
 @Component({
   selector: 'osm-time-series',
@@ -20,22 +21,28 @@ export class TimeSeriesComponent implements OnInit {
   }
 
   getTimeSeriesChartData() {
-    this.linechartDataService.fetchEventResultData<EventResultDataDTO>(
+    return this.linechartDataService.fetchEventResultData<EventResultDataDTO>(
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
       URL.EVENT_RESULT_DASHBOARD_LINECHART_DATA
-    ).subscribe(next => this.results$.next(next));
+    );
   }
 
   getEvents() {
-    this.linechartDataService.fetchEvents<any>(
+    return this.linechartDataService.fetchEvents<EventDTO[]>(
       this.resultSelectionStore.resultSelectionCommand,
       URL.EVENTS
-    ).subscribe(next => console.log(next));
+    );
   }
 
   getData() {
-    this.getTimeSeriesChartData();
-    this.getEvents();
+    forkJoin({
+      eventResultData: this.getTimeSeriesChartData(),
+      events: this.getEvents()
+    })
+    .subscribe((next) => {
+      next.eventResultData.events = next.events;
+      this.results$.next(next.eventResultData);
+    });
   }
 }
