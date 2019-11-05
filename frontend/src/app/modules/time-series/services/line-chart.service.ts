@@ -136,13 +136,31 @@ export class LineChartService {
    */
   public setLegendData(incomingData: EventResultDataDTO) {
     let labelDataMap = {};
+    let translateMeasurands: boolean = incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand";
     incomingData.series.forEach((data: EventResultSeriesDTO) => {
-      let label = data.identifier;
-      let key = this.generateKey(data);
-      labelDataMap[key] = {
-        text: label,
-        key: key,
-        show: true,
+      if (translateMeasurands) {
+        let splitLabelList: string[] = data.identifier.split(' | ', 2);
+        this.translationService
+          .get('frontend.de.iteratec.isr.measurand.' + splitLabelList[0])
+          .pipe(take(1))
+          .subscribe((splitLabel: string) => {
+            if (!splitLabel.startsWith('frontend.de.iteratec.isr.measurand.')) {
+              splitLabelList[0] = splitLabel;
+            }
+            let key = this.generateKey(data);
+            labelDataMap[key] = {
+              text: splitLabelList.join(' | '),
+              key: key,
+              show: true,
+            }
+          });
+      } else {
+        let key = this.generateKey(data);
+        labelDataMap[key] = {
+          text: data.identifier,
+          key: key,
+          show: true,
+        }
       }
     });
     this.legendDataMap = labelDataMap;
@@ -170,9 +188,7 @@ export class LineChartService {
   }
 
   private generateKey(data: EventResultSeriesDTO): string {
-    return data.jobGroup
-      + data.measuredEvent
-      + data.data.length;
+    return data.identifier.split(' | ').join();
   }
 
   /**
