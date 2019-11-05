@@ -47,6 +47,7 @@ import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-po
 import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 import {ChartCommons} from "../../../enums/chart-commons.enum";
+import {SummaryLabel} from "../models/summary-label.model";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -67,7 +68,6 @@ export class LineChartService {
   private _height = 550 - this._margin.top - this._margin.bottom;
   private _labelGroupHeight;
   private _legendGroupTop = this._margin.top + this._height + 50;
-  private _legendGroupLeft = this._margin.left;
   private legendDataMap = {};
   private brush;
 
@@ -117,6 +117,7 @@ export class LineChartService {
 
     this.addBrush(chart, xScale, yScale, data);
     this.addLegendsToChart(chart, incomingData);
+    this.setSummaryLabel(chart, incomingData.summaryLabels);
     this.addDataLinesToChart(chart, xScale, yScale, data);
 
     this.bringMouseMarkerToTheFront(xScale, yScale);
@@ -185,12 +186,67 @@ export class LineChartService {
       .attr('height', 0);
 
     svg.append('g')
-      .attr('class', 'legend-group')
-      .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop})`);
+      .attr('id', 'header-group')
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top - 16})`);
 
-    return svg.append('g') // g =  grouping element; group all other stuff into the chart
+    let chart = svg.append('g') // g =  grouping element; group all other stuff into the chart
       .attr('id', 'time-series-chart-drawing-area')
-      .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`); // translates the origin to the top left corner (default behavior of D3)
+
+    svg.append('g')
+      .attr('class', 'legend-group')
+      .attr('transform', `translate(${this._margin.left}, ${this._legendGroupTop})`);
+
+    return chart;
+  }
+
+  private setSummaryLabel(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, summaryLabels: SummaryLabel[]): void {
+    d3Select('g#header-group').selectAll('.summary-label-text').remove();
+    if (summaryLabels.length > 0) {
+      d3Select('#header-group')
+        .append('g')
+        .attr('class', 'summary-label-text')
+        .append('text')
+        .attr('id', 'summary-label-part0')
+        .attr('x', this._width / 2)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#555555');
+
+      summaryLabels.forEach((summaryLabel: SummaryLabel, index: number) => {
+        this.translationService
+          .get('frontend.de.iteratec.osm.timeSeries.chart.label.' + summaryLabel.key)
+          .pipe(take(1))
+          .subscribe((key: string) => {
+            if (summaryLabel.key == 'measurand') {
+              this.translationService
+                .get('frontend.de.iteratec.isr.measurand.' + summaryLabel.label)
+                .pipe(take(1))
+                .subscribe((label: string) => {
+                  if (label.startsWith('frontend.de.iteratec.isr.measurand.')) {
+                    label = summaryLabel.label
+                  }
+                  label = index < summaryLabels.length - 1 ? `${label} | ` : label;
+                  this.addSummaryLabel(key, label, index);
+                });
+            } else {
+              const label: string = index < summaryLabels.length - 1 ? `${summaryLabel.label} | ` : summaryLabel.label;
+              this.addSummaryLabel(key, label, index);
+            }
+          });
+      });
+      chart.selectAll('.summary-label-text').remove();
+    }
+  }
+
+  private addSummaryLabel(key: string, label: string, index: number): void {
+    d3Select(`#summary-label-part${index}`)
+      .append('tspan')
+      .attr('id', `summary-label-part${index + 1}`)
+      .attr('class', 'summary-label-key')
+      .text(`${key}: `)
+      .append('tspan')
+      .attr('class', 'summary-label')
+      .text(label);
   }
 
   public startResize(svgElement: ElementRef): void {
