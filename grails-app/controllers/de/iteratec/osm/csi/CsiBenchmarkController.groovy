@@ -53,7 +53,7 @@ class CsiBenchmarkController extends ExceptionHandlerController {
         }
 
         String selectedCsiType = params.csiType == "visuallyComplete" ? 'csByWptVisuallyCompleteInPercent' : 'csByWptDocCompleteInPercent'
-        List<JobGroup> allJobGroups = JobGroup.findAllByNameInList(cmd.jobGroups)
+        List<JobGroup> allJobGroups = JobGroup.findAllByIdInList(cmd.jobGroups)
 
         CsiAggregationInterval interval = CsiAggregationInterval.findByIntervalInMinutes(CsiAggregationInterval.DAILY)
 
