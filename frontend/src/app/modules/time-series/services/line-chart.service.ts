@@ -188,7 +188,7 @@ export class LineChartService {
   }
 
   private generateKey(data: EventResultSeriesDTO): string {
-    return data.identifier.split(' | ').join();
+    return data.identifier.split(' | ').join().split(':').join("");
   }
 
   /**
