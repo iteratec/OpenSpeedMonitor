@@ -17,6 +17,7 @@ class ChartLabelProcessing {
 
   constructor(series, i18nMap) {
     this.seriesData = series;
+    this.deduceUniqueEntries();
     this.i18nData = i18nMap || {};
   }
 

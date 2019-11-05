@@ -1,9 +1,9 @@
 import * as d3 from "d3";
 
 export default class ChartColorProvider {
-  static measurandGroupColorCombination = ChartColorProvider.initColors();
+  private static measurandGroupColorCombination = ChartColorProvider.initColors();
 
-  static initColors() {
+  private static initColors() {
     const loadingTimeColors = [
         "#1660A7",
         "#558BBF",
@@ -40,13 +40,13 @@ export default class ChartColorProvider {
     }
   }
 
-  static getColorscaleForMeasurandGroup(measurandUnit, skipFirst: boolean = false) {
+  static getColorscaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean = false) {
     const colors = ChartColorProvider.measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0);
     return d3.scaleOrdinal(colors)
       .domain(ChartColorProvider.createDomain(colors.length));
   }
 
-  static createDomain(arrayLength: number): string[] {
+  private static createDomain(arrayLength: number): string[] {
     return Array.from(Array(arrayLength).keys())
       .map(elem => elem.toString());
   }

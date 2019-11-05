@@ -1,24 +1,30 @@
-import {Component, ElementRef, Input, OnChanges, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnInit} from '@angular/core';
 import * as d3 from 'd3';
 import {BehaviorSubject} from "rxjs";
 import {DistributionDataDTO} from "../../models/distribution-data.model";
 import ChartColorProvider from "../util/chart-color-provider";
 import "../util/chart-label-util";
+import ChartLabelUtil from "../util/chart-label-util";
 
 @Component({
   selector: 'osm-violin-chart',
   templateUrl: './violin-chart.component.html',
   styleUrls: ['./violin-chart.component.scss']
 })
-export class ViolinChartComponent implements OnChanges {
-
-  @ViewChild('yAxisLeftLabel')
-  private yAxisLeftLabel: ElementRef;
+export class ViolinChartComponent implements OnInit, OnChanges {
 
   @Input()
   dataInput: BehaviorSubject<DistributionDataDTO>;
 
-  constructor() {
+  private chartData: DistributionDataDTO = null;
+  private svgContainer = new SvgContainer("#svg-container");
+
+  ngOnInit(): void {
+    window.addEventListener('resize', () => {
+      if(this.chartData) {
+        this.distributionChart(this.chartData, this.svgContainer)
+      }
+    });
   }
 
   ngOnChanges() {
@@ -28,39 +34,27 @@ export class ViolinChartComponent implements OnChanges {
 
     this.dataInput.subscribe(d => {
       if (d.series.length > 0) {
-        this.distributionChart(d);
+        this.chartData = d;
+        this.distributionChart(this.chartData, this.svgContainer);
       }
     })
   }
 
-  distributionChart = (function (distributionChartData) {
-    let svg = null,
-      chartData = null,
-      currentSeries = null,
-      width = 600,
-      height = 600,
+  distributionChart = (function (distributionChartData, svg: SvgContainer,) {
+    const height = 600,
       margin = {top: 50, right: 0, bottom: 70, left: 100},
       maxViolinWidth = 150,
-      violinWidth: number = null,
       mainDataResolution = 30,
-      interpolation = d3.curveBasis,
-      dataTrimValue: number = null,
-      commonLabelParts: string[] = null;
+      interpolation = d3.curveBasis;
 
-    // var drawUpdatedSize = function () {
-    //   var domain = getDomain();
-    //
-    //   width = svg.node().getBoundingClientRect().width;
-    //   violinWidth = calculateViolinWidth();
-    //
-    //   drawXAxis();
-    //   drawViolins(domain);
-    //   svg.select("#header-text").attr("transform", getHeaderTransform());
-    //   chartStyling();
-    // };
+    let width = 600,
+      chartData = null,
+      currentSeries = null,
+      violinWidth: number = null,
+      dataTrimValue: number = null,
+      commonLabelParts = null;
 
     function drawChart(distributionChartData) {
-
       chartData = distributionChartData;
       sortSeriesDataAscending();
 
@@ -86,8 +80,8 @@ export class ViolinChartComponent implements OnChanges {
 
       drawXAxis();
 
-      //fixme in backend data there is no i18nMap and no dimensionalUnit!
-      // drawYAxis(domain, chartData.i18nMap['measurand'] + " [" + chartData.dimensionalUnit + "]");
+      // fixme - in backend data there is no 'dimensionalUnit'!
+      //drawYAxis(domain, chartData.i18nMap['measurand'] + " [" + chartData.dimensionalUnit + "]");
       drawYAxis(domain, "Ladezeiten [ms]");
       drawViolins(domain);
       drawHeader();
@@ -96,36 +90,31 @@ export class ViolinChartComponent implements OnChanges {
     }
 
     function initSvg() {
-      //TODO it does not work because 'svg' variable is set every time as null
-      if (svg) {
+      if (svg.svgElem) {
         svg.remove();
       }
 
-      const svgSelection = d3.select("#svg-container");
+      const svgSelection = d3.select(svg.svgContainerElemName);
 
-      svg = svgSelection.append("svg")
+      svg.svgElem = svgSelection.append("svg")
         .attr("class", "d3chart")
         .attr("height", height)
         .attr("width", "100%");
-      width = svg.node().getBoundingClientRect().width;
+      width = svg.svgElem.node().getBoundingClientRect().width;
     }
 
+    //fixme labels still are wrong
     function assignShortLabels() {
-      const seriesLabelParts = Object.keys(chartData.series).map(function (traceLabel) {
-        return {grouping: traceLabel};
+      const seriesLabelParts = chartData.series.map(elem => {
+        return {grouping: elem.identifier, page: elem.page, jobGroup: elem.jobGroup, label: elem.identifier};
       });
 
-      //TODO why that way?
+      const labelUtil = ChartLabelUtil.processWith(seriesLabelParts, chartData.i18nMap);
+      labelUtil.getSeriesWithShortestUniqueLabels();
+      commonLabelParts = labelUtil.getCommonLabelParts();
 
-      // const labelUtil = ChartLabelUtil.processWith(seriesLabelParts, chartData.i18nMap);
-      // labelUtil.getSeriesWithShortestUniqueLabels();
-      // commonLabelParts = labelUtil.getCommonLabelParts();
-      commonLabelParts = chartData.series.map(it => it.identifier);
-
-      console.log("commonLabelParts", commonLabelParts);
-
-      seriesLabelParts.forEach(function (labelPart) {
-        chartData.series[labelPart.grouping].label = labelPart.grouping;
+      seriesLabelParts.forEach((labelPart, index) => {
+        chartData.series[index].label = labelPart.grouping;
       });
     }
 
@@ -135,7 +124,9 @@ export class ViolinChartComponent implements OnChanges {
     }
 
     function drawHeader() {
-      svg.append("g").selectAll("text")
+      svg.svgElem
+        .append("g")
+        .selectAll("text")
         .data([commonLabelParts])
         .enter()
         .append("text")
@@ -151,9 +142,8 @@ export class ViolinChartComponent implements OnChanges {
           return currentSeries[seriesKey].label;
         }));
 
-      //TODO why?
-      // svg.selectAll(".d3chart-xAxis").remove();
-      svg.append("g")
+      svg.svgElem.append("g")
+        .attr("id", "x-axis")
         .attr("class", "d3chart-axis d3chart-xAxis")
         .call(d3.axisBottom(x))
         .call(rotateLabels)
@@ -165,9 +155,11 @@ export class ViolinChartComponent implements OnChanges {
         .range([height - margin.bottom, margin.top])
         .domain(domain);
 
-      document.getElementById("y-axis_left_label").textContent = text;
+      const yAxisLeftLabel = document.getElementById("y-axis_left_label");
+      yAxisLeftLabel.textContent = text;
 
-      const g = svg.append("g")
+
+      const g = svg.svgElem.append("g")
         .attr("class", "d3chart-axis d3chart-yAxis")
         .attr("transform", "translate(" + margin.left + ", 0)")
         .call(d3.axisLeft(y));
@@ -177,10 +169,10 @@ export class ViolinChartComponent implements OnChanges {
     }
 
     function drawViolins(domain) {
-      svg.selectAll("clipPath").remove();
-      svg.select("[clip-path]").remove();
+      svg.svgElem.selectAll("clipPath").remove();
+      svg.svgElem.select("[clip-path]").remove();
 
-      const violinGroup = svg.append("g");
+      const violinGroup = svg.svgElem.append("g");
       createClipPathAroundViolins(violinGroup);
       Object.keys(currentSeries).forEach(function (trace, i) {
         const traceData = currentSeries[trace].data;
@@ -197,6 +189,7 @@ export class ViolinChartComponent implements OnChanges {
     function createClipPathAroundViolins(violinGroup) {
       const clipPathId = "violin-clip";
       svg
+        .svgElem
         .append("clipPath")
         .attr("id", clipPathId)
         .append("rect")
@@ -281,19 +274,19 @@ export class ViolinChartComponent implements OnChanges {
 
       const area = d3.area()
         .curve(interpolation)
-        .x( d => x(d['x0']))
+        .x(d => x(d['x0']))
         .y0(violinWidth / 2)
         .y1(d => y(d.length));
 
       const line = d3.line()
         .curve(interpolation)
         .x(d => x(d['x0']))
-        .y( d => y(d.length));
+        .y(d => y(d.length));
 
       const gPlus = g.append("g");
       const gMinus = g.append("g");
 
-      //TODO ?
+      //TODO There is no 'dimensionalUnit' in chartData
       const colorScale = ChartColorProvider.getColorscaleForMeasurandGroup("ms");
       const violinColor = colorScale("0");
 
@@ -367,45 +360,64 @@ export class ViolinChartComponent implements OnChanges {
 
     function rotateLabels() {
       let maxLabelLength = -1;
-      d3.selectAll(".d3chart-xAxis text").each(elem => {
-        //TODO temp
-        // var labelLength = d3.select(this).node().getComputedTextLength();
-        const labelLength = 10;
+      let rotate;
+      d3.selectAll(".d3chart-xAxis g").each(function () {
+        const childTextElem = d3.select(this).select("text");
+        const childTextElemNode: SVGTSpanElement = <SVGTSpanElement>childTextElem.node();
+        const labelLength = childTextElemNode.getComputedTextLength();
 
         if (labelLength > maxLabelLength)
           maxLabelLength = labelLength;
 
-        if (labelLength > violinWidth)
-          rotateLabel(maxLabelLength, elem)
+        if (labelLength > violinWidth) {
+          rotate = true;
+        }
       });
-    }
 
-    function rotateLabel(maxLabelLength: number, label) {
       margin.bottom = Math.cos(Math.PI / 4) * maxLabelLength + 20;
 
-      d3.selectAll(".d3chart-xAxis text")
-        .style("text-anchor", "start")
-        .each(function () {
-          const x = d3.select(this).attr("x");
-          const y = d3.select(this).attr("y");
-          // get the translate value
-          const t = getTranslation(d3.select(this).attr("transform"));
-
-          const translateX = t[0];
-          const translateY = t[1];
-
-          d3.select(label)
-            .attr("transform", "translate(" + translateX + "," + translateY + ")rotate(" + 45 + ", " + x + ", " + y + ")");
+      if(rotate) {
+        d3.selectAll(".d3chart-xAxis g").each(function () {
+          const selectedLabel = d3.select(this);
+          rotateLabel(selectedLabel)
         });
+      }
     }
 
-    function getTranslation(transform) {
-      const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      g.setAttributeNS(null, "transform", transform);
-      const matrix = g.transform.baseVal.consolidate().matrix;
-      return [matrix.e, matrix.f];
+    function rotateLabel(labelElem) {
+      labelElem.style("text-anchor", "start");
+
+      const childTextElem = labelElem.select("text");
+      const y = childTextElem.attr("y");
+
+      const transformBaseVal: SVGTransformList = labelElem.node().transform.baseVal;
+      const transformMatrix: SVGMatrix = transformBaseVal.getItem(0).matrix;
+
+      const translateX = transformMatrix.e;
+      const translateY = transformMatrix.f;
+
+      const translateString = "translate(" + translateX + "," + translateY + ")";
+      const rotateString = "rotate(45,0," + y + ")";
+
+      labelElem.attr("transform", translateString + rotateString);
     }
 
     drawChart(distributionChartData)
   });
+}
+
+class SvgContainer {
+  svgContainerElemName: string;
+  svgElem = null;
+
+  constructor(svgContainerElemName: string) {
+    this.svgContainerElemName = svgContainerElemName;
+  }
+
+  remove() {
+    if (this.svgElem) {
+      this.svgElem.remove();
+    }
+    this.svgElem = null;
+  }
 }
