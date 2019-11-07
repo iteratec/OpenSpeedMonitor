@@ -114,7 +114,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
       commonLabelParts = labelUtil.getCommonLabelParts();
 
       seriesLabelParts.forEach((labelPart, index) => {
-        chartData.series[index].label = labelPart.grouping;
+        chartData.series[index].label = labelPart.label;
       });
     }
 
