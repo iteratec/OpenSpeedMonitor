@@ -136,31 +136,15 @@ export class LineChartService {
    */
   public setLegendData(incomingData: EventResultDataDTO) {
     let labelDataMap = {};
-    let translateMeasurands: boolean = incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand";
     incomingData.series.forEach((data: EventResultSeriesDTO) => {
-      if (translateMeasurands) {
-        let splitLabelList: string[] = data.identifier.split(' | ', 2);
-        this.translationService
-          .get('frontend.de.iteratec.isr.measurand.' + splitLabelList[0])
-          .pipe(take(1))
-          .subscribe((splitLabel: string) => {
-            if (!splitLabel.startsWith('frontend.de.iteratec.isr.measurand.')) {
-              splitLabelList[0] = splitLabel;
-            }
-            let key = this.generateKey(data);
-            labelDataMap[key] = {
-              text: splitLabelList.join(' | '),
-              key: key,
-              show: true,
-            }
-          });
-      } else {
-        let key = this.generateKey(data);
-        labelDataMap[key] = {
-          text: data.identifier,
-          key: key,
-          show: true,
-        }
+      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+        data.identifier = this.translateMeasurand(data);
+      }
+      let key = this.generateKey(data);
+      labelDataMap[key] = {
+        text: data.identifier,
+        key: key,
+        show: true
       }
     });
     this.legendDataMap = labelDataMap;
@@ -170,16 +154,18 @@ export class LineChartService {
    * Prepares the incoming data for drawing with D3.js
    */
   private prepareData(incomingData: EventResultDataDTO): TimeSeries[] {
-
     return incomingData.series.map((data: EventResultSeriesDTO) => {
       let lineChartData: TimeSeries = new TimeSeries();
+      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+        data.identifier = this.translateMeasurand(data);
+      }
       lineChartData.key = this.generateKey(data);
 
       lineChartData.values = data.data.map((point: EventResultPointDTO) => {
         let lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
-        lineChartDataPoint.tooltipText = data.jobGroup + ' | ' + data.measuredEvent + ' : '; // TODO Set exact label text when IT-2793 is implemented
+        lineChartDataPoint.tooltipText = data.identifier + ' : ';
         return lineChartDataPoint;
       });
 
@@ -187,8 +173,17 @@ export class LineChartService {
     });
   }
 
+  private translateMeasurand(data: EventResultSeriesDTO): string {
+    let splitLabelList: string[] = data.identifier.split(' | ');
+    let splitLabel: string = this.translationService.instant('frontend.de.iteratec.isr.measurand.' + splitLabelList[0]);
+    if (!splitLabel.startsWith('frontend.de.iteratec.isr.measurand.')) {
+      splitLabelList[0] = splitLabel;
+    }
+    return splitLabelList.join(' | ');
+  }
+
   private generateKey(data: EventResultSeriesDTO): string {
-    return data.identifier.split(' | ').join().split(':').join("");
+    return data.identifier.split(' | ').join().split(':').join("").split("?").join("");
   }
 
   /**
@@ -576,7 +571,7 @@ export class LineChartService {
       })
       // fade in
       .transition().duration(500).style('opacity', (timeSeries: TimeSeries) => {
-      return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.2';
+      return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
     });
 
     return resultingSelection;
