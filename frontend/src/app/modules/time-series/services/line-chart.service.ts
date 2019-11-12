@@ -38,7 +38,7 @@ import {
 
 import 'd3-transition';
 
-import {brushX as d3BrushX} from 'd3-brush';
+import {BrushBehavior, brushX as d3BrushX} from 'd3-brush';
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
 import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
@@ -62,15 +62,17 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  private _margin = {top: 40, right: 70, bottom: 40, left: 60};
-  private _width = 600 - this._margin.left - this._margin.right;
-  private _height = 550 - this._margin.top - this._margin.bottom;
-  private _legendGroupTop = this._margin.top + this._height + 50;
-  private _legendGroupLeft = this._margin.left;
+  private _margin: any = {top: 40, right: 70, bottom: 40, left: 60};
+  private _width: number = 600 - this._margin.left - this._margin.right;
+  private _height: number = 550 - this._margin.top - this._margin.bottom;
+  private _labelGroupHeight: number;
+  private _legendGroupTop: number = this._margin.top + this._height + 50;
+  private _legendGroupLeft: number = this._margin.left;
   private _legendGroupColumnWidth;
   private _legendGroupColumns;
-  private legendDataMap = {};
-  private brush;
+  private legendDataMap: Object = {};
+  private brush: BrushBehavior<{}>;
+  private focusedLegendEntry: string;
 
   // Map that holds all points clustered by their x-axis values
   private _xAxisCluster: any = {};
@@ -98,13 +100,11 @@ export class LineChartService {
    * Draws a line chart for the given data into the given svg
    */
   public drawLineChart(incomingData: EventResultDataDTO): void {
-
-    let data: TimeSeries[] = this.prepareData(incomingData);
-
-    if (data.length == 0) {
+    if (incomingData.series.length == 0) {
       return;
     }
 
+    let data: TimeSeries[] = this.prepareData(incomingData);
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
@@ -134,6 +134,10 @@ export class LineChartService {
    * Set the data for the legend after the incoming data is received
    */
   public setLegendData(incomingData: EventResultDataDTO) {
+    if (incomingData.series.length == 0) {
+      return;
+    }
+
     let labelDataMap = {};
     incomingData.series.forEach((data: EventResultSeriesDTO) => {
       let label = data.identifier;
@@ -784,11 +788,11 @@ export class LineChartService {
         .style('opacity', 0)
         .remove()
     )
-      .attr("transform", (datum, index) => this.position(index))
+      .attr("transform", (datum, index) => this.getPosition(index))
       .on('click', (datum) => this.onMouseClick(datum, incomingData));
   }
 
-  private position(index: number): string {
+  private getPosition(index: number): string {
     const x = index % this._legendGroupColumns * this._legendGroupColumnWidth;
     const y = Math.floor(index / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 12;
 
@@ -796,12 +800,24 @@ export class LineChartService {
   }
 
   private onMouseClick(labelKey: string, incomingData: EventResultDataDTO): void {
-    if (d3Event.metaKey) {
-      this.legendDataMap[labelKey].show ? this.legendDataMap[labelKey].show = false : this.legendDataMap[labelKey].show = true;
+    if (d3Event.metaKey || d3Event.ctrlKey) {
+      this.legendDataMap[labelKey].show = !this.legendDataMap[labelKey].show;
     } else {
-      Object.keys(this.legendDataMap).forEach((legend) => {
-        this.legendDataMap[legend].show = legend === labelKey;
-      });
+      if (labelKey == this.focusedLegendEntry) {
+        Object.keys(this.legendDataMap).forEach((legend) => {
+          this.legendDataMap[legend].show = true;
+        });
+        this.focusedLegendEntry = "";
+      } else {
+        Object.keys(this.legendDataMap).forEach((legend) => {
+          if (legend === labelKey) {
+            this.legendDataMap[legend].show = true;
+            this.focusedLegendEntry = legend;
+          } else {
+            this.legendDataMap[legend].show = false;
+          }
+        });
+      }
     }
     this.drawLineChart(incomingData);
   }
