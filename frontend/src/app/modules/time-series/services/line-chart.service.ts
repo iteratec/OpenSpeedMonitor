@@ -68,6 +68,7 @@ export class LineChartService {
   private _labelGroupHeight: number;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
   private _legendGroupLeft: number = this._margin.left;
+  private _legendGroupHeight;
   private _legendGroupColumnWidth;
   private _legendGroupColumns;
   private legendDataMap: Object = {};
@@ -108,9 +109,9 @@ export class LineChartService {
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
-    let labelGroupHeight: number = this.getLegendHeight();
+this.calculateLegendDimensions();
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
-    d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + labelGroupHeight + this._margin.top + this._margin.bottom);
+    d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._legendGroupHeight + this._margin.top + this._margin.bottom);
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
     this.brush = d3BrushX().extent([[0, 0], [this._width, this._height]]);
@@ -248,7 +249,7 @@ export class LineChartService {
       .nice();
   }
 
-  private getLegendHeight(): number {
+  private calculateLegendDimensions(): void {
     let maximumLabelWidth: number = 1;
     let labels = Object.keys(this.legendDataMap);
 
@@ -264,7 +265,7 @@ export class LineChartService {
       .each((datum, index, groups) => {
         Array.from(groups).forEach((text) => {
           if (text) {
-            maximumLabelWidth = Math.max(maximumLabelWidth, text.clientWidth)
+            maximumLabelWidth = Math.max(maximumLabelWidth, text.getBoundingClientRect().width)
           }
         });
       });
@@ -273,8 +274,7 @@ export class LineChartService {
 
     this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
     this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
-
-    return Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
+    this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
   }
 
   private getMaxValue(data: TimeSeries[]): number {
