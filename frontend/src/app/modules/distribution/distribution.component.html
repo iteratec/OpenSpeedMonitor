@@ -3,7 +3,7 @@
   {{ 'frontend.de.iteratec.osm.distribution.description' | translate }}
 </p>
 
-<osm-violin-chart [dataInput]="this.results$"></osm-violin-chart>
+<osm-violin-chart [dataInput]="this.results$" [hidden]="!showChart"></osm-violin-chart>
 
 <div class="action-row">
   <div class="col-md-12">

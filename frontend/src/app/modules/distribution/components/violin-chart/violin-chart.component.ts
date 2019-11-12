@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import * as d3 from 'd3';
 import {BehaviorSubject} from "rxjs";
 import {DistributionDataDTO} from "../../models/distribution-data.model";
@@ -11,33 +11,36 @@ import ChartLabelUtil from "../util/chart-label-util";
   templateUrl: './violin-chart.component.html',
   styleUrls: ['./violin-chart.component.scss']
 })
-export class ViolinChartComponent implements OnInit, OnChanges {
+export class ViolinChartComponent implements OnInit, OnDestroy {
 
   @Input()
   dataInput: BehaviorSubject<DistributionDataDTO>;
 
+  @ViewChild("svgContainer")
+  svgContainerElem: ElementRef;
+
   private chartData: DistributionDataDTO = null;
-  private svgContainer = new SvgContainer("#svg-container");
+  private svgContainer: SvgContainer = null;
 
   ngOnInit(): void {
-    window.addEventListener('resize', () => {
-      if(this.chartData) {
-        this.distributionChart(this.chartData, this.svgContainer)
-      }
-    });
-  }
-
-  ngOnChanges() {
-    if (!this.dataInput) {
-      return;
-    }
+    this.svgContainer = new SvgContainer(this.svgContainerElem);
 
     this.dataInput.subscribe(d => {
       if (d.series.length > 0) {
         this.chartData = d;
         this.distributionChart(this.chartData, this.svgContainer);
       }
-    })
+    });
+
+    window.addEventListener('resize', () => {
+      if (this.chartData) {
+        this.distributionChart(this.chartData, this.svgContainer)
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.dataInput.unsubscribe();
   }
 
   distributionChart = (function (distributionChartData, svg: SvgContainer,) {
@@ -49,7 +52,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
 
     let width = 600,
       chartData = null,
-      currentSeries = null,
+      currentSeries: object[] = null,
       violinWidth: number = null,
       dataTrimValue: number = null,
       commonLabelParts = null;
@@ -94,7 +97,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
         svg.remove();
       }
 
-      const svgSelection = d3.select(svg.svgContainerElemName);
+      const svgSelection = d3.select(svg.svgContainerElem.nativeElement);
 
       svg.svgElem = svgSelection.append("svg")
         .attr("class", "d3chart")
@@ -103,7 +106,6 @@ export class ViolinChartComponent implements OnInit, OnChanges {
       width = svg.svgElem.node().getBoundingClientRect().width;
     }
 
-    //fixme labels still are wrong
     function assignShortLabels() {
       const seriesLabelParts = chartData.series.map(elem => {
         return {grouping: elem.identifier, page: elem.page, jobGroup: elem.jobGroup, label: elem.identifier};
@@ -246,7 +248,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
     }
 
     function xRange(): number[] {
-      return Object.keys(currentSeries).map((_, index: number) => {
+      return currentSeries.map((_, index: number) => {
         return index * violinWidth + violinWidth / 2
       });
     }
@@ -376,7 +378,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
 
       margin.bottom = Math.cos(Math.PI / 4) * maxLabelLength + 20;
 
-      if(rotate) {
+      if (rotate) {
         d3.selectAll(".d3chart-xAxis g").each(function () {
           const selectedLabel = d3.select(this);
           rotateLabel(selectedLabel)
@@ -407,11 +409,11 @@ export class ViolinChartComponent implements OnInit, OnChanges {
 }
 
 class SvgContainer {
-  svgContainerElemName: string;
+  svgContainerElem: ElementRef = null;
   svgElem = null;
 
-  constructor(svgContainerElemName: string) {
-    this.svgContainerElemName = svgContainerElemName;
+  constructor(svgContainerElem: ElementRef) {
+    this.svgContainerElem = svgContainerElem;
   }
 
   remove() {
