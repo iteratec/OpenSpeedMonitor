@@ -52,7 +52,7 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
 
     let width = 600,
       chartData = null,
-      currentSeries: object[] = null,
+      currentSeries: any[] = null,
       violinWidth: number = null,
       dataTrimValue: number = null,
       commonLabelParts = null;
@@ -69,9 +69,7 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
         return chartData.series[trace];
       });
       chartData.series = sortedSeries;
-      currentSeries = Object.keys(sortedSeries).map(key => {
-        return sortedSeries[key];
-      });
+      currentSeries = sortedSeries;
       draw();
     }
 
@@ -121,7 +119,7 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
     }
 
     function getHeaderTransform() {
-      const widthOfAllViolins = Object.keys(currentSeries).length * violinWidth;
+      const widthOfAllViolins = currentSeries.length * violinWidth;
       return "translate(" + (margin.left + widthOfAllViolins / 2) + ",20)";
     }
 
@@ -140,9 +138,7 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
 
     function drawXAxis() {
       const x = d3.scaleOrdinal(xRange())
-        .domain(Object.keys(currentSeries).map(seriesKey => {
-          return currentSeries[seriesKey].label;
-        }));
+        .domain(currentSeries.map(elem => elem.label));
 
       svg.svgElem.append("g")
         .attr("id", "x-axis")
@@ -160,7 +156,6 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
       const yAxisLeftLabel = document.getElementById("y-axis_left_label");
       yAxisLeftLabel.textContent = text;
 
-
       const g = svg.svgElem.append("g")
         .attr("class", "d3chart-axis d3chart-yAxis")
         .attr("transform", "translate(" + margin.left + ", 0)")
@@ -176,8 +171,8 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
 
       const violinGroup = svg.svgElem.append("g");
       createClipPathAroundViolins(violinGroup);
-      Object.keys(currentSeries).forEach(function (trace, i) {
-        const traceData = currentSeries[trace].data;
+      currentSeries.forEach((elem, i) => {
+        const traceData = elem.data;
 
         const g = violinGroup.append("g")
           .attr("class", "d3chart-violin")
@@ -203,8 +198,8 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
     }
 
     function sortSeriesDataAscending() {
-      Object.keys(chartData.series).forEach(trace => {
-        chartData.series[trace].data.sort(d3.ascending);
+      chartData.series.forEach(elem => {
+        elem.data.sort(d3.ascending);
       });
     }
 
@@ -214,7 +209,7 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
 
     function calculateViolinWidth() {
       const svgWidth = width - margin.left;
-      const numberOfViolins = Object.keys(currentSeries).length;
+      const numberOfViolins = currentSeries.length;
 
       if (numberOfViolins * maxViolinWidth > svgWidth) {
         return svgWidth / numberOfViolins;
@@ -224,10 +219,10 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
     }
 
     function getDomain() {
-      const maxInSeries = Object.keys(currentSeries).map(trace => {
-        return Math.max(...currentSeries[trace].data)
+      const maxInSeries = currentSeries.map(elem => {
+        return Math.max(...elem.data)
       });
-      const maxValue = Math.max(...maxInSeries);
+      const maxValue = d3.max(maxInSeries);
       const trimValue = dataTrimValue || maxValue;
 
       return [0, Math.min(maxValue, trimValue)];
@@ -236,8 +231,8 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
     function getGreatestDomainTrace() {
       let maxDomainSize = -1;
       let greatestTrace = [];
-      Object.keys(currentSeries).forEach(function (trace) {
-        const curTrace = currentSeries[trace].data;
+      currentSeries.forEach(elem => {
+        const curTrace = elem.data;
         const domainSize = d3.quantile(curTrace, 0.75) - d3.quantile(curTrace, 0.25);
         if (domainSize > maxDomainSize) {
           maxDomainSize = domainSize;
@@ -254,9 +249,6 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
     }
 
     function addViolin(g, traceData, height, violinWidth, domain) {
-      //filter nullable values
-      traceData = traceData.filter(it => it != null);
-
       const resolution = histogramResolutionForTraceData(traceData);
 
       const data = d3.histogram()
@@ -329,8 +321,8 @@ export class ViolinChartComponent implements OnInit, OnDestroy {
     }
 
     function sortByMedian() {
-      Object.keys(chartData.series).forEach(trace => {
-        chartData.series[trace].median = calculateMedian(chartData.series[trace].data);
+      chartData.series.forEach(elem => {
+        elem.median = calculateMedian(elem.data);
       });
 
       chartData.sortingRules = {};
