@@ -68,6 +68,9 @@ export class LineChartService {
   private _labelGroupHeight: number;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
   private _legendGroupLeft: number = this._margin.left;
+  private _legendGroupHeight;
+  private _legendGroupColumnWidth;
+  private _legendGroupColumns;
   private legendDataMap: Object = {};
   private brush: BrushBehavior<{}>;
   private focusedLegendEntry: string;
@@ -106,9 +109,9 @@ export class LineChartService {
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
     let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
-    this._labelGroupHeight = data.length * ChartCommons.LABEL_HEIGHT;
+this.calculateLegendDimensions();
     d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
-    d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._labelGroupHeight + this._margin.top + this._margin.bottom);
+    d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._legendGroupHeight + this._margin.top + this._margin.bottom);
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
     this.brush = d3BrushX().extent([[0, 0], [this._width, this._height]]);
@@ -187,6 +190,7 @@ export class LineChartService {
       .attr('height', 0);
 
     svg.append('g')
+      .attr('id', 'time-series-chart-legend')
       .attr('class', 'legend-group')
       .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop})`);
 
@@ -243,6 +247,34 @@ export class LineChartService {
       .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
       .domain([0, this.getMaxValue(data)])
       .nice();
+  }
+
+  private calculateLegendDimensions(): void {
+    let maximumLabelWidth: number = 1;
+    let labels = Object.keys(this.legendDataMap);
+
+    d3Select('g#time-series-chart-legend')
+      .append('g')
+      .attr('id', 'renderToCalculateMaxWidth')
+      .selectAll('.renderToCalculateMaxWidth')
+      .data(labels)
+      .enter()
+      .append('text')
+      .attr('class', 'legend-text')
+      .text(datum => this.legendDataMap[datum].text)
+      .each((datum, index, groups) => {
+        Array.from(groups).forEach((text) => {
+          if (text) {
+            maximumLabelWidth = Math.max(maximumLabelWidth, text.getBoundingClientRect().width)
+          }
+        });
+      });
+
+    d3Select('g#renderToCalculateMaxWidth').remove();
+
+    this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
+    this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
+    this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
   }
 
   private getMaxValue(data: TimeSeries[]): number {
@@ -761,13 +793,8 @@ export class LineChartService {
   }
 
   private getPosition(index: number): string {
-    const columns = 3;
-    const columnWidth = 550;
-    const xMargin = 10;
-    const yMargin = 10;
-
-    const x = index % columns * columnWidth + xMargin;
-    const y = Math.floor(index / columns) * ChartCommons.LABEL_HEIGHT + yMargin;
+    const x = index % this._legendGroupColumns * this._legendGroupColumnWidth;
+    const y = Math.floor(index / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 12;
 
     return "translate(" + x + "," + y + ")";
   }
