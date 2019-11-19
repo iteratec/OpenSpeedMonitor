@@ -106,8 +106,8 @@
                 data: {
                     from: selectedTimeFrame[0].toISOString(),
                     to: selectedTimeFrame[1].toISOString(),
-                    selectedJobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
-                        return $(e).text()
+                    jobGroups: JSON.stringify($.map($("#folderSelectHtmlId option:selected"), function (e) {
+                        return parseInt(e.value);
                     })),
                     csiType: $('input[name=csiTypeRadios]:checked').val()
                 },
