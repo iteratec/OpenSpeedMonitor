@@ -4,6 +4,7 @@
 export class TimeSeriesPoint {
   date: Date;
   value: number;
+  agent: string;
   tooltipText: string;
 
   constructor() {}

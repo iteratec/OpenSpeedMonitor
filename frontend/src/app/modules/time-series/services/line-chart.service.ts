@@ -163,6 +163,7 @@ export class LineChartService {
         let lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
+        lineChartDataPoint.agent = point.agent;
         lineChartDataPoint.tooltipText = data.jobGroup + ' | ' + data.measuredEvent + ' : '; // TODO Set exact label text when IT-2793 is implemented
         return lineChartDataPoint;
       });
@@ -678,6 +679,12 @@ export class LineChartService {
       })
       .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
         tableBody.append(this.generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDot));
+      })
+      .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
+        if (index == 0) {
+          tableBody.append(this.generateTooltipTestAgentRow(timeSeriesPoint));
+        }
+        return;
       });
 
     return table;
@@ -717,6 +724,19 @@ export class LineChartService {
     }
     row.append(label);
     row.append(value);
+    return row;
+  }
+
+  private generateTooltipTestAgentRow(timeSeriesPoint: TimeSeriesPoint): string | Node {
+    const label: HTMLTableCellElement = document.createElement('td');
+    label.append("Test agent");
+
+    const testAgent: HTMLTableCellElement = document.createElement('td');
+    testAgent.append(timeSeriesPoint.agent);
+
+    const row: HTMLTableRowElement = document.createElement('tr');
+    row.append(label);
+    row.append(testAgent);
     return row;
   }
 
