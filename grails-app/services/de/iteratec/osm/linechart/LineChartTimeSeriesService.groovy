@@ -93,6 +93,7 @@ class LineChartTimeSeriesService {
         performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
             eventResultProjections.each { EventResultProjection eventResultProjection ->
                 Date date = (Date) eventResultProjection.jobResultDate
+                String testAgent = eventResultProjection.testAgent
                 JobGroup jobGroup = (JobGroup) jobGroups.find { jobGroup -> jobGroup.id == eventResultProjection.jobGroupId }
                 String identifier = "${jobGroup.name}"
                 MeasuredEvent measuredEvent
@@ -122,14 +123,14 @@ class LineChartTimeSeriesService {
                     String measurandName = measurand.getName()
                     Double value = (Double) eventResultProjection."$dataBaseRelevantName"
                     String identifierMeasurand = identifier + " | $measurandName"
-                    buildSeries(value, identifierMeasurand, date, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
+                    buildSeries(date, value, testAgent, identifierMeasurand, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
                     timeSeriesChartDTO.series.find{ it.identifier == identifierMeasurand }.measurand = measurandName
                 }
 
                 performanceAspectTypes.each { performanceAspectType ->
                     Double value = (Double) eventResultProjection."$performanceAspectType"
                     String identifierAspect = identifier + " | $performanceAspectType"
-                    buildSeries(value, identifierAspect, date, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
+                    buildSeries(date, value, testAgent, identifierAspect, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
                     timeSeriesChartDTO.series.find{ it.identifier == identifierAspect }.performanceAspectType = performanceAspectType.toString()
                 }
             }
@@ -142,7 +143,7 @@ class LineChartTimeSeriesService {
         return timeSeriesChartDTO
     }
 
-    private void buildSeries(Double value, String identifier, Date date, JobGroup jobGroup, MeasuredEvent measuredEvent,
+    private void buildSeries(Date date, Double value, String testAgent, String identifier, JobGroup jobGroup, MeasuredEvent measuredEvent,
                              Location location, ConnectivityProfile connectivity, TimeSeriesChartDTO timeSeriesChartDTO) {
         TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
         if (!timeSeries) {
@@ -161,7 +162,7 @@ class LineChartTimeSeriesService {
             }
             timeSeriesChartDTO.series.add(timeSeries)
         }
-        TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value)
+        TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value, agent: testAgent)
         timeSeries.data.add(timeSeriesDataPoint)
     }
 }

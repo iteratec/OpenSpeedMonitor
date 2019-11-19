@@ -1,7 +1,7 @@
 <osm-menu></osm-menu>
-<div class="card time-series-container">
+<div class="card time-series-container" *ngIf="showChart">
   <osm-spinner [spinnerId]="'time-series-chart-spinner'"></osm-spinner>
-  <osm-time-series-line-chart *ngIf="showChart" [timeSeriesResults]="results$ | async"></osm-time-series-line-chart>
+  <osm-time-series-line-chart [timeSeriesResults]="results$ | async"></osm-time-series-line-chart>
 </div>
 
 <div class="action-row">
