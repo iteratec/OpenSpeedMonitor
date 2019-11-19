@@ -114,19 +114,19 @@ class LineChartTimeSeriesService {
             timeSeriesChartDTO.summaryLabels.add new SummaryLabel("connectivity", "${connectivity?.name}")
         }
 
-        fillData(timeSeriesChartDTO, eventResultProjections, measurands, performanceAspectTypes, jobGroups,
-                measuredEvents, locations, connectivityProfiles, jobGroup, measuredEvent, location, connectivity)
+        timeSeriesChartDTO = fillData(timeSeriesChartDTO, eventResultProjections, measurands, performanceAspectTypes,
+                jobGroups, measuredEvents, locations, connectivityProfiles, jobGroup, measuredEvent, location, connectivity)
 
-        rebuildIdentifierForEdgeCases(timeSeriesChartDTO, measuredEvents, locations, connectivityProfiles)
+        timeSeriesChartDTO = rebuildIdentifierForEdgeCases(timeSeriesChartDTO, measuredEvents, locations, connectivityProfiles)
         timeSeriesChartDTO.series.sort { it.identifier.toUpperCase() }
         return timeSeriesChartDTO
     }
 
-    private void fillData(TimeSeriesChartDTO timeSeriesChartDTO, List<EventResultProjection> eventResultProjections,
-                          List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes,
-                          List<JobGroup> jobGroups, List<MeasuredEvent> measuredEvents, List<Location> locations,
-                          List<ConnectivityProfile> connectivityProfiles, JobGroup jobGroup,
-                          MeasuredEvent measuredEvent, Location location, ConnectivityProfile connectivity) {
+    private TimeSeriesChartDTO fillData(TimeSeriesChartDTO timeSeriesChartDTO, List<EventResultProjection> eventResultProjections,
+                                        List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes,
+                                        List<JobGroup> jobGroups, List<MeasuredEvent> measuredEvents, List<Location> locations,
+                                        List<ConnectivityProfile> connectivityProfiles, JobGroup jobGroup,
+                                        MeasuredEvent measuredEvent, Location location, ConnectivityProfile connectivity) {
         performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
             eventResultProjections.each { EventResultProjection eventResultProjection ->
                 String identifier = ""
@@ -193,6 +193,7 @@ class LineChartTimeSeriesService {
                 }
             }
         }
+        return timeSeriesChartDTO
     }
 
     private void buildSeries(Double value, String identifier, Date date, String measurandName, JobGroup jobGroup,
@@ -214,8 +215,8 @@ class LineChartTimeSeriesService {
         timeSeries.data.add(timeSeriesDataPoint)
     }
 
-    private void rebuildIdentifierForEdgeCases(TimeSeriesChartDTO timeSeriesChartDTO, List<MeasuredEvent> measuredEvents,
-                                               List<Location> locations, List<ConnectivityProfile> connectivityProfiles) {
+    private TimeSeriesChartDTO rebuildIdentifierForEdgeCases(TimeSeriesChartDTO timeSeriesChartDTO, List<MeasuredEvent> measuredEvents,
+                                                             List<Location> locations, List<ConnectivityProfile> connectivityProfiles) {
         if (timeSeriesChartDTO.series.size() == 1) {
             timeSeriesChartDTO.series.each { TimeSeries timeSeries ->
                 timeSeries.identifier = "${timeSeries.measurand} | ${timeSeries.jobGroup} | ${timeSeries.measuredEvent} | ${timeSeries.location} | ${timeSeries.connectivity}"
@@ -290,6 +291,7 @@ class LineChartTimeSeriesService {
                 }
             }
         }
+        return timeSeriesChartDTO
     }
 
     private String addToIdentifier(String element, String identifier) {

@@ -183,7 +183,11 @@ export class LineChartService {
   }
 
   private generateKey(data: EventResultSeriesDTO): string {
-    return data.identifier.split(' | ').join().split(':').join("").split("?").join("");
+    let key: string = data.identifier.replace(/[^_a-zA-Z0-9-]/g, "");
+    if (new RegExp('[0-9]').test(key.charAt(0))) {
+      key = key.replace(/[0-9]/, '_');
+    }
+    return key;
   }
 
   /**
