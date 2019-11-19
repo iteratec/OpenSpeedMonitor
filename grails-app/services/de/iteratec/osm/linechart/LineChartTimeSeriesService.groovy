@@ -6,6 +6,7 @@ import de.iteratec.osm.measurement.environment.Location
 import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
@@ -122,15 +123,19 @@ class LineChartTimeSeriesService {
                     String dataBaseRelevantName = measurand.getDatabaseRelevantName()
                     String measurandName = measurand.getName()
                     Double value = (Double) eventResultProjection."$dataBaseRelevantName"
+                    String measurandGroup = measurand.measurandGroup
+                    String unit = measurand.measurandGroup.unit
                     String identifierMeasurand = identifier + " | $measurandName"
-                    buildSeries(date, value, testAgent, identifierMeasurand, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
+                    buildSeries(date, value, testAgent, measurandGroup, unit, identifierMeasurand, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
                     timeSeriesChartDTO.series.find{ it.identifier == identifierMeasurand }.measurand = measurandName
                 }
 
                 performanceAspectTypes.each { performanceAspectType ->
                     Double value = (Double) eventResultProjection."$performanceAspectType"
+                    String measurandGroup = MeasurandGroup.LOAD_TIMES
+                    String unit = MeasurandGroup.LOAD_TIMES.unit
                     String identifierAspect = identifier + " | $performanceAspectType"
-                    buildSeries(date, value, testAgent, identifierAspect, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
+                    buildSeries(date, value, testAgent, measurandGroup, unit, identifierAspect, jobGroup, measuredEvent, location, connectivity, timeSeriesChartDTO)
                     timeSeriesChartDTO.series.find{ it.identifier == identifierAspect }.performanceAspectType = performanceAspectType.toString()
                 }
             }
@@ -143,11 +148,14 @@ class LineChartTimeSeriesService {
         return timeSeriesChartDTO
     }
 
-    private void buildSeries(Date date, Double value, String testAgent, String identifier, JobGroup jobGroup, MeasuredEvent measuredEvent,
-                             Location location, ConnectivityProfile connectivity, TimeSeriesChartDTO timeSeriesChartDTO) {
+    private void buildSeries(Date date, Double value, String testAgent, measurandGroup, unit, String identifier,
+                             JobGroup jobGroup, MeasuredEvent measuredEvent, Location location,
+                             ConnectivityProfile connectivity, TimeSeriesChartDTO timeSeriesChartDTO) {
         TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
         if (!timeSeries) {
             timeSeries = new TimeSeries(
+                    measurandGroup: measurandGroup,
+                    unit: unit,
                     identifier: identifier,
                     jobGroup: jobGroup.name
             )
