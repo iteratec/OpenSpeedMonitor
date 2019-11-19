@@ -111,6 +111,7 @@ export class LineChartService {
     d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._labelGroupHeight + this._margin.top + this._margin.bottom);
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
+    this.addAxisDescription(incomingData.measurandGroups);
     this.brush = d3BrushX().extent([[0, 0], [this._width, this._height]]);
 
     this.addBrush(chart, xScale, yScale, data);
@@ -279,14 +280,19 @@ export class LineChartService {
     // Add the Y-Axis to the chart
     chart.append('g')                   // new group for the y-axis
       .attr('class', 'axis y-axis')  // a css class to style it later
-      .call(yAxis);
+      .call(yAxis)
+      .append('g')
+      .attr('class', 'axis-description');
+  }
 
-    // Add the axis description
-    this.translationService.get("frontend.de.iteratec.osm.timeSeries.loadTimes").pipe(take(1)).subscribe(title => {
-      d3Select('.y-axis').append('text')
+  private addAxisDescription(measurandGroups: any): void {
+    let axisLabelKeys = Object.keys(measurandGroups);
+    this.translationService.get("frontend.de.iteratec.isr.measurand.group." + axisLabelKeys[0]).pipe(take(1)).subscribe(title => {
+      d3Select('.axis-description').selectAll('*').remove();
+      d3Select('.axis-description').append('text')
         .attr('class', 'description')
         .attr('transform', 'translate(-' + (this._margin.left - 20) + ', ' + (this._height / 2 - this._margin.bottom) + ') rotate(-90)')
-        .text(title + ' [ms]');
+        .text(`${title} [${measurandGroups[axisLabelKeys[0]]}]`);
     });
   }
 
