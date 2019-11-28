@@ -6,6 +6,7 @@ import {ResultSelectionModule} from "../result-selection/result-selection.module
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {ViolinchartDataService} from "./services/violinchart-data.service";
+import {ViolinChartComponent} from "./components/violin-chart/violin-chart.component";
 
 describe('DistributionComponent', () => {
   let component: DistributionComponent;
@@ -13,7 +14,7 @@ describe('DistributionComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DistributionComponent ],
+      declarations: [ DistributionComponent, ViolinChartComponent ],
       imports: [
         SharedMocksModule,
         ResultSelectionModule

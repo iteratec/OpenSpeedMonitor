@@ -1,6 +1,5 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import * as d3 from 'd3';
-import {BehaviorSubject} from "rxjs";
 import {DistributionDataDTO} from "../../models/distribution-data.model";
 import ChartColorProvider from "../util/chart-color-provider";
 import "../util/chart-label-util";
@@ -11,36 +10,32 @@ import ChartLabelUtil from "../util/chart-label-util";
   templateUrl: './violin-chart.component.html',
   styleUrls: ['./violin-chart.component.scss']
 })
-export class ViolinChartComponent implements OnInit, OnDestroy {
+export class ViolinChartComponent implements OnInit, OnChanges {
 
   @Input()
-  dataInput: BehaviorSubject<DistributionDataDTO>;
+  dataInput: DistributionDataDTO;
 
   @ViewChild("svgContainer")
   svgContainerElem: ElementRef;
 
-  private chartData: DistributionDataDTO = null;
   private svgContainer: SvgContainer = null;
 
   ngOnInit(): void {
     this.svgContainer = new SvgContainer(this.svgContainerElem);
 
-    this.dataInput.subscribe(d => {
-      if (d.series.length > 0) {
-        this.chartData = d;
-        this.distributionChart(this.chartData, this.svgContainer);
-      }
-    });
-
     window.addEventListener('resize', () => {
-      if (this.chartData) {
-        this.distributionChart(this.chartData, this.svgContainer)
+      if (this.dataInput) {
+        this.distributionChart(this.dataInput, this.svgContainer)
       }
     });
   }
 
-  ngOnDestroy(): void {
-    this.dataInput.unsubscribe();
+  ngOnChanges(): void {
+    if(!this.dataInput || this.dataInput.series.length == 0) {
+      return;
+    }
+
+    this.distributionChart(this.dataInput, this.svgContainer);
   }
 
   distributionChart = (function (distributionChartData, svg: SvgContainer,) {
