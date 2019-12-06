@@ -1,0 +1,67 @@
+.d3-context-menu-background {
+  width: 100%;
+  height: 100%;
+  display: none;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: rgba(255,0,0,0.5);
+}
+
+.d3-context-menu {
+  position: absolute;
+  display: none;
+  min-width: 13em;
+  max-width: 26em;
+  padding: .25em 0;
+  margin: .3em;
+  font-family: inherit;
+  font-size: 14px;
+  list-style-type: none;
+  background: #ffffff;
+  border: 1px solid #bebebe;
+  border-radius: .2em;
+  box-shadow: 0 2px 5px rgba(0,0,0,.5);
+  cursor: default;
+  z-index:1200;
+  pointer-events: visible;
+
+  li {
+    position: relative;
+    box-sizing: content-box;
+    padding: .2em 2em;
+
+    background-color: #ffffff;
+    color: #000000;
+
+    i {
+      position: absolute;
+      top: .3em;
+      left: .5em;
+
+      color: #2980b9;
+    }
+  }
+
+  li:hover {
+    background-color: #2980b9;
+    color: #ffffff;
+    cursor: pointer;
+
+    i {
+      color: #ffffff;
+    }
+  }
+
+  .d3-context-menu-divider {
+    padding: 0;
+    margin: .35em 0;
+    border-bottom: 1px solid #e6e6e6;
+    cursor: default;
+  }
+
+  .d3-context-menu-divider:hover {
+    cursor: default;
+  }
+}
