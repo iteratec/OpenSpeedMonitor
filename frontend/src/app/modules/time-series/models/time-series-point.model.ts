@@ -7,4 +7,8 @@ export class TimeSeriesPoint {
   tooltipText: string;
 
   constructor() {}
+
+  public equals(other: TimeSeriesPoint) {
+    return other && this.date.getTime() == other.date.getTime() && this.tooltipText == other.tooltipText && this.value == other.value;
+  }
 }

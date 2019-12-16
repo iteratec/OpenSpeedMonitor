@@ -48,6 +48,7 @@ import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 import {ChartCommons} from "../../../enums/chart-commons.enum";
 import * as d3 from "d3";
+import {PointSelectionService} from "./point-selection.service";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -86,10 +87,9 @@ export class LineChartService {
   private _contextMenu: D3Selection<D3BaseType, number, D3BaseType, unknown>;
 
   private dotsOnMarker: D3Selection<D3BaseType, {}, HTMLElement, any>;
-  private selectedDots: TimeSeriesPoint[] = [];
 
   //TODO i18n
-  private contextMenu = [
+  private contextMenu: ContextMenuPosition[] = [
     {
       title: 'Summary',
       icon: "fas fa-file-alt",
@@ -150,7 +150,7 @@ export class LineChartService {
       title: 'Compare Filmstrips',
       icon: "fas fa-columns",
       visible: () => {
-        return this.selectedDots.length > 0;
+        return this.pointSelectionService.countSelectedDots() > 0;
       },
       action: (elm, d, i) => {
         console.log("Item 'Compare Filmstrips' clicked!");
@@ -162,8 +162,21 @@ export class LineChartService {
     {
       title: 'Select point',
       icon: "fas fa-dot-circle",
+      visible: (elm, d: TimeSeriesPoint, i) => {
+        return !this.pointSelectionService.isPointSelected(d);
+      },
       action: (elm, d: TimeSeriesPoint, i) => {
-        this.selectPoint(d);
+        this.changePointSelection(d);
+      }
+    },
+    {
+      title: 'Unselect point',
+      icon: "fas fa-trash-alt",
+      visible: (elm, d: TimeSeriesPoint, i) => {
+        return this.pointSelectionService.isPointSelected(d);
+      },
+      action: (elm, d: TimeSeriesPoint, i) => {
+        this.changePointSelection(d);
       }
     },
   ];
@@ -174,17 +187,17 @@ export class LineChartService {
       title: 'Compare Filmstrips',
       icon: "fas fa-columns",
       visible: () => {
-        return this.selectedDots.length >= 2;
+        return this.pointSelectionService.countSelectedDots() >= 2;
       },
       action: function (elm, d, i) {
         console.log('Background item #1 clicked!');
       }
     },
     {
-      title: 'Deselect all Points',
+      title: 'Unselect all Points',
       icon: "fas fa-trash-alt",
       visible: () => {
-        return this.selectedDots.length > 0;
+        return this.pointSelectionService.countSelectedDots() > 0;
       },
       action: (elm, d, i) => {
         this.unselectAllPoints();
@@ -192,7 +205,8 @@ export class LineChartService {
     },
   ];
 
-  constructor(private translationService: TranslateService) {
+  constructor(private translationService: TranslateService,
+              private pointSelectionService: PointSelectionService) {
   }
 
   public initChart(svgElement: ElementRef): void {
@@ -534,8 +548,6 @@ export class LineChartService {
       .selectAll('.line')                             // Get all lines already drawn
       .data(data, (timeSeries: TimeSeries) => timeSeries.key)   // ... for this data
       .join(enter => {
-          console.log("enter.data()", enter.data());
-
           this.addDataPointsToXAxisCluster(enter);
           const lineSelection: any = this.drawLine(enter, xScale, yScale);
 
@@ -580,9 +592,7 @@ export class LineChartService {
 
   private drawSelectedPoints(dotsToCheck: D3Selection<D3BaseType, {}, HTMLElement, any>) {
     dotsToCheck.each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
-      const isDotSelected = this.selectedDots.some(elem => {
-        return currentDotData.tooltipText == elem.tooltipText && currentDotData.date.getTime() == elem.date.getTime()
-      });
+      const isDotSelected = this.pointSelectionService.isPointSelected(currentDotData);
       if (isDotSelected) {
         d3Select(dots[index]).style("opacity", 1)
       }
@@ -689,7 +699,7 @@ export class LineChartService {
         })
         .attr('cy', (dot: TimeSeriesPoint) => {
           return yScale(dot.value);
-        }).on("contextmenu", this.showContextMenu(this.contextMenu))
+        })
     });
   }
 
@@ -716,14 +726,25 @@ export class LineChartService {
       .attr('class', 'd3-context-menu')
       .on('contextmenu', () => d3Event.preventDefault());
 
+    const showMarker = () => {
+      d3Select('.marker-line').style('opacity', 1);
+      d3Select('#marker-tooltip').style('opacity', 1);
+    };
+
+    const hideMarker = () => {
+      d3Select('.marker-line').style('opacity', 0);
+      d3Select('#marker-tooltip').style('opacity', 0);
+      this.hideOldDotsOnMarker();
+    };
+
     // Watcher for mouse events
     this._mouseEventCatcher = markerGroup.append('svg:g')
       .attr('class', 'mouse-event-catcher')
       .attr('width', this._width)
       .attr('height', this._height)
       .attr('fill', 'none')
-      .on('mouseover', this.showMarker)
-      .on('mouseout', this.hideMarker)
+      .on('mouseover', () => showMarker())
+      .on('mouseout', () => hideMarker())
       .on("contextmenu", () => d3Event.preventDefault());
 
     this._mouseEventCatcher.append('svg:rect')
@@ -731,8 +752,6 @@ export class LineChartService {
       .attr('height', this._height)
       .attr('fill', 'none')
       .style('pointer-events', 'all')
-      .on('mouseover', this.showMarker)
-      .on('mouseout', this.hideMarker)
       .on('contextmenu', this.showContextMenu(this.backgroundContextMenu));
 
     // Append the marker line, initially hidden
@@ -752,14 +771,17 @@ export class LineChartService {
       .style('opacity', '0.9');
   }
 
-  private showMarker() {
-    d3Select('.marker-line').style('opacity', '1');
-  }
-
-  private hideMarker() {
-    d3Select('.marker-line').style('opacity', '0');
-    // d3SelectAll('.dot').style('opacity', '0');
-  }
+  private hideOldDotsOnMarker() {
+    if(this.dotsOnMarker) {
+      this.dotsOnMarker
+        .attr('r', this.DOT_RADIUS)
+        .style('opacity', '0')
+        .style('cursor', 'auto')
+        .on('click', null)
+        .on('contextmenu', null);
+      this.drawSelectedPoints(this.dotsOnMarker);
+    }
+  };
 
   private moveMarker(node: D3ContainerElement, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>, containerHeight: number) {
     const mouseCoordinates = d3Mouse(node);
@@ -797,19 +819,7 @@ export class LineChartService {
         return d;
       });
 
-    const hideOldDotsOnMarker = () => {
-      if(this.dotsOnMarker) {
-        this.dotsOnMarker
-          .attr('r', this.DOT_RADIUS)
-          .style('opacity', '0')
-          .style('cursor', 'auto');
-        this.drawSelectedPoints(this.dotsOnMarker);
-      } else {
-        console.log("There is no dots on marker");
-      }
-    };
-
-    const findDotsOnMarker= (pointX: number) => {
+    const findDotsOnMarker = (pointX: number) => {
       const cx = pointX.toString().replace('.', '_');
       return d3SelectAll('.dot-x-' + cx);
     };
@@ -818,21 +828,20 @@ export class LineChartService {
       //show dots on marker
       dotsOnMarker
         .style('opacity', '1')
-        .style('cursor', 'pointer')
         .style('fill', 'white')
-        .on("mouseover", (_, index, nodes: D3ContainerElement[]) => {
-          d3Select(nodes[index]).style('cursor', 'pointer');
-        }).on("click", (dotData: TimeSeriesPoint, index, nodes: D3ContainerElement[]) => {
-        if (event.ctrlKey) {
-          this.selectPoint(dotData);
-        } else {
-          //TODO click
-          console.log("left click!")
-        }
-      });
+        .style('cursor', 'pointer')
+        .on("contextmenu", this.showContextMenu(this.contextMenu))
+        .on("click", (dotData: TimeSeriesPoint, index, nodes: D3ContainerElement[]) => {
+          if (d3Event.ctrlKey) {
+            this.changePointSelection(dotData);
+          } else {
+            //TODO click
+            console.log("left click!")
+          }
+        });
     };
 
-    hideOldDotsOnMarker();
+    this.hideOldDotsOnMarker();
     const dotsOnMarker = findDotsOnMarker(pointX);
     showDotsOnMarker(dotsOnMarker);
 
@@ -844,12 +853,13 @@ export class LineChartService {
   }
 
 
-  private showContextMenu(menu) {
+  private showContextMenu(menu: ContextMenuPosition[]) {
     // this gets executed when a contextmenu event occurs
     return (data, currentIndex, viewElements) => {
+      const selectedPointNode = viewElements[currentIndex];
       const visibleMenuElements = menu.filter(elem => {
         //visible is default value, so even without this property the element is visible
-        return (elem.visible == undefined) || (elem.visible() == true);
+        return (elem.visible == undefined) || (elem.visible(selectedPointNode, data, currentIndex));
       });
 
       if (visibleMenuElements.length == 0) {
@@ -865,20 +875,20 @@ export class LineChartService {
         .enter()
         .append('li');
 
-      const clickListener = (e, d, i) => {
-        e.action(viewElements[currentIndex], data, currentIndex);
+      const clickListener = (e: ContextMenuPosition) => {
+        e.action(selectedPointNode, data, currentIndex);
         this.closeContextMenu();
       };
 
-      contextMenuPositions.each((ctxMenuPositionData: any, ctxMenuPositionIndex, ctxMenuPositions) => {
+      contextMenuPositions.each((ctxMenuPositionData: ContextMenuPosition, ctxMenuPositionIndex, ctxMenuPositions) => {
         const currentMenuPosition = d3Select(ctxMenuPositions[ctxMenuPositionIndex]);
         if (ctxMenuPositionData.divider) {
           currentMenuPosition
             .attr('class', 'd3-context-menu-divider')
             .on('contextmenu', () => d3Event.preventDefault());
         } else {
-          currentMenuPosition.append('i').attr('class', (d: any) => d.icon);
-          currentMenuPosition.append('span').html((d: any) => d.title);
+          currentMenuPosition.append('i').attr('class', (d: ContextMenuPosition) => d.icon);
+          currentMenuPosition.append('span').html((d: ContextMenuPosition) => d.title);
           currentMenuPosition
             .on('click', clickListener)
             .on('contextmenu', clickListener);
@@ -886,12 +896,18 @@ export class LineChartService {
       });
 
       // display context menu
-      background
-        .style('display', 'block');
+      background.style('display', 'block');
+      contextMenu.style('display', 'block');
+
+      //context menu must be displayed to take its width
+      const contextMenuWidth = (<HTMLDivElement>this._contextMenu.node()).offsetWidth;
+      const selectedPointX = Number(d3Select(selectedPointNode).attr("cx"));
+      const left = (selectedPointX + contextMenuWidth < this._width) ? (d3Event.pageX) : (d3Event.pageX - contextMenuWidth);
+
+      //move context menu
       contextMenu
-        .style('display', 'block')
-        .style('left', (d3.event.pageX - 2) + 'px')
-        .style('top', (d3.event.pageY - 2) + 'px');
+        .style('left', left + 'px')
+        .style('top', (d3Event.pageY - 2) + 'px');
 
       d3Event.preventDefault();
     };
@@ -903,8 +919,12 @@ export class LineChartService {
     this._contextMenu.style('display', 'none');
   };
 
-  private selectPoint(selectedDotData: TimeSeriesPoint) {
-    this.selectedDots.push(selectedDotData);
+  private changePointSelection(point: TimeSeriesPoint) {
+    if(this.pointSelectionService.isPointSelected(point)) {
+      this.pointSelectionService.unselectPoint(point);
+    } else {
+      this.pointSelectionService.selectPoint(point);
+    }
     this.drawAllSelectedPoints();
   }
 
@@ -914,7 +934,7 @@ export class LineChartService {
     };
 
     d3SelectAll(".dot").each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
-      const wasDotSelected = this.selectedDots.some(elem => arePointEqual(currentDotData, elem));
+      const wasDotSelected = this.pointSelectionService.isPointSelected(currentDotData);
       const isDotOnMarkerLine = this.dotsOnMarker.data().some((elem: TimeSeriesPoint) => {
         return arePointEqual(currentDotData, elem)
       });
@@ -922,7 +942,7 @@ export class LineChartService {
         d3Select(dots[index]).style("opacity", "0")
       }
     });
-    this.selectedDots.splice(0, this.selectedDots.length);
+    this.pointSelectionService.unselectAllPoints();
   }
 
   private highlightNearestDot(visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, mouseY: number, yScale: D3ScaleLinear<number, number>) {
@@ -1088,4 +1108,12 @@ export class LineChartService {
     }
     this.drawLineChart(incomingData);
   }
+}
+
+class ContextMenuPosition {
+  title?: string;
+  icon?: string;
+  visible?: (elm, d: TimeSeriesPoint, i) => boolean;
+  action?: (elm, d: TimeSeriesPoint, i) => void;
+  divider?: boolean = false;
 }

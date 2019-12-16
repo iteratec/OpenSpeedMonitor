@@ -6,7 +6,6 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: rgba(255,0,0,0.5);
 }
 
 .d3-context-menu {
@@ -31,6 +30,7 @@
     position: relative;
     box-sizing: content-box;
     padding: .2em 2em;
+    user-select: none;
 
     background-color: #ffffff;
     color: #000000;
