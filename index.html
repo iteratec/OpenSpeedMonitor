@@ -91,9 +91,9 @@
             height: 100%;
         }
         header mark {
+            display: none;
             background: #008cd2;
             color: #ededed;
-            display: block;
             padding: 0.5em;
             text-align: center;
             margin: 0;
@@ -292,9 +292,9 @@
                 </span>
             </div>
         </nav>
-        <mark>
+        <mark id="release-banner">
             <div class="fixed-width">
-                OpenSpeedMonitor 5.3.3 is now available! Read the <a href="https://github.com/iteratec/OpenSpeedMonitor/releases/tag/v5.3.3">release notes</a>.
+                OpenSpeedMonitor <span id="version"></span> is now available! Read the <a id="version-link" href="">release notes</a>.
             </div>
         </mark>
         <main>
@@ -388,7 +388,40 @@
         </article>
     </section>
     <footer>
-        <p class="fixed-width">© 2019  iteratec GmbH</p>
+        <p class="fixed-width">© <span id="current-year"></span> iteratec GmbH</p>
     </footer>
+
+    <script type="text/javascript">
+        function displayCurrentYearInCopyright() {
+            const yearSpan = document.querySelector('#current-year');
+            const year = new Date().getFullYear();
+            yearSpan.innerText = year.toString();
+        }
+
+        async function displayCurrentReleaseAndLinkToIt() {
+            let releaseData = null;
+
+            await fetch('https://api.github.com/repos/iteratec/OpenSpeedMonitor/releases/latest')
+                .then(response => response.json())
+                .then(data => releaseData = data);
+
+            if (releaseData && releaseData.tag_name && releaseData.html_url) {
+                const version = releaseData.tag_name;
+                const versionLink = releaseData.html_url;
+
+                const versionSpan = document.querySelector('#version');
+                const versionLinkSpan = document.querySelector('#version-link');
+                const releaseBanner = document.querySelector('#release-banner');
+
+                versionSpan.innerText = version.toString();
+                versionLinkSpan.href = versionLink.toString();
+
+                releaseBanner.style.display = "block";
+            }
+        }
+
+        displayCurrentYearInCopyright();
+        displayCurrentReleaseAndLinkToIt();
+    </script>
 </body>
 </html>
