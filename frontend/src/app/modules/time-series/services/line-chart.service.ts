@@ -87,67 +87,68 @@ export class LineChartService {
   private _contextMenu: D3Selection<D3BaseType, number, D3BaseType, unknown>;
 
   private dotsOnMarker: D3Selection<D3BaseType, {}, HTMLElement, any>;
+  private _contextMenuPoint: D3Selection<D3BaseType, TimeSeriesPoint, D3BaseType, any>;
 
   //TODO i18n
   private contextMenu: ContextMenuPosition[] = [
     {
-      title: 'Summary',
+      title: 'summary',
       icon: "fas fa-file-alt",
       action: function (elm, d, i) {
         console.log('Item #1 clicked!');
       }
     },
     {
-      title: 'Waterfall',
+      title: 'waterfall',
       icon: "fas fa-bars",
       action: function (elm, d, i) {
         console.log('Item #2 clicked!');
       }
     },
     {
-      title: 'Performance Review',
+      title: 'performanceReview',
       icon: "fas fa-check",
       action: function (elm, d, i) {
         console.log('Item #3 clicked!');
       }
     },
     {
-      title: 'Content Breakdown',
+      title: 'contentBreakdown',
       icon: "fas fa-chart-pie",
       action: function (elm, d, i) {
         console.log('Item #4 clicked!');
       }
     },
     {
-      title: 'Domains',
+      title: 'domains',
       icon: "fas fa-list",
       action: function (elm, d, i) {
         console.log('Item #5 clicked!');
       }
     },
     {
-      title: 'Screen Shots',
+      title: 'screenshot',
       icon: "fas fa-image",
       action: function (elm, d, i) {
         console.log('Item #6 clicked!');
       }
     },
     {
-      title: 'Filmstrip',
+      title: 'filmstrip',
       icon: "fas fa-film",
       action: function (elm, d, i) {
         console.log('Item #7 clicked!');
       }
     },
     {
-      title: 'Filmstrip Overview',
+      title: 'filmstripTool',
       icon: "fas fa-money-check",
       action: function (elm, d, i) {
         console.log('Item #8 clicked!');
       }
     },
     {
-      title: 'Compare Filmstrips',
+      title: 'compareFilmstrips',
       icon: "fas fa-columns",
       visible: () => {
         return this.pointSelectionService.countSelectedDots() > 0;
@@ -160,7 +161,7 @@ export class LineChartService {
       divider: true
     },
     {
-      title: 'Select point',
+      title: 'selectPoint',
       icon: "fas fa-dot-circle",
       visible: (elm, d: TimeSeriesPoint, i) => {
         return !this.pointSelectionService.isPointSelected(d);
@@ -170,7 +171,7 @@ export class LineChartService {
       }
     },
     {
-      title: 'Unselect point',
+      title: 'deselectPoint',
       icon: "fas fa-trash-alt",
       visible: (elm, d: TimeSeriesPoint, i) => {
         return this.pointSelectionService.isPointSelected(d);
@@ -184,7 +185,7 @@ export class LineChartService {
   //TODO i18n
   private backgroundContextMenu = [
     {
-      title: 'Compare Filmstrips',
+      title: 'compareFilmstrips',
       icon: "fas fa-columns",
       visible: () => {
         return this.pointSelectionService.countSelectedDots() >= 2;
@@ -194,7 +195,7 @@ export class LineChartService {
       }
     },
     {
-      title: 'Unselect all Points',
+      title: 'deselectAllPoints',
       icon: "fas fa-trash-alt",
       visible: () => {
         return this.pointSelectionService.countSelectedDots() > 0;
@@ -228,6 +229,9 @@ export class LineChartService {
     if (incomingData.series.length == 0) {
       return;
     }
+
+    this.pointSelectionService.unselectAllPoints();
+    this._contextMenuPoint = null;
 
     let data: TimeSeries[] = this.prepareData(incomingData);
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
@@ -703,6 +707,12 @@ export class LineChartService {
     });
   }
 
+  private hideMarker() {
+    d3Select('.marker-line').style('opacity', 0);
+    d3Select('#marker-tooltip').style('opacity', 0);
+    this.hideOldDotsOnMarker();
+  }
+
   private addMouseMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, data: TimeSeries[]): void {
     let markerGroup = chart;
 
@@ -731,27 +741,21 @@ export class LineChartService {
       d3Select('#marker-tooltip').style('opacity', 1);
     };
 
-    const hideMarker = () => {
-      d3Select('.marker-line').style('opacity', 0);
-      d3Select('#marker-tooltip').style('opacity', 0);
-      this.hideOldDotsOnMarker();
-    };
-
     // Watcher for mouse events
     this._mouseEventCatcher = markerGroup.append('svg:g')
       .attr('class', 'mouse-event-catcher')
       .attr('width', this._width)
       .attr('height', this._height)
       .attr('fill', 'none')
-      .on('mouseover', () => showMarker())
-      .on('mouseout', () => hideMarker())
+      .on('mouseenter', () => showMarker())
+      .on('mouseleave', () => this.hideMarker())
       .on("contextmenu", () => d3Event.preventDefault());
 
     this._mouseEventCatcher.append('svg:rect')
       .attr('width', this._width)
       .attr('height', this._height)
       .attr('fill', 'none')
-      .style('pointer-events', 'all')
+      .style('pointer-events', 'visible')
       .on('contextmenu', this.showContextMenu(this.backgroundContextMenu));
 
     // Append the marker line, initially hidden
@@ -773,7 +777,10 @@ export class LineChartService {
 
   private hideOldDotsOnMarker() {
     if(this.dotsOnMarker) {
+      const contextMenuPointData = this._contextMenuPoint && this._contextMenuPoint.data()[0];
+
       this.dotsOnMarker
+        .filter((s: TimeSeriesPoint) => !s.equals(contextMenuPointData))
         .attr('r', this.DOT_RADIUS)
         .style('opacity', '0')
         .style('cursor', 'auto')
@@ -853,18 +860,21 @@ export class LineChartService {
   }
 
 
+  //TODO for background context menu there is no 'cx' value
   private showContextMenu(menu: ContextMenuPosition[]) {
     // this gets executed when a contextmenu event occurs
     return (data, currentIndex, viewElements) => {
-      const selectedPointNode = viewElements[currentIndex];
+      const selectedNode = viewElements[currentIndex];
+      this._contextMenuPoint = d3Select(selectedNode);
+
       const visibleMenuElements = menu.filter(elem => {
-        //visible is default value, so even without this property the element is visible
-        return (elem.visible == undefined) || (elem.visible(selectedPointNode, data, currentIndex));
+        //visible is optional value, so even without this property the element is visible
+        return (elem.visible == undefined) || (elem.visible(selectedNode, data, currentIndex));
       });
 
       if (visibleMenuElements.length == 0) {
         //do not show empty context menu
-        return
+        return;
       }
 
       const background = this._contextMenuBackground.html('');
@@ -876,7 +886,7 @@ export class LineChartService {
         .append('li');
 
       const clickListener = (e: ContextMenuPosition) => {
-        e.action(selectedPointNode, data, currentIndex);
+        e.action(selectedNode, data, currentIndex);
         this.closeContextMenu();
       };
 
@@ -888,7 +898,9 @@ export class LineChartService {
             .on('contextmenu', () => d3Event.preventDefault());
         } else {
           currentMenuPosition.append('i').attr('class', (d: ContextMenuPosition) => d.icon);
-          currentMenuPosition.append('span').html((d: ContextMenuPosition) => d.title);
+          currentMenuPosition.append('span').html((d: ContextMenuPosition) => {
+            return this.translationService.instant("frontend.de.iteratec.chart.contextMenu." + d.title);
+          });
           currentMenuPosition
             .on('click', clickListener)
             .on('contextmenu', clickListener);
@@ -901,7 +913,7 @@ export class LineChartService {
 
       //context menu must be displayed to take its width
       const contextMenuWidth = (<HTMLDivElement>this._contextMenu.node()).offsetWidth;
-      const selectedPointX = Number(d3Select(selectedPointNode).attr("cx"));
+      const selectedPointX = Number(d3Select(selectedNode).attr("cx"));
       const left = (selectedPointX + contextMenuWidth < this._width) ? (d3Event.pageX) : (d3Event.pageX - contextMenuWidth);
 
       //move context menu
@@ -915,6 +927,7 @@ export class LineChartService {
 
   private closeContextMenu() {
     d3Event.preventDefault();
+    this._contextMenuPoint = null;
     this._contextMenuBackground.style('display', 'none');
     this._contextMenu.style('display', 'none');
   };
