@@ -965,7 +965,8 @@ export class LineChartService {
 
     if(!canPointBeSelected) {
       //TODO temp
-      alert('Comparison of the filmstrips is only possible for measurements on the same server.');
+      const alertMessage = this.translationService.instant("frontend.de.iteratec.chart.datapointSelection.error.multipleServer");
+      alert(alertMessage);
       return;
     }
 
