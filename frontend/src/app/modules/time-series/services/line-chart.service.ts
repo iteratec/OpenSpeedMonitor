@@ -47,8 +47,8 @@ import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-po
 import {parseDate} from 'src/app/utils/date.util';
 import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 import {ChartCommons} from "../../../enums/chart-commons.enum";
-import * as d3 from "d3";
-import {PointSelectionService} from "./point-selection.service";
+import {UrlBuilderService} from "./url-builder.service";
+import {PointsSelection} from "../models/points-selection.model";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -86,72 +86,80 @@ export class LineChartService {
   private _contextMenuBackground: D3Selection<D3BaseType, number, D3BaseType, unknown>;
   private _contextMenu: D3Selection<D3BaseType, number, D3BaseType, unknown>;
 
-  private dotsOnMarker: D3Selection<D3BaseType, {}, HTMLElement, any>;
+  private _dotsOnMarker: D3Selection<D3BaseType, {}, HTMLElement, any>;
+  private _pointsSelection: PointsSelection;
   private _contextMenuPoint: D3Selection<D3BaseType, TimeSeriesPoint, D3BaseType, any>;
 
-  //TODO i18n
   private contextMenu: ContextMenuPosition[] = [
     {
       title: 'summary',
       icon: "fas fa-file-alt",
-      action: function (elm, d, i) {
-        console.log('Item #1 clicked!');
+      action: (elm, d: TimeSeriesPoint, i) => {
+        window.open(this.urlBuilderService
+          .buildSummaryUrl(d.wptInfo));
       }
     },
     {
       title: 'waterfall',
       icon: "fas fa-bars",
-      action: function (elm, d, i) {
-        console.log('Item #2 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.waterfall));
       }
     },
     {
       title: 'performanceReview',
       icon: "fas fa-check",
-      action: function (elm, d, i) {
-        console.log('Item #3 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.performanceReview));
       }
     },
     {
       title: 'contentBreakdown',
       icon: "fas fa-chart-pie",
-      action: function (elm, d, i) {
-        console.log('Item #4 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.contentBreakdown));
       }
     },
     {
       title: 'domains',
       icon: "fas fa-list",
-      action: function (elm, d, i) {
-        console.log('Item #5 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.domains));
       }
     },
     {
       title: 'screenshot',
       icon: "fas fa-image",
-      action: function (elm, d, i) {
-        console.log('Item #6 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.screenshot));
       }
     },
     {
       title: 'filmstrip',
       icon: "fas fa-film",
-      action: function (elm, d, i) {
-        console.log('Item #7 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildFilmstripUrl(d.wptInfo));
       }
     },
     {
       title: 'filmstripTool',
       icon: "fas fa-money-check",
-      action: function (elm, d, i) {
-        console.log('Item #8 clicked!');
+      action: (elm, d, i) => {
+        window.open(this.urlBuilderService
+          .buildFilmstripToolUrl(d.wptInfo));
       }
     },
     {
       title: 'compareFilmstrips',
       icon: "fas fa-columns",
       visible: () => {
-        return this.pointSelectionService.countSelectedDots() > 0;
+        return this._pointsSelection.count() > 0;
       },
       action: (elm, d, i) => {
         console.log("Item 'Compare Filmstrips' clicked!");
@@ -164,7 +172,7 @@ export class LineChartService {
       title: 'selectPoint',
       icon: "fas fa-dot-circle",
       visible: (elm, d: TimeSeriesPoint, i) => {
-        return !this.pointSelectionService.isPointSelected(d);
+        return !this._pointsSelection.isPointSelected(d);
       },
       action: (elm, d: TimeSeriesPoint, i) => {
         this.changePointSelection(d);
@@ -174,7 +182,7 @@ export class LineChartService {
       title: 'deselectPoint',
       icon: "fas fa-trash-alt",
       visible: (elm, d: TimeSeriesPoint, i) => {
-        return this.pointSelectionService.isPointSelected(d);
+        return this._pointsSelection.isPointSelected(d);
       },
       action: (elm, d: TimeSeriesPoint, i) => {
         this.changePointSelection(d);
@@ -182,23 +190,25 @@ export class LineChartService {
     },
   ];
 
-  //TODO i18n
-  private backgroundContextMenu = [
+  private backgroundContextMenu: ContextMenuPosition[] = [
     {
       title: 'compareFilmstrips',
       icon: "fas fa-columns",
       visible: () => {
-        return this.pointSelectionService.countSelectedDots() >= 2;
+        return this._pointsSelection.count() >= 2;
       },
-      action: function (elm, d, i) {
-        console.log('Background item #1 clicked!');
+      action: () => {
+        const selectedDots = this._pointsSelection.getAll();
+        const wptInfos = selectedDots.map(it => it.wptInfo);
+        window.open(this.urlBuilderService
+          .buildFilmstripsComparisionUrl(wptInfos));
       }
     },
     {
       title: 'deselectAllPoints',
       icon: "fas fa-trash-alt",
       visible: () => {
-        return this.pointSelectionService.countSelectedDots() > 0;
+        return this._pointsSelection.count() > 0;
       },
       action: (elm, d, i) => {
         this.unselectAllPoints();
@@ -207,7 +217,7 @@ export class LineChartService {
   ];
 
   constructor(private translationService: TranslateService,
-              private pointSelectionService: PointSelectionService) {
+              private urlBuilderService: UrlBuilderService) {
   }
 
   public initChart(svgElement: ElementRef): void {
@@ -230,8 +240,9 @@ export class LineChartService {
       return;
     }
 
-    this.pointSelectionService.unselectAllPoints();
+    this._pointsSelection = new PointsSelection();
     this._contextMenuPoint = null;
+    this._xAxisCluster = {};
 
     let data: TimeSeries[] = this.prepareData(incomingData);
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
@@ -247,14 +258,28 @@ export class LineChartService {
     this.addDataLinesToChart(chart, xScale, yScale, data);
     this.drawAllSelectedPoints();
 
+    this.resizeChartBackground();
     this.bringMouseMarkerToTheFront(xScale, yScale);
+  }
+
+  private resizeChartBackground() {
+    d3Select('.char-background')
+      .attr('width', this._width)
+      .attr('height', this._height);
+    this._mouseEventCatcher
+      .attr('width', this._width)
+      .attr('height', this._height);
   }
 
   private bringMouseMarkerToTheFront(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
     const markerLine = d3Select('.marker-line').remove();
     d3Select('#time-series-chart-drawing-area')
       .append(() => markerLine.node());
-    this._mouseEventCatcher.on('mousemove', (_, index, nodes: D3ContainerElement[]) => this.moveMarker(nodes[index], xScale, yScale, this._height));
+
+    this._mouseEventCatcher
+      .on('mousemove', (_, index, nodes: D3ContainerElement[]) => {
+        this.moveMarker(nodes[index], xScale, yScale, this._height)
+      });
   }
 
   /**
@@ -292,6 +317,7 @@ export class LineChartService {
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
         lineChartDataPoint.tooltipText = data.jobGroup + ' | ' + data.measuredEvent + ' : '; // TODO Set exact label text when IT-2793 is implemented
+        lineChartDataPoint.wptInfo = point.wptInfo;
         return lineChartDataPoint;
       });
 
@@ -596,7 +622,7 @@ export class LineChartService {
 
   private drawSelectedPoints(dotsToCheck: D3Selection<D3BaseType, {}, HTMLElement, any>) {
     dotsToCheck.each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
-      const isDotSelected = this.pointSelectionService.isPointSelected(currentDotData);
+      const isDotSelected = this._pointsSelection.isPointSelected(currentDotData);
       if (isDotSelected) {
         d3Select(dots[index]).style("opacity", 1)
       }
@@ -688,7 +714,6 @@ export class LineChartService {
     lineGroups.each((timeSeries: TimeSeries, index: number, nodes: D3BaseType[]) => {
       const lineGroup = d3Select(nodes[index]);
 
-      // TODO: Some dots are group into the wrong parent line group (and in turn do have the wrong color!) and I fucking don't know why!
       lineGroup
         .append('g')
         .selectAll('.dot-' + timeSeries.key)
@@ -696,14 +721,10 @@ export class LineChartService {
         .enter()
         .append('circle')
         .attr('class', (dot: TimeSeriesPoint) => 'dot dot-' + timeSeries.key + ' dot-x-' + xScale(dot.date).toString().replace('.', '_'))
-        .style('opacity', '0')
+        .style('opacity', 0)
         .attr('r', this.DOT_RADIUS)
-        .attr('cx', (dot: TimeSeriesPoint) => {
-          return xScale(dot.date);
-        })
-        .attr('cy', (dot: TimeSeriesPoint) => {
-          return yScale(dot.value);
-        })
+        .attr('cx', (dot: TimeSeriesPoint) => xScale(dot.date))
+        .attr('cy', (dot: TimeSeriesPoint) => yScale(dot.value))
     });
   }
 
@@ -752,6 +773,7 @@ export class LineChartService {
       .on("contextmenu", () => d3Event.preventDefault());
 
     this._mouseEventCatcher.append('svg:rect')
+      .attr('class', 'char-background')
       .attr('width', this._width)
       .attr('height', this._height)
       .attr('fill', 'none')
@@ -776,17 +798,17 @@ export class LineChartService {
   }
 
   private hideOldDotsOnMarker() {
-    if(this.dotsOnMarker) {
+    if (this._dotsOnMarker) {
       const contextMenuPointData = this._contextMenuPoint && this._contextMenuPoint.data()[0];
 
-      this.dotsOnMarker
+      this._dotsOnMarker
         .filter((s: TimeSeriesPoint) => !s.equals(contextMenuPointData))
         .attr('r', this.DOT_RADIUS)
         .style('opacity', '0')
         .style('cursor', 'auto')
         .on('click', null)
         .on('contextmenu', null);
-      this.drawSelectedPoints(this.dotsOnMarker);
+      this.drawSelectedPoints(this._dotsOnMarker);
     }
   };
 
@@ -819,6 +841,7 @@ export class LineChartService {
       pointX = pointXBefore;
       point = firstPointFromClusterBefore;
     }
+    //draw marker line
     d3Select('.marker-line')
       .attr('d', function () {
         let d = "M" + pointX + "," + containerHeight;
@@ -838,7 +861,7 @@ export class LineChartService {
         .style('fill', 'white')
         .style('cursor', 'pointer')
         .on("contextmenu", this.showContextMenu(this.contextMenu))
-        .on("click", (dotData: TimeSeriesPoint, index, nodes: D3ContainerElement[]) => {
+        .on("click", (dotData: TimeSeriesPoint) => {
           if (d3Event.ctrlKey) {
             this.changePointSelection(dotData);
           } else {
@@ -852,13 +875,12 @@ export class LineChartService {
     const dotsOnMarker = findDotsOnMarker(pointX);
     showDotsOnMarker(dotsOnMarker);
 
-    this.dotsOnMarker = dotsOnMarker;
+    this._dotsOnMarker = dotsOnMarker;
 
     const mouseY = mouseCoordinates[1];
     const nearestDot = this.highlightNearestDot(dotsOnMarker, mouseY, yScale);
     this.showTooltip(nearestDot, dotsOnMarker, point.date);
   }
-
 
   //TODO for background context menu there is no 'cx' value
   private showContextMenu(menu: ContextMenuPosition[]) {
@@ -933,29 +955,43 @@ export class LineChartService {
   };
 
   private changePointSelection(point: TimeSeriesPoint) {
-    if(this.pointSelectionService.isPointSelected(point)) {
-      this.pointSelectionService.unselectPoint(point);
+    let canPointBeSelected = true;
+    if(this._pointsSelection.count() > 0) {
+      const testServerUrl = this._pointsSelection.getFirst().wptInfo.baseUrl;
+      if(point.wptInfo.baseUrl != testServerUrl) {
+        canPointBeSelected = false;
+      }
+    }
+
+    if(!canPointBeSelected) {
+      //TODO temp
+      alert('Comparison of the filmstrips is only possible for measurements on the same server.');
+      return;
+    }
+
+    if (this._pointsSelection.isPointSelected(point)) {
+      this._pointsSelection.unselectPoint(point);
     } else {
-      this.pointSelectionService.selectPoint(point);
+      this._pointsSelection.selectPoint(point);
     }
     this.drawAllSelectedPoints();
   }
 
   private unselectAllPoints() {
     const arePointEqual = (t1: TimeSeriesPoint, t2: TimeSeriesPoint) => {
-      return t1.tooltipText == t2.tooltipText && t1.date.getTime() == t2.date.getTime()
+      return t1.tooltipText == t2.tooltipText && t1.date.getTime() == t2.date.getTime();
     };
 
     d3SelectAll(".dot").each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
-      const wasDotSelected = this.pointSelectionService.isPointSelected(currentDotData);
-      const isDotOnMarkerLine = this.dotsOnMarker.data().some((elem: TimeSeriesPoint) => {
-        return arePointEqual(currentDotData, elem)
+      const wasDotSelected = this._pointsSelection.isPointSelected(currentDotData);
+      const isDotOnMarkerLine = this._dotsOnMarker.data().some((elem: TimeSeriesPoint) => {
+        return arePointEqual(currentDotData, elem);
       });
       if (wasDotSelected && !isDotOnMarkerLine) {
-        d3Select(dots[index]).style("opacity", "0")
+        d3Select(dots[index]).style("opacity", "0");
       }
     });
-    this.pointSelectionService.unselectAllPoints();
+    this._pointsSelection.unselectAll();
   }
 
   private highlightNearestDot(visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, mouseY: number, yScale: D3ScaleLinear<number, number>) {
@@ -990,21 +1026,21 @@ export class LineChartService {
   }
 
   private generateTooltipText(nearestDot: D3Selection<any, unknown, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date): HTMLTableElement {
+    const nearestDotData = nearestDot.datum() as TimeSeriesPoint;
+
     const table: HTMLTableElement = document.createElement('table');
     const tableBody: HTMLTableSectionElement = document.createElement('tbody');
     table.append(tableBody);
-
     tableBody.append(this.generateTooltipTimestampRow(highlightedDate));
 
+    const tempArray = [];
     visibleDots
-      .sort((a: TimeSeriesPoint, b: TimeSeriesPoint) => {
-        if (a.value > b.value) return -1;
-        else if (a.value < b.value) return 1;
-        else return 0;
-      })
       .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
-        tableBody.append(this.generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDot));
+        tempArray.push({"value": timeSeriesPoint.value, "htmlNode": this.generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDotData)});
       });
+    tempArray
+      .sort((a, b) => b.value - a.value)
+      .forEach(elem => table.append(elem.htmlNode));
 
     return table;
   }
@@ -1022,23 +1058,21 @@ export class LineChartService {
     return row;
   }
 
-  private generateTooltipDataPointRow(timeSeriesPoint: TimeSeriesPoint, node: D3BaseType, nearestDot: D3Selection<any, unknown, null, undefined>): string | Node {
-    const nodeSelection = d3Select(node);
-
+  private generateTooltipDataPointRow(currentPoint: TimeSeriesPoint, node: D3BaseType, nearestDotData: TimeSeriesPoint): string | Node {
     const label: HTMLTableCellElement = document.createElement('td');
-    label.append(timeSeriesPoint.tooltipText);
+    label.append(currentPoint.tooltipText);
 
     const value: HTMLTableCellElement = document.createElement('td');
     const lineColorDot: HTMLElement = document.createElement('i');
     lineColorDot.className = 'fas fa-circle';
-    lineColorDot.style.color = nodeSelection.style('stroke');
+    lineColorDot.style.color = d3Select(node).style('stroke');
     value.append(lineColorDot);
-    if (timeSeriesPoint.value !== undefined && timeSeriesPoint.value !== null) {
-      value.append(timeSeriesPoint.value.toString());
+    if (currentPoint.value !== undefined && currentPoint.value !== null) {
+      value.append(currentPoint.value.toString());
     }
 
     const row: HTMLTableRowElement = document.createElement('tr');
-    if (nodeSelection.node() === nearestDot.node()) {
+    if (currentPoint.equals(nearestDotData)) {
       row.className = 'active';
     }
     row.append(label);
