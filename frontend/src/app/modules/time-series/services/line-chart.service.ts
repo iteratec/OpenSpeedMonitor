@@ -865,8 +865,8 @@ export class LineChartService {
           if (d3Event.ctrlKey) {
             this.changePointSelection(dotData);
           } else {
-            //TODO click
-            console.log("left click!")
+            window.open(this.urlBuilderService
+              .buildUrlByOption(dotData.wptInfo, this.urlBuilderService.options.waterfall));
           }
         });
     };
