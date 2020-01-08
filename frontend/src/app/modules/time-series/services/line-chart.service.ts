@@ -94,7 +94,7 @@ export class LineChartService {
     {
       title: 'summary',
       icon: "fas fa-file-alt",
-      action: (elm, d: TimeSeriesPoint, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildSummaryUrl(d.wptInfo));
       }
@@ -102,7 +102,7 @@ export class LineChartService {
     {
       title: 'waterfall',
       icon: "fas fa-bars",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.waterfall));
       }
@@ -110,7 +110,7 @@ export class LineChartService {
     {
       title: 'performanceReview',
       icon: "fas fa-check",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.performanceReview));
       }
@@ -118,7 +118,7 @@ export class LineChartService {
     {
       title: 'contentBreakdown',
       icon: "fas fa-chart-pie",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.contentBreakdown));
       }
@@ -126,7 +126,7 @@ export class LineChartService {
     {
       title: 'domains',
       icon: "fas fa-list",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.domains));
       }
@@ -134,7 +134,7 @@ export class LineChartService {
     {
       title: 'screenshot',
       icon: "fas fa-image",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.screenshot));
       }
@@ -142,7 +142,7 @@ export class LineChartService {
     {
       title: 'filmstrip',
       icon: "fas fa-film",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildFilmstripUrl(d.wptInfo));
       }
@@ -150,7 +150,7 @@ export class LineChartService {
     {
       title: 'filmstripTool',
       icon: "fas fa-money-check",
-      action: (elm, d, i) => {
+      action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
           .buildFilmstripToolUrl(d.wptInfo));
       }
@@ -161,8 +161,11 @@ export class LineChartService {
       visible: () => {
         return this._pointsSelection.count() > 0;
       },
-      action: (elm, d, i) => {
-        console.log("Item 'Compare Filmstrips' clicked!");
+      action: () => {
+        const selectedDots = this._pointsSelection.getAll();
+        const wptInfos = selectedDots.map(it => it.wptInfo);
+        window.open(this.urlBuilderService
+          .buildFilmstripsComparisionUrl(wptInfos));
       }
     },
     {
@@ -171,20 +174,20 @@ export class LineChartService {
     {
       title: 'selectPoint',
       icon: "fas fa-dot-circle",
-      visible: (elm, d: TimeSeriesPoint, i) => {
+      visible: (d: TimeSeriesPoint) => {
         return !this._pointsSelection.isPointSelected(d);
       },
-      action: (elm, d: TimeSeriesPoint, i) => {
+      action: (d: TimeSeriesPoint) => {
         this.changePointSelection(d);
       }
     },
     {
       title: 'deselectPoint',
       icon: "fas fa-trash-alt",
-      visible: (elm, d: TimeSeriesPoint, i) => {
+      visible: (d: TimeSeriesPoint) => {
         return this._pointsSelection.isPointSelected(d);
       },
-      action: (elm, d: TimeSeriesPoint, i) => {
+      action: (d: TimeSeriesPoint) => {
         this.changePointSelection(d);
       }
     },
@@ -210,7 +213,7 @@ export class LineChartService {
       visible: () => {
         return this._pointsSelection.count() > 0;
       },
-      action: (elm, d, i) => {
+      action: () => {
         this.unselectAllPoints();
       }
     },
@@ -561,7 +564,6 @@ export class LineChartService {
         return yScale(point.value);
       })  // ... and for the Y-Coordinate
     // .curve(d3CurveMonotoneX);  // smooth the line
-
   }
 
   /**
@@ -891,7 +893,7 @@ export class LineChartService {
 
       const visibleMenuElements = menu.filter(elem => {
         //visible is optional value, so even without this property the element is visible
-        return (elem.visible == undefined) || (elem.visible(selectedNode, data, currentIndex));
+        return (elem.visible == undefined) || (elem.visible(data, currentIndex, selectedNode));
       });
 
       if (visibleMenuElements.length == 0) {
@@ -908,7 +910,7 @@ export class LineChartService {
         .append('li');
 
       const clickListener = (e: ContextMenuPosition) => {
-        e.action(selectedNode, data, currentIndex);
+        e.action(data, currentIndex, selectedNode);
         this.closeContextMenu();
       };
 
@@ -1161,7 +1163,7 @@ export class LineChartService {
 class ContextMenuPosition {
   title?: string;
   icon?: string;
-  visible?: (elm, d: TimeSeriesPoint, i) => boolean;
-  action?: (elm, d: TimeSeriesPoint, i) => void;
+  visible?: (d: TimeSeriesPoint, i: number, elem) => boolean;
+  action?: (d: TimeSeriesPoint, i: number, elem) => void;
   divider?: boolean = false;
 }
