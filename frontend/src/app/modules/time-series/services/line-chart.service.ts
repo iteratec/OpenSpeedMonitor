@@ -884,7 +884,6 @@ export class LineChartService {
     this.showTooltip(nearestDot, dotsOnMarker, point.date);
   }
 
-  //TODO for background context menu there is no 'cx' value
   private showContextMenu(menu: ContextMenuPosition[]) {
     // this gets executed when a contextmenu event occurs
     return (data, currentIndex, viewElements) => {
@@ -937,8 +936,7 @@ export class LineChartService {
 
       //context menu must be displayed to take its width
       const contextMenuWidth = (<HTMLDivElement>this._contextMenu.node()).offsetWidth;
-      const selectedPointX = Number(d3Select(selectedNode).attr("cx"));
-      const left = (selectedPointX + contextMenuWidth < this._width) ? (d3Event.pageX) : (d3Event.pageX - contextMenuWidth);
+      const left = ((d3Event.pageX + contextMenuWidth + 40) < window.innerWidth) ? (d3Event.pageX) : (d3Event.pageX - contextMenuWidth);
 
       //move context menu
       contextMenu
