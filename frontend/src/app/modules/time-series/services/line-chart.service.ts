@@ -949,9 +949,12 @@ export class LineChartService {
 
   private closeContextMenu() {
     d3Event.preventDefault();
-    this._contextMenuPoint = null;
     this._contextMenuBackground.style('display', 'none');
     this._contextMenu.style('display', 'none');
+
+    //hide context menu point
+    this._contextMenuPoint = null;
+    this.hideOldDotsOnMarker();
   };
 
   private changePointSelection(point: TimeSeriesPoint) {
