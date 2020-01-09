@@ -864,7 +864,8 @@ export class LineChartService {
         .style('cursor', 'pointer')
         .on("contextmenu", this.showContextMenu(this.contextMenu))
         .on("click", (dotData: TimeSeriesPoint) => {
-          if (d3Event.ctrlKey) {
+          d3Event.preventDefault();
+          if (d3Event.metaKey || d3Event.ctrlKey) {
             this.changePointSelection(dotData);
           } else {
             window.open(this.urlBuilderService
