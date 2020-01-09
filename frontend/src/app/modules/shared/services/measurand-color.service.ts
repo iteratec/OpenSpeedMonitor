@@ -1,7 +1,13 @@
+import { Injectable } from '@angular/core';
 import * as d3 from "d3";
+import {scaleOrdinal} from "d3";
 
-export default class ChartColorProvider {
-  private static measurandGroupColorCombination = ChartColorProvider.initColors();
+@Injectable({
+  providedIn: 'root'
+})
+export class MeasurandColorService {
+
+  private measurandGroupColorCombination = MeasurandColorService.initColors();
 
   private static initColors() {
     const loadingTimeColors = [
@@ -40,14 +46,24 @@ export default class ChartColorProvider {
     }
   }
 
-  static getColorscaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean = false) {
-    const colors = ChartColorProvider.measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0);
-    return d3.scaleOrdinal(colors)
-      .domain(ChartColorProvider.createDomain(colors.length));
+  getColorScaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean = false) {
+    const colors = this.measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0);
+    return d3.scaleOrdinal(colors).domain(MeasurandColorService.createDomain(colors.length));
   }
 
   private static createDomain(arrayLength: number): string[] {
-    return Array.from(Array(arrayLength).keys())
-      .map(elem => elem.toString());
+    return Array.from({length: arrayLength}, (_, index) => index.toString());
+  }
+
+  getColorScaleForTrafficLight() {
+    const trafficColors = [
+      "#5cb85c",
+      "#f0ad4e",
+      "#d9534f"
+    ];
+
+    return scaleOrdinal()
+      .domain(["good", "ok", "bad"])
+      .range(trafficColors);
   }
 }

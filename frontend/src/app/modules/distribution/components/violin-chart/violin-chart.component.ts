@@ -1,9 +1,9 @@
 import {Component, ElementRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import * as d3 from 'd3';
 import {DistributionDataDTO} from "../../models/distribution-data.model";
-import ChartColorProvider from "../util/chart-color-provider";
 import "../util/chart-label-util";
 import ChartLabelUtil from "../util/chart-label-util";
+import {MeasurandColorService} from "../../../shared/services/measurand-color.service";
 
 @Component({
   selector: 'osm-violin-chart',
@@ -18,14 +18,20 @@ export class ViolinChartComponent implements OnInit, OnChanges {
   @ViewChild("svgContainer")
   svgContainerElem: ElementRef;
 
+  @ViewChild("yLabel")
+  yLabelElem: ElementRef;
+
   private svgContainer: SvgContainer = null;
+
+  constructor(private measurandColorProviderService: MeasurandColorService) {
+  }
 
   ngOnInit(): void {
     this.svgContainer = new SvgContainer(this.svgContainerElem);
 
     window.addEventListener('resize', () => {
       if (this.dataInput) {
-        this.distributionChart(this.dataInput, this.svgContainer)
+        this.distributionChart(this.dataInput, this.svgContainer, this.yLabelElem, this.measurandColorProviderService)
       }
     });
   }
@@ -35,10 +41,10 @@ export class ViolinChartComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.distributionChart(this.dataInput, this.svgContainer);
+    this.distributionChart(this.dataInput, this.svgContainer, this.yLabelElem, this.measurandColorProviderService);
   }
 
-  distributionChart = (function (distributionChartData, svg: SvgContainer,) {
+  distributionChart = (function (distributionChartData, svg: SvgContainer, yLabelElem: ElementRef, measurandColorProviderService: MeasurandColorService) {
     const height = 600,
       margin = {top: 50, right: 0, bottom: 70, left: 100},
       maxViolinWidth = 150,
@@ -148,8 +154,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
         .range([height - margin.bottom, margin.top])
         .domain(domain);
 
-      const yAxisLeftLabel = document.getElementById("y-axis_left_label");
-      yAxisLeftLabel.textContent = text;
+      yLabelElem.nativeElement.textContent = text;
 
       const g = svg.svgElem.append("g")
         .attr("class", "d3chart-axis d3chart-yAxis")
@@ -276,7 +281,7 @@ export class ViolinChartComponent implements OnInit, OnChanges {
       const gMinus = g.append("g");
 
       //TODO There is no 'dimensionalUnit' in chartData
-      const colorScale = ChartColorProvider.getColorscaleForMeasurandGroup("ms");
+      const colorScale = measurandColorProviderService.getColorScaleForMeasurandGroup("ms");
       const violinColor = colorScale("0");
 
       gPlus.append("path")
