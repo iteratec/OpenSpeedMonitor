@@ -49,6 +49,7 @@ import {getColorScheme} from 'src/app/enums/color-scheme.enum';
 import {ChartCommons} from "../../../enums/chart-commons.enum";
 import {UrlBuilderService} from "./url-builder.service";
 import {PointsSelection} from "../models/points-selection.model";
+import {SummaryLabel} from "../models/summary-label.model";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -69,10 +70,9 @@ export class LineChartService {
   private _height: number = 550 - this._margin.top - this._margin.bottom;
   private _labelGroupHeight: number;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
-  private _legendGroupLeft: number = this._margin.left;
-  private _legendGroupHeight;
-  private _legendGroupColumnWidth;
-  private _legendGroupColumns;
+  private _legendGroupHeight: number;
+  private _legendGroupColumnWidth: number;
+  private _legendGroupColumns: number;
   private legendDataMap: Object = {};
   private brush: BrushBehavior<{}>;
   private focusedLegendEntry: string;
@@ -261,6 +261,7 @@ export class LineChartService {
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
 
     this.addLegendsToChart(chart, incomingData);
+    this.setSummaryLabel(chart, incomingData.summaryLabels);
     this.addDataLinesToChart(chart, xScale, yScale, data);
     this.drawAllSelectedPoints();
 
@@ -298,12 +299,14 @@ export class LineChartService {
 
     let labelDataMap = {};
     incomingData.series.forEach((data: EventResultSeriesDTO) => {
-      let label = data.identifier;
+      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+        data.identifier = this.translateMeasurand(data);
+      }
       let key = this.generateKey(data);
       labelDataMap[key] = {
-        text: label,
+        text: data.identifier,
         key: key,
-        show: true,
+        show: true
       }
     });
     this.legendDataMap = labelDataMap;
@@ -313,16 +316,18 @@ export class LineChartService {
    * Prepares the incoming data for drawing with D3.js
    */
   private prepareData(incomingData: EventResultDataDTO): TimeSeries[] {
-
     return incomingData.series.map((data: EventResultSeriesDTO) => {
       let lineChartData: TimeSeries = new TimeSeries();
+      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+        data.identifier = this.translateMeasurand(data);
+      }
       lineChartData.key = this.generateKey(data);
 
       lineChartData.values = data.data.map((point: EventResultPointDTO) => {
         let lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
-        lineChartDataPoint.tooltipText = data.jobGroup + ' | ' + data.measuredEvent + ' : '; // TODO Set exact label text when IT-2793 is implemented
+        lineChartDataPoint.tooltipText = data.identifier + ' : ';
         lineChartDataPoint.wptInfo = point.wptInfo;
         return lineChartDataPoint;
       });
@@ -331,10 +336,21 @@ export class LineChartService {
     });
   }
 
+  private translateMeasurand(data: EventResultSeriesDTO): string {
+    let splitLabelList: string[] = data.identifier.split(' | ');
+    let splitLabel: string = this.translationService.instant('frontend.de.iteratec.isr.measurand.' + splitLabelList[0]);
+    if (!splitLabel.startsWith('frontend.de.iteratec.isr.measurand.')) {
+      splitLabelList[0] = splitLabel;
+    }
+    return splitLabelList.join(' | ');
+  }
+
   private generateKey(data: EventResultSeriesDTO): string {
-    return data.jobGroup
-      + data.measuredEvent
-      + data.data.length;
+    let key: string = data.identifier.replace(/[^_a-zA-Z0-9-]/g, "");
+    if (new RegExp('[0-9]').test(key.charAt(0))) {
+      key = key.replace(/[0-9]/, '_');
+    }
+    return key;
   }
 
   /**
@@ -348,13 +364,68 @@ export class LineChartService {
       .attr('height', 0);
 
     svg.append('g')
+      .attr('id', 'header-group')
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top - 16})`);
+
+    let chart = svg.append('g') // g =  grouping element; group all other stuff into the chart
+      .attr('id', 'time-series-chart-drawing-area')
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`); // translates the origin to the top left corner (default behavior of D3)
+
+    svg.append('g')
       .attr('id', 'time-series-chart-legend')
       .attr('class', 'legend-group')
-      .attr('transform', `translate(${this._legendGroupLeft}, ${this._legendGroupTop})`);
+      .attr('transform', `translate(${this._margin.left}, ${this._legendGroupTop})`);
 
-    return svg.append('g') // g =  grouping element; group all other stuff into the chart
-      .attr('id', 'time-series-chart-drawing-area')
-      .attr('transform', 'translate(' + this._margin.left + ', ' + this._margin.top + ')'); // translates the origin to the top left corner (default behavior of D3)
+    return chart;
+  }
+
+  private setSummaryLabel(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, summaryLabels: SummaryLabel[]): void {
+    d3Select('g#header-group').selectAll('.summary-label-text').remove();
+    if (summaryLabels.length > 0) {
+      d3Select('#header-group')
+        .append('g')
+        .attr('class', 'summary-label-text')
+        .append('text')
+        .attr('id', 'summary-label-part0')
+        .attr('x', this._width / 2)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#555555');
+
+      summaryLabels.forEach((summaryLabel: SummaryLabel, index: number) => {
+        this.translationService
+          .get('frontend.de.iteratec.osm.timeSeries.chart.label.' + summaryLabel.key)
+          .pipe(take(1))
+          .subscribe((key: string) => {
+            if (summaryLabel.key == 'measurand') {
+              this.translationService
+                .get('frontend.de.iteratec.isr.measurand.' + summaryLabel.label)
+                .pipe(take(1))
+                .subscribe((label: string) => {
+                  if (label.startsWith('frontend.de.iteratec.isr.measurand.')) {
+                    label = summaryLabel.label
+                  }
+                  label = index < summaryLabels.length - 1 ? `${label} | ` : label;
+                  this.addSummaryLabel(key, label, index);
+                });
+            } else {
+              const label: string = index < summaryLabels.length - 1 ? `${summaryLabel.label} | ` : summaryLabel.label;
+              this.addSummaryLabel(key, label, index);
+            }
+          });
+      });
+      chart.selectAll('.summary-label-text').remove();
+    }
+  }
+
+  private addSummaryLabel(key: string, label: string, index: number): void {
+    d3Select(`#summary-label-part${index}`)
+      .append('tspan')
+      .attr('id', `summary-label-part${index + 1}`)
+      .attr('class', 'summary-label-key')
+      .text(`${key}: `)
+      .append('tspan')
+      .attr('class', 'summary-label')
+      .text(label);
   }
 
   public startResize(svgElement: ElementRef): void {
@@ -709,7 +780,7 @@ export class LineChartService {
       })
       // fade in
       .transition().duration(500).style('opacity', (timeSeries: TimeSeries) => {
-      return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.2';
+      return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
     });
 
     return resultingSelection;
