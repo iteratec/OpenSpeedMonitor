@@ -81,6 +81,7 @@ export class LineChartService {
   private _xAxisCluster: any = {};
 
   // Mouse events
+  private _pointSelectionErrorHandler: Function;
   private _mouseEventCatcher: D3Selection<D3BaseType, {}, D3ContainerElement, {}>;
   private _markerTooltip: D3Selection<HTMLDivElement, {}, D3ContainerElement, {}>;
   private _contextMenuBackground: D3Selection<D3BaseType, number, D3BaseType, unknown>;
@@ -223,7 +224,9 @@ export class LineChartService {
               private urlBuilderService: UrlBuilderService) {
   }
 
-  public initChart(svgElement: ElementRef): void {
+  public initChart(svgElement: ElementRef, pointSelectionErrorHandler: Function): void {
+    this._pointSelectionErrorHandler = pointSelectionErrorHandler;
+
     let data: TimeSeries[] = [new TimeSeries()];
     let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
     let xScale: D3ScaleTime<number, number> = this.getXScale(data);
@@ -968,9 +971,7 @@ export class LineChartService {
     }
 
     if(!canPointBeSelected) {
-      //TODO temp
-      const alertMessage = this.translationService.instant("frontend.de.iteratec.chart.datapointSelection.error.multipleServer");
-      alert(alertMessage);
+      this._pointSelectionErrorHandler();
       return;
     }
 

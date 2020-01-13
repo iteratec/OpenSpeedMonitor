@@ -12,6 +12,7 @@ import {
 
 import {EventResultData} from '../../models/event-result-data.model';
 import {LineChartService} from '../../services/line-chart.service';
+import {NgxSmartModalService} from "ngx-smart-modal";
 
 
 @Component({
@@ -30,13 +31,12 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
   private _resizeTimeoutId: number;
 
-  constructor(
-    private lineChartService: LineChartService
-  ) {
+  constructor(private lineChartService: LineChartService,
+              private ngxSmartModalService: NgxSmartModalService) {
   }
 
   ngAfterContentInit(): void {
-    this.lineChartService.initChart(this.svgElement);
+    this.lineChartService.initChart(this.svgElement, () => this.handlePointSelectionError());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -60,5 +60,9 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   redraw() {
     this.lineChartService.setLegendData(this.timeSeriesResults);
     this.lineChartService.drawLineChart(this.timeSeriesResults);
+  }
+
+  handlePointSelectionError() {
+    this.ngxSmartModalService.open("pointSelectionErrorModal");
   }
 }
