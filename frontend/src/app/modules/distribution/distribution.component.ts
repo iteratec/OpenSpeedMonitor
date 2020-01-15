@@ -12,12 +12,13 @@ import {ViolinchartDataService} from "./services/violinchart-data.service";
 })
 export class DistributionComponent {
 
-  private showChart: boolean = false;
+  private showChartCard: boolean = false;
   public results$ = new BehaviorSubject<DistributionDataDTO>(new DistributionData());
   constructor(private violinChartService: ViolinchartDataService, private resultSelectionStore: ResultSelectionStore) { }
 
   getDistributionChartData() {
-    this.showChart = true;
+    this.results$.next(null);
+    this.showChartCard = true;
 
     this.violinChartService.fetchDistributionData<DistributionDataDTO>(
       this.resultSelectionStore.resultSelectionCommand,

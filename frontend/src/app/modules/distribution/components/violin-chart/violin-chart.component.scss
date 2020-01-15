@@ -1,13 +1,11 @@
-#svg-container {
+#violin-chart-component {
   position: relative;
+  width: 100%;
+  min-height: 100px;
 
   #y-axis_left_label {
-    left: 45px;
     position: absolute;
+    transform: translate(0, -300px) rotate(-90deg);
     white-space: nowrap;
-    transform: translate(-50%, 0%) rotate(-90deg);
-    top: 50%;
   }
 }
-
-
