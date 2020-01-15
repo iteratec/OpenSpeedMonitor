@@ -7,6 +7,7 @@ import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
 import {ViolinchartDataService} from "./services/violinchart-data.service";
 import {ViolinChartComponent} from "./components/violin-chart/violin-chart.component";
+import {SharedModule} from "../shared/shared.module";
 
 describe('DistributionComponent', () => {
   let component: DistributionComponent;
@@ -16,6 +17,7 @@ describe('DistributionComponent', () => {
     TestBed.configureTestingModule({
       declarations: [ DistributionComponent, ViolinChartComponent ],
       imports: [
+        SharedModule,
         SharedMocksModule,
         ResultSelectionModule
       ],
