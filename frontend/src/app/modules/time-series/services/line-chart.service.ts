@@ -705,58 +705,6 @@ export class LineChartService {
     })
   }
 
-  // private addBrush(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-  //                  xScale: D3ScaleTime<number, number>,
-  //                  yScale: D3ScaleLinear<number, number>,
-  //                  data: TimeSeries[]): void {
-  //   chart.selectAll('.brush')
-  //     .remove();
-  //   this.brush.on('end', () => this.updateChart(chart, xScale, yScale));
-  //   chart.append('g')
-  //     .attr('class', 'brush')
-  //     .data([1])
-  //     .call(this.brush)
-  //     .on('dblclick', () => {
-  //       xScale.domain([this.getMinDate(data), this.getMaxDate(data)]);
-  //       this.resetChart(xScale, yScale);
-  //     });
-  // }
-  //
-  // private resetChart(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
-  //   d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
-  //   d3Select('g#time-series-chart-drawing-area').selectAll('.line')
-  //     .each((data, index, nodes) => {
-  //       d3Select(nodes[index])
-  //         .attr('d', (dataItem: TimeSeries) => this.getLineGenerator(xScale, yScale)(dataItem.values));
-  //     })
-  // }
-  //
-  // private updateChart(selection: any, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
-  //   // selected boundaries
-  //   let extent = d3Event.selection;
-  //   // If no selection, back to initial coordinate. Otherwise, update X axis domain
-  //   if (!extent) {
-  //     return
-  //   } else {
-  //     let minDate = xScale.invert(extent[0]);
-  //     let maxDate = xScale.invert(extent[1]);
-  //     xScale.domain([minDate, maxDate]);
-  //     selection.select(".brush").call(this.brush.move, null); // This remove the grey brush area
-  //     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
-  //     selection.selectAll('.line').each((_, index, nodes) => {
-  //         d3Select(nodes[index])
-  //           .transition()
-  //           .attr('d', (dataItem: TimeSeries) => {
-  //             let newDataValues = dataItem.values.filter((point) => {
-  //               return point.date <= maxDate && point.date >= minDate;
-  //             });
-  //             return this.getLineGenerator(xScale, yScale)(newDataValues);
-  //           })
-  //       }
-  //     )
-  //   }
-  // }
-
   private drawLine(selection: any,
                    xScale: D3ScaleTime<number, number>,
                    yScale: D3ScaleLinear<number, number>): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> {
