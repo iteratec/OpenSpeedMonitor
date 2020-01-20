@@ -256,7 +256,6 @@ export class LineChartService {
     const xScale: D3ScaleTime<number, number> = this.getXScale(data);
     const yScale: D3ScaleLinear<number, number> = this.getYScale(data);
     this.calculateLegendDimensions();
-    d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
     d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._legendGroupHeight + this._margin.top + this._margin.bottom);
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(updateYAxis, yScale, this._width);

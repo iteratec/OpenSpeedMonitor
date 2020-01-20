@@ -1,7 +1,10 @@
 @import "../../../../../styles/colors";
 
 osm-time-series-line-chart {
-  visibility: hidden;
+  #time-series-line-chart-container {
+    position: relative;
+    width: 100%;
+  }
 
   #marker-tooltip {
     position: absolute;
@@ -67,7 +70,7 @@ osm-time-series-line-chart {
 .summary-label {
   font-weight: normal;
 }
-  
+
 .legend-entry {
   cursor: pointer;
 }

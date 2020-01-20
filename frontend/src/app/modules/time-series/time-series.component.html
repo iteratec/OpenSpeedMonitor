@@ -1,6 +1,6 @@
 <osm-menu></osm-menu>
 
-<div class="action-row">
+<div class="action-row" *ngIf="showTimeSeriesChart">
   <div class="col-md-12">
     <osm-time-series-line-chart [timeSeriesResults]="results$ | async"></osm-time-series-line-chart>
   </div>
