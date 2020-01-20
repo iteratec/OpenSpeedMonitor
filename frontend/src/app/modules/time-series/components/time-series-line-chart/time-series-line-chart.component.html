@@ -1,5 +1,19 @@
 <div class="time-series-line-chart-container">
   <div class="card">
-    <svg #svg />
+    <svg #svg/>
   </div>
 </div>
+
+<ngx-smart-modal id="pointSelectionErrorModal" identifier="pointSelectionErrorModal">
+  <header>
+    <h2>{{ "frontend.de.iteratec.chart.errorHeader" | translate }}</h2>
+  </header>
+  <main>
+    <div>{{ "frontend.de.iteratec.chart.datapointSelection.error.multipleServer" | translate }}</div>
+  </main>
+  <footer>
+    <button (click)="this.ngxSmartModalService.close('pointSelectionErrorModal')" class="btn btn-default">
+      {{ "frontend.default.button.cancel.label" | translate }}
+    </button>
+  </footer>
+</ngx-smart-modal>

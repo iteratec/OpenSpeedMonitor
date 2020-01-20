@@ -75,3 +75,21 @@ osm-time-series-line-chart {
 .legend-text {
   font-size: 12px;
 }
+
+#pointSelectionErrorModal {
+  header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  main {
+    position: relative;
+    padding: 15px;
+  }
+
+  footer {
+    padding: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+  }
+}

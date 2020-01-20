@@ -328,7 +328,7 @@ public class EventResultDashboardService {
         return chartPointsForEachGraph
     }
 
-    private getChartPointsWptInfos(EventResultProjection eventResult) {
+    public getChartPointsWptInfos(EventResultProjection eventResult) {
         String serverBaseUrl = eventResult.wptServerBaseurl
         String testId = eventResult.testId
         Integer numberOfWptRun = eventResult.numberOfWptRun
