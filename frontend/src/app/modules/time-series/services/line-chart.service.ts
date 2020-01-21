@@ -1074,7 +1074,7 @@ export class LineChartService {
         });
       tempArray
         .sort((a, b) => b.value - a.value)
-        .forEach(elem => table.append(elem.htmlNode));
+        .forEach(elem => tableBody.append(elem.htmlNode));
 
       return table;
     };
