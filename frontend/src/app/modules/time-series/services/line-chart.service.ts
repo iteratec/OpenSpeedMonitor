@@ -3,42 +3,32 @@ import {TranslateService} from "@ngx-translate/core";
 import {take} from "rxjs/operators";
 
 import {
+  BaseType as D3BaseType,
+  ContainerElement as D3ContainerElement,
+  event as d3Event,
   mouse as d3Mouse,
   select as d3Select,
   selectAll as d3SelectAll,
-  event as d3Event,
-  Selection as D3Selection,
-  BaseType as D3BaseType,
-  ContainerElement as D3ContainerElement
+  Selection as D3Selection
 } from 'd3-selection';
 
-import {bisector as d3Bisector, max as d3Max, min as d3Min} from 'd3-array';
+import {max as d3Max, min as d3Min} from 'd3-array';
+
+import {timeFormat as d3TimeFormat} from 'd3-time-format';
 
 import {
-  timeFormat as d3TimeFormat
-} from 'd3-time-format';
-
-import {
-  scaleTime as d3ScaleTime,
   scaleLinear as d3ScaleLinear,
   ScaleLinear as D3ScaleLinear,
+  scaleTime as d3ScaleTime,
   ScaleTime as D3ScaleTime
 } from 'd3-scale';
 
-import {
-  axisBottom as d3AxisBottom,
-  axisLeft as d3AxisLeft,
-  axisRight as d3AxisRight
-} from 'd3-axis';
+import {axisBottom as d3AxisBottom, axisLeft as d3AxisLeft, axisRight as d3AxisRight} from 'd3-axis';
 
-import {
-  line as d3Line,
-  Line as D3Line
-} from 'd3-shape';
+import {line as d3Line, Line as D3Line} from 'd3-shape';
 
 import 'd3-transition';
 
-import {BrushBehavior, brushX as d3BrushX} from 'd3-brush';
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
 import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
@@ -50,6 +40,7 @@ import {ChartCommons} from "../../../enums/chart-commons.enum";
 import {UrlBuilderService} from "./url-builder.service";
 import {PointsSelection} from "../models/points-selection.model";
 import {SummaryLabel} from "../models/summary-label.model";
+import ContextMenuPosition from "../models/context-menu-position.model";
 
 /**
  * Generate line charts with ease and fun 😎
@@ -68,13 +59,11 @@ export class LineChartService {
   private _margin: any = {top: 40, right: 70, bottom: 40, left: 60};
   private _width: number = 600 - this._margin.left - this._margin.right;
   private _height: number = 550 - this._margin.top - this._margin.bottom;
-  private _labelGroupHeight: number;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
   private _legendGroupHeight: number;
   private _legendGroupColumnWidth: number;
   private _legendGroupColumns: number;
   private legendDataMap: Object = {};
-  private brush: BrushBehavior<{}>;
   private focusedLegendEntry: string;
 
   // Map that holds all points clustered by their x-axis values
@@ -83,7 +72,6 @@ export class LineChartService {
   // Mouse events
   private _pointSelectionErrorHandler: Function;
   private _mouseEventCatcher: D3Selection<D3BaseType, {}, D3ContainerElement, {}>;
-  private _markerTooltip: D3Selection<HTMLDivElement, {}, D3ContainerElement, {}>;
   private _contextMenuBackground: D3Selection<D3BaseType, number, D3BaseType, unknown>;
   private _contextMenu: D3Selection<D3BaseType, number, D3BaseType, unknown>;
 
@@ -227,21 +215,34 @@ export class LineChartService {
   public initChart(svgElement: ElementRef, pointSelectionErrorHandler: Function): void {
     this._pointSelectionErrorHandler = pointSelectionErrorHandler;
 
-    let data: TimeSeries[] = [new TimeSeries()];
-    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
-    let xScale: D3ScaleTime<number, number> = this.getXScale(data);
-    let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
+    const data: TimeSeries[] = [];
+    const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
+    const xScale: D3ScaleTime<number, number> = this.getXScale(data);
+    const yScale: D3ScaleLinear<number, number> = this.getYScale(data);
 
     this.addXAxisToChart(chart, xScale);
     this.addYAxisToChart(chart, yScale);
 
-    this.addMouseMarkerToChart(chart, xScale, data);
+    this.addMouseMarkerToChart(chart);
   }
 
   /**
    * Draws a line chart for the given data into the given svg
    */
   public drawLineChart(incomingData: EventResultDataDTO): void {
+    const updateYAxis = (transition: any, yScale: any, width: number) => {
+      transition.call(
+        d3AxisRight(yScale)  // axis right, because we draw the background line with this
+          .tickSize(width)   // background line over complete chart width
+      )
+        .attr('transform', 'translate(0, 0)') // move the axis to the left
+        .call(g => g.selectAll(".tick:not(:first-of-type) line")  // make all line dotted, except the one on the bottom as this will indicate the x-axis
+          .attr("stroke-opacity", 0.5)
+          .attr("stroke-dasharray", "1,1"))
+        .call(g => g.selectAll(".tick text")  // move the text a little so it does not overlap with the lines
+          .attr("x", -5));
+    };
+
     if (incomingData.series.length == 0) {
       return;
     }
@@ -250,15 +251,14 @@ export class LineChartService {
     this._contextMenuPoint = null;
     this._xAxisCluster = {};
 
-    let data: TimeSeries[] = this.prepareData(incomingData);
-    let chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    let xScale: D3ScaleTime<number, number> = this.getXScale(data);
-    let yScale: D3ScaleLinear<number, number> = this.getYScale(data);
+    const data: TimeSeries[] = this.prepareData(incomingData);
+    const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
+    const xScale: D3ScaleTime<number, number> = this.getXScale(data);
+    const yScale: D3ScaleLinear<number, number> = this.getYScale(data);
     this.calculateLegendDimensions();
-    d3Select('osm-time-series-line-chart').transition().duration(500).style('visibility', 'visible');
     d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._legendGroupHeight + this._margin.top + this._margin.bottom);
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
-    d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
+    d3Select('.y-axis').transition().call(updateYAxis, yScale, this._width);
 
     this.addLegendsToChart(chart, incomingData);
     this.setSummaryLabel(chart, incomingData.summaryLabels);
@@ -266,7 +266,7 @@ export class LineChartService {
     this.drawAllSelectedPoints();
 
     this.resizeChartBackground();
-    this.bringMouseMarkerToTheFront(xScale, yScale);
+    this.bringMouseMarkerToTheFront();
   }
 
   private resizeChartBackground() {
@@ -278,14 +278,14 @@ export class LineChartService {
       .attr('height', this._height);
   }
 
-  private bringMouseMarkerToTheFront(xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>) {
+  private bringMouseMarkerToTheFront() {
     const markerLine = d3Select('.marker-line').remove();
     d3Select('#time-series-chart-drawing-area')
       .append(() => markerLine.node());
 
     this._mouseEventCatcher
       .on('mousemove', (_, index, nodes: D3ContainerElement[]) => {
-        this.moveMarker(nodes[index], xScale, yScale, this._height)
+        this.moveMarker(nodes[index], this._height)
       });
   }
 
@@ -297,12 +297,12 @@ export class LineChartService {
       return;
     }
 
-    let labelDataMap = {};
+    const labelDataMap = {};
     incomingData.series.forEach((data: EventResultSeriesDTO) => {
       if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
         data.identifier = this.translateMeasurand(data);
       }
-      let key = this.generateKey(data);
+      const key = this.generateKey(data);
       labelDataMap[key] = {
         text: data.identifier,
         key: key,
@@ -317,14 +317,14 @@ export class LineChartService {
    */
   private prepareData(incomingData: EventResultDataDTO): TimeSeries[] {
     return incomingData.series.map((data: EventResultSeriesDTO) => {
-      let lineChartData: TimeSeries = new TimeSeries();
+      const lineChartData: TimeSeries = new TimeSeries();
       if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
         data.identifier = this.translateMeasurand(data);
       }
       lineChartData.key = this.generateKey(data);
 
       lineChartData.values = data.data.map((point: EventResultPointDTO) => {
-        let lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
+        const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
         lineChartDataPoint.date = parseDate(point.date);
         lineChartDataPoint.value = point.value;
         lineChartDataPoint.tooltipText = data.identifier + ' : ';
@@ -337,8 +337,8 @@ export class LineChartService {
   }
 
   private translateMeasurand(data: EventResultSeriesDTO): string {
-    let splitLabelList: string[] = data.identifier.split(' | ');
-    let splitLabel: string = this.translationService.instant('frontend.de.iteratec.isr.measurand.' + splitLabelList[0]);
+    const splitLabelList: string[] = data.identifier.split(' | ');
+    const splitLabel: string = this.translationService.instant('frontend.de.iteratec.isr.measurand.' + splitLabelList[0]);
     if (!splitLabel.startsWith('frontend.de.iteratec.isr.measurand.')) {
       splitLabelList[0] = splitLabel;
     }
@@ -346,9 +346,13 @@ export class LineChartService {
   }
 
   private generateKey(data: EventResultSeriesDTO): string {
-    let key: string = data.identifier.replace(/[^_a-zA-Z0-9-]/g, "");
-    if (new RegExp('[0-9]').test(key.charAt(0))) {
-      key = key.replace(/[0-9]/, '_');
+    //remove every non alpha numeric character
+    const key: string = data.identifier.replace(/[^_a-zA-Z0-9-]/g, "");
+
+    //if first character is digit, replace it with '_'
+    const digitRegex = /[0-9]/;
+    if (digitRegex.test(key.charAt(0))) {
+      return key.replace(digitRegex, '_');
     }
     return key;
   }
@@ -367,7 +371,7 @@ export class LineChartService {
       .attr('id', 'header-group')
       .attr('transform', `translate(${this._margin.left}, ${this._margin.top - 16})`);
 
-    let chart = svg.append('g') // g =  grouping element; group all other stuff into the chart
+    const chart = svg.append('g') // g =  grouping element; group all other stuff into the chart
       .attr('id', 'time-series-chart-drawing-area')
       .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`); // translates the origin to the top left corner (default behavior of D3)
 
@@ -380,6 +384,17 @@ export class LineChartService {
   }
 
   private setSummaryLabel(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, summaryLabels: SummaryLabel[]): void {
+    const addSummaryLabel = (key: string, label: string, index: number): void => {
+      d3Select(`#summary-label-part${index}`)
+        .append('tspan')
+        .attr('id', `summary-label-part${index + 1}`)
+        .attr('class', 'summary-label-key')
+        .text(`${key}: `)
+        .append('tspan')
+        .attr('class', 'summary-label')
+        .text(label);
+    };
+
     d3Select('g#header-group').selectAll('.summary-label-text').remove();
     if (summaryLabels.length > 0) {
       d3Select('#header-group')
@@ -405,27 +420,16 @@ export class LineChartService {
                     label = summaryLabel.label
                   }
                   label = index < summaryLabels.length - 1 ? `${label} | ` : label;
-                  this.addSummaryLabel(key, label, index);
+                  addSummaryLabel(key, label, index);
                 });
             } else {
               const label: string = index < summaryLabels.length - 1 ? `${summaryLabel.label} | ` : summaryLabel.label;
-              this.addSummaryLabel(key, label, index);
+              addSummaryLabel(key, label, index);
             }
           });
       });
       chart.selectAll('.summary-label-text').remove();
     }
-  }
-
-  private addSummaryLabel(key: string, label: string, index: number): void {
-    d3Select(`#summary-label-part${index}`)
-      .append('tspan')
-      .attr('id', `summary-label-part${index + 1}`)
-      .attr('class', 'summary-label-key')
-      .text(`${key}: `)
-      .append('tspan')
-      .attr('class', 'summary-label')
-      .text(label);
   }
 
   public startResize(svgElement: ElementRef): void {
@@ -447,25 +451,25 @@ export class LineChartService {
    * Determine the xScale for the given data
    */
   private getXScale(data: TimeSeries[]): D3ScaleTime<number, number> {
+    const getDate = (data: TimeSeries[], f: Function): Date => {
+      return f(data, (dataItem: TimeSeries) => {
+        return f(dataItem.values, (point: TimeSeriesPoint) => {
+          return point.date;
+        });
+      });
+    };
+
+    const getMinDate = (data: TimeSeries[]): Date => {
+      return getDate(data, d3Min);
+    };
+
+    const getMaxDate = (data: TimeSeries[]): Date => {
+      return getDate(data, d3Max);
+    };
+
     return d3ScaleTime()               // Define a scale for the X-Axis
       .range([0, this._width])  // Display the X-Axis over the complete width
-      .domain([this.getMinDate(data), this.getMaxDate(data)]);
-  }
-
-  private getMinDate(data: TimeSeries[]): Date {
-    return d3Min(data, (dataItem: TimeSeries) => {
-      return d3Min(dataItem.values, (point: TimeSeriesPoint) => {
-        return point.date;
-      });
-    });
-  }
-
-  private getMaxDate(data: TimeSeries[]): Date {
-    return d3Max(data, (dataItem: TimeSeries) => {
-      return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
-        return point.date;
-      });
-    });
+      .domain([getMinDate(data), getMaxDate(data)]);
   }
 
   /**
@@ -480,7 +484,7 @@ export class LineChartService {
 
   private calculateLegendDimensions(): void {
     let maximumLabelWidth: number = 1;
-    let labels = Object.keys(this.legendDataMap);
+    const labels = Object.keys(this.legendDataMap);
 
     d3Select('g#time-series-chart-legend')
       .append('g')
@@ -555,14 +559,14 @@ export class LineChartService {
     /**********  SOME HELPER FUNCTIONS  **********/
     const insertLinebreakToLabels = function () {
       d3Select(this).selectAll('g.tick text').each((_, index, nodes) => {
-        let element = d3Select(nodes[index]);
-        let lines = element.text().split(' _nl_ ');
+        const element = d3Select(nodes[index]);
+        const lines = element.text().split(' _nl_ ');
 
         // Reset the text as we will replace it
         element.text('');
 
         lines.forEach((line, index) => {
-          let tspan = element.append('tspan').text(line);
+          const tspan = element.append('tspan').text(line);
           if (index > 0)
             tspan.attr('x', 0).attr('dy', '15');
         });
@@ -612,19 +616,6 @@ export class LineChartService {
     });
   }
 
-  private updateYAxis(transition: any, yScale: any, width: number, margin: any) {
-    transition.call(
-      d3AxisRight(yScale)  // axis right, because we draw the background line with this
-        .tickSize(width)   // background line over complete chart width
-    )
-      .attr('transform', 'translate(0, 0)') // move the axis to the left
-      .call(g => g.selectAll(".tick:not(:first-of-type) line")  // make all line dotted, except the one on the bottom as this will indicate the x-axis
-        .attr("stroke-opacity", 0.5)
-        .attr("stroke-dasharray", "1,1"))
-      .call(g => g.selectAll(".tick text")  // move the text a little so it does not overlap with the lines
-        .attr("x", -5));
-  }
-
   /**
    * Configuration of the line generator which does print the lines
    */
@@ -643,54 +634,57 @@ export class LineChartService {
   /**
    * Adds one line per data group to the chart
    */
-  private addDataLinesToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-                              xScale: D3ScaleTime<number, number>,
-                              yScale: D3ScaleLinear<number, number>,
-                              data: TimeSeries[]): void {
-    // Remove after resize
-    chart.selectAll('.line').remove();
-    // Create one group per line / data entry
-    chart.select('.mouse-event-catcher')
-      .selectAll('.line')                             // Get all lines already drawn
-      .data(data, (timeSeries: TimeSeries) => timeSeries.key)   // ... for this data
-      .join(enter => {
-          this.addDataPointsToXAxisCluster(enter);
-          const lineSelection: any = this.drawLine(enter, xScale, yScale);
-
-          const lineGroup = lineSelection.select(function () {
-            return (<SVGPathElement>this).parentNode;
-          });
-          this.addDataPointMarkersToChart(lineGroup, xScale, yScale);
-
-          return lineSelection;
-        },
-        update => update,
-        exit => {
-          this.removeDataPointsFromXAxisCluster(exit);
-          exit.transition().duration(200).style('opacity', '0').remove();
-        }
-      )
-  }
-
-  private addDataPointsToXAxisCluster(enter: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>) {
-    enter.each((timeSeries: TimeSeries) => {
-      timeSeries.values.forEach((timeSeriesPoint: TimeSeriesPoint) => {
-        if (!this._xAxisCluster[timeSeriesPoint.date.getTime()]) this._xAxisCluster[timeSeriesPoint.date.getTime()] = [];
-        this._xAxisCluster[timeSeriesPoint.date.getTime()].push(timeSeriesPoint);
+  private addDataLinesToChart = (() => {
+    const addDataPointsToXAxisCluster = (enter: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>): void => {
+      enter.each((timeSeries: TimeSeries) => {
+        timeSeries.values.forEach((timeSeriesPoint: TimeSeriesPoint) => {
+          if (!this._xAxisCluster[timeSeriesPoint.date.getTime()]) this._xAxisCluster[timeSeriesPoint.date.getTime()] = [];
+          this._xAxisCluster[timeSeriesPoint.date.getTime()].push(timeSeriesPoint);
+        });
       });
-    });
-  }
+    };
 
-  private removeDataPointsFromXAxisCluster(exit: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>): void {
-    exit.each((timeSeries: TimeSeries) => {
-      timeSeries.values.forEach((timeSeriesPoint: TimeSeriesPoint) => {
-        this._xAxisCluster[timeSeriesPoint.date.getTime()].splice(timeSeriesPoint, 1);
-        if (this._xAxisCluster[timeSeriesPoint.date.getTime()].length == 0) {
-          delete this._xAxisCluster[timeSeriesPoint.date.getTime()];
-        }
+    const removeDataPointsFromXAxisCluster = (exit: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>): void => {
+      exit.each((timeSeries: TimeSeries, index: number) => {
+        timeSeries.values.forEach((timeSeriesPoint: TimeSeriesPoint) => {
+          this._xAxisCluster[timeSeriesPoint.date.getTime()].splice(index, 1);
+          if (this._xAxisCluster[timeSeriesPoint.date.getTime()].length == 0) {
+            delete this._xAxisCluster[timeSeriesPoint.date.getTime()];
+          }
+        });
       });
-    });
-  }
+    };
+
+    return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+            xScale: D3ScaleTime<number, number>,
+            yScale: D3ScaleLinear<number, number>,
+            data: TimeSeries[]): void => {
+      // Remove after resize
+      chart.selectAll('.line').remove();
+      // Create one group per line / data entry
+      chart.select('.mouse-event-catcher')
+        .selectAll('.line')                             // Get all lines already drawn
+        .data(data, (timeSeries: TimeSeries) => timeSeries.key)   // ... for this data
+        .join(enter => {
+            addDataPointsToXAxisCluster(enter);
+            const lineSelection: any = this.drawLine(enter, xScale, yScale);
+
+            const lineGroup = lineSelection.select(function () {
+              return (<SVGPathElement>this).parentNode;
+            });
+            this.addDataPointMarkersToChart(lineGroup, xScale, yScale);
+
+            return lineSelection;
+          },
+          update => update,
+          exit => {
+            removeDataPointsFromXAxisCluster(exit);
+            exit.transition().duration(200).style('opacity', '0').remove();
+          }
+        )
+    }
+  })();
+
 
   private drawAllSelectedPoints() {
     this.drawSelectedPoints(d3SelectAll(".dot"));
@@ -752,14 +746,8 @@ export class LineChartService {
     });
   }
 
-  private hideMarker() {
-    d3Select('.marker-line').style('opacity', 0);
-    d3Select('#marker-tooltip').style('opacity', 0);
-    this.hideOldDotsOnMarker();
-  }
-
-  private addMouseMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, data: TimeSeries[]): void {
-    let markerGroup = chart;
+  private addMouseMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>): void {
+    const markerGroup = chart;
 
     this._contextMenuBackground = d3Select('body')
       .selectAll('.d3-context-menu-background')
@@ -786,6 +774,12 @@ export class LineChartService {
       d3Select('#marker-tooltip').style('opacity', 1);
     };
 
+    const hideMarker = () => {
+      d3Select('.marker-line').style('opacity', 0);
+      d3Select('#marker-tooltip').style('opacity', 0);
+      this.hideOldDotsOnMarker();
+    };
+
     // Watcher for mouse events
     this._mouseEventCatcher = markerGroup.append('svg:g')
       .attr('class', 'mouse-event-catcher')
@@ -793,7 +787,7 @@ export class LineChartService {
       .attr('height', this._height)
       .attr('fill', 'none')
       .on('mouseenter', () => showMarker())
-      .on('mouseleave', () => this.hideMarker())
+      .on('mouseleave', () => hideMarker())
       .on("contextmenu", () => d3Event.preventDefault());
 
     this._mouseEventCatcher.append('svg:rect')
@@ -810,13 +804,10 @@ export class LineChartService {
       .style('opacity', '0')
       .style('pointer-events', 'none');
 
-    this.addTooltipBoxToChart();
-  }
-
-  private addTooltipBoxToChart() {
-    this._markerTooltip = d3Select('#time-series-chart').select(function () {
-      return (<SVGElement>this).parentNode;
-    }).append('div')
+    // Add tooltip box to chart
+    d3Select('#time-series-chart')
+      .select((_, index: number, elem) => (<SVGElement>elem[index]).parentNode)
+      .append('div')
       .attr('id', 'marker-tooltip')
       .style('opacity', '0.9');
   }
@@ -836,44 +827,37 @@ export class LineChartService {
     }
   };
 
-  private moveMarker(node: D3ContainerElement, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>, containerHeight: number) {
+  private moveMarker(node: D3ContainerElement, containerHeight: number) {
     const mouseCoordinates = d3Mouse(node);
-    const mouseX = mouseCoordinates[0];
-    const mouseXDatum = xScale.invert(mouseX);
 
-    const bisect = d3Bisector((timestamp: string) => timestamp).left;
-    const clusterKeys = Object.keys(this._xAxisCluster);
-    if (clusterKeys.length < 2) return;
-    clusterKeys.sort();
-
-    let clusterIndex = bisect(clusterKeys, mouseXDatum.getTime().toString());
-
-    if (clusterIndex == 0) clusterIndex = 1;
-    if (clusterIndex >= clusterKeys.length) clusterIndex = clusterKeys.length - 1;
-
-    const firstPointFromClusterBefore: TimeSeriesPoint = this._xAxisCluster[clusterKeys[clusterIndex - 1]][0];
-    const firstPointFromClusterAfter: TimeSeriesPoint = this._xAxisCluster[clusterKeys[clusterIndex]][0];
-    const pointXBefore = xScale(firstPointFromClusterBefore.date);
-    const pointXAfter = xScale(firstPointFromClusterAfter.date);
-
-    let pointX: number;
-    let point: TimeSeriesPoint;
-    if (pointXAfter - mouseX < mouseX - pointXBefore) {
-      pointX = pointXAfter;
-      point = firstPointFromClusterAfter;
-    } else {
-      pointX = pointXBefore;
-      point = firstPointFromClusterBefore;
+    if (this._xAxisCluster.length < 2) {
+      return;
     }
-    //draw marker line
-    d3Select('.marker-line')
-      .attr('d', function () {
-        let d = "M" + pointX + "," + containerHeight;
-        d += " " + pointX + "," + 0;
-        return d;
-      });
 
-    const findDotsOnMarker = (pointX: number) => {
+    const pointsCompareDistance = (p1, p2): number => {
+      // Taxicab/Manhattan approximation of euclidean distance
+      return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
+    };
+
+    const findNearestDot = (dots) => {
+      const mousePosition = {x: mouseCoordinates[0], y: mouseCoordinates[1]};
+
+      let nearestDot = null;
+      let minCompareDistance;
+      dots.each((_, index: number, nodes: []) => {
+        const pointSelection = d3Select(nodes[index]);
+        const cx = parseFloat(pointSelection.attr('cx'));
+        const cy = parseFloat(pointSelection.attr('cy'));
+        const compareDistance = pointsCompareDistance(mousePosition, {x: cx, y: cy});
+        if (minCompareDistance === undefined || compareDistance < minCompareDistance) {
+          nearestDot = pointSelection;
+          minCompareDistance = compareDistance;
+        }
+      });
+      return nearestDot;
+    };
+
+    const findDotsOnMarker = (pointX: number): D3Selection<D3BaseType, {}, HTMLElement, any> => {
       const cx = pointX.toString().replace('.', '_');
       return d3SelectAll('.dot-x-' + cx);
     };
@@ -896,15 +880,20 @@ export class LineChartService {
         });
     };
 
+    const nearestDot = findNearestDot(d3SelectAll('.dot'));
+    const markerPositionX = nearestDot.attr('cx');
+    //draw marker line
+    const markerPath = `M${markerPositionX},${containerHeight} ${markerPositionX},0`;
+    d3Select('.marker-line').attr('d', markerPath);
+
     this.hideOldDotsOnMarker();
-    const dotsOnMarker = findDotsOnMarker(pointX);
+    const dotsOnMarker = findDotsOnMarker(markerPositionX);
     showDotsOnMarker(dotsOnMarker);
+    nearestDot.attr('r', this.DOT_HIGHLIGHT_RADIUS);
 
     this._dotsOnMarker = dotsOnMarker;
 
-    const mouseY = mouseCoordinates[1];
-    const nearestDot = this.highlightNearestDot(dotsOnMarker, mouseY, yScale);
-    this.showTooltip(nearestDot, dotsOnMarker, point.date);
+    this.showTooltip(nearestDot, dotsOnMarker, nearestDot.datum().date);
   }
 
   private showContextMenu(menu: ContextMenuPosition[]) {
@@ -982,14 +971,14 @@ export class LineChartService {
 
   private changePointSelection(point: TimeSeriesPoint) {
     let canPointBeSelected = true;
-    if(this._pointsSelection.count() > 0) {
+    if (this._pointsSelection.count() > 0) {
       const testServerUrl = this._pointsSelection.getFirst().wptInfo.baseUrl;
-      if(point.wptInfo.baseUrl != testServerUrl) {
+      if (point.wptInfo.baseUrl != testServerUrl) {
         canPointBeSelected = false;
       }
     }
 
-    if(!canPointBeSelected) {
+    if (!canPointBeSelected) {
       this._pointSelectionErrorHandler();
       return;
     }
@@ -1003,14 +992,10 @@ export class LineChartService {
   }
 
   private unselectAllPoints() {
-    const arePointEqual = (t1: TimeSeriesPoint, t2: TimeSeriesPoint) => {
-      return t1.tooltipText == t2.tooltipText && t1.date.getTime() == t2.date.getTime();
-    };
-
     d3SelectAll(".dot").each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
-      const wasDotSelected = this._pointsSelection.isPointSelected(currentDotData);
-      const isDotOnMarkerLine = this._dotsOnMarker.data().some((elem: TimeSeriesPoint) => {
-        return arePointEqual(currentDotData, elem);
+      const wasDotSelected: boolean = this._pointsSelection.isPointSelected(currentDotData);
+      const isDotOnMarkerLine: boolean = this._dotsOnMarker.data().some((elem: TimeSeriesPoint) => {
+        return currentDotData.equals(elem);
       });
       if (wasDotSelected && !isDotOnMarkerLine) {
         d3Select(dots[index]).style("opacity", "0");
@@ -1019,22 +1004,7 @@ export class LineChartService {
     this._pointsSelection.unselectAll();
   }
 
-  private highlightNearestDot(visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, mouseY: number, yScale: D3ScaleLinear<number, number>) {
-    let nearestDot;
-    let minDistance;
-    visibleDots.each((_, index: number, nodes: []) => {
-      const cy = parseFloat(d3Select(nodes[index]).attr('cy'));
-      const distance = Math.abs(mouseY - cy);
-      if (minDistance === undefined || distance < minDistance) {
-        nearestDot = nodes[index];
-        minDistance = distance;
-      }
-    });
-
-    return d3Select(nearestDot).attr('r', this.DOT_HIGHLIGHT_RADIUS);
-  }
-
-  private showTooltip(nearestDot: D3Selection<any, unknown, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date) {
+  private showTooltip(nearestDot: D3Selection<any, TimeSeriesPoint, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date) {
     const tooltip = d3Select('#marker-tooltip');
 
     const tooltipText = this.generateTooltipText(nearestDot, visibleDots, highlightedDate);
@@ -1050,142 +1020,142 @@ export class LineChartService {
     tooltip.style('left', left + 'px');
   }
 
-  private generateTooltipText(nearestDot: D3Selection<any, unknown, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date): HTMLTableElement {
-    const nearestDotData = nearestDot.datum() as TimeSeriesPoint;
+  private generateTooltipText = (() => {
+    const generateTooltipTimestampRow = (highlightedDate: Date): string | Node => {
+      const label: HTMLTableCellElement = document.createElement('td');
+      label.append('Timestamp');
 
-    const table: HTMLTableElement = document.createElement('table');
-    const tableBody: HTMLTableSectionElement = document.createElement('tbody');
-    table.append(tableBody);
-    tableBody.append(this.generateTooltipTimestampRow(highlightedDate));
+      const date: HTMLTableCellElement = document.createElement('td');
+      date.append(highlightedDate.toLocaleString());
 
-    const tempArray = [];
-    visibleDots
-      .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
-        tempArray.push({"value": timeSeriesPoint.value, "htmlNode": this.generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDotData)});
-      });
-    tempArray
-      .sort((a, b) => b.value - a.value)
-      .forEach(elem => table.append(elem.htmlNode));
+      const row: HTMLTableRowElement = document.createElement('tr');
+      row.append(label);
+      row.append(date);
+      return row;
+    };
 
-    return table;
-  }
+    const generateTooltipDataPointRow = (currentPoint: TimeSeriesPoint, node: D3BaseType, nearestDotData: TimeSeriesPoint): string | Node => {
+      const label: HTMLTableCellElement = document.createElement('td');
+      label.append(currentPoint.tooltipText);
 
-  private generateTooltipTimestampRow(highlightedDate: Date): string | Node {
-    const label: HTMLTableCellElement = document.createElement('td');
-    label.append('Timestamp');
+      const value: HTMLTableCellElement = document.createElement('td');
+      const lineColorDot: HTMLElement = document.createElement('i');
+      lineColorDot.className = 'fas fa-circle';
+      lineColorDot.style.color = d3Select(node).style('stroke');
+      value.append(lineColorDot);
+      if (currentPoint.value !== undefined && currentPoint.value !== null) {
+        value.append(currentPoint.value.toString());
+      }
 
-    const date: HTMLTableCellElement = document.createElement('td');
-    date.append(highlightedDate.toLocaleString());
+      const row: HTMLTableRowElement = document.createElement('tr');
+      if (currentPoint.equals(nearestDotData)) {
+        row.className = 'active';
+      }
+      row.append(label);
+      row.append(value);
+      return row;
+    };
 
-    const row: HTMLTableRowElement = document.createElement('tr');
-    row.append(label);
-    row.append(date);
-    return row;
-  }
+    return (nearestDot: D3Selection<any, TimeSeriesPoint, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date): HTMLTableElement => {
+      const nearestDotData = nearestDot.datum() as TimeSeriesPoint;
 
-  private generateTooltipDataPointRow(currentPoint: TimeSeriesPoint, node: D3BaseType, nearestDotData: TimeSeriesPoint): string | Node {
-    const label: HTMLTableCellElement = document.createElement('td');
-    label.append(currentPoint.tooltipText);
+      const table: HTMLTableElement = document.createElement('table');
+      const tableBody: HTMLTableSectionElement = document.createElement('tbody');
+      table.append(tableBody);
+      tableBody.append(generateTooltipTimestampRow(highlightedDate));
 
-    const value: HTMLTableCellElement = document.createElement('td');
-    const lineColorDot: HTMLElement = document.createElement('i');
-    lineColorDot.className = 'fas fa-circle';
-    lineColorDot.style.color = d3Select(node).style('stroke');
-    value.append(lineColorDot);
-    if (currentPoint.value !== undefined && currentPoint.value !== null) {
-      value.append(currentPoint.value.toString());
-    }
-
-    const row: HTMLTableRowElement = document.createElement('tr');
-    if (currentPoint.equals(nearestDotData)) {
-      row.className = 'active';
-    }
-    row.append(label);
-    row.append(value);
-    return row;
-  }
-
-  private addLegendsToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-                            incomingData: EventResultDataDTO) {
-    chart.selectAll('.legend-entry').remove();
-    const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
-    legendEntry.join(
-      enter => {
-        const legendElement = enter
-          .append('g')
-          .attr('class', 'legend-entry');
-        legendElement
-          .append('rect')
-          .attr('class', 'legend-rect')
-          .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
-          .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
-          .attr("rx", 2)
-          .attr("ry", 2)
-          .attr('fill', (key: string, index: number) => {
-            return getColorScheme()[incomingData.series.length - index - 1]
+      const tempArray = [];
+      visibleDots
+        .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
+          tempArray.push({
+            "value": timeSeriesPoint.value,
+            "htmlNode": generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDotData)
           });
-        legendElement
-          .append('text')
-          .attr('class', 'legend-text')
-          .attr('x', 10 + 5)
-          .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
-          .text(datum => this.legendDataMap[datum].text);
-        return legendElement;
-      },
-      update => {
-        update
+        });
+      tempArray
+        .sort((a, b) => b.value - a.value)
+        .forEach(elem => tableBody.append(elem.htmlNode));
+
+      return table;
+    };
+  })();
+
+  private addLegendsToChart = (() => {
+    const onLegendClick = (labelKey: string, incomingData: EventResultDataDTO): void => {
+      if (d3Event.metaKey || d3Event.ctrlKey) {
+        this.legendDataMap[labelKey].show = !this.legendDataMap[labelKey].show;
+      } else {
+        if (labelKey == this.focusedLegendEntry) {
+          Object.keys(this.legendDataMap).forEach((legend) => {
+            this.legendDataMap[legend].show = true;
+          });
+          this.focusedLegendEntry = "";
+        } else {
+          Object.keys(this.legendDataMap).forEach((legend) => {
+            if (legend === labelKey) {
+              this.legendDataMap[legend].show = true;
+              this.focusedLegendEntry = legend;
+            } else {
+              this.legendDataMap[legend].show = false;
+            }
+          });
+        }
+      }
+
+      //redraw chart
+      this.drawLineChart(incomingData);
+    };
+
+    const getPosition = (index: number): string => {
+      const x = index % this._legendGroupColumns * this._legendGroupColumnWidth;
+      const y = Math.floor(index / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 12;
+
+      return "translate(" + x + "," + y + ")";
+    };
+
+    return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, incomingData: EventResultDataDTO): void => {
+      chart.selectAll('.legend-entry').remove();
+      const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
+      legendEntry.join(
+        enter => {
+          const legendElement = enter
+            .append('g')
+            .attr('class', 'legend-entry');
+          legendElement
+            .append('rect')
+            .attr('class', 'legend-rect')
+            .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
+            .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
+            .attr("rx", 2)
+            .attr("ry", 2)
+            .attr('fill', (key: string, index: number) => {
+              return getColorScheme()[incomingData.series.length - index - 1]
+            });
+          legendElement
+            .append('text')
+            .attr('class', 'legend-text')
+            .attr('x', 10 + 5)
+            .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+            .text(datum => this.legendDataMap[datum].text);
+          return legendElement;
+        },
+        update => {
+          update
+            .transition()
+            .duration(ChartCommons.TRANSITION_DURATION)
+            .style('opacity', (datum) => {
+              return (this.legendDataMap[datum].show) ? 1 : 0.2;
+            });
+          return update;
+        },
+        exit => exit
           .transition()
           .duration(ChartCommons.TRANSITION_DURATION)
-          .style('opacity', (datum) => {
-            return (this.legendDataMap[datum].show) ? 1 : 0.2;
-          });
-        return update;
-      },
-      exit => exit
-        .transition()
-        .duration(ChartCommons.TRANSITION_DURATION)
-        .style('opacity', 0)
-        .remove()
-    )
-      .attr("transform", (datum, index) => this.getPosition(index))
-      .on('click', (datum) => this.onMouseClick(datum, incomingData));
-  }
-
-  private getPosition(index: number): string {
-    const x = index % this._legendGroupColumns * this._legendGroupColumnWidth;
-    const y = Math.floor(index / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 12;
-
-    return "translate(" + x + "," + y + ")";
-  }
-
-  private onMouseClick(labelKey: string, incomingData: EventResultDataDTO): void {
-    if (d3Event.metaKey || d3Event.ctrlKey) {
-      this.legendDataMap[labelKey].show = !this.legendDataMap[labelKey].show;
-    } else {
-      if (labelKey == this.focusedLegendEntry) {
-        Object.keys(this.legendDataMap).forEach((legend) => {
-          this.legendDataMap[legend].show = true;
-        });
-        this.focusedLegendEntry = "";
-      } else {
-        Object.keys(this.legendDataMap).forEach((legend) => {
-          if (legend === labelKey) {
-            this.legendDataMap[legend].show = true;
-            this.focusedLegendEntry = legend;
-          } else {
-            this.legendDataMap[legend].show = false;
-          }
-        });
-      }
-    }
-    this.drawLineChart(incomingData);
-  }
-}
-
-class ContextMenuPosition {
-  title?: string;
-  icon?: string;
-  visible?: (d: TimeSeriesPoint, i: number, elem) => boolean;
-  action?: (d: TimeSeriesPoint, i: number, elem) => void;
-  divider?: boolean = false;
+          .style('opacity', 0)
+          .remove()
+      )
+        .attr("transform", (datum, index) => getPosition(index))
+        .on('click', (datum) => onLegendClick(datum, incomingData));
+    };
+  })();
 }
