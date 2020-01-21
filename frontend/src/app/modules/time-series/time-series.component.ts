@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {URL} from "../../enums/url.enum";
 import {LinechartDataService} from "./services/linechart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
@@ -8,7 +8,10 @@ import {BehaviorSubject} from 'rxjs';
 @Component({
   selector: 'osm-time-series',
   templateUrl: './time-series.component.html',
-  styleUrls: ['./time-series.component.scss']
+  styleUrls: ['./time-series.component.scss'],
+
+  //used to render context menu with styles from time-series.component.scss file
+  encapsulation: ViewEncapsulation.None
 })
 export class TimeSeriesComponent implements OnInit {
 
