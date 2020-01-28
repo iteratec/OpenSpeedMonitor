@@ -758,8 +758,7 @@ export class LineChartService {
     dotsToCheck.each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
       const isDotSelected: boolean = this._pointsSelection.isPointSelected(currentDotData);
       if (isDotSelected) {
-        d3Select(dots[index])
-          .style('visibility', 'visible')
+        d3Select(dots[index]).attr('visibility', 'visible')
       }
     })
   }
@@ -1034,16 +1033,15 @@ export class LineChartService {
   }
 
   private unselectAllPoints() {
+    this._pointsSelection.unselectAll();
     d3SelectAll(".dot").each((currentDotData: TimeSeriesPoint, index: number, dots: D3BaseType[]) => {
-      const wasDotSelected: boolean = this._pointsSelection.isPointSelected(currentDotData);
       const isDotOnMarkerLine: boolean = this._dotsOnMarker.data().some((elem: TimeSeriesPoint) => {
         return currentDotData.equals(elem);
       });
-      if (wasDotSelected && !isDotOnMarkerLine) {
+      if (!isDotOnMarkerLine) {
         d3Select(dots[index]).attr('visibility', 'hidden');
       }
     });
-    this._pointsSelection.unselectAll();
   }
 
   private showTooltip(nearestDot: D3Selection<any, TimeSeriesPoint, null, undefined>, visibleDots: D3Selection<D3BaseType, {}, HTMLElement, any>, highlightedDate: Date) {
