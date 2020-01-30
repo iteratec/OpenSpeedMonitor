@@ -262,7 +262,7 @@ export class LineChartService {
     };
 
     const createContextMenu = () => {
-      if(!this._contextMenuBackground) {
+      if (!this._contextMenuBackground) {
         this._contextMenuBackground = d3Select('body')
           .selectAll('.d3-context-menu-background')
           .data([1])
@@ -276,7 +276,7 @@ export class LineChartService {
           }, false);
       }
 
-      if(!this._contextMenu) {
+      if (!this._contextMenu) {
         this._contextMenu = d3Select('body')
           .selectAll('.d3-context-menu')
           .data([1])
@@ -730,14 +730,18 @@ export class LineChartService {
       // Find series with only one dot in range
       const seriesWithOneDot = data
         .map((d: TimeSeries, index: number) => {
-          return {key: d.key, values: d.values.filter((point) => point.date <= maxDate && point.date >= minDate), index: index}
+          return {
+            key: d.key,
+            values: d.values.filter((point) => point.date <= maxDate && point.date >= minDate),
+            index: index
+          }
         })
         .filter((d: TimeSeries) => {
           return d.values.length === 1;
         });
 
       // If there is no series with one dot, end the function
-      if(seriesWithOneDot.length === 0) {
+      if (seriesWithOneDot.length === 0) {
         return;
       }
 
@@ -1198,48 +1202,49 @@ export class LineChartService {
     };
 
     return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, incomingData: EventResultDataDTO): void => {
-      chart.selectAll('.legend-entry').remove();
-      const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
-      legendEntry.join(
-        enter => {
-          const legendElement = enter
-            .append('g')
-            .attr('class', 'legend-entry');
-          legendElement
-            .append('rect')
-            .attr('class', 'legend-rect')
-            .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
-            .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
-            .attr("rx", 2)
-            .attr("ry", 2)
-            .attr('fill', (key: string, index: number) => {
-              return getColorScheme()[incomingData.series.length - index - 1]
-            });
-          legendElement
-            .append('text')
-            .attr('class', 'legend-text')
-            .attr('x', 10 + 5)
-            .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
-            .text(datum => this.legendDataMap[datum].text);
-          return legendElement;
-        },
-        update => {
-          update
+      const legendGroup = d3Select('.legend-group');
+
+      // Remove old legend elements
+      legendGroup.selectAll('.legend-entry').remove();
+
+      legendGroup
+        .selectAll()
+        .data(Object.keys(this.legendDataMap))
+        .join(
+          enter => {
+            const legendElement = enter
+              .append('g')
+              .attr('class', 'legend-entry')
+              .style('opacity', (datum) => {
+                return (this.legendDataMap[datum].show) ? 1 : 0.2;
+              });
+            legendElement
+              .append('rect')
+              .attr('class', 'legend-rect')
+              .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
+              .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
+              .attr("rx", 2)
+              .attr("ry", 2)
+              .attr('fill', (key: string, index: number) => {
+                return getColorScheme()[incomingData.series.length - index - 1]
+              });
+            legendElement
+              .append('text')
+              .attr('class', 'legend-text')
+              .attr('x', 10 + 5)
+              .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+              .text(datum => this.legendDataMap[datum].text);
+            return legendElement;
+          },
+          update => update,
+          exit => exit
             .transition()
             .duration(ChartCommons.TRANSITION_DURATION)
-            .style('opacity', (datum) => {
-              return (this.legendDataMap[datum].show) ? 1 : 0.2;
-            });
-          return update;
-        },
-        exit => exit
-          .transition()
-          .duration(ChartCommons.TRANSITION_DURATION)
-          .style('opacity', 0)
-          .remove()
-      )
-        .attr("transform", (datum, index) => getPosition(index))
-        .on('click', (datum) => onLegendClick(datum, incomingData));
+            .style('opacity', 0)
+            .remove()
+        )
+        .attr("transform", (_, index: number) => getPosition(index))
+        .on('click', (datum: string) => onLegendClick(datum, incomingData));
     };
   })();
 }
