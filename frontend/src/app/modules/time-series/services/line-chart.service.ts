@@ -237,6 +237,56 @@ export class LineChartService {
       this._xAxisCluster = {};
     };
 
+    /**
+     * Prepares the incoming data for drawing with D3.js
+     */
+    const prepareData = (incomingData: EventResultDataDTO): TimeSeries[] => {
+      return incomingData.series.map((data: EventResultSeriesDTO) => {
+        const lineChartData: TimeSeries = new TimeSeries();
+        if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+          data.identifier = this.translateMeasurand(data);
+        }
+        lineChartData.key = this.generateKey(data);
+
+        lineChartData.values = data.data.map((point: EventResultPointDTO) => {
+          const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
+          lineChartDataPoint.date = parseDate(point.date);
+          lineChartDataPoint.value = point.value;
+          lineChartDataPoint.tooltipText = data.identifier + ' : ';
+          lineChartDataPoint.wptInfo = point.wptInfo;
+          return lineChartDataPoint;
+        });
+
+        return lineChartData;
+      })
+    };
+
+    const createContextMenu = () => {
+      if(!this._contextMenuBackground) {
+        this._contextMenuBackground = d3Select('body')
+          .selectAll('.d3-context-menu-background')
+          .data([1])
+          .enter()
+          .append('div')
+          .attr('class', 'd3-context-menu-background')
+          .on('click', () => {
+            this.closeContextMenu();
+          }).on('contextmenu', () => {
+            this.closeContextMenu();
+          }, false);
+      }
+
+      if(!this._contextMenu) {
+        this._contextMenu = d3Select('body')
+          .selectAll('.d3-context-menu')
+          .data([1])
+          .enter()
+          .append('rect')
+          .attr('class', 'd3-context-menu')
+          .on('contextmenu', () => d3Event.preventDefault());
+      }
+    };
+
     return (incomingData: EventResultDataDTO) => {
       if (incomingData.series.length == 0) {
         return;
@@ -244,7 +294,7 @@ export class LineChartService {
 
       prepareCleanState();
 
-      const data: TimeSeries[] = this.prepareData(incomingData);
+      const data: TimeSeries[] = prepareData(incomingData);
       const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
       const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, this._width);
       const yScale: D3ScaleLinear<number, number> = this.lineChartScaleService.getYScale(data, this._height);
@@ -253,26 +303,7 @@ export class LineChartService {
       d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
       d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width);
 
-      this._contextMenuBackground = d3Select('body')
-        .selectAll('.d3-context-menu-background')
-        .data([1])
-        .enter()
-        .append('div')
-        .attr('class', 'd3-context-menu-background')
-        .on('click', () => {
-          this.closeContextMenu();
-        }).on('contextmenu', () => {
-          this.closeContextMenu();
-        }, false);
-
-      this._contextMenu = d3Select('body')
-        .selectAll('.d3-context-menu')
-        .data([1])
-        .enter()
-        .append('rect')
-        .attr('class', 'd3-context-menu')
-        .on('contextmenu', () => d3Event.preventDefault());
-
+      createContextMenu();
       this.addBrush(chart, xScale, yScale, data);
 
       this.addLegendsToChart(chart, incomingData);
@@ -310,30 +341,6 @@ export class LineChartService {
       }
     });
     this.legendDataMap = labelDataMap;
-  }
-
-  /**
-   * Prepares the incoming data for drawing with D3.js
-   */
-  private prepareData(incomingData: EventResultDataDTO): TimeSeries[] {
-    return incomingData.series.map((data: EventResultSeriesDTO) => {
-      const lineChartData: TimeSeries = new TimeSeries();
-      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
-        data.identifier = this.translateMeasurand(data);
-      }
-      lineChartData.key = this.generateKey(data);
-
-      lineChartData.values = data.data.map((point: EventResultPointDTO) => {
-        const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
-        lineChartDataPoint.date = parseDate(point.date);
-        lineChartDataPoint.value = point.value;
-        lineChartDataPoint.tooltipText = data.identifier + ' : ';
-        lineChartDataPoint.wptInfo = point.wptInfo;
-        return lineChartDataPoint;
-      });
-
-      return lineChartData;
-    });
   }
 
   private translateMeasurand(data: EventResultSeriesDTO): string {
@@ -679,6 +686,80 @@ export class LineChartService {
       });
     };
 
+    const drawLine = (selection: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>,
+                      xScale: D3ScaleTime<number, number>,
+                      yScale: D3ScaleLinear<number, number>): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> => {
+      const resultingSelection = selection
+        .append('g')       // Group each line so we can add dots to this group latter
+        .attr('class', (timeSeries: TimeSeries) => 'line line-' + timeSeries.key)
+        .style('opacity', '0')
+        .append('path')  // Draw one path for every item in the data set
+        .style('pointer-events', 'none')
+        .attr('fill', 'none')
+        .attr('stroke-width', 1.5)
+        .attr('d', (dataItem: TimeSeries) => {
+          const minDate = xScale.domain()[0];
+          const maxDate = xScale.domain()[1];
+          const values = dataItem.values.filter((point) => point.date <= maxDate && point.date >= minDate);
+          return this.getLineGenerator(xScale, yScale)(values);
+        });
+
+      d3SelectAll('.line')
+      // colorize (in reverse order as d3 adds new line before the existing ones ...
+        .attr('stroke', (_, index: number, nodes: []) => {
+          return getColorScheme()[nodes.length - index - 1];
+        })
+        // fade in
+        .transition().duration(500).style('opacity', (timeSeries: TimeSeries) => {
+        return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
+      });
+
+      return resultingSelection;
+    };
+
+    const drawSinglePointsDots = (data: TimeSeries[],
+                                  xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>): void => {
+      // Remove old dots
+      this._chartContentContainer
+        .select(".single-dots")
+        .remove();
+
+      const minDate = xScale.domain()[0];
+      const maxDate = xScale.domain()[1];
+
+      // Find series with only one dot in range
+      const seriesWithOneDot = data
+        .map((d: TimeSeries, index: number) => {
+          return {key: d.key, values: d.values.filter((point) => point.date <= maxDate && point.date >= minDate), index: index}
+        })
+        .filter((d: TimeSeries) => {
+          return d.values.length === 1;
+        });
+
+      // If there is no series with one dot, end the function
+      if(seriesWithOneDot.length === 0) {
+        return;
+      }
+
+      this._chartContentContainer
+        .append('g')
+        .attr('class', 'single-dots')
+        .selectAll()
+        .data(seriesWithOneDot)
+        .enter()
+        .append('g')
+        .attr('class', s => 'single-dot-' + s.key)
+        .style('fill', d => getColorScheme()[data.length - d.index - 1])
+        .selectAll()
+        .data((s: TimeSeries) => s.values)
+        .enter()
+        .append('circle')
+        .attr('r', this.DOT_RADIUS)
+        .attr('cx', (dot: TimeSeriesPoint) => xScale(dot.date))
+        .attr('cy', (dot: TimeSeriesPoint) => yScale(dot.value))
+        .style('pointer-events', 'visible');
+    };
+
     const addDataPointsToChart = (timeSeries: TimeSeries[], xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>): void => {
       // Remove old dots
       this._chartContentContainer
@@ -696,13 +777,11 @@ export class LineChartService {
         .attr('stroke', (_, index: number, nodes: []) => {
           return getColorScheme()[nodes.length - index - 1];
         })
-        .each((d, i, e) => {
+        .each((d: TimeSeries, i: number, e) => {
             const key = d.key;
             const dotsGroupSelection = d3Select(e[i]);
-
             const minDate = xScale.domain()[0];
             const maxDate = xScale.domain()[1];
-
             dotsGroupSelection
               .selectAll()
               .data((timeSeries: TimeSeries) => {
@@ -737,7 +816,8 @@ export class LineChartService {
         .data(data, (timeSeries: TimeSeries) => timeSeries.key)   // ... for this data
         .join(enter => {
             addDataPointsToXAxisCluster(enter);
-            const lineSelection: any = this.drawLine(enter, xScale, yScale);
+            const lineSelection: any = drawLine(enter, xScale, yScale);
+            drawSinglePointsDots(data, xScale, yScale);
             addDataPointsToChart(data, xScale, yScale);
             return lineSelection;
           },
@@ -763,38 +843,6 @@ export class LineChartService {
     })
   }
 
-  private drawLine(selection: any,
-                   xScale: D3ScaleTime<number, number>,
-                   yScale: D3ScaleLinear<number, number>): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> {
-
-    const resultingSelection = selection
-      .append('g')       // Group each line so we can add dots to this group latter
-      .attr('class', (timeSeries: TimeSeries) => 'line line-' + timeSeries.key)
-      .style('opacity', '0')
-      .append('path')  // Draw one path for every item in the data set
-      .style('pointer-events', 'none')
-      .attr('fill', 'none')
-      .attr('stroke-width', 1.5)
-      .attr('d', (dataItem: TimeSeries) => {
-        const minDate = xScale.domain()[0];
-        const maxDate = xScale.domain()[1];
-        const values = dataItem.values.filter((point) => point.date <= maxDate && point.date >= minDate);
-        return this.getLineGenerator(xScale, yScale)(values);
-      });
-
-    d3SelectAll('.line')
-    // colorize (in reverse order as d3 adds new line before the existing ones ...
-      .attr('stroke', (_, index: number, nodes: []) => {
-        return getColorScheme()[nodes.length - index - 1];
-      })
-      // fade in
-      .transition().duration(500).style('opacity', (timeSeries: TimeSeries) => {
-      return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
-    });
-
-    return resultingSelection;
-  }
-
   private prepareMouseEventCatcher = (() => {
     const showMarker = () => {
       d3Select('.marker-line').style('opacity', 1);
@@ -808,7 +856,7 @@ export class LineChartService {
     };
 
     return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>) => {
-      if(!chart.select('.chart-content').empty()) {
+      if (!chart.select('.chart-content').empty()) {
         return;
       }
 
@@ -828,7 +876,7 @@ export class LineChartService {
   })();
 
   private addMouseMarkerToChart(markerParent: D3Selection<D3BaseType, {}, D3ContainerElement, {}>): void {
-    if(!d3Select('.marker-line').empty()) {
+    if (!d3Select('.marker-line').empty()) {
       return;
     }
 
@@ -948,10 +996,6 @@ export class LineChartService {
         //do not show empty context menu
         return;
       }
-
-      //TODO I don't know why these variables are not assigned
-      this._contextMenu = d3Select('.d3-context-menu');
-      this._contextMenuBackground = d3Select('.d3-context-menu-background');
 
       const background = this._contextMenuBackground.html('');
       const contextMenu = this._contextMenu.html('');
