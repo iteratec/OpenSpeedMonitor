@@ -287,6 +287,34 @@ export class LineChartService {
       }
     };
 
+    const calculateLegendDimensions = (): void => {
+      let maximumLabelWidth: number = 1;
+      const labels = Object.keys(this.legendDataMap);
+
+      d3Select('g#time-series-chart-legend')
+        .append('g')
+        .attr('id', 'renderToCalculateMaxWidth')
+        .selectAll('.renderToCalculateMaxWidth')
+        .data(labels)
+        .enter()
+        .append('text')
+        .attr('class', 'legend-text')
+        .text(datum => this.legendDataMap[datum].text)
+        .each((datum, index, groups) => {
+          Array.from(groups).forEach((text) => {
+            if (text) {
+              maximumLabelWidth = Math.max(maximumLabelWidth, text.getBoundingClientRect().width)
+            }
+          });
+        });
+
+      d3Select('g#renderToCalculateMaxWidth').remove();
+
+      this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
+      this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
+      this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
+    };
+
     return (incomingData: EventResultDataDTO) => {
       if (incomingData.series.length == 0) {
         return;
@@ -298,7 +326,7 @@ export class LineChartService {
       const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
       const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, this._width);
       const yScale: D3ScaleLinear<number, number> = this.lineChartScaleService.getYScale(data, this._height);
-      this.calculateLegendDimensions();
+      calculateLegendDimensions();
       d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._legendGroupHeight + this._margin.top + this._margin.bottom);
       d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
       d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width);
@@ -510,34 +538,6 @@ export class LineChartService {
     d3Select(svgElement.nativeElement).transition().duration(50).style('opacity', 1.0);
   }
 
-  private calculateLegendDimensions(): void {
-    let maximumLabelWidth: number = 1;
-    const labels = Object.keys(this.legendDataMap);
-
-    d3Select('g#time-series-chart-legend')
-      .append('g')
-      .attr('id', 'renderToCalculateMaxWidth')
-      .selectAll('.renderToCalculateMaxWidth')
-      .data(labels)
-      .enter()
-      .append('text')
-      .attr('class', 'legend-text')
-      .text(datum => this.legendDataMap[datum].text)
-      .each((datum, index, groups) => {
-        Array.from(groups).forEach((text) => {
-          if (text) {
-            maximumLabelWidth = Math.max(maximumLabelWidth, text.getBoundingClientRect().width)
-          }
-        });
-      });
-
-    d3Select('g#renderToCalculateMaxWidth').remove();
-
-    this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
-    this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
-    this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
-  }
-
   /**
    * Print the x-axis on the graph
    */
@@ -745,7 +745,7 @@ export class LineChartService {
         return;
       }
 
-      this._chartContentContainer
+      const singleDotsContainerSelection = this._chartContentContainer
         .append('g')
         .attr('class', 'single-dots')
         .selectAll()
@@ -754,7 +754,10 @@ export class LineChartService {
         .append('g')
         .attr('class', s => 'single-dot-' + s.key)
         .style('fill', d => getColorScheme()[data.length - d.index - 1])
+        .style('opacity', '0');
+      singleDotsContainerSelection
         .selectAll()
+        .filter((d: TimeSeries) => this.legendDataMap[d.key].show)
         .data((s: TimeSeries) => s.values)
         .enter()
         .append('circle')
@@ -762,6 +765,12 @@ export class LineChartService {
         .attr('cx', (dot: TimeSeriesPoint) => xScale(dot.date))
         .attr('cy', (dot: TimeSeriesPoint) => yScale(dot.value))
         .style('pointer-events', 'visible');
+      singleDotsContainerSelection
+        .transition()
+        .duration(500)
+        .style('opacity', (timeSeries: TimeSeries) => {
+        return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
+      });
     };
 
     const addDataPointsToChart = (timeSeries: TimeSeries[], xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>): void => {
@@ -782,7 +791,11 @@ export class LineChartService {
           return getColorScheme()[nodes.length - index - 1];
         })
         .each((d: TimeSeries, i: number, e) => {
-            const key = d.key;
+            // Do not render dots from not active lines
+            if (!this.legendDataMap[d.key].show) {
+              return;
+            }
+
             const dotsGroupSelection = d3Select(e[i]);
             const minDate = xScale.domain()[0];
             const maxDate = xScale.domain()[1];
@@ -793,7 +806,7 @@ export class LineChartService {
               })
               .enter()
               .append('circle')
-              .attr('class', (dot: TimeSeriesPoint) => 'dot dot-' + key + ' dot-x-' + xScale(dot.date).toString().replace('.', '_'))
+              .attr('class', (dot: TimeSeriesPoint) => 'dot dot-' + d.key + ' dot-x-' + xScale(dot.date).toString().replace('.', '_'))
               .attr('visibility', 'hidden')
               .attr('r', this.DOT_RADIUS)
               .attr('cx', (dot: TimeSeriesPoint) => xScale(dot.date))
