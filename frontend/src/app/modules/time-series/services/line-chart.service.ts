@@ -315,13 +315,33 @@ export class LineChartService {
       this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
     };
 
-    return (incomingData: EventResultDataDTO) => {
+    /**
+     * Set the data for the legend after the incoming data is received
+     */
+    const setLegendData = (incomingData: EventResultDataDTO) => {
       if (incomingData.series.length == 0) {
         return;
       }
 
+      const labelDataMap = {};
+      incomingData.series.forEach((data: EventResultSeriesDTO) => {
+        if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+          data.identifier = this.translateMeasurand(data);
+        }
+        const key = this.generateKey(data);
+        labelDataMap[key] = {
+          text: data.identifier,
+          key: key,
+          show: true
+        }
+      });
+      this.legendDataMap = labelDataMap;
+    };
+
+    return (incomingData: EventResultDataDTO) => {
       prepareCleanState();
 
+      setLegendData(incomingData);
       const data: TimeSeries[] = prepareData(incomingData);
       const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
       const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, this._width);
@@ -334,7 +354,7 @@ export class LineChartService {
       createContextMenu();
       this.addBrush(chart, xScale, yScale, data);
 
-      this.addLegendsToChart(chart, incomingData);
+      this.addLegendsToChart(chart, xScale, yScale, data)();
       this.setSummaryLabel(chart, incomingData.summaryLabels);
       this.addDataLinesToChart(chart, xScale, yScale, data);
 
@@ -347,29 +367,6 @@ export class LineChartService {
         .attr('height', this._height);
     }
   })();
-
-  /**
-   * Set the data for the legend after the incoming data is received
-   */
-  public setLegendData(incomingData: EventResultDataDTO) {
-    if (incomingData.series.length == 0) {
-      return;
-    }
-
-    const labelDataMap = {};
-    incomingData.series.forEach((data: EventResultSeriesDTO) => {
-      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
-        data.identifier = this.translateMeasurand(data);
-      }
-      const key = this.generateKey(data);
-      labelDataMap[key] = {
-        text: data.identifier,
-        key: key,
-        show: true
-      }
-    });
-    this.legendDataMap = labelDataMap;
-  }
 
   private translateMeasurand(data: EventResultSeriesDTO): string {
     const splitLabelList: string[] = data.identifier.split(' | ');
@@ -769,8 +766,8 @@ export class LineChartService {
         .transition()
         .duration(500)
         .style('opacity', (timeSeries: TimeSeries) => {
-        return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
-      });
+          return (this.legendDataMap[timeSeries.key].show) ? '1' : '0.1';
+        });
     };
 
     const addDataPointsToChart = (timeSeries: TimeSeries[], xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>): void => {
@@ -860,16 +857,20 @@ export class LineChartService {
     })
   }
 
+  private hideMarker() {
+    d3Select('.marker-line').style('opacity', 0);
+    d3Select('#marker-tooltip').style('opacity', 0);
+    this.hideOldDotsOnMarker();
+  };
+
   private prepareMouseEventCatcher = (() => {
     const showMarker = () => {
+      if(this._dotsOnMarker && this._dotsOnMarker.empty()) {
+        return;
+      }
+
       d3Select('.marker-line').style('opacity', 1);
       d3Select('#marker-tooltip').style('opacity', 1);
-    };
-
-    const hideMarker = () => {
-      d3Select('.marker-line').style('opacity', 0);
-      d3Select('#marker-tooltip').style('opacity', 0);
-      this.hideOldDotsOnMarker();
     };
 
     return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>) => {
@@ -884,7 +885,7 @@ export class LineChartService {
         .attr('height', this._height)
         .attr('fill', 'none')
         .on('mouseenter', () => showMarker())
-        .on('mouseleave', () => hideMarker())
+        .on('mouseleave', () => this.hideMarker())
         .on("contextmenu", () => d3Event.preventDefault())
         .on('mousemove', (_, index, nodes: D3ContainerElement[]) => {
           this.moveMarker(nodes[index], this._height)
@@ -927,19 +928,13 @@ export class LineChartService {
     }
   };
 
-  private moveMarker(node: D3ContainerElement, containerHeight: number) {
-    const mouseCoordinates = d3Mouse(node);
-
-    if (this._xAxisCluster.length < 2) {
-      return;
-    }
-
+  private moveMarker = (() => {
     const pointsCompareDistance = (p1, p2): number => {
       // Taxicab/Manhattan approximation of euclidean distance
       return Math.abs(p1.x - p2.x) + Math.abs(p1.y - p2.y);
     };
 
-    const findNearestDot = (dots) => {
+    const findNearestDot = (mouseCoordinates: [number, number], dots) => {
       const mousePosition = {x: mouseCoordinates[0], y: mouseCoordinates[1]};
 
       let nearestDot = null;
@@ -983,21 +978,34 @@ export class LineChartService {
         });
     };
 
-    const nearestDot = findNearestDot(d3SelectAll('.dot'));
-    const markerPositionX = nearestDot.attr('cx');
-    //draw marker line
-    const markerPath = `M${markerPositionX},${containerHeight} ${markerPositionX},0`;
-    d3Select('.marker-line').attr('d', markerPath);
+    return (node: D3ContainerElement, containerHeight: number) => {
+      if (this._xAxisCluster.length < 2) {
+        return;
+      }
 
-    this.hideOldDotsOnMarker();
-    const dotsOnMarker = findDotsOnMarker(markerPositionX);
-    showDotsOnMarker(dotsOnMarker);
-    nearestDot.attr('r', this.DOT_HIGHLIGHT_RADIUS);
+      const nearestDot = findNearestDot(d3Mouse(node), d3SelectAll('.dot'));
 
-    this._dotsOnMarker = dotsOnMarker;
+      if(!nearestDot) {
+        this._dotsOnMarker = d3Select(null);
+        this.hideMarker();
+        return;
+      }
 
-    this.showTooltip(nearestDot, dotsOnMarker, nearestDot.datum().date);
-  }
+      const markerPositionX = nearestDot.attr('cx');
+      //draw marker line
+      const markerPath = `M${markerPositionX},${containerHeight} ${markerPositionX},0`;
+      d3Select('.marker-line').attr('d', markerPath);
+
+      this.hideOldDotsOnMarker();
+      const dotsOnMarker = findDotsOnMarker(markerPositionX);
+      showDotsOnMarker(dotsOnMarker);
+      nearestDot.attr('r', this.DOT_HIGHLIGHT_RADIUS);
+
+      this._dotsOnMarker = dotsOnMarker;
+
+      this.showTooltip(nearestDot, dotsOnMarker, nearestDot.datum().date);
+    };
+  })();
 
   private showContextMenu(menu: ContextMenuPosition[]) {
     // this gets executed when a contextmenu event occurs
@@ -1181,8 +1189,8 @@ export class LineChartService {
     };
   })();
 
-  private addLegendsToChart = (() => {
-    const onLegendClick = (labelKey: string, incomingData: EventResultDataDTO): void => {
+  private addLegendsToChart = ((chart, xScale, yScale, data: TimeSeries[]) => {
+    const onLegendClick = (labelKey: string): void => {
       if (d3Event.metaKey || d3Event.ctrlKey) {
         this.legendDataMap[labelKey].show = !this.legendDataMap[labelKey].show;
       } else {
@@ -1204,7 +1212,9 @@ export class LineChartService {
       }
 
       //redraw chart
-      this.drawLineChart(incomingData);
+      this.addDataLinesToChart(chart, xScale, yScale, data);
+      //redraw legend
+      drawLegend();
     };
 
     const getPosition = (index: number): string => {
@@ -1214,7 +1224,7 @@ export class LineChartService {
       return "translate(" + x + "," + y + ")";
     };
 
-    return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, incomingData: EventResultDataDTO): void => {
+    const drawLegend = () => {
       const legendGroup = d3Select('.legend-group');
 
       // Remove old legend elements
@@ -1239,7 +1249,7 @@ export class LineChartService {
               .attr("rx", 2)
               .attr("ry", 2)
               .attr('fill', (key: string, index: number) => {
-                return getColorScheme()[incomingData.series.length - index - 1]
+                return getColorScheme()[data.length - index - 1]
               });
             legendElement
               .append('text')
@@ -1257,7 +1267,11 @@ export class LineChartService {
             .remove()
         )
         .attr("transform", (_, index: number) => getPosition(index))
-        .on('click', (datum: string) => onLegendClick(datum, incomingData));
+        .on('click', (datum: string) => onLegendClick(datum));
     };
-  })();
+
+    return (): void => {
+      drawLegend();
+    };
+  });
 }
