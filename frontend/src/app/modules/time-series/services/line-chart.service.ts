@@ -388,6 +388,8 @@ export class LineChartService {
       d3Select('.y-axis').transition().call((transition) => this.updateYAxis(transition, yNewScale, this._width));
       // Redraw lines and dots
       this.addDataLinesToChart(chart, xScale, yScale, data);
+      // Show marker
+      this.showMarker();
     };
 
     const updateChart = (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, yScale: D3ScaleLinear<number, number>, data: TimeSeries[]) => {
@@ -857,6 +859,11 @@ export class LineChartService {
     })
   }
 
+  private showMarker() {
+    d3Select('.marker-line').style('opacity', 1);
+    d3Select('#marker-tooltip').style('opacity', 1);
+  };
+
   private hideMarker() {
     d3Select('.marker-line').style('opacity', 0);
     d3Select('#marker-tooltip').style('opacity', 0);
@@ -864,15 +871,6 @@ export class LineChartService {
   };
 
   private prepareMouseEventCatcher = (() => {
-    const showMarker = () => {
-      if(this._dotsOnMarker && this._dotsOnMarker.empty()) {
-        return;
-      }
-
-      d3Select('.marker-line').style('opacity', 1);
-      d3Select('#marker-tooltip').style('opacity', 1);
-    };
-
     return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>) => {
       if (!chart.select('.chart-content').empty()) {
         return;
@@ -884,7 +882,7 @@ export class LineChartService {
         .attr('width', this._width)
         .attr('height', this._height)
         .attr('fill', 'none')
-        .on('mouseenter', () => showMarker())
+        .on('mouseenter', () => this.showMarker())
         .on('mouseleave', () => this.hideMarker())
         .on("contextmenu", () => d3Event.preventDefault())
         .on('mousemove', (_, index, nodes: D3ContainerElement[]) => {
