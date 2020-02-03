@@ -13,6 +13,7 @@ import {
 import {EventResultData} from '../../models/event-result-data.model';
 import {LineChartService} from '../../services/line-chart.service';
 import {NgxSmartModalService} from "ngx-smart-modal";
+import {SpinnerService} from "../../../shared/services/spinner.service";
 
 
 @Component({
@@ -32,7 +33,8 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   private _resizeTimeoutId: number;
 
   constructor(private lineChartService: LineChartService,
-              private ngxSmartModalService: NgxSmartModalService) {
+              private ngxSmartModalService: NgxSmartModalService,
+              private spinnerService: SpinnerService) {
   }
 
   ngAfterContentInit(): void {
@@ -58,6 +60,13 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   }
 
   redraw() {
+    if(this.timeSeriesResults == null) {
+      this.spinnerService.showSpinner("time-series-line-chart-spinner");
+      return;
+    }
+
+    this.spinnerService.hideSpinner("time-series-line-chart-spinner");
+
     this.lineChartService.setLegendData(this.timeSeriesResults);
     this.lineChartService.drawLineChart(this.timeSeriesResults);
   }
