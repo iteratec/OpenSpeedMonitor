@@ -169,7 +169,7 @@ export class LineChartService {
     container.className = 'gridContainer';
 
     const dateItem = document.createElement('div');
-    dateItem.append(event.eventDate.toLocaleString());
+    dateItem.append(new Date(event.eventDate).toLocaleString());
     container.append(dateItem);
 
     const shortNameItem = document.createElement('div');
