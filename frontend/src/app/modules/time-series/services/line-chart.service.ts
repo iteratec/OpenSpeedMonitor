@@ -43,7 +43,7 @@ import {brushX as d3BrushX} from 'd3-brush';
 import {EventResultDataDTO} from 'src/app/modules/time-series/models/event-result-data.model';
 import {EventResultSeriesDTO} from 'src/app/modules/time-series/models/event-result-series.model';
 import {EventResultPointDTO} from 'src/app/modules/time-series/models/event-result-point.model';
-import {EventDTO} from 'src/app/modules/time-series/models/event.model';
+import {EventDTO, TimeEvent} from 'src/app/modules/time-series/models/event.model';
 import {TimeSeries} from 'src/app/modules/time-series/models/time-series.model';
 import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-point.model';
 import {parseDate} from 'src/app/utils/date.util';
@@ -87,9 +87,14 @@ export class LineChartService {
    * Draws a line chart for the given data into the given svg
    */
   public drawLineChart(incomingData: EventResultDataDTO): void {
+    const prepareEventsData = (events: EventDTO[]) => {
+      return events.map(eventDto => {
+        return new TimeEvent(new Date(eventDto.eventDate), eventDto.description, eventDto.shortName);
+      })
+    };
 
     let data: TimeSeries[] = this.prepareData(incomingData);
-    //console.log(incomingData); console.log(data);
+    const eventsData: TimeEvent[] = prepareEventsData(incomingData.events);
 
     if (data.length == 0) {
       console.log("No data > No chart !");
@@ -106,8 +111,8 @@ export class LineChartService {
     d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
     d3Select('.y-axis').transition().call(this.updateYAxis, yScale, this._width, this._margin);
     this.brush = d3BrushX().extent([[0,0], [this._width, this._height]]);
-    this.addBrush(chart, xScale, yScale, data, incomingData.events);
-    this.addEventMarkerToChart(chart, xScale, incomingData.events);
+    this.addBrush(chart, xScale, yScale, data, eventsData);
+    this.addEventMarkerToChart(chart, xScale, eventsData);
     this.addDataLinesToChart(chart, xScale, yScale, data);
   }
 
@@ -124,27 +129,50 @@ export class LineChartService {
   }
 
   private addEventMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, xScale: D3ScaleTime<number, number>, events: EventDTO[]) {
-    let eventMarkerLine = d3Select('#event-marker-group').selectAll('line').data(events);
-    let eventMarkerCircle = d3Select('#event-marker-group').selectAll('circle').data(events);
+    const changeLineVisibility = (event: EventDTO, index: number, nodes) => {
+      const eventMarkerLineSelection = d3Select(nodes[index].parentNode).select(".event-marker-line");
+      if(eventMarkerLineSelection.style('opacity') == '1') {
+        eventMarkerLineSelection.style('opacity', '0');
+      } else {
+        eventMarkerLineSelection.style('opacity', '1');
+      }
+    };
 
-    eventMarkerLine.join(
-      enter => enter.append('line').attr('class', 'event-marker-line')
-    )
-    .attr('x1', (event: EventDTO) => { return xScale(parseDate(event.eventDate)); })
-    .attr('y1', 0)
-    .attr('x2', (event: EventDTO) => { return xScale(parseDate(event.eventDate)); })
-    .attr('y2', this._height);
+    const eventMarkerGroup = d3Select('#event-marker-group')
+      .selectAll('g')
+      .data(events, (d: EventDTO) => {
+        // fixme This key is not unique. EventDTO has no unique date.
+        return d.eventDate.toString()
+      })
+      .join(
+        enter => {
+          const eventMarker = enter
+            .append('g')
+            .attr('class', 'event-marker');
+          eventMarker
+            .append('line')
+            .attr('class', 'event-marker-line')
+            .style('opacity', '0')
+            .attr('y1', 0)
+            .attr('y2', this._height);
+          eventMarker
+            .append('circle')
+            .attr('class', 'event-marker-dot')
+            .style('cursor', 'pointer')
+            .on('mouseover', (event: EventDTO, index: number, nodes: []) => this.showEventMarkerTooltip(event, index, nodes))
+            .on('mouseout', () => d3Select('#event-marker-tooltip').style('opacity', 0))
+            .on('click', (data: EventDTO, index: number, nodes: []) => changeLineVisibility(data, index, nodes))
+            .attr('cy', this._height)
+            .attr('r', 8);
+          return eventMarker;
+        }
+      );
 
-    eventMarkerCircle.join(
-      enter => enter
-                 .append('circle')
-                 .attr('class', 'event-marker-dot')
-                 .on('mouseover', (event: EventDTO, index: number, nodes: []) => this.showEventMarkerTooltip(event, index, nodes))
-                 .on('mouseout', () => d3Select('#event-marker-tooltip').style('opacity', 0))
-    )
-    .attr('cx', (event: EventDTO) => { return xScale(parseDate(event.eventDate)); })
-    .attr('cy', this._height)
-    .attr('r', 8);
+    eventMarkerGroup.selectAll('.event-marker-line')
+      .attr('x1', (event: EventDTO) => xScale(event.eventDate))
+      .attr('x2', (event: EventDTO) => xScale(event.eventDate));
+    eventMarkerGroup.selectAll('.event-marker-dot')
+      .attr('cx', (event: EventDTO) => xScale(parseDate(event.eventDate)));
   }
 
   private showEventMarkerTooltip(event: EventDTO, index: number, nodes: []): D3Selection<SVGCircleElement, EventDTO, D3BaseType, unknown> {
@@ -169,7 +197,7 @@ export class LineChartService {
     container.className = 'gridContainer';
 
     const dateItem = document.createElement('div');
-    dateItem.append(new Date(event.eventDate).toLocaleString());
+    dateItem.append(event.eventDate.toLocaleString());
     container.append(dateItem);
 
     const shortNameItem = document.createElement('div');
