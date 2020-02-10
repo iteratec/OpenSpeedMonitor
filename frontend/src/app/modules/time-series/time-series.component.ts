@@ -15,8 +15,7 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class TimeSeriesComponent implements OnInit {
 
-  private showTimeSeriesChart = false;
-
+  public showTimeSeriesChart = false;
   public results$ = new BehaviorSubject<EventResultDataDTO>(new EventResultData());
 
   constructor(private linechartDataService: LinechartDataService, private resultSelectionStore: ResultSelectionStore) { }
