@@ -12,6 +12,8 @@ import {
 
 import {EventResultData} from '../../models/event-result-data.model';
 import {LineChartService} from '../../services/line-chart.service';
+import {NgxSmartModalService} from "ngx-smart-modal";
+import {SpinnerService} from "../../../shared/services/spinner.service";
 
 
 @Component({
@@ -28,15 +30,18 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   @ViewChild("svg")
   svgElement: ElementRef;
 
+  public ngxSmartModalService;
+
   private _resizeTimeoutId: number;
 
-  constructor(
-    private lineChartService: LineChartService
-  ) {
+  constructor(private lineChartService: LineChartService,
+              private spinnerService: SpinnerService,
+              ngxSmartModalService: NgxSmartModalService) {
+    this.ngxSmartModalService = ngxSmartModalService;
   }
 
   ngAfterContentInit(): void {
-    this.lineChartService.initChart(this.svgElement);
+    this.lineChartService.initChart(this.svgElement, () => this.handlePointSelectionError());
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -58,7 +63,18 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   }
 
   redraw() {
+    if(this.timeSeriesResults == null) {
+      this.spinnerService.showSpinner("time-series-line-chart-spinner");
+      return;
+    }
+
+    this.spinnerService.hideSpinner("time-series-line-chart-spinner");
+
     this.lineChartService.setLegendData(this.timeSeriesResults);
     this.lineChartService.drawLineChart(this.timeSeriesResults);
+  }
+
+  handlePointSelectionError() {
+    this.ngxSmartModalService.open("pointSelectionErrorModal");
   }
 }

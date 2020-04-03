@@ -1,40 +1,39 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {URL} from "../../enums/url.enum";
 import {LinechartDataService} from "./services/linechart-data.service";
 import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
 import {EventResultData, EventResultDataDTO} from './models/event-result-data.model';
 import {BehaviorSubject} from 'rxjs';
-import {SpinnerService} from "../shared/services/spinner.service";
 
 @Component({
   selector: 'osm-time-series',
   templateUrl: './time-series.component.html',
-  styleUrls: ['./time-series.component.scss']
+  styleUrls: ['./time-series.component.scss'],
+
+  //used to render context menu with styles from time-series.component.scss file
+  encapsulation: ViewEncapsulation.None
 })
 export class TimeSeriesComponent implements OnInit {
 
+  public showTimeSeriesChart = false;
   public results$ = new BehaviorSubject<EventResultDataDTO>(new EventResultData());
-  showChart: boolean = false;
 
-  constructor(private linechartDataService: LinechartDataService, private resultSelectionStore: ResultSelectionStore, private spinnerService: SpinnerService) { }
+  constructor(private linechartDataService: LinechartDataService, private resultSelectionStore: ResultSelectionStore) { }
 
   ngOnInit() {
-    this.showChart = false;
     if (this.resultSelectionStore.validQuery) {
       this.getTimeSeriesChartData();
     }
   }
 
   getTimeSeriesChartData() {
-    this.showChart = true;
-    this.spinnerService.showSpinner('time-series-chart-spinner');
+    this.showTimeSeriesChart = true;
+    this.results$.next(null);
+
     this.linechartDataService.fetchEventResultData<EventResultDataDTO>(
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection,
       URL.EVENT_RESULT_DASHBOARD_LINECHART_DATA
-    ).subscribe(next => {
-      this.spinnerService.hideSpinner('time-series-chart-spinner');
-      this.results$.next(next)
-    });
+    ).subscribe(next => this.results$.next(next));
   }
 }

@@ -1,7 +1,10 @@
 @import "../../../../../styles/colors";
 
 osm-time-series-line-chart {
-  visibility: hidden;
+  #time-series-line-chart-container {
+    position: relative;
+    width: 100%;
+  }
 
   #marker-tooltip {
     position: absolute;
@@ -57,5 +60,39 @@ osm-time-series-line-chart {
       fill: white;
     }
 
+  }
+}
+
+.summary-label-key {
+  font-weight: bold;
+}
+
+.summary-label {
+  font-weight: normal;
+}
+
+.legend-entry {
+  cursor: pointer;
+}
+
+.legend-text {
+  font-size: 12px;
+}
+
+#pointSelectionErrorModal {
+  header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  main {
+    position: relative;
+    padding: 15px;
+  }
+
+  footer {
+    padding: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
   }
 }
