@@ -229,7 +229,7 @@ export class LineChartService {
   /**
    * Draws a line chart for the given data into the given svg
    */
-  public drawLineChart(incomingData: EventResultDataDTO): void {
+  public drawLineChart(incomingData: EventResultDataDTO, updateLegendEntries: boolean): void {
     const updateYAxis = (transition: any, yScale: any, width: number) => {
       transition.call(
         d3AxisRight(yScale)  // axis right, because we draw the background line with this
@@ -261,7 +261,7 @@ export class LineChartService {
     d3Select('.y-axis').transition().call(updateYAxis, yScale, this._width);
 
     this.addAxisDescription(incomingData.measurandGroups);
-    this.addLegendsToChart(chart, incomingData);
+    this.addLegendsToChart(incomingData, updateLegendEntries);
     this.setSummaryLabel(chart, incomingData.summaryLabels);
     this.addDataLinesToChart(chart, xScale, yScale, data);
     this.drawAllSelectedPoints();
@@ -300,7 +300,7 @@ export class LineChartService {
 
     const labelDataMap = {};
     incomingData.series.forEach((data: EventResultSeriesDTO) => {
-      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
+      if (incomingData.summaryLabels.length == 0 || (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand")) {
         data.identifier = this.translateMeasurand(data);
       }
       const key = this.generateKey(data);
@@ -725,7 +725,7 @@ export class LineChartService {
     d3SelectAll('.line')
     // colorize (in reverse order as d3 adds new line before the existing ones ...
       .attr('stroke', (_, index: number, nodes: []) => {
-        return getColorScheme()[nodes.length - index - 1];
+        return getColorScheme()[(nodes.length - index - 1) % 23];
       })
       // fade in
       .transition().duration(500).style('opacity', (timeSeries: TimeSeries) => {
@@ -1030,7 +1030,8 @@ export class LineChartService {
   private generateTooltipText = (() => {
     const generateTooltipTimestampRow = (highlightedDate: Date): string | Node => {
       const label: HTMLTableCellElement = document.createElement('td');
-      label.append('Timestamp');
+      const translatedLabel: string = this.translationService.instant("frontend.de.iteratec.osm.timeSeries.chart.label.timestamp");
+      label.append(translatedLabel);
 
       const date: HTMLTableCellElement = document.createElement('td');
       date.append(highlightedDate.toLocaleString());
@@ -1065,7 +1066,8 @@ export class LineChartService {
 
     const generateTooltipTestAgentRow = (currentPoint: TimeSeriesPoint): string | Node => {
       const label: HTMLTableCellElement = document.createElement('td');
-      label.append("Test agent");
+      const translatedLabel: string = this.translationService.instant("frontend.de.iteratec.osm.timeSeries.chart.label.testAgent");
+      label.append(translatedLabel);
       const testAgent: HTMLTableCellElement = document.createElement('td');
       testAgent.append(currentPoint.agent);
 
@@ -1127,7 +1129,7 @@ export class LineChartService {
       }
 
       //redraw chart
-      this.drawLineChart(incomingData);
+      this.drawLineChart(incomingData, false);
     };
 
     const getPosition = (index: number): string => {
@@ -1137,9 +1139,12 @@ export class LineChartService {
       return "translate(" + x + "," + y + ")";
     };
 
-    return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>, incomingData: EventResultDataDTO): void => {
-      chart.selectAll('.legend-entry').remove();
-      const legendEntry = d3Select('.legend-group').selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
+    return (incomingData: EventResultDataDTO, updateLegendEntries: boolean): void => {
+      const legend: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-legend');
+      if (updateLegendEntries) {
+        legend.selectAll('.legend-entry').remove();
+      }
+      const legendEntry = legend.selectAll('.legend-entry').data(Object.keys(this.legendDataMap));
       legendEntry.join(
         enter => {
           const legendElement = enter
@@ -1153,7 +1158,7 @@ export class LineChartService {
             .attr("rx", 2)
             .attr("ry", 2)
             .attr('fill', (key: string, index: number) => {
-              return getColorScheme()[incomingData.series.length - index - 1]
+              return getColorScheme()[(incomingData.series.length - index - 1) % 23]
             });
           legendElement
             .append('text')
