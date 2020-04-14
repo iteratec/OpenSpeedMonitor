@@ -56,7 +56,7 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  private _margin: any = {top: 40, right: 70, bottom: 40, left: 60};
+  private _margin: any = {top: 40, right: 75, bottom: 40, left: 75};
   private _width: number = 600 - this._margin.left - this._margin.right;
   private _height: number = 550 - this._margin.top - this._margin.bottom;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
@@ -215,14 +215,11 @@ export class LineChartService {
   public initChart(svgElement: ElementRef, pointSelectionErrorHandler: Function): void {
     this._pointSelectionErrorHandler = pointSelectionErrorHandler;
 
-    const data: TimeSeries[] = [];
+    const data: TimeSeries[][] = [[]];
     const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
-    const xScale: D3ScaleTime<number, number> = this.getXScale(data);
-    const yScale: D3ScaleLinear<number, number> = this.getYScale(data);
+    const xScale: D3ScaleTime<number, number> = this.getXScale(data, this._width);
 
     this.addXAxisToChart(chart, xScale);
-    this.addYAxisToChart(chart, yScale);
-
     this.addMouseMarkerToChart(chart);
   }
 
@@ -230,17 +227,25 @@ export class LineChartService {
    * Draws a line chart for the given data into the given svg
    */
   public drawLineChart(incomingData: EventResultDataDTO, updateLegendEntries: boolean): void {
-    const updateYAxis = (transition: any, yScale: any, width: number) => {
+    const updateYAxes = (transition: any, yScale: any, width: number, index: number) => {
+      let strokeOpacity: number, textPosition: number;
+      if (index === 0) {
+        strokeOpacity = 0.5;
+        textPosition = -5;
+      } else {
+        strokeOpacity = 0;
+        textPosition = (index - 1) * 60 + width + 5;
+      }
       transition.call(
         d3AxisRight(yScale)  // axis right, because we draw the background line with this
           .tickSize(width)   // background line over complete chart width
       )
         .attr('transform', 'translate(0, 0)') // move the axis to the left
         .call(g => g.selectAll(".tick:not(:first-of-type) line")  // make all line dotted, except the one on the bottom as this will indicate the x-axis
-          .attr("stroke-opacity", 0.5)
+          .attr("stroke-opacity", strokeOpacity)
           .attr("stroke-dasharray", "1,1"))
         .call(g => g.selectAll(".tick text")  // move the text a little so it does not overlap with the lines
-          .attr("x", -5));
+          .attr("x", textPosition));
     };
 
     if (incomingData.series.length == 0) {
@@ -251,20 +256,31 @@ export class LineChartService {
     this._contextMenuPoint = null;
     this._xAxisCluster = {};
 
-    const data: TimeSeries[] = this.prepareData(incomingData);
+    const data: TimeSeries[][] = this.prepareData(incomingData);
     const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    const xScale: D3ScaleTime<number, number> = this.getXScale(data);
-    const yScale: D3ScaleLinear<number, number> = this.getYScale(data);
+    let width: number = this._width;
+    if (Object.keys(incomingData.measurandGroups).length > 1) {
+      width = this._width - ((Object.keys(incomingData.measurandGroups).length - 1) * 60);
+    }
+    const xScale: D3ScaleTime<number, number> = this.getXScale(data, width);
+    const yScales: D3ScaleLinear<number, number>[] = this.getYScales(data);
+    this.setYAxesInChart(chart, yScales);
+
+    d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
+    yScales.forEach((yScale: D3ScaleLinear<number, number>, index: number) => {
+      d3Select(`.y-axis${index}`).transition().call(updateYAxes, yScale, width, index);
+    });
+    this.addYAxisUnits(incomingData.measurandGroups, width);
+
+    yScales.forEach((yScale, index) => {
+      this.addDataLinesToChart(chart, xScale, yScale, data[index], index);
+    });
+    this.drawAllSelectedPoints();
+
     this.calculateLegendDimensions();
     d3Select('svg#time-series-chart').transition().duration(500).attr('height', this._height + this._legendGroupHeight + this._margin.top + this._margin.bottom);
-    d3Select('.x-axis').transition().call(this.updateXAxis, xScale);
-    d3Select('.y-axis').transition().call(updateYAxis, yScale, this._width);
-
-    this.addAxisDescription(incomingData.measurandGroups);
     this.addLegendsToChart(incomingData, updateLegendEntries);
     this.setSummaryLabel(chart, incomingData.summaryLabels);
-    this.addDataLinesToChart(chart, xScale, yScale, data);
-    this.drawAllSelectedPoints();
 
     this.resizeChartBackground();
     this.bringMouseMarkerToTheFront();
@@ -299,16 +315,20 @@ export class LineChartService {
     }
 
     const labelDataMap = {};
-    incomingData.series.forEach((data: EventResultSeriesDTO) => {
-      if (incomingData.summaryLabels.length == 0 || (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand")) {
-        data.identifier = this.translateMeasurand(data);
-      }
-      const key = this.generateKey(data);
-      labelDataMap[key] = {
-        text: data.identifier,
-        key: key,
-        show: true
-      }
+    const measurandInIdentifier: boolean = incomingData.summaryLabels.length == 0 || (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand");
+    const measurandGroups = Object.keys(incomingData.series);
+    measurandGroups.forEach((series: string) => {
+      incomingData.series[series].forEach((data: EventResultSeriesDTO) => {
+        if (measurandInIdentifier) {
+          data.identifier = this.translateMeasurand(data);
+        }
+        const key = this.generateKey(data);
+        labelDataMap[key] = {
+          text: data.identifier,
+          key: key,
+          show: true
+        }
+      });
     });
     this.legendDataMap = labelDataMap;
   }
@@ -316,26 +336,34 @@ export class LineChartService {
   /**
    * Prepares the incoming data for drawing with D3.js
    */
-  private prepareData(incomingData: EventResultDataDTO): TimeSeries[] {
-    return incomingData.series.map((data: EventResultSeriesDTO) => {
-      const lineChartData: TimeSeries = new TimeSeries();
-      if (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand") {
-        data.identifier = this.translateMeasurand(data);
-      }
-      lineChartData.key = this.generateKey(data);
+  private prepareData(incomingData: EventResultDataDTO): TimeSeries[][] {
+    const data: TimeSeries[][] = [];
+    const measurandGroups = Object.keys(incomingData.series);
+    measurandGroups.forEach((measurandGroup: string) => {
+      const series: TimeSeries[] = incomingData.series[measurandGroup].map((data: EventResultSeriesDTO) => {
+        const lineChartData: TimeSeries = new TimeSeries();
+        if (incomingData.summaryLabels.length == 0 || (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key != "measurand")) {
+          data.identifier = this.translateMeasurand(data);
+        }
+        lineChartData.key = this.generateKey(data);
 
-      lineChartData.values = data.data.map((point: EventResultPointDTO) => {
-        const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
-        lineChartDataPoint.date = parseDate(point.date);
-        lineChartDataPoint.value = point.value;
-        lineChartDataPoint.agent = point.agent;
-        lineChartDataPoint.tooltipText = data.identifier + ' : ';
-        lineChartDataPoint.wptInfo = point.wptInfo;
-        return lineChartDataPoint;
+        lineChartData.values = data.data.map((point: EventResultPointDTO) => {
+          const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
+          lineChartDataPoint.date = parseDate(point.date);
+          lineChartDataPoint.value = point.value;
+          lineChartDataPoint.agent = point.agent;
+          lineChartDataPoint.tooltipText = data.identifier + ': ';
+          lineChartDataPoint.wptInfo = point.wptInfo;
+          return lineChartDataPoint;
+        });
+
+        return lineChartData;
       });
 
-      return lineChartData;
+      data.push(series);
     });
+
+    return data;
   }
 
   private translateMeasurand(data: EventResultSeriesDTO): string {
@@ -452,36 +480,44 @@ export class LineChartService {
   /**
    * Determine the xScale for the given data
    */
-  private getXScale(data: TimeSeries[]): D3ScaleTime<number, number> {
-    const getDate = (data: TimeSeries[], f: Function): Date => {
-      return f(data, (dataItem: TimeSeries) => {
-        return f(dataItem.values, (point: TimeSeriesPoint) => {
-          return point.date;
+  private getXScale(dataList: TimeSeries[][], width: number): D3ScaleTime<number, number> {
+    const getDate = (dataList: TimeSeries[][], f: Function): Date => {
+      return f(dataList, (data: TimeSeries[]) => {
+        return f(data, (dataItem: TimeSeries) => {
+          return f(dataItem.values, (point: TimeSeriesPoint) => {
+            return point.date;
+          });
         });
       });
     };
 
-    const getMinDate = (data: TimeSeries[]): Date => {
+    const getMinDate = (data: TimeSeries[][]): Date => {
       return getDate(data, d3Min);
     };
 
-    const getMaxDate = (data: TimeSeries[]): Date => {
+    const getMaxDate = (data: TimeSeries[][]): Date => {
       return getDate(data, d3Max);
     };
 
     return d3ScaleTime()               // Define a scale for the X-Axis
-      .range([0, this._width])  // Display the X-Axis over the complete width
-      .domain([getMinDate(data), getMaxDate(data)]);
+      .range([0, width])  // Display the X-Axis over the complete width
+      .domain([getMinDate(dataList), getMaxDate(dataList)]);
   }
 
   /**
-   * Determine the yScale for the given data
+   * Determine the yScales for the given data
    */
-  private getYScale(data: TimeSeries[]): D3ScaleLinear<number, number> {
-    return d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
-      .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-      .domain([0, this.getMaxValue(data)])
-      .nice();
+  private getYScales(dataList: TimeSeries[][]): D3ScaleLinear<number, number>[] {
+    const yAxes: D3ScaleLinear<number, number>[] = [];
+    dataList.forEach((data: TimeSeries[]) => {
+      const yAxis: D3ScaleLinear<number, number> = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
+        .range([this._height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
+        .domain([0, this.getMaxValue(data)])
+        .nice();
+      yAxes.push(yAxis);
+    });
+
+    return yAxes;
   }
 
   private calculateLegendDimensions(): void {
@@ -536,29 +572,49 @@ export class LineChartService {
   }
 
   /**
-   * Print the y-axis on the graph
+   * Print the y-axes on the graph
    */
-  private addYAxisToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-                          yScale: D3ScaleLinear<number, number>): void {
+  private setYAxesInChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+                          yScales: D3ScaleLinear<number, number>[]): void {
 
-    const yAxis = d3AxisLeft(yScale);
+    const yAxes = d3SelectAll('.y-axis');
+    if (yScales.length !== yAxes.size()) {
+      yAxes.remove();
+      yScales.forEach((yScale: D3ScaleLinear<number, number>, index: number) => {
+        let yAxis;
+        if (index == 0) {
+          yAxis = d3AxisLeft(yScale);
+        } else {
+          yAxis = d3AxisRight(yScale);
+        }
 
-    // Add the Y-Axis to the chart
-    chart.append('g')                   // new group for the y-axis
-      .attr('class', 'axis y-axis')  // a css class to style it later
-      .call(yAxis)
-      .append('g')
-      .attr('class', 'axis-description');
+        // Add the Y-Axis to the chart
+        chart.append('g')                   // new group for the y-axis
+          .attr('class', `axis y-axis y-axis${index}`)  // a css class to style it later
+          .call(yAxis)
+          .append('g')
+          .attr('class', `axis-unit axis-unit${index}`);
+      });
+    }
+
   }
 
-  private addAxisDescription(measurandGroups: any): void {
-    let axisLabelKeys = Object.keys(measurandGroups);
-    this.translationService.get("frontend.de.iteratec.isr.measurand.group." + axisLabelKeys[0]).pipe(take(1)).subscribe(title => {
-      d3Select('.axis-description').selectAll('*').remove();
-      d3Select('.axis-description').append('text')
-        .attr('class', 'description')
-        .attr('transform', 'translate(-' + (this._margin.left - 20) + ', ' + (this._height / 2 - this._margin.bottom) + ') rotate(-90)')
-        .text(`${title} [${measurandGroups[axisLabelKeys[0]]}]`);
+  private addYAxisUnits(measurandGroups: any, width: number): void {
+    d3SelectAll('.axis-unit').selectAll('*').remove();
+    const axisLabelKeys = Object.keys(measurandGroups);
+    axisLabelKeys.forEach((axisLabelKey: string, index: number) => {
+      let xPosition: number;
+      if (index == 0) {
+        xPosition = -45;
+      } else {
+        xPosition = width - 5 + 60 * index;
+      }
+      this.translationService.get("frontend.de.iteratec.isr.measurand.group." + axisLabelKey).pipe(take(1)).subscribe(title => {
+        d3Select(`.axis-unit${index}`).append('text')
+          .attr('class', 'description unit')
+          .attr('transform', 'translate(' + xPosition + ', ' + (this._height / 2 - this._margin.bottom) + ') rotate(-90)')
+          .text(`${title} [${measurandGroups[axisLabelKey]}]`);
+      });
     });
   }
 
@@ -665,16 +721,19 @@ export class LineChartService {
     return (chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
             xScale: D3ScaleTime<number, number>,
             yScale: D3ScaleLinear<number, number>,
-            data: TimeSeries[]): void => {
+            data: TimeSeries[],
+            index: number): void => {
       // Remove after resize
-      chart.selectAll('.line').remove();
+      if (index === 0) {
+        chart.selectAll('.line').remove();
+      }
       // Create one group per line / data entry
       chart.select('.mouse-event-catcher')
-        .selectAll('.line')                             // Get all lines already drawn
+        .selectAll(`.line-group${index}`)                             // Get all lines already drawn
         .data(data, (timeSeries: TimeSeries) => timeSeries.key)   // ... for this data
         .join(enter => {
             addDataPointsToXAxisCluster(enter);
-            const lineSelection: any = this.drawLine(enter, xScale, yScale);
+            const lineSelection: any = this.drawLine(enter, xScale, yScale, index);
 
             const lineGroup = lineSelection.select(function () {
               return (<SVGPathElement>this).parentNode;
@@ -708,11 +767,12 @@ export class LineChartService {
 
   private drawLine(selection: any,
                    xScale: D3ScaleTime<number, number>,
-                   yScale: D3ScaleLinear<number, number>): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> {
+                   yScale: D3ScaleLinear<number, number>,
+                   index: number): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> {
 
     const resultingSelection = selection
       .append('g')       // Group each line so we can add dots to this group latter
-      .attr('class', (timeSeries: TimeSeries) => 'line line-' + timeSeries.key)
+      .attr('class', (timeSeries: TimeSeries) => `line line-group${index} line-${timeSeries.key}`)
       .style('opacity', '0')
       .append('path')  // Draw one path for every item in the data set
       .style('pointer-events', 'none')
@@ -1158,7 +1218,7 @@ export class LineChartService {
             .attr("rx", 2)
             .attr("ry", 2)
             .attr('fill', (key: string, index: number) => {
-              return getColorScheme()[(incomingData.series.length - index - 1) % 23]
+              return getColorScheme()[(incomingData.numberOfTimeSeries - index - 1) % 23];
             });
           legendElement
             .append('text')
