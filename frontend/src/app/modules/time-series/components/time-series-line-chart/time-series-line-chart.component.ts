@@ -70,7 +70,6 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
     this.spinnerService.hideSpinner("time-series-line-chart-spinner");
 
-    this.lineChartService.setLegendData(this.timeSeriesResults);
     this.lineChartService.drawLineChart(this.timeSeriesResults);
   }
 

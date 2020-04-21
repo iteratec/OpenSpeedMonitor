@@ -4,6 +4,10 @@ osm-time-series-line-chart {
   #time-series-line-chart-container {
     position: relative;
     width: 100%;
+
+    rect.overlay {
+      cursor: default !important
+    }
   }
 
   #marker-tooltip {
