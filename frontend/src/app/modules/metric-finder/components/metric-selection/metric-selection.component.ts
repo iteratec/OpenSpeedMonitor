@@ -15,13 +15,16 @@ interface SelectableMetric {
 })
 export class MetricSelectionComponent {
 
+  @Output()
+  selectedMetricChange = new EventEmitter<string>();
+
+  constructor(
+    private metricFinderService: MetricFinderService
+  ) {
+  }
+
   private _selectedMetric = '';
   private _availableMetrics: SelectableMetric[] = [];
-
-  @Input()
-  set results(results: TestResult[]) {
-    this._availableMetrics = this.findCommonMetrics(results);
-  }
 
   @Input()
   get selectedMetric() {
@@ -33,16 +36,13 @@ export class MetricSelectionComponent {
     this.selectedMetricChange.emit(this._selectedMetric);
   }
 
-  @Output()
-  selectedMetricChange = new EventEmitter<string>();
-
   get availableMetrics(): SelectableMetric[] {
     return this._availableMetrics;
   }
 
-  constructor(
-    private metricFinderService: MetricFinderService
-  ) {
+  @Input()
+  set results(results: TestResult[]) {
+    this._availableMetrics = this.findCommonMetrics(results);
   }
 
   private findCommonMetrics(results: TestResult[]): SelectableMetric[] {

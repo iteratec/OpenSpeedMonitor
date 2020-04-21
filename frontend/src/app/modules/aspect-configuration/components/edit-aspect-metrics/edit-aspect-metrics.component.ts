@@ -1,20 +1,20 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
-import {combineLatest, Observable, ReplaySubject} from "rxjs";
-import {Application} from "../../../../models/application.model";
-import {Page} from "../../../../models/page.model";
-import {ApplicationService} from "../../../../services/application.service";
-import {ActivatedRoute, ParamMap} from "@angular/router";
-import {AspectConfigurationService} from "../../services/aspect-configuration.service";
+import {combineLatest, Observable, ReplaySubject} from 'rxjs';
+import {Application} from '../../../../models/application.model';
+import {Page} from '../../../../models/page.model';
+import {ApplicationService} from '../../../../services/application.service';
+import {ActivatedRoute, ParamMap} from '@angular/router';
+import {AspectConfigurationService} from '../../services/aspect-configuration.service';
 import {
   ExtendedPerformanceAspect,
   PerformanceAspect,
   PerformanceAspectType
-} from "../../../../models/perfomance-aspect.model";
-import {distinctUntilChanged, map, withLatestFrom} from "rxjs/operators";
-import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
-import {MetricFinderComponent} from "../../../metric-finder/metric-finder.component";
-import {AspectMetricsComponent} from "../aspect-metrics/aspect-metrics.component";
-import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
+} from '../../../../models/perfomance-aspect.model';
+import {distinctUntilChanged, withLatestFrom} from 'rxjs/operators';
+import {MetricFinderService} from '../../../metric-finder/services/metric-finder.service';
+import {MetricFinderComponent} from '../../../metric-finder/metric-finder.component';
+import {AspectMetricsComponent} from '../aspect-metrics/aspect-metrics.component';
+import {GrailsBridgeService} from '../../../../services/grails-bridge.service';
 
 @Component({
   selector: 'osm-edit-aspect-metrics',
@@ -73,7 +73,7 @@ export class EditAspectMetricsComponent implements OnInit {
     ).subscribe(([browserId, app, page]: [number, Application, Page]) => {
       this.loadChartData(app.id, page.id, browserId);
       this.metricFinderCmp.clearResults();
-    })
+    });
   }
 
   private loadChartData(appId: number, pageId: number, browserId: number) {
@@ -87,13 +87,13 @@ export class EditAspectMetricsComponent implements OnInit {
       ([aspects, selectedType]: [ExtendedPerformanceAspect[], PerformanceAspectType]) => {
 
         this.selectedAspect = aspects
-          .filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name == selectedType.name)
+          .filter((aspect: ExtendedPerformanceAspect) => aspect.performanceAspectType.name === selectedType.name)
           .find((aspect: ExtendedPerformanceAspect) => {
             return aspect.browserId === browserId;
           });
 
-        if (typeof(this.selectedAspect) != "undefined") {
-          this.selectedMetric= this.selectedAspect.measurand.name;
+        if (typeof(this.selectedAspect) !== 'undefined') {
+          this.selectedMetric = this.selectedAspect.measurand.name;
         }
       }
     );
@@ -102,7 +102,7 @@ export class EditAspectMetricsComponent implements OnInit {
   persistAspect() {
     const perfAspectToCreateOrUpdate: PerformanceAspect = {
       ...this.aspectMetricsCmp.getSelectedAspect(),
-      measurand: {kind: "selectable-measurand", name: this.metricFinderCmp.selectedMetric, id: this.metricFinderCmp.selectedMetric}
+      measurand: {kind: 'selectable-measurand', name: this.metricFinderCmp.selectedMetric, id: this.metricFinderCmp.selectedMetric}
     };
     this.aspectConfService.createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate);
   }

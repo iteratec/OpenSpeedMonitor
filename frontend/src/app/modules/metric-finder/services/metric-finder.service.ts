@@ -25,7 +25,10 @@ export class MetricFinderService {
     };
     this.http.get<TestResultDTO[]>('/metricFinder/rest/getEventResults', {params}).pipe(
       map(dtos => dtos.map(dto => new TestResult(dto)))
-    ).subscribe(next => this.testResults$.next(next));
+    ).subscribe(
+      next => this.testResults$.next(next),
+      error => this.testResults$.next([])
+    );
   }
 
   public getMetricName(metric: string): string {
