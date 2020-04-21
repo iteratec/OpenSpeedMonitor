@@ -30,11 +30,14 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   @ViewChild("svg")
   svgElement: ElementRef;
 
+  public ngxSmartModalService;
+
   private _resizeTimeoutId: number;
 
   constructor(private lineChartService: LineChartService,
-              private ngxSmartModalService: NgxSmartModalService,
-              private spinnerService: SpinnerService) {
+              private spinnerService: SpinnerService,
+              ngxSmartModalService: NgxSmartModalService) {
+    this.ngxSmartModalService = ngxSmartModalService;
   }
 
   ngAfterContentInit(): void {
