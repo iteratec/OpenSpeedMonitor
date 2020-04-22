@@ -190,7 +190,9 @@ class LineChartTimeSeriesService {
                     MeasurandGroup measurandGroup = measurand.measurandGroup
                     String unit = measurandGroup.unit.label
                     if (MeasurandGroup.REQUEST_SIZES.equals(measurandGroup)) {
-                        value = (value / MEGA_BYTE).round(2)
+                        if (value) {
+                            value = (value / MEGA_BYTE).round(2)
+                        }
                     }
                     timeSeriesChartDTO.measurandGroups.put(measurandGroup, unit)
                     buildSeries(value, identifierMeasurand, date, testAgent, wptInfo, measurandName, jobGroup, measuredEvent, location,
