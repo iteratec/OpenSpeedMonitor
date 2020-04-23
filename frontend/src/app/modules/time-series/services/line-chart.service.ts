@@ -273,15 +273,15 @@ export class LineChartService {
       visibleDots
         .each((timeSeriesPoint: TimeSeriesPoint, index: number, nodes: D3BaseType[]) => {
           tempArray.push({
-            'value': timeSeriesPoint.value,
-            'htmlNode': generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDotData)
+            'htmlNode': generateTooltipDataPointRow(timeSeriesPoint, nodes[index], nearestDotData),
+            'yPosition': nodes[index]['cy'].animVal.value
           });
           if (index === 0) {
             testAgent = generateTooltipTestAgentRow(timeSeriesPoint);
           }
         });
       tempArray
-        .sort((a, b) => b.value - a.value)
+        .sort((a, b) => a.yPosition - b.yPosition)
         .forEach(elem => tableBody.append(elem.htmlNode));
       tableBody.append(testAgent);
 
@@ -405,11 +405,10 @@ export class LineChartService {
 
     const drawLine = (selection: D3Selection<D3BaseType, TimeSeries, D3BaseType, {}>,
                       xScale: D3ScaleTime<number, number>,
-                      yScale: D3ScaleLinear<number, number>,
-                      index: number): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> => {
+                      yScale: D3ScaleLinear<number, number>): D3Selection<D3BaseType, TimeSeries, D3BaseType, {}> => {
       const resultingSelection = selection
         .append('g')       // Group each line so we can add dots to this group latter
-        .attr('class', (timeSeries: TimeSeries) => `line line-group${index} line-${timeSeries.key}`)
+        .attr('class', (timeSeries: TimeSeries) => `line line-${timeSeries.key}`)
         .style('opacity', '0')
         .append('path')  // Draw one path for every item in the data set
         .style('pointer-events', 'none')
@@ -438,11 +437,6 @@ export class LineChartService {
     const drawSinglePointsDots = (data: TimeSeries[],
                                   xScale: D3ScaleTime<number, number>,
                                   yScale: D3ScaleLinear<number, number>): void => {
-      // Remove old dots
-      this._chartContentContainer
-        .select('.single-dots')
-        .remove();
-
       const minDate = xScale.domain()[0];
       const maxDate = xScale.domain()[1];
 
@@ -495,11 +489,6 @@ export class LineChartService {
     const addDataPointsToChart = (timeSeries: TimeSeries[],
                                   xScale: D3ScaleTime<number, number>,
                                   yScale: D3ScaleLinear<number, number>): void => {
-      // Remove old dots
-      this._chartContentContainer
-        .select('.dots')
-        .remove();
-
       this._chartContentContainer
         .append('g')
         .attr('class', 'dots')
@@ -547,17 +536,21 @@ export class LineChartService {
             index: number): void => {
       if (index === 0) {
         // Remove after resize
-        chart.select('.lines').remove();
+        chart.selectAll('.lines').remove();
+        // Remove old dots
+        this._chartContentContainer.select('.single-dots').remove();
+        // Remove old dots
+        this._chartContentContainer.select('.dots').remove();
       }
       // Create one group per line / data entry
       this._chartContentContainer
         .append('g')
-        .attr('class', 'lines')
+        .attr('class', `lines y-axis-${index}`)
         .selectAll('.line')                             // Get all lines already drawn
         .data(data, (timeSeries: TimeSeries) => timeSeries.key)   // ... for this data
         .join(enter => {
             addDataPointsToXAxisCluster(enter);
-            const lineSelection: any = drawLine(enter, xScale, yScale, index);
+            const lineSelection: any = drawLine(enter, xScale, yScale);
             drawSinglePointsDots(data, xScale, yScale);
             addDataPointsToChart(data, xScale, yScale);
             return lineSelection;
@@ -709,7 +702,7 @@ export class LineChartService {
       // Update X axis with smooth transition
       d3Select('.x-axis').transition().call((transition) => this.updateXAxis(transition, xScale));
       // Update Y axis with smooth transition
-      const yNewScales = this.lineChartScaleService.getYScalesInRange(data, minDate, maxDate, this._height);
+      const yNewScales = this.lineChartScaleService.getYScalesInTimeRange(data, minDate, maxDate, this._height);
       this.updateYAxes(yNewScales);
       // Redraw lines and dots
       yNewScales.forEach((yScale, index) => {
@@ -976,7 +969,8 @@ export class LineChartService {
 
     const chart = svg.append('g') // g =  grouping element; group all other stuff into the chart
       .attr('id', 'time-series-chart-drawing-area')
-      .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`); // translates the origin to the top left corner (default behavior of D3)
+      // translates the origin to the top left corner (default behavior of D3)
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`);
 
     svg.append('g')
       .attr('id', 'time-series-chart-legend')
@@ -1046,7 +1040,8 @@ export class LineChartService {
     // Add the X-Axis to the chart
     chart.append('g')                   // new group for the X-Axis (see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g)
       .attr('class', 'axis x-axis')  // a css class to style it later
-      .attr('transform', `translate(0, ${this._height})`) // even if the D3 method called `axisBottom` we have to move it to the bottom by ourselves
+      // even if the D3 method called `axisBottom` we have to move it to the bottom by ourselves
+      .attr('transform', `translate(0, ${this._height})`)
       .call(xAxis);
   }
 
@@ -1181,7 +1176,8 @@ export class LineChartService {
         .tickSize(drawingAreaWidth)   // background line over complete chart width
     )
       .attr('transform', 'translate(0, 0)') // move the axis to the left
-      .call(g => g.selectAll('.tick:not(:first-of-type) line') // make all line dotted, except the one on the bottom as this will indicate the x-axis
+      // make all line dotted, except the one on the bottom as this will indicate the x-axis
+      .call(g => g.selectAll('.tick:not(:first-of-type) line')
         .attr('stroke-opacity', strokeOpacity)
         .attr('stroke-dasharray', '1,1'))
       .call(g => g.selectAll('.tick text')  // move the text a little so it does not overlap with the lines

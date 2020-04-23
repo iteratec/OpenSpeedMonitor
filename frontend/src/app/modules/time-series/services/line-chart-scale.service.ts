@@ -53,7 +53,7 @@ export class LineChartScaleService {
   /**
    * Determine the yScales for the given data in time range
    */
-  public getYScalesInRange(dataList: TimeSeries[][], minDate: Date, maxDate: Date, height: number): D3ScaleLinear<number, number>[] {
+  public getYScalesInTimeRange(dataList: TimeSeries[][], minDate: Date, maxDate: Date, height: number): D3ScaleLinear<number, number>[] {
     const yScales: D3ScaleLinear<number, number>[] = [];
     dataList.forEach((data: TimeSeries[]) => {
       const yScale: D3ScaleLinear<number, number> = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
