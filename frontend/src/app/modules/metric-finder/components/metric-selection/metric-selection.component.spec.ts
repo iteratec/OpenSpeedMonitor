@@ -4,6 +4,8 @@ import {MetricSelectionComponent} from './metric-selection.component';
 import {MetricFinderService} from '../../services/metric-finder.service';
 import {MetricFinderServiceMock} from '../../services/metric-finder.service.mock';
 import {TestInfoDTO, TestResult} from '../../models/test-result.model';
+import {ResultSelectionService} from '../../../result-selection/services/result-selection.service';
+import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
 
 describe('MetricSelectionComponent', () => {
   let component: MetricSelectionComponent;
@@ -19,10 +21,14 @@ describe('MetricSelectionComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ MetricSelectionComponent ],
-      providers: [{
+      imports: [ SharedMocksModule ],
+      providers: [
+        {
         provide: MetricFinderService,
         useClass: MetricFinderServiceMock
-      }]
+        },
+        ResultSelectionService
+      ]
     })
     .compileComponents();
   }));
