@@ -119,7 +119,7 @@ export class AspectConfigurationService {
   private getPerfAspectParams(): Observable<any> {
     return combineLatest(this.applicationService.selectedApplication$, this.selectedPage$)
       .pipe(
-        filter(([application, page]: [Application, Page]) => page.id !== -1 && page.name !== ''),
+        filter(([_, page]: [Application, Page]) => page.id !== -1 && page.name !== ''),
         mergeMap(([application, page]: [Application, Page]) => {
           const params = this.createLocationParams(application, page);
           return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(

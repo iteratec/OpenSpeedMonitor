@@ -27,7 +27,7 @@ export class MetricFinderService {
       map(dtos => dtos.map(dto => new TestResult(dto)))
     ).subscribe(
       next => this.testResults$.next(next),
-      error => this.testResults$.next([])
+      _ => this.testResults$.next([])
     );
   }
 
