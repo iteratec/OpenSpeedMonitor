@@ -58,6 +58,7 @@ class EventResultQueryExecutor {
                 PerformanceLoggingService.LogLevel.INFO, "getting results - exec for ${selectedMeasurands[0]?.selectedType.isUserTiming() ? 'ut' : 'm'}", 4) {
             executeQuery(queryParts)
         }
+        // TODO return rawData.size()
         List<EventResultProjection> result = (List<EventResultProjection>) performanceLoggingService.logExecutionTimeSilently(
                 PerformanceLoggingService.LogLevel.INFO, "getting results - transform for ${selectedMeasurands[0]?.selectedType.isUserTiming() ? 'ut' : 'm'}", 4) {
             transformer.transformRawQueryResult(rawData)

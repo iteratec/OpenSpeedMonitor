@@ -328,10 +328,13 @@ class EventResultQueryBuilder {
     List<EventResultProjection> getPercentile(int percentile) {
         if (this.aspectUtil.aspectsIncluded()) {
             List<EventResultProjection> rawData = getRawData(MetaDataSet.ASPECT)
-            return this.aspectUtil.getPercentileFrom(rawData, percentile)
+            if (rawData.size() >= 30) {
+                return this.aspectUtil.getPercentileFrom(rawData, percentile)
+            }
         } else {
             return getPercentileWithoutAspects(percentile)
         }
+        return [];
     }
 
     List<EventResultProjection> getPercentileWithoutAspects(int percentile) {
