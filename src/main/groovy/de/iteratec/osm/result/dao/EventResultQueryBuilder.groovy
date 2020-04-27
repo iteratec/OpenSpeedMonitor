@@ -288,7 +288,7 @@ class EventResultQueryBuilder {
         }
 
         List<EventResultProjection> results = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - getting results', 2) {
-            getResults()
+            getResults(false)
         }
 
         if (this.aspectUtil.aspectsIncluded()) {
@@ -322,7 +322,7 @@ class EventResultQueryBuilder {
         userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
         userTimingQueryExecutor.setTransformer(new UserTimingMedianDataTransformer(baseProjections: baseProjections))
         userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
-        return getResults()
+        return getResults(false)
     }
 
     List<EventResultProjection> getPercentile(int percentile) {
@@ -345,7 +345,7 @@ class EventResultQueryBuilder {
         userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
         userTimingQueryExecutor.setTransformer(new UserTimingPercentileDataTransformer(percentile, baseProjections))
         userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
-        return getResults()
+        return getResults(true)
     }
 
     List<EventResultProjection> getAverageData() {
@@ -373,26 +373,39 @@ class EventResultQueryBuilder {
         userTimingQueryExecutor.setTransformer(new UserTimingAverageDataTransformer(baseProjections: baseProjections))
         userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
 
-        return getResults()
+        return getResults(false)
     }
 
-    private List<EventResultProjection> getResults() {
+    private List<EventResultProjection> getResults(boolean minimumLevel) {
+        List<Map> userTimingRawData = []
+        List<Map> measurandRawData = []
+        List<EventResultProjection> userTimingsResult = []
+        List<EventResultProjection> measurandResult = []
 
-        List<EventResultProjection> userTimingsResult = this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, 'getResults - getting user timing results', 3) {
-            userTimingQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO,
+                'getResults - getting user timing results',
+                3) {
+            userTimingRawData = userTimingQueryExecutor.getRawResultDataFor(filters, trims, baseProjections, performanceLoggingService)
+            userTimingsResult = userTimingQueryExecutor.getResultFor(userTimingRawData, performanceLoggingService)
         }
-        List<EventResultProjection> measurandResult = this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, 'getResults - getting measurand results', 3) {
-            measurandQueryExecutor.getResultFor(filters, trims, baseProjections, performanceLoggingService)
+        this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO,
+                'getResults - getting measurand results',
+                3) {
+            measurandRawData = measurandQueryExecutor.getRawResultDataFor(filters, trims, baseProjections, performanceLoggingService)
+            measurandResult = measurandQueryExecutor.getResultFor(measurandRawData, performanceLoggingService)
         }
 
-        List<EventResultProjection> merged
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, "getResults - merge ${measurandResult.size()} measurand results with ${userTimingsResult.size()} user timing results", 3) {
-            merged = mergeResults(measurandResult, userTimingsResult)
-        }
+        if (!minimumLevel || userTimingRawData.size() + measurandRawData.size() >= 30) {
+            List<EventResultProjection> merged = []
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, "getResults - merge ${measurandResult.size()} measurand results with ${userTimingsResult.size()} user timing results", 3) {
+                merged = mergeResults(measurandResult, userTimingsResult)
+            }
 
-        return merged
+            return merged
+        }
+        return []
     }
 
     private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResults, List<EventResultProjection> userTimingResults) {
