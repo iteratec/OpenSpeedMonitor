@@ -54,21 +54,8 @@ export class AggregationChartComponent implements OnChanges {
   ) {
   }
 
-  changeStackBars(status: string): void {
-    this.aggregationChartDataService.stackBars = (status === 'true');
-  }
-
-  reloadPercentile(): void {
-    if (this.percentileValue === null || this.percentileValue < 1) {
-      this.percentileValue = 1;
-    } else if (this.percentileValue > 100) {
-      this.percentileValue = 100;
-    }
-    this.aggregationChartDataService.reloadPercentile(
-      this.percentileValue,
-      this.resultSelectionStore.resultSelectionCommand,
-      this.resultSelectionStore.remainingResultSelection
-    );
+  ngOnChanges(changes: SimpleChanges): void {
+    this.redraw();
   }
 
   selectFilter(filter: string): void {
@@ -76,12 +63,18 @@ export class AggregationChartComponent implements OnChanges {
     this.redraw();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+  drawOtherDiagramType(diagramType: string) {
+    this.aggregationChartDataService.stackBars = (diagramType === 'stacked');
+    this.redraw();
+  }
+
+  drawOtherAggregationType(aggregationType: string): void {
+    this.aggregationChartDataService.aggregationType = aggregationType;
     this.redraw();
   }
 
   redraw(): void {
-    if (Object.keys(this.barchartAverageData).length < 1 || Object.keys(this.barchartMedianData).length < 1) {
+    if (Object.keys(this.barchartAverageData).length < 1) {
       return;
     }
 
@@ -113,7 +106,7 @@ export class AggregationChartComponent implements OnChanges {
     this.svgElement.nativeElement.setAttribute('height', this.svgHeight);
     this.isHidden = this.aggregationChartDataService.hasComparativeData;
     if (this.aggregationChartDataService.hasComparativeData) {
-      this.changeStackBars('true');
+      this.aggregationChartDataService.stackBars = true;
     }
 
     this.xScale = scaleLinear()
@@ -125,6 +118,23 @@ export class AggregationChartComponent implements OnChanges {
       .range([0, this.barsHeight]);
 
     this.render();
+  }
+
+  reloadPercentile(): void {
+    if (this.percentileValue === null || this.percentileValue < 1) {
+      this.percentileValue = 1;
+    } else if (this.percentileValue > 100) {
+      this.percentileValue = 100;
+    }
+    this.aggregationChartDataService.reloadPercentile(
+      this.percentileValue,
+      this.resultSelectionStore.resultSelectionCommand,
+      this.resultSelectionStore.remainingResultSelection
+    );
+  }
+
+  enoughPercentileValues(): boolean {
+    return Object.keys(this.barchartMedianData).length >= 1;
   }
 
   private render(): void {

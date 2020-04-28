@@ -110,3 +110,10 @@ svg.aggregation-chart-svg {
     border-radius: 2px;
   }
 }
+
+.label-disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: .65;
+  box-shadow: none;
+}

@@ -123,6 +123,11 @@ export class AggregationChartDataService {
     const finishedLoadingAvg$: Subject<void> = new Subject<void>();
     const finishedLoadingPercentile$: Subject<void> = new Subject<void>();
 
+    combineLatest(finishedLoadingAvg$, finishedLoadingPercentile$).subscribe(() => {
+      this.spinnerService.hideSpinner('aggregation-chart-spinner');
+      this.hideChartIfNoDataAvailable();
+    });
+
     const additionalParams: Params = {
       selectedFilter: this.selectedFilter,
       selectedAggregationValue: this.aggregationType,
@@ -131,11 +136,6 @@ export class AggregationChartDataService {
     };
 
     this.resultSelectionStore.writeQueryParams(additionalParams);
-
-    combineLatest(finishedLoadingAvg$, finishedLoadingPercentile$).subscribe(() => {
-      this.spinnerService.hideSpinner('aggregation-chart-spinner');
-      this.hideChartIfNoDataAvailable();
-    });
 
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
