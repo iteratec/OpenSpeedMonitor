@@ -10,6 +10,7 @@ import {AggregationChartSeries} from '../models/aggregation-chart-series.model';
 import {SpinnerService} from '../../shared/services/spinner.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {ResultSelectionStore} from '../../result-selection/services/result-selection.store';
+import {TranslateService} from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
@@ -105,7 +106,9 @@ export class AggregationChartDataService {
               private route: ActivatedRoute,
               private router: Router,
               private resultSelectionStore: ResultSelectionStore,
-              private spinnerService: SpinnerService) {
+              private spinnerService: SpinnerService,
+              private translationService: TranslateService
+  ) {
     route.queryParams.subscribe((params: Params) => {
       this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
       this.aggregationType = params.selectedAggregationValue ? params.selectedAggregationValue : this.aggregationType;
@@ -114,7 +117,8 @@ export class AggregationChartDataService {
     });
   }
 
-  getBarchartData(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): void {
+  getBarchartData(resultSelectionCommand: ResultSelectionCommand,
+                  remainingResultSelection: RemainingResultSelection): void {
     this.spinnerService.showSpinner('aggregation-chart-spinner');
     const finishedLoadingAvg$: Subject<void> = new Subject<void>();
     const finishedLoadingPercentile$: Subject<void> = new Subject<void>();
@@ -179,7 +183,9 @@ export class AggregationChartDataService {
     }
     this.filterRules = data.filterRules;
     this.i18nMap = data.i18nMap;
-    this.aggregationValue = data.series[0].aggregationValue !== undefined ? data.series[0].aggregationValue : this.aggregationValue;
+    this.aggregationValue = data.series[0].aggregationValue !== undefined ?
+      data.series[0].aggregationValue :
+      this.aggregationValue;
     this.series = data.series;
     this.hasComparativeData = data.hasComparativeData;
     this.setMeasurandDataMap(data.series);
@@ -256,7 +262,7 @@ export class AggregationChartDataService {
       {
         id: 'good',
         fill: '#bbe2bb',
-        label: 'GOOD',
+        label: this.translationService.instant('frontend.de.iteratec.osm.barchart.scores.good'),
         cssClass: 'd3chart-good',
         end: 1000,
         start: 0
@@ -264,7 +270,7 @@ export class AggregationChartDataService {
       {
         id: 'okay',
         fill: '#f9dfba',
-        label: 'OK',
+        label: this.translationService.instant('frontend.de.iteratec.osm.barchart.scores.ok'),
         cssClass: 'd3chart-okay',
         end: 3000,
         start: 0
@@ -273,7 +279,7 @@ export class AggregationChartDataService {
       {
         id: 'bad',
         fill: '#f5d1d0',
-        label: 'BAD',
+        label: this.translationService.instant('frontend.de.iteratec.osm.barchart.scores.bad'),
         cssClass: 'd3chart-bad',
         end: undefined,
         start: 0
@@ -311,7 +317,9 @@ export class AggregationChartDataService {
     let aggregation = '';
     const pages = data.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     const jobGroups = data.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
-    this.aggregationValue === 'avg' ? aggregation = 'Average' : aggregation = `Percentile ${this.aggregationValue}%`;
+    this.aggregationValue === 'avg' ?
+      aggregation = this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.average') :
+      aggregation = `${this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.percentile')} ${this.aggregationValue}%`;
 
     if (pages.length > 1 && jobGroups.length > 1) {
       header = aggregation;

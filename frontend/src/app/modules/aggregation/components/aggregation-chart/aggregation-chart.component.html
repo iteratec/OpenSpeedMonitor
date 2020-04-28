@@ -6,12 +6,12 @@
         <label class="btn btn-sm btn-default" id="switch-beside-button"
                [class.active]="!aggregationChartDataService.stackBars" (click)="changeStackBars(beside.value); redraw()">
           <input #beside type="radio" name="stackBars" [value]="false">
-          Beside
+          {{'frontend.de.iteratec.osm.barchart.settings.beside' | translate }}
         </label>
         <label class="btn btn-sm btn-default" id="switch-infront-button"
                [class.active]="aggregationChartDataService.stackBars" (click)="changeStackBars(inFront.value); redraw()">
           <input #inFront type="radio" name="stackBars" [value]="true">
-          In Front
+          {{'frontend.de.iteratec.osm.barchart.settings.inFront' | translate }}
         </label>
       </div>
       <div class="btn-group pull-left perc-element" data-toggle="buttons" id="aggregation-value-switch">
@@ -19,13 +19,13 @@
                [class.active]="aggregationChartDataService.aggregationType === 'avg'"
                (click)="aggregationChartDataService.aggregationType = average.value; redraw()">
           <input #average type="radio" name="aggregationValue" value="avg" checked>
-          Average
+          {{'frontend.de.iteratec.osm.barchart.settings.average' | translate }}
         </label>
         <label class="btn btn-sm btn-default" id="aggregation-percentile-button"
                [class.active]="aggregationChartDataService.aggregationType === 'percentile'"
                (click)="aggregationChartDataService.aggregationType = percentile.value; redraw()">
           <input #percentile type="radio" name="aggregationValue" value="percentile">
-          Percentile
+          {{'frontend.de.iteratec.osm.barchart.settings.percentile' | translate }}
         </label>
       </div>
 
