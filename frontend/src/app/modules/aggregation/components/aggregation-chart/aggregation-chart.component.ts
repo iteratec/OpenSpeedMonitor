@@ -17,8 +17,8 @@ import {AggregationChartDataByMeasurand} from '../../models/aggregation-chart-da
 export class AggregationChartComponent implements OnChanges {
 
   @ViewChild('svg') svgElement: ElementRef;
-  @Input() barchartAverageData;
-  @Input() barchartMedianData;
+  @Input() barchartAverageData = [];
+  @Input() barchartMedianData = [];
 
   hasFilterRules = false;
   showDiagramTypeSwitch = false;
