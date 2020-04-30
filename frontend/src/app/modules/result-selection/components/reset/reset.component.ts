@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ResultSelectionStore} from "../../services/result-selection.store";
+import {ResultSelectionStore} from '../../services/result-selection.store';
 
 @Component({
   selector: 'osm-result-selection-reset',
@@ -8,7 +8,8 @@ import {ResultSelectionStore} from "../../services/result-selection.store";
 })
 export class ResetComponent implements OnInit {
 
-  constructor(private resultSelectionStore: ResultSelectionStore) { }
+  constructor(private resultSelectionStore: ResultSelectionStore) {
+  }
 
   ngOnInit() {
   }

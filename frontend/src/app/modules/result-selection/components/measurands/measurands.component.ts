@@ -1,13 +1,13 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {MeasurandGroup, SelectableMeasurand, Measurand} from "../../../../models/measurand.model";
-import {BehaviorSubject, combineLatest, Observable, Subject} from "rxjs";
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {Measurand, MeasurandGroup, SelectableMeasurand} from '../../../../models/measurand.model';
+import {BehaviorSubject, combineLatest, Observable, Subject} from 'rxjs';
+import {ResultSelectionStore} from '../../services/result-selection.store';
+import {ResponseWithLoadingState} from '../../../../models/response-with-loading-state.model';
 import {map, takeUntil, takeWhile} from 'rxjs/operators';
-import {UiComponent} from "../../../../enums/ui-component.enum";
-import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
-import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
-import {RemainingResultSelectionParameter} from "../../models/remaing-result-selection.model";
+import {UiComponent} from '../../../../enums/ui-component.enum';
+import {PerformanceAspectService} from '../../../../services/performance-aspect.service';
+import {PerformanceAspectType} from '../../../../models/perfomance-aspect.model';
+import {RemainingResultSelectionParameter} from '../../models/remaing-result-selection.model';
 
 @Component({
   selector: 'osm-result-selection-measurands',
@@ -15,7 +15,7 @@ import {RemainingResultSelectionParameter} from "../../models/remaing-result-sel
   styleUrls: ['./measurands.component.scss']
 })
 export class MeasurandsComponent implements OnInit {
-  aspectTypes$:BehaviorSubject<ResponseWithLoadingState<PerformanceAspectType[]>> = new BehaviorSubject({
+  aspectTypes$: BehaviorSubject<ResponseWithLoadingState<PerformanceAspectType[]>> = new BehaviorSubject({
     isLoading: false,
     data: []
   });
@@ -89,7 +89,7 @@ export class MeasurandsComponent implements OnInit {
   removeMeasurandField(index: number): void {
     this.selectedMeasurands.splice(index, 1);
     this.setResultSelection();
-    if (this.selectedMeasurands.length == 1) {
+    if (this.selectedMeasurands.length === 1) {
       this.addingComparativeTimeFrameDisabled$.next(false);
     }
   }
@@ -121,8 +121,9 @@ export class MeasurandsComponent implements OnInit {
       this.requestSizes$,
       this.percentages$
     ).pipe(
-      map((next: [ResponseWithLoadingState<PerformanceAspectType[]> | MeasurandGroup]) => next.map(item  => item.isLoading).some(value => value))
-    )
+      map((next: [ResponseWithLoadingState<PerformanceAspectType[]> | MeasurandGroup]) =>
+        next.map(item => item.isLoading).some(value => value))
+    );
   }
 
   private loadResultSelection(): void {
@@ -142,8 +143,12 @@ export class MeasurandsComponent implements OnInit {
           ...this.percentages$.getValue().values
         ];
 
-        const selectedPerformanceAspectTypes = (performanceAspects && this.resultSelectionStore.remainingResultSelection.performanceAspectTypes) ?
-          [...performanceAspects.filter(aspect => this.resultSelectionStore.remainingResultSelection.performanceAspectTypes.includes(aspect.name))] : [];
+        const selectedPerformanceAspectTypes =
+          (performanceAspects && this.resultSelectionStore.remainingResultSelection.performanceAspectTypes) ?
+            [...performanceAspects.filter(
+              aspect => this.resultSelectionStore.remainingResultSelection.performanceAspectTypes.includes(aspect.name))
+            ] :
+            [];
         const selectedMeasurandsx = (allMeasurands && this.resultSelectionStore.remainingResultSelection.measurands) ?
           [...allMeasurands.filter(measurand => this.resultSelectionStore.remainingResultSelection.measurands.includes(measurand.id))] : [];
 
@@ -162,16 +167,16 @@ export class MeasurandsComponent implements OnInit {
     this.resultSelectionStore.setRemainingResultSelectionEnums(
       this.selectedMeasurands.filter((item: Measurand) => {
         if (item) {
-          return item.kind === "performance-aspect-type"
+          return item.kind === 'performance-aspect-type';
         }
-        return false
+        return false;
       }).map((performanceAspectType: PerformanceAspectType) => performanceAspectType.name),
       RemainingResultSelectionParameter.PERFORMANCE_ASPECT_TYPES
     );
     this.resultSelectionStore.setRemainingResultSelectionEnums(
       this.selectedMeasurands.filter((item: Measurand) => {
         if (item) {
-          return item.kind === "selectable-measurand"
+          return item.kind === 'selectable-measurand';
         }
         return false;
       }).map((measurand: SelectableMeasurand) => measurand.id),

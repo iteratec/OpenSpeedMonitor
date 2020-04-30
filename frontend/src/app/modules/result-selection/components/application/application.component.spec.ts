@@ -1,10 +1,10 @@
-import { async, ComponentFixture, TestBed} from '@angular/core/testing';
-import { ApplicationComponent } from './application.component';
-import { SelectableApplication } from 'src/app/models/application.model';
-import { SharedMocksModule } from 'src/app/testing/shared-mocks.module';
-import { By } from '@angular/platform-browser';
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {ResultSelectionService} from "../../services/result-selection.service";
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {ApplicationComponent} from './application.component';
+import {SelectableApplication} from 'src/app/models/application.model';
+import {SharedMocksModule} from 'src/app/testing/shared-mocks.module';
+import {By} from '@angular/platform-browser';
+import {ResultSelectionStore} from '../../services/result-selection.store';
+import {ResultSelectionService} from '../../services/result-selection.service';
 
 describe('ApplicationComponent', () => {
   let component: ApplicationComponent;
@@ -12,13 +12,13 @@ describe('ApplicationComponent', () => {
   const applications = [new SelectableApplication({
     id: 3,
     name: 'test_Application',
-    tags: ['test','application']
+    tags: ['test', 'application']
   }),
-  new SelectableApplication({
-    id: 1,
-    name: 'test2_Application',
-    tags: ['test2','application']
-  })];
+    new SelectableApplication({
+      id: 1,
+      name: 'test2_Application',
+      tags: ['test2', 'application']
+    })];
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -34,7 +34,7 @@ describe('ApplicationComponent', () => {
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ApplicationComponent);
-    
+
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -43,8 +43,8 @@ describe('ApplicationComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should correctly show the tags according to the available applications', () =>{
-    let tags: string[] = ['application','test','test2'];
+  it('should correctly show the tags according to the available applications', () => {
+    const tags: string[] = ['application', 'test', 'test2'];
 
     component.updateApplicationsAndTags(applications);
     expect(component.selectableTags.sort()).toEqual(tags);
@@ -54,9 +54,9 @@ describe('ApplicationComponent', () => {
 
   });
 
-  it('should correctly show the applications according to the selected tag',() => {
+  it('should correctly show the applications according to the selected tag', () => {
     component.updateApplicationsAndTags(applications);
-    let tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
+    const tagApplicationsMapping = getTagApplicationsMapping(component.applications, component.selectableTags);
 
     expect(component.filteredApplications).toEqual(component.applications);
 
@@ -73,28 +73,29 @@ describe('ApplicationComponent', () => {
     expect(component.filteredApplications).toEqual(component.applications);
   });
 
-  it('should show the no result message', ()=>{
+  it('should show the no result message', () => {
     const select = fixture.debugElement.query(By.css('select > option')).nativeElement;
 
     component.updateApplicationsAndTags([]);
     fixture.detectChanges();
 
     expect(select.innerText.trim()).toEqual('frontend.de.iteratec.osm.resultSelection.application.noResults');
-    
-  })
+
+  });
 });
-function getTagApplicationsMapping(jobGroups: SelectableApplication[], selectableTags: string[]): any{
-  if(selectableTags){
-    let sortedJobGroups = [];
-    for(let i=1; i<=selectableTags.length; i++){
+
+function getTagApplicationsMapping(jobGroups: SelectableApplication[], selectableTags: string[]): any {
+  if (selectableTags) {
+    const sortedJobGroups = [];
+    for (let i = 1; i <= selectableTags.length; i++) {
       sortedJobGroups.push([]);
     }
-    selectableTags.forEach(tag =>{
-    jobGroups.forEach(element => {
-      if(element.tags.indexOf(tag) > -1){
-        sortedJobGroups[selectableTags.indexOf(tag)].push(element);
+    selectableTags.forEach(tag => {
+      jobGroups.forEach(element => {
+        if (element.tags.indexOf(tag) > -1) {
+          sortedJobGroups[selectableTags.indexOf(tag)].push(element);
         }
-      })
+      });
     });
     return sortedJobGroups;
   }
