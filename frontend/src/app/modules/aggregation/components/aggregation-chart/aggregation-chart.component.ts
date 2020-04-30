@@ -21,8 +21,7 @@ export class AggregationChartComponent implements OnChanges {
   @Input() barchartMedianData;
 
   hasFilterRules = false;
-  percentileValue = 50;
-  isHidden = true;
+  showDiagramTypeSwitch = false;
 
   svgWidth: number;
   svgHeight: number;
@@ -58,24 +57,30 @@ export class AggregationChartComponent implements OnChanges {
     this.redraw();
   }
 
+  selectDiagramType(diagramType: string) {
+    this.aggregationChartDataService.stackBars = (diagramType === 'stacked');
+    this.aggregationChartDataService.writeAdditionalQueryParams();
+    this.redraw();
+  }
+
+  selectAggregationType(aggregationType: string): void {
+    this.aggregationChartDataService.aggregationType = aggregationType;
+    this.aggregationChartDataService.writeAdditionalQueryParams();
+    this.redraw();
+  }
+
   selectFilter(filter: string): void {
     this.aggregationChartDataService.selectedFilter = filter;
-    this.redraw();
-  }
-
-  drawOtherDiagramType(diagramType: string) {
-    this.aggregationChartDataService.stackBars = (diagramType === 'stacked');
-    this.redraw();
-  }
-
-  drawOtherAggregationType(aggregationType: string): void {
-    this.aggregationChartDataService.aggregationType = aggregationType;
+    this.aggregationChartDataService.writeAdditionalQueryParams();
     this.redraw();
   }
 
   redraw(): void {
     if (Object.keys(this.barchartAverageData).length < 1) {
       return;
+    } else if (Object.keys(this.barchartMedianData).length === 0) {
+      this.aggregationChartDataService.aggregationType = 'avg';
+      this.aggregationChartDataService.writeAdditionalQueryParams();
     }
 
     this.aggregationChartDataService.setData();
@@ -104,7 +109,8 @@ export class AggregationChartComponent implements OnChanges {
     this.legendHeight = this.estimateHeight(this.svgElement.nativeElement) + ChartCommons.COMPONENT_MARGIN;
     this.svgHeight = this.legendPosY + this.legendHeight + this.headerHeight;
     this.svgElement.nativeElement.setAttribute('height', this.svgHeight);
-    this.isHidden = this.aggregationChartDataService.hasComparativeData;
+    this.showDiagramTypeSwitch = !this.aggregationChartDataService.hasComparativeData &&
+      Object.keys(this.aggregationChartDataService.allMeasurandDataMap).length > 1;
     if (this.aggregationChartDataService.hasComparativeData) {
       this.aggregationChartDataService.stackBars = true;
     }
@@ -121,13 +127,13 @@ export class AggregationChartComponent implements OnChanges {
   }
 
   reloadPercentile(): void {
-    if (this.percentileValue === null || this.percentileValue < 1) {
-      this.percentileValue = 1;
-    } else if (this.percentileValue > 100) {
-      this.percentileValue = 100;
+    if (this.aggregationChartDataService.percentileValue === null || this.aggregationChartDataService.percentileValue < 1) {
+      this.aggregationChartDataService.percentileValue = 1;
+    } else if (this.aggregationChartDataService.percentileValue > 100) {
+      this.aggregationChartDataService.percentileValue = 100;
     }
     this.aggregationChartDataService.reloadPercentile(
-      this.percentileValue,
+      this.aggregationChartDataService.percentileValue,
       this.resultSelectionStore.resultSelectionCommand,
       this.resultSelectionStore.remainingResultSelection
     );

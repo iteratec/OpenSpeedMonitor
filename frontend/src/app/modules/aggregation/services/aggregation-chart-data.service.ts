@@ -22,13 +22,12 @@ export class AggregationChartDataService {
   i18nMap: { comparativeDeterioration: string, comparativeImprovement: string, jobGroup: string, measurand: string, page: string };
   series: AggregationChartSeries[] = [];
   selectedFilter = 'asc';
-  aggregationValue = 'avg';
+  aggregationType = 'avg';
   percentileValue = 50;
-  stackBars = true;
+  stackBars = false;
   dataForScoreBar: { min: number, max: number, barsToRender: Array<any> } = {min: 0, max: 0, barsToRender: []};
   dataForHeader = '';
   uniqueSideLabels: string[] = [];
-  aggregationType = 'avg';
   hasComparativeData = false;
 
   loadingTimeColors: Array<string> = [
@@ -112,7 +111,7 @@ export class AggregationChartDataService {
     route.queryParams.subscribe((params: Params) => {
       this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
       this.aggregationType = params.selectedAggregationValue ? params.selectedAggregationValue : this.aggregationType;
-      this.stackBars = params.stackBars === 1;
+      this.stackBars = params.stackBars === '1';
       this.percentileValue = params.selectedPercentile ? parseInt(params.selectedPercentile, 10) : this.percentileValue;
     });
   }
@@ -128,14 +127,7 @@ export class AggregationChartDataService {
       this.hideChartIfNoDataAvailable();
     });
 
-    const additionalParams: Params = {
-      selectedFilter: this.selectedFilter,
-      selectedAggregationValue: this.aggregationType,
-      selectedPercentile: this.percentileValue,
-      stackBars: this.stackBars ? 1 : 0
-    };
-
-    this.resultSelectionStore.writeQueryParams(additionalParams);
+    this.writeAdditionalQueryParams();
 
     this.barchartDataService.fetchBarchartData<any>(
       resultSelectionCommand,
@@ -171,6 +163,7 @@ export class AggregationChartDataService {
       URL.AGGREGATION_BARCHART_DATA
     ).subscribe(result => {
       this.barchartMedianData$.next(this.sortDataByMeasurandOrder(result));
+      this.writeAdditionalQueryParams();
     });
   }
 
@@ -183,9 +176,6 @@ export class AggregationChartDataService {
     }
     this.filterRules = data.filterRules;
     this.i18nMap = data.i18nMap;
-    this.aggregationValue = data.series[0].aggregationValue !== undefined ?
-      data.series[0].aggregationValue :
-      this.aggregationValue;
     this.series = data.series;
     this.hasComparativeData = data.hasComparativeData;
     this.setMeasurandDataMap(data.series);
@@ -317,9 +307,9 @@ export class AggregationChartDataService {
     let aggregation = '';
     const pages = data.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     const jobGroups = data.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
-    this.aggregationValue === 'avg' ?
+    this.aggregationType === 'avg' ?
       aggregation = this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.average') :
-      aggregation = `${this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.percentile')} ${this.aggregationValue}%`;
+      aggregation = `${this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.percentile')} ${this.percentileValue}%`;
 
     if (pages.length > 1 && jobGroups.length > 1) {
       header = aggregation;
@@ -412,6 +402,17 @@ export class AggregationChartDataService {
       });
     });
     return series.concat(comparativeData);
+  }
+
+  writeAdditionalQueryParams(): void {
+    const additionalParams: Params = {
+      selectedFilter: this.selectedFilter,
+      selectedAggregationValue: this.aggregationType,
+      selectedPercentile: this.percentileValue,
+      stackBars: this.stackBars ? 1 : 0
+    };
+
+    this.resultSelectionStore.writeQueryParams(additionalParams);
   }
 
   private sortDataByMeasurandOrder(data) {

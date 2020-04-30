@@ -2,14 +2,15 @@
   <div class="aggregation-chart">
     <osm-spinner [spinnerId]="'aggregation-chart-spinner'"></osm-spinner>
     <div class="filter-dropdown-group">
-      <div *ngIf="!isHidden" class="btn-group pull-left perc-element" data-toggle="buttons" id="stack-bars-switch">
-        <label (click)="drawOtherDiagramType(beside.value)" [class.active]="!aggregationChartDataService.stackBars"
+      <div *ngIf="showDiagramTypeSwitch" class="btn-group pull-left perc-element" data-toggle="buttons"
+           id="stack-bars-switch">
+        <label (click)="selectDiagramType(beside.value)" [class.active]="!aggregationChartDataService.stackBars"
                class="btn btn-sm btn-default"
                id="switch-beside-button">
           <input #beside [value]="'grouped'" name="stackBars" type="radio">
           {{'frontend.de.iteratec.osm.barchart.settings.beside' | translate }}
         </label>
-        <label (click)="drawOtherDiagramType(inFront.value)" [class.active]="aggregationChartDataService.stackBars"
+        <label (click)="selectDiagramType(inFront.value)" [class.active]="aggregationChartDataService.stackBars"
                class="btn btn-sm btn-default"
                id="switch-infront-button">
           <input #inFront [value]="'stacked'" name="stackBars" type="radio">
@@ -17,14 +18,14 @@
         </label>
       </div>
       <div class="btn-group pull-left perc-element" data-toggle="buttons" id="aggregation-value-switch">
-        <label (click)="drawOtherAggregationType(average.value)"
+        <label (click)="selectAggregationType(average.value)"
                [class.active]="aggregationChartDataService.aggregationType === 'avg'"
                class="btn btn-sm btn-default"
                id="aggregation-average-button">
           <input #average checked name="aggregationValue" type="radio" value="avg">
           {{'frontend.de.iteratec.osm.barchart.settings.average' | translate }}
         </label>
-        <label (click)="drawOtherAggregationType(percentile.value)"
+        <label (click)="selectAggregationType(percentile.value)"
                [class.active]="aggregationChartDataService.aggregationType === 'percentile'"
                [class.label-disabled]="!enoughPercentileValues()"
                class="btn btn-sm btn-default" id="aggregation-percentile-button">
@@ -33,12 +34,14 @@
         </label>
       </div>
 
-      <input (ngModelChange)="reloadPercentile()" *ngIf="enoughPercentileValues()" [(ngModel)]="percentileValue"
+      <input (ngModelChange)="reloadPercentile()" *ngIf="enoughPercentileValues()"
+             [(ngModel)]="aggregationChartDataService.percentileValue"
              [disabled]="aggregationChartDataService.aggregationType === 'avg'"
              class="btn btn-sm btn-default perc-element" id="percentage-field" max="100" min="1"
              placeholder="%" style="max-width: 5em;"
              type="number"/>
-      <input (mouseup)="reloadPercentile()" *ngIf="enoughPercentileValues()" [(ngModel)]="percentileValue"
+      <input (mouseup)="reloadPercentile()" *ngIf="enoughPercentileValues()"
+             [(ngModel)]="aggregationChartDataService.percentileValue"
              [disabled]="aggregationChartDataService.aggregationType === 'avg'"
              class="form-control perc-element perc-slider" id="percentage-slider" max="100" min="5"
              step="5"
