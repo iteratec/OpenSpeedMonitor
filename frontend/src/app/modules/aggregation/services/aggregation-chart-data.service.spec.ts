@@ -5,6 +5,7 @@ import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 import {ResultSelectionStore} from '../../result-selection/services/result-selection.store';
 import {ResultSelectionService} from 'src/app/modules/result-selection/services/result-selection.service';
+import {SharedMocksModule} from '../../../testing/shared-mocks.module';
 
 describe('AggregationChartDataService', () => {
   beforeEach(() =>
@@ -17,7 +18,8 @@ describe('AggregationChartDataService', () => {
       ],
       imports: [
         HttpClientTestingModule,
-        RouterTestingModule
+        RouterTestingModule,
+        SharedMocksModule
       ]
     }));
 

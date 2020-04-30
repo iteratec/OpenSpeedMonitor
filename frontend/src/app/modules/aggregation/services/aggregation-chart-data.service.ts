@@ -106,7 +106,7 @@ export class AggregationChartDataService {
               private router: Router,
               private resultSelectionStore: ResultSelectionStore,
               private spinnerService: SpinnerService,
-              private translationService: TranslateService
+              private translateService: TranslateService
   ) {
     route.queryParams.subscribe((params: Params) => {
       this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
@@ -252,7 +252,7 @@ export class AggregationChartDataService {
       {
         id: 'good',
         fill: '#bbe2bb',
-        label: this.translationService.instant('frontend.de.iteratec.osm.barchart.scores.good'),
+        label: this.translateService.instant('frontend.de.iteratec.osm.barchart.scores.good'),
         cssClass: 'd3chart-good',
         end: 1000,
         start: 0
@@ -260,7 +260,7 @@ export class AggregationChartDataService {
       {
         id: 'okay',
         fill: '#f9dfba',
-        label: this.translationService.instant('frontend.de.iteratec.osm.barchart.scores.ok'),
+        label: this.translateService.instant('frontend.de.iteratec.osm.barchart.scores.ok'),
         cssClass: 'd3chart-okay',
         end: 3000,
         start: 0
@@ -269,7 +269,7 @@ export class AggregationChartDataService {
       {
         id: 'bad',
         fill: '#f5d1d0',
-        label: this.translationService.instant('frontend.de.iteratec.osm.barchart.scores.bad'),
+        label: this.translateService.instant('frontend.de.iteratec.osm.barchart.scores.bad'),
         cssClass: 'd3chart-bad',
         end: undefined,
         start: 0
@@ -308,8 +308,8 @@ export class AggregationChartDataService {
     const pages = data.map(x => x.page).filter((el, i, a) => i === a.indexOf(el));
     const jobGroups = data.map(x => x.jobGroup).filter((el, i, a) => i === a.indexOf(el));
     this.aggregationType === 'avg' ?
-      aggregation = this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.average') :
-      aggregation = `${this.translationService.instant('frontend.de.iteratec.osm.barchart.settings.percentile')} ${this.percentileValue}%`;
+      aggregation = this.translateService.instant('frontend.de.iteratec.osm.barchart.settings.average') :
+      aggregation = `${this.translateService.instant('frontend.de.iteratec.osm.barchart.settings.percentile')} ${this.percentileValue}%`;
 
     if (pages.length > 1 && jobGroups.length > 1) {
       header = aggregation;
