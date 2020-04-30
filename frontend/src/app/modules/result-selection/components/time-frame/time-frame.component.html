@@ -43,13 +43,16 @@
       <div class="input-group">
         <input [(ngModel)]="selectedDates" [max]="max" [owlDateTimeTrigger]="dateTimeFrom"
                [owlDateTime]="dateTimeFrom" [selectMode]="'rangeFrom'" class="form-control">
-        <owl-date-time #dateTimeFrom (afterPickerClosed)="updateFromDate(CalendarType.From)" (afterPickerOpen)="observeCalendarClicks(CalendarType.From)"
+        <owl-date-time #dateTimeFrom (afterPickerClosed)="updateFromDate(CalendarType.From)"
+                       (afterPickerOpen)="observeCalendarClicks(CalendarType.From)"
                        firstDayOfWeek="1"></owl-date-time>
         <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
-        <owl-date-time #dateTimeTo (afterPickerClosed)="updateToDate(CalendarType.To)" (afterPickerOpen)="observeCalendarClicks(CalendarType.To)"
+        <owl-date-time #dateTimeTo (afterPickerClosed)="updateToDate(CalendarType.To)"
+                       (afterPickerOpen)="observeCalendarClicks(CalendarType.To)"
                        firstDayOfWeek="1"></owl-date-time>
         <input [(ngModel)]="selectedDates" [max]="max" [min]="selectedDates[0]"
-               [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [selectMode]="'rangeTo'" class="form-control">
+               [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [selectMode]="'rangeTo'"
+               class="form-control">
       </div>
     </div>
   </div>
@@ -77,7 +80,8 @@
                            (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeTo)"
                            firstDayOfWeek="1"></owl-date-time>
             <input [(ngModel)]="selectedComparativeDates" [max]="max"
-                   [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo" [selectMode]="'rangeTo'"
+                   [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo"
+                   [selectMode]="'rangeTo'"
                    class="form-control">
           </div>
         </div>
@@ -92,7 +96,9 @@
 
   <div *ngIf="!comparativeSelectionActive && showComparativeTimeFrame" class="row form-group">
     <div class="col-md-8 col-md-offset-3">
-      <button (click)="toggleComparativeSelection()" [disabled]="resultSelectionStore.remainingResultSelection.measurands?.length > 1" [title]="'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate"
+      <button (click)="toggleComparativeSelection()"
+              [disabled]="resultSelectionStore.remainingResultSelection.measurands?.length + resultSelectionStore.remainingResultSelection.performanceAspectTypes?.length > 1"
+              [title]="'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate"
               class="btn btn-default btn-block"
               id="show-comparative-button"
               type="button">

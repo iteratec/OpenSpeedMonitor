@@ -12,7 +12,7 @@
                               [selectableMeasurandGroups]="measurands$"
                               [selectedMeasurand]="metric"></osm-measurand-select>
       </div>
-      <div *ngIf="!isFirst" class="col-sm-1 remove-measurand">
+      <div *ngIf="selectedMeasurands.length > 1" class="col-sm-1 remove-measurand">
         <a (click)="removeMeasurandField(i)" id="remove-measurand-button">
           <i aria-hidden="true" class="fas fa-times"></i>
         </a>
@@ -21,7 +21,10 @@
 
     <div *ngIf="multipleMeasurands" class="row form-group">
       <div class="col-sm-8 col-sm-offset-3">
-        <button (click)="addMeasurandField()" [disabled]="resultSelectionStore.remainingResultSelection.fromComparative || resultSelectionStore.remainingResultSelection.toComparative" [title]="'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate" class="btn btn-default btn-block"
+        <button (click)="addMeasurandField()"
+                [disabled]="resultSelectionStore.remainingResultSelection.fromComparative || resultSelectionStore.remainingResultSelection.toComparative"
+                [title]="'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate"
+                class="btn btn-default btn-block"
                 id="add-measurand-button"
                 type="button">
           <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.measurands.add' | translate }}
