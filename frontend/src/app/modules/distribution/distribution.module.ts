@@ -8,7 +8,8 @@ import {ViolinchartDataService} from './services/violinchart-data.service';
 import {ViolinChartComponent} from './components/violin-chart/violin-chart.component';
 
 const DistributionRoutes: Routes = [
-  {path: 'show', component: DistributionComponent}
+  {path: 'show', component: DistributionComponent},
+  {path: '**', redirectTo: 'show', pathMatch: 'full'}
 ];
 
 @NgModule({
