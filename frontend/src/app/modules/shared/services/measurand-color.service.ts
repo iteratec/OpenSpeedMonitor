@@ -46,7 +46,7 @@ export class MeasurandColorService {
     }
   }
 
-  getColorScaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean = false) {
+  getColorScaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean = false): d3.ScaleOrdinal<string, any> {
     const colors = this.measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0);
     return d3.scaleOrdinal(colors).domain(MeasurandColorService.createDomain(colors.length));
   }

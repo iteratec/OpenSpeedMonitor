@@ -6,6 +6,8 @@ import ChartLabelUtil from '../util/chart-label-util';
 import {MeasurandColorService} from '../../../shared/services/measurand-color.service';
 import {ViolinChartMathService} from '../../services/violin-chart-math.service';
 import {SpinnerService} from '../../../shared/services/spinner.service';
+import {DistributionDTO} from '../../models/distribution.model';
+import {CurveFactory} from 'd3-shape';
 
 @Component({
   selector: 'osm-violin-chart',
@@ -19,16 +21,82 @@ export class ViolinChartComponent implements OnChanges {
   dataInput: DistributionDataDTO;
 
   private height = 600;
-  private margin = {top: 50, right: 0, bottom: 70, left: 100};
-  private maxViolinWidth = 150;
-  private mainDataResolution = 30;
-  private interpolation = d3.curveBasis;
   private width = 600;
-  private chartData = null;
-  private currentSeries: any[] = null;
+  private margin = {top: 50, right: 0, bottom: 70, left: 100};
   private violinWidth: number = null;
+  private maxViolinWidth = 150;
+
+  private interpolation: CurveFactory = d3.curveBasis;
+
+  private mainDataResolution = 30;
   private dataTrimValue: number = null;
-  private commonLabelParts = null;
+
+  private chartData: DistributionDataDTO = null;
+  private currentSeries: DistributionDTO[] = null;
+  private commonLabelParts: string = null;
+
+  drawXAxis = (() => {
+    const xRange = (): number[] => {
+      return this.currentSeries.map((_, index: number) => {
+        return index * this.violinWidth + this.violinWidth / 2;
+      });
+    };
+
+    const rotateLabels = (): void => {
+      let maxLabelLength = -1;
+      let rotate;
+      d3.selectAll('.d3chart-xAxis g').each((_, index: number, nodes: d3.BaseType[]) => {
+        const childTextElem = d3.select(nodes[index]).select('text');
+        const childTextElemNode: SVGTSpanElement = <SVGTSpanElement>childTextElem.node();
+        const labelLength = childTextElemNode.getComputedTextLength();
+
+        if (labelLength > maxLabelLength) {
+          maxLabelLength = labelLength;
+        }
+
+        if (labelLength > this.violinWidth) {
+          rotate = true;
+        }
+      });
+
+      this.margin.bottom = Math.cos(Math.PI / 4) * maxLabelLength + 20;
+
+      if (rotate) {
+        d3.selectAll('.d3chart-xAxis g').each((_, index: number, nodes: d3.BaseType[]) => {
+          const selectedLabel = d3.select(nodes[index]);
+          rotateLabel(selectedLabel);
+        });
+      }
+    };
+
+    const rotateLabel = (labelElem): void => {
+      labelElem.style('text-anchor', 'start');
+
+      const childTextElem = labelElem.select('text');
+      const y = childTextElem.attr('y');
+
+      const transformBaseVal: SVGTransformList = labelElem.node().transform.baseVal;
+      const transformMatrix: SVGMatrix = transformBaseVal.getItem(0).matrix;
+
+      const translateX = transformMatrix.e;
+      const translateY = transformMatrix.f;
+
+      labelElem.attr('transform', `translate(${translateX}, ${translateY}) rotate(45, 0, ${y})`);
+    };
+
+    return () => {
+      const x = d3.scaleOrdinal(xRange())
+        .domain(this.currentSeries.map(elem => elem.label));
+
+      d3.select('#svg')
+        .append('g')
+        .attr('id', 'x-axis')
+        .attr('class', 'd3chart-axis d3chart-xAxis')
+        .call(d3.axisBottom(x))
+        .call(() => rotateLabels())
+        .attr('transform', `translate(${this.margin.left}, ${(this.height - this.margin.bottom)})`);
+    };
+  })();
 
   drawChart = (() => {
     const initSvg = () => {
@@ -46,8 +114,7 @@ export class ViolinChartComponent implements OnChanges {
 
     const drawChartElements = () => {
       this.violinWidth = this.calculateViolinWidth();
-
-      const domain = this.violinChartMathService.getDomain(this.currentSeries, this.dataTrimValue);
+      const domain: number[] = this.violinChartMathService.getDomain(this.currentSeries, this.dataTrimValue);
 
       this.drawXAxis();
 
@@ -63,7 +130,6 @@ export class ViolinChartComponent implements OnChanges {
     };
 
     return () => {
-      // remove old chart
       d3.select('#svg-container')
         .selectAll('*')
         .remove();
@@ -91,72 +157,6 @@ export class ViolinChartComponent implements OnChanges {
     };
   })();
 
-  drawXAxis = (() => {
-    const xRange = (): number[] => {
-      return this.currentSeries.map((_, index: number) => {
-        return index * this.violinWidth + this.violinWidth / 2;
-      });
-    };
-
-    const rotateLabels = (): void => {
-      let maxLabelLength = -1;
-      let rotate;
-      d3.selectAll('.d3chart-xAxis g').each((d, i, e) => {
-        const childTextElem = d3.select(e[i]).select('text');
-        const childTextElemNode: SVGTSpanElement = <SVGTSpanElement>childTextElem.node();
-        const labelLength = childTextElemNode.getComputedTextLength();
-
-        if (labelLength > maxLabelLength) {
-          maxLabelLength = labelLength;
-        }
-
-        if (labelLength > this.violinWidth) {
-          rotate = true;
-        }
-      });
-
-      this.margin.bottom = Math.cos(Math.PI / 4) * maxLabelLength + 20;
-
-      if (rotate) {
-        d3.selectAll('.d3chart-xAxis g').each((d, i, e) => {
-          const selectedLabel = d3.select(e[i]);
-          rotateLabel(selectedLabel);
-        });
-      }
-    };
-
-    const rotateLabel = (labelElem): void => {
-      labelElem.style('text-anchor', 'start');
-
-      const childTextElem = labelElem.select('text');
-      const y = childTextElem.attr('y');
-
-      const transformBaseVal: SVGTransformList = labelElem.node().transform.baseVal;
-      const transformMatrix: SVGMatrix = transformBaseVal.getItem(0).matrix;
-
-      const translateX = transformMatrix.e;
-      const translateY = transformMatrix.f;
-
-      const translateString = 'translate(' + translateX + ',' + translateY + ')';
-      const rotateString = 'rotate(45,0,' + y + ')';
-
-      labelElem.attr('transform', translateString + rotateString);
-    };
-
-    return () => {
-      const x = d3.scaleOrdinal(xRange())
-        .domain(this.currentSeries.map(elem => elem.label));
-
-      d3.select('#svg')
-        .append('g')
-        .attr('id', 'x-axis')
-        .attr('class', 'd3chart-axis d3chart-xAxis')
-        .call(d3.axisBottom(x))
-        .call(() => rotateLabels())
-        .attr('transform', 'translate(' + this.margin.left + ', ' + (this.height - this.margin.bottom) + ')');
-    };
-  })();
-
   constructor(private measurandColorProviderService: MeasurandColorService,
               private violinChartMathService: ViolinChartMathService,
               private spinnerService: SpinnerService) {
@@ -173,14 +173,14 @@ export class ViolinChartComponent implements OnChanges {
 
   prepareChartData(inputData: DistributionDataDTO): DistributionDataDTO {
     const dataInputCopy = {...inputData};
-    dataInputCopy.series.forEach(elem => {
+    dataInputCopy.series.forEach((elem: DistributionDTO) => {
       return elem.data.sort(d3.ascending);
     });
     return dataInputCopy;
   }
 
   assignShortLabels(): void {
-    const seriesLabelParts = this.chartData.series.map(elem => {
+    const seriesLabelParts = this.chartData.series.map((elem: DistributionDTO) => {
       return {grouping: elem.identifier, page: elem.page, jobGroup: elem.jobGroup, label: elem.identifier};
     });
 
@@ -188,7 +188,7 @@ export class ViolinChartComponent implements OnChanges {
     labelUtil.getSeriesWithShortestUniqueLabels();
     this.commonLabelParts = labelUtil.getCommonLabelParts();
 
-    seriesLabelParts.forEach((labelPart, index) => {
+    seriesLabelParts.forEach((labelPart: {grouping: string, page: string, jobGroup: string, label: string}, index: number) => {
       this.chartData.series[index].label = labelPart.label;
     });
   }
@@ -196,7 +196,7 @@ export class ViolinChartComponent implements OnChanges {
   drawHeader(): void {
     const getHeaderTransform = () => {
       const widthOfAllViolins = this.currentSeries.length * this.violinWidth;
-      return 'translate(' + (this.margin.left + widthOfAllViolins / 2) + ',20)';
+      return `translate(${(this.margin.left + widthOfAllViolins / 2)}, 20)`;
     };
 
     d3.select('#svg')
@@ -211,7 +211,7 @@ export class ViolinChartComponent implements OnChanges {
       .attr('transform', getHeaderTransform());
   }
 
-  drawYAxis(domain, text): void {
+  drawYAxis(domain: number[], text: string): void {
     const y = d3.scaleLinear()
       .range([this.height - this.margin.bottom, this.margin.top])
       .domain(domain);
@@ -224,27 +224,27 @@ export class ViolinChartComponent implements OnChanges {
     const g = d3.select('#svg')
       .append('g')
       .attr('class', 'd3chart-axis d3chart-yAxis')
-      .attr('transform', 'translate(' + this.margin.left + ', 0)')
+      .attr('transform', `translate(${this.margin.left}, 0)`)
       .call(d3.axisLeft(y));
 
     g.selectAll('.tick line').classed('d3chart-yAxis-line', true);
     g.selectAll('path').classed('d3chart-yAxis-line', true);
   }
 
-  drawViolins(domain): void {
+  drawViolins(domain: number[]): void {
     const svgSelection = d3.select('#svg');
     svgSelection.selectAll('clipPath').remove();
     svgSelection.select('[clip-path]').remove();
 
     const violinGroup = svgSelection.append('g');
     this.createClipPathAroundViolins(violinGroup);
-    this.currentSeries.forEach((d, i) => {
-      const traceData = d.data;
+    this.currentSeries.forEach((distribution: DistributionDTO, index: number) => {
+      const traceData = distribution.data;
 
       const g = violinGroup.append('g')
         .attr('class', 'd3chart-violin')
         .attr('style', 'fill: none;')
-        .attr('transform', 'translate(' + (i * this.violinWidth + this.margin.left) + ',0)');
+        .attr('transform', `translate(${(index * this.violinWidth + this.margin.left)}, 0)`);
 
       this.addViolin(g, traceData, this.height - this.margin.bottom, this.violinWidth, domain);
     });
@@ -260,7 +260,7 @@ export class ViolinChartComponent implements OnChanges {
       .attr('y', this.margin.top)
       .attr('width', this.width - this.margin.left - this.margin.right)
       .attr('height', this.height - this.margin.top - this.margin.bottom);
-    violinGroup.attr('clip-path', 'url(#' + clipPathId + ')');
+    violinGroup.attr('clip-path', `url(#${clipPathId})`);
   }
 
   calculateViolinWidth(): number {
@@ -275,7 +275,7 @@ export class ViolinChartComponent implements OnChanges {
   }
 
   sortByMedian(): void {
-    this.chartData.series.forEach(seriesData => {
+    this.chartData.series.forEach((seriesData: DistributionDTO) => {
       seriesData.median = this.violinChartMathService.calculateMedian(seriesData.data);
     });
 
@@ -290,7 +290,11 @@ export class ViolinChartComponent implements OnChanges {
     });
   }
 
-  private addViolin(g, traceData, height, violinWidth, domain): void {
+  private addViolin(gElement: d3.Selection<SVGGElement, {}, HTMLElement, {}>,
+                    traceData: number[],
+                    height: number,
+                    violinWidth: number,
+                    domain: number[]): void {
     const resolution = this.violinChartMathService
       .histogramResolutionForTraceData(this.currentSeries, traceData, this.mainDataResolution);
 
@@ -299,33 +303,33 @@ export class ViolinChartComponent implements OnChanges {
       (traceData);
 
     // y is now the horizontal axis because of the violin being a 90 degree rotated histogram
-    const y = d3.scaleLinear()
+    const y: d3.ScaleLinear<number, number> = d3.scaleLinear()
       .range([violinWidth / 2, 0])
-      .domain([0, d3.max(data, d => d.length)]);
+      .domain([0, d3.max(data, datum => datum.length)]);
 
     // x is now the vertical axis because of the violin being a 90 degree rotated histogram
-    const x = d3.scaleLinear()
+    const x: d3.ScaleLinear<number, number> = d3.scaleLinear()
       .range([height, this.margin.top])
       .domain(domain)
       .nice();
 
-    const area = d3.area()
+    const area: d3.Area<number[]> = d3.area()
       .curve(this.interpolation)
-      .x(d => x(d['x0']))
+      .x(datum => x(datum['x0']))
       .y0(violinWidth / 2)
       .y1(d => y(d.length));
 
-    const line = d3.line()
+    const line: d3.Line<number[]> = d3.line()
       .curve(this.interpolation)
-      .x(d => x(d['x0']))
-      .y(d => y(d.length));
+      .x(datum => x(datum['x0']))
+      .y(datum => y(datum.length));
 
-    const gPlus = g.append('g');
-    const gMinus = g.append('g');
+    const gPlus: d3.Selection<SVGGElement, {}, HTMLElement, {}> = gElement.append('g');
+    const gMinus: d3.Selection<SVGGElement, {}, HTMLElement, {}> = gElement.append('g');
 
     // TODO There is no 'dimensionalUnit' in chartData
-    const colorScale = this.measurandColorProviderService.getColorScaleForMeasurandGroup('ms');
-    const violinColor = colorScale('0');
+    const colorScale: d3.ScaleOrdinal<string, any> = this.measurandColorProviderService.getColorScaleForMeasurandGroup('ms');
+    const violinColor: string = colorScale('0');
 
     gPlus.append('path')
       .datum(data)
@@ -351,7 +355,7 @@ export class ViolinChartComponent implements OnChanges {
       .attr('d', line)
       .style('stroke', violinColor);
 
-    gPlus.attr('transform', 'rotate(90, 0, 0)  translate(0, -' + violinWidth + ')');
+    gPlus.attr('transform', `rotate(90, 0, 0)  translate(0, -${violinWidth})`);
     gMinus.attr('transform', 'rotate(90, 0, 0) scale(1, -1)');
   }
 }

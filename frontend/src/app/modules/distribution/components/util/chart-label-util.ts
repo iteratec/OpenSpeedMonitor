@@ -1,11 +1,11 @@
 export default class ChartLabelUtil {
-  static groupingDelimiter = " | ";
-  static delimiter = ", ";
+  static groupingDelimiter = ' | ';
+  static delimiter = ', ';
 
   static processWith(series, i18nMap): ChartLabelProcessing {
     return new ChartLabelProcessing(series, i18nMap);
   }
-};
+}
 
 class ChartLabelProcessing {
   seriesData = null;
@@ -21,7 +21,7 @@ class ChartLabelProcessing {
     this.i18nData = i18nMap || {};
   }
 
-  deduceUniqueEntries() {
+  deduceUniqueEntries(): void {
     this.seriesData.forEach(series => {
       if (series.grouping && !series.page && !series.jobGroup && !series.browser) {
         const splittedIdentifier = series.grouping.split(ChartLabelUtil.groupingDelimiter);
@@ -43,9 +43,9 @@ class ChartLabelProcessing {
         this.uniqueBrowsers.push(series.browser);
       }
     });
-  };
+  }
 
-  setLabelInSeriesData(omitMeasurands) {
+  setLabelInSeriesData(omitMeasurands): void {
     this.seriesData.forEach(series => {
       const labelParts = [];
       if (this.uniquePages.length > 1) {
@@ -62,9 +62,9 @@ class ChartLabelProcessing {
       }
       series.label = labelParts.join(ChartLabelUtil.delimiter);
     });
-  };
+  }
 
-  getCommonLabelParts(omitMeasurands = null) {
+  getCommonLabelParts(omitMeasurands = null): string {
     const commonPartsHeader = [];
     if (this.uniqueJobGroups.length === 1) {
       commonPartsHeader.push(this.uniqueJobGroups[0]);
@@ -76,9 +76,9 @@ class ChartLabelProcessing {
       commonPartsHeader.push(this.uniqueMeasurands[0]);
     }
     return commonPartsHeader.join(ChartLabelUtil.delimiter);
-  };
+  }
 
-  getSeriesWithShortestUniqueLabels() {
+  getSeriesWithShortestUniqueLabels(): void {
     this.setLabelInSeriesData(this.seriesData);
-  };
+  }
 }
