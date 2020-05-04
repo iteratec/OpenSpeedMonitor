@@ -7,7 +7,8 @@
 
 <div class="action-row">
   <div class="col-md-12">
-    <osm-result-selection-submit [applicationsRequired]="true" [measurandsRequired]="true" [pagesRequired]="true" (submit)="getDistributionChartData()"></osm-result-selection-submit>
+    <osm-result-selection-submit (submit)="getDistributionChartData()" [applicationsRequired]="true" [measurandsRequired]="true"
+                                 [pagesRequired]="true"></osm-result-selection-submit>
   </div>
 </div>
 <div class="row">
@@ -21,9 +22,9 @@
         <osm-result-selection-application></osm-result-selection-application>
       </div>
       <div class="col-md-5">
-        <osm-result-selection-page-location-connectivity [showPageSelection]="true"
+        <osm-result-selection-page-location-connectivity [pageRequired]="true"
                                                          [showBrowserSelection]="false"
-                                                         [pageRequired]="true">
+                                                         [showPageSelection]="true">
         </osm-result-selection-page-location-connectivity>
       </div>
       <div class="col-md-12">

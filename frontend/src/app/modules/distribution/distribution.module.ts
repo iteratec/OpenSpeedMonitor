@@ -1,14 +1,14 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {DistributionComponent} from './distribution.component';
-import {RouterModule, Routes} from "@angular/router";
-import {ResultSelectionModule} from "../result-selection/result-selection.module";
-import {SharedModule} from "../shared/shared.module";
-import {ViolinchartDataService} from "./services/violinchart-data.service";
-import { ViolinChartComponent } from './components/violin-chart/violin-chart.component';
+import {RouterModule, Routes} from '@angular/router';
+import {ResultSelectionModule} from '../result-selection/result-selection.module';
+import {SharedModule} from '../shared/shared.module';
+import {ViolinchartDataService} from './services/violinchart-data.service';
+import {ViolinChartComponent} from './components/violin-chart/violin-chart.component';
 
 const DistributionRoutes: Routes = [
-  {path: 'show', component: DistributionComponent},
+  {path: 'show', component: DistributionComponent}
 ];
 
 @NgModule({
@@ -23,4 +23,5 @@ const DistributionRoutes: Routes = [
     ViolinchartDataService
   ]
 })
-export class DistributionModule { }
+export class DistributionModule {
+}

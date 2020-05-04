@@ -1,23 +1,11 @@
-import { Injectable } from '@angular/core';
-import * as d3 from "d3";
-import {DistributionDTO} from "../models/distribution.model";
+import {Injectable} from '@angular/core';
+import * as d3 from 'd3';
+import {DistributionDTO} from '../models/distribution.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ViolinChartMathService {
-
-  constructor() { }
-
-  getDomain(currentSeries: DistributionDTO[], dataTrimValue: number): Array<number> {
-    const maxInSeries = currentSeries.map(elem => {
-      return Math.max(...elem.data)
-    });
-    const maxValue = d3.max(maxInSeries);
-    const trimValue = dataTrimValue || maxValue;
-
-    return [0, Math.min(maxValue, trimValue)];
-  }
 
   histogramResolutionForTraceData = (() => {
     const getGreatestDomainTrace = (currentSeries: any) => {
@@ -40,11 +28,24 @@ export class ViolinChartMathService {
       const quantile75 = d3.quantile(greatestDomainTrace, 0.75);
       const binSize = (quantile75 - quantile25) / mainDataResolution;
       return Math.floor((traceData[traceData.length - 1] - traceData[0]) / binSize);
-    }
+    };
   })();
 
+  constructor() {
+  }
+
+  getDomain(currentSeries: DistributionDTO[], dataTrimValue: number): Array<number> {
+    const maxInSeries = currentSeries.map(elem => {
+      return Math.max(...elem.data);
+    });
+    const maxValue = d3.max(maxInSeries);
+    const trimValue = dataTrimValue || maxValue;
+
+    return [0, Math.min(maxValue, trimValue)];
+  }
+
   calculateMedian(arr: Array<number>): number {
-    if(!arr || arr.length === 0) {
+    if (!arr || arr.length === 0) {
       return 0;
     }
 
