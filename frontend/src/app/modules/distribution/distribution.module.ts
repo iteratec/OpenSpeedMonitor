@@ -6,6 +6,7 @@ import {ResultSelectionModule} from '../result-selection/result-selection.module
 import {SharedModule} from '../shared/shared.module';
 import {ViolinchartDataService} from './services/violinchart-data.service';
 import {ViolinChartComponent} from './components/violin-chart/violin-chart.component';
+import {FormsModule} from "@angular/forms";
 
 const DistributionRoutes: Routes = [
   {path: 'show', component: DistributionComponent},
@@ -19,6 +20,7 @@ const DistributionRoutes: Routes = [
     RouterModule.forChild(DistributionRoutes),
     SharedModule,
     ResultSelectionModule,
+    FormsModule,
   ],
   providers: [
     ViolinchartDataService

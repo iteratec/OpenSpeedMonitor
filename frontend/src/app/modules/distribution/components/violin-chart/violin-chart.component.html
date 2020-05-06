@@ -2,6 +2,50 @@
   <div id="violin-chart-component">
     <osm-spinner [spinnerId]="'violin-chart-spinner'"></osm-spinner>
 
-    <div id="svg-container"></div>
+    <div class="settings-row">
+      <input (ngModelChange)="drawChart()" [(ngModel)]="dataTrimValue"
+             [max]="maxValueForInputField"
+             [step]="step" class="form-control settings-element max-value-input-field"
+             min="0" placeholder="{{'frontend.de.iteratec.osm.distribution.chart.settings.maximum' | translate}}"
+             type="number">
+
+      <button aria-expanded="false" aria-haspopup="true"
+              class="btn btn-default btn-sm dropdown-toggle settings-element filter-button"
+              data-toggle="dropdown"
+              id="filter-dropdown"
+              type="button">{{'frontend.de.iteratec.osm.distribution.chart.settings.filter' | translate }} <span
+        class="caret"></span>
+      </button>
+      <ul class="dropdown-menu pull-right">
+        <li class="dropdown-header" id="all-bars-header">
+          {{'frontend.de.iteratec.osm.distribution.chart.settings.sort' | translate }}
+        </li>
+        <li>
+          <a (click)="setSeriesBySortingRule('desc')" class="chart-filter"><i
+            [ngClass]="sort === 'desc' ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+            {{'frontend.de.iteratec.osm.distribution.chart.settings.sort.desc' | translate }}
+          </a>
+        </li>
+        <li>
+          <a (click)="setSeriesBySortingRule('asc')" class="chart-filter"><i
+            [ngClass]="sort === 'asc' ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+            {{'frontend.de.iteratec.osm.distribution.chart.settings.sort.asc' | translate }}
+          </a>
+        </li>
+        <!--<ng-container *ngIf="hasFilterRules">
+          <li class="dropdown-header" id="customer-journey-header">
+            {{'frontend.de.iteratec.osm.barchart.filter.customerJourneyHeader' | translate}}
+          </li>
+          <li *ngFor="let filterRule of filterRules | keyvalue">
+            <a (click)="selectFilter(filterRule.key)" class="chart-filter">
+              <i [ngClass]="filterRule.value.selected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+              {{filterRule.key}}
+            </a>
+          </li>
+        </ng-container>-->
+      </ul>
+    </div>
+
+    <div class="svg-container" id="svg-container"></div>
   </div>
 </div>

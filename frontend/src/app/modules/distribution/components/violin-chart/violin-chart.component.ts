@@ -24,16 +24,21 @@ export class ViolinChartComponent implements OnChanges {
   private width = 600;
   private margin = {top: 50, right: 0, bottom: 70, left: 100};
   private violinWidth: number = null;
+
+  private maxLabelWidth = 1;
   private maxViolinWidth = 150;
 
   private interpolation: CurveFactory = d3.curveBasis;
 
   private mainDataResolution = 30;
-  private dataTrimValue: number = null;
-
   private chartData: DistributionDataDTO = null;
   private currentSeries: DistributionDTO[] = null;
   private commonLabelParts: string = null;
+
+  maxValueForInputField: number = null;
+  dataTrimValue: number = null;
+  step = 50;
+  sort = 'desc';
 
   drawXAxis = (() => {
     const xRange = (): number[] => {
@@ -59,17 +64,18 @@ export class ViolinChartComponent implements OnChanges {
         }
       });
 
+      this.maxLabelWidth = maxLabelLength;
       this.margin.bottom = Math.cos(Math.PI / 4) * maxLabelLength + 20;
 
       if (rotate) {
         d3.selectAll('.d3chart-xAxis g').each((_, index: number, nodes: d3.BaseType[]) => {
-          const selectedLabel = d3.select(nodes[index]);
+          const selectedLabel = d3.select(nodes[index] as SVGGElement);
           rotateLabel(selectedLabel);
         });
       }
     };
 
-    const rotateLabel = (labelElem): void => {
+    const rotateLabel = (labelElem: d3.Selection<SVGGElement, {}, null, undefined>): void => {
       labelElem.style('text-anchor', 'start');
 
       const childTextElem = labelElem.select('text');
@@ -99,7 +105,7 @@ export class ViolinChartComponent implements OnChanges {
   })();
 
   drawChart = (() => {
-    const initSvg = () => {
+    const initSvg = (): void => {
       const svgContainerSelection = d3.select('#svg-container');
 
       svgContainerSelection
@@ -112,9 +118,16 @@ export class ViolinChartComponent implements OnChanges {
       this.width = (<HTMLElement>svgContainerSelection.node()).getBoundingClientRect().width;
     };
 
-    const drawChartElements = () => {
+    const drawChartElements = (): void => {
       this.violinWidth = this.calculateViolinWidth();
-      const domain: number[] = this.violinChartMathService.getDomain(this.currentSeries, this.dataTrimValue);
+      const maxValue: number = this.violinChartMathService.getMaxValue(this.currentSeries);
+      if (this.dataTrimValue && this.dataTrimValue > maxValue) {
+        this.dataTrimValue = null;
+      }
+      const domain: number[] = this.violinChartMathService.getDomain(maxValue, this.dataTrimValue);
+      const orderOfMagnitudeOfMaxValue: number = Math.max(Math.floor(Math.log(maxValue) * Math.LOG10E), 0);
+      this.step = 5 * Math.pow(10, orderOfMagnitudeOfMaxValue - 2);
+      this.maxValueForInputField = Math.ceil(maxValue / this.step) * this.step;
 
       this.drawXAxis();
 
@@ -127,6 +140,14 @@ export class ViolinChartComponent implements OnChanges {
       // remove the xAxis lines
       d3.select('.d3chart-axis.d3chart-xAxis > path.domain').remove();
       d3.selectAll('.d3chart-axis.d3chart-xAxis g > line').remove();
+    };
+
+    const setSvgWidth = (): void => {
+      const graphWidth: number =
+        (this.violinWidth > this.maxLabelWidth) ?
+          150 + this.currentSeries.length * this.violinWidth :
+          150 + this.currentSeries.length * this.maxLabelWidth;
+      d3.select('#svg').attr('width', graphWidth);
     };
 
     return () => {
@@ -148,12 +169,13 @@ export class ViolinChartComponent implements OnChanges {
 
       // sort the violins after descending median as default
       this.sortByMedian();
-      const sortedSeries = this.chartData.sortingRules.desc.map(trace => {
+      const sortedSeries = this.chartData.sortingRules[this.sort].map(trace => {
         return this.chartData.series[trace];
       });
       this.chartData.series = sortedSeries;
       this.currentSeries = sortedSeries;
       drawChartElements();
+      setSvgWidth();
     };
   })();
 
@@ -168,6 +190,14 @@ export class ViolinChartComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
+    this.drawChart();
+  }
+
+  setSeriesBySortingRule(sort: string): void {
+    if (sort !== 'desc' && sort !== 'asc') {
+      return;
+    }
+    this.sort = sort;
     this.drawChart();
   }
 
@@ -250,7 +280,7 @@ export class ViolinChartComponent implements OnChanges {
     });
   }
 
-  createClipPathAroundViolins(violinGroup): void {
+  createClipPathAroundViolins(violinGroup: d3.Selection<SVGGElement, {}, HTMLElement, any>): void {
     const clipPathId = 'violin-clip';
     d3.select('#svg')
       .append('clipPath')

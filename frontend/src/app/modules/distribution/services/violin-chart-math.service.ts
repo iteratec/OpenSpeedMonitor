@@ -34,17 +34,20 @@ export class ViolinChartMathService {
   constructor() {
   }
 
-  getDomain(currentSeries: DistributionDTO[], dataTrimValue: number): Array<number> {
+  getMaxValue(currentSeries: DistributionDTO[]): number {
     const maxInSeries = currentSeries.map(elem => {
       return Math.max(...elem.data);
     });
-    const maxValue = d3.max(maxInSeries);
+    return d3.max(maxInSeries);
+  }
+
+  getDomain(maxValue: number, dataTrimValue: number): number[] {
     const trimValue = dataTrimValue || maxValue;
 
     return [0, Math.min(maxValue, trimValue)];
   }
 
-  calculateMedian(arr: Array<number>): number {
+  calculateMedian(arr: number[]): number {
     if (!arr || arr.length === 0) {
       return 0;
     }
