@@ -1,7 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { ViolinChartComponent } from './violin-chart.component';
-import {SharedModule} from "../../../shared/shared.module";
+import {ViolinChartComponent} from './violin-chart.component';
+import {SharedModule} from '../../../shared/shared.module';
+import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
 
 describe('ViolinChartComponent', () => {
   let component: ViolinChartComponent;
@@ -9,10 +10,10 @@ describe('ViolinChartComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ViolinChartComponent ],
-      imports: [ SharedModule ]
+      declarations: [ViolinChartComponent],
+      imports: [SharedModule, SharedMocksModule]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
