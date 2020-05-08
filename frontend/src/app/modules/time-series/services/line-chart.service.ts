@@ -824,6 +824,9 @@ export class LineChartService {
 
       this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
       this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
+      if (this._legendGroupColumns < 1) {
+        this._legendGroupColumns = 1;
+      }
       this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
     };
 
