@@ -1,13 +1,13 @@
 import {Component, OnInit} from '@angular/core';
-import {ApplicationService} from "../../services/application.service";
-import {ActivatedRoute, ParamMap} from "@angular/router";
-import {Page} from "../../models/page.model";
-import {Observable} from "rxjs";
-import {ExtendedPerformanceAspect, PerformanceAspectType} from "../../models/perfomance-aspect.model";
-import {Application} from "../../models/application.model";
-import {AspectConfigurationService} from "./services/aspect-configuration.service";
-import {PerformanceAspectService} from "../../services/performance-aspect.service";
-import {ResponseWithLoadingState} from "../../models/response-with-loading-state.model";
+import {ApplicationService} from '../../services/application.service';
+import {ActivatedRoute, ParamMap} from '@angular/router';
+import {Page} from '../../models/page.model';
+import {Observable} from 'rxjs';
+import {ExtendedPerformanceAspect, PerformanceAspectType} from '../../models/perfomance-aspect.model';
+import {Application} from '../../models/application.model';
+import {AspectConfigurationService} from './services/aspect-configuration.service';
+import {PerformanceAspectService} from '../../services/performance-aspect.service';
+import {ResponseWithLoadingState} from '../../models/response-with-loading-state.model';
 
 @Component({
   selector: 'osm-aspect-configuration',
@@ -41,6 +41,6 @@ export class AspectConfigurationComponent implements OnInit {
   }
 
   deselectPage() {
-    this.aspectConfService.selectedPage$.next({id: -1, name: ""});
+    this.aspectConfService.selectedPage$.next({id: -1, name: ''});
   }
 }

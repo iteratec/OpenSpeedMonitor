@@ -1,6 +1,8 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, Output} from '@angular/core';
 import {TestResult} from '../../models/test-result.model';
 import {MetricFinderService} from '../../services/metric-finder.service';
+import {ResultSelectionService} from '../../../result-selection/services/result-selection.service';
+import {MeasurandGroup, SelectableMeasurand} from '../../../../models/measurand.model';
 
 interface SelectableMetric {
   id: string;
@@ -13,15 +15,19 @@ interface SelectableMetric {
   templateUrl: './metric-selection.component.html',
   styleUrls: ['./metric-selection.component.scss']
 })
-export class MetricSelectionComponent {
+export class MetricSelectionComponent implements AfterViewInit {
+
+  @Output()
+  selectedMetricChange = new EventEmitter<string>();
+
+  constructor(
+    private metricFinderService: MetricFinderService,
+    private measurandService: ResultSelectionService
+  ) {
+  }
 
   private _selectedMetric = '';
   private _availableMetrics: SelectableMetric[] = [];
-
-  @Input()
-  set results(results: TestResult[]) {
-    this._availableMetrics = this.findCommonMetrics(results);
-  }
 
   @Input()
   get selectedMetric() {
@@ -33,16 +39,17 @@ export class MetricSelectionComponent {
     this.selectedMetricChange.emit(this._selectedMetric);
   }
 
-  @Output()
-  selectedMetricChange = new EventEmitter<string>();
-
   get availableMetrics(): SelectableMetric[] {
     return this._availableMetrics;
   }
 
-  constructor(
-    private metricFinderService: MetricFinderService
-  ) {
+  @Input()
+  set results(results: TestResult[]) {
+    this._availableMetrics = this.findCommonMetrics(results);
+  }
+
+  ngAfterViewInit() {
+    this.findDefaultMetrics();
   }
 
   private findCommonMetrics(results: TestResult[]): SelectableMetric[] {
@@ -54,6 +61,29 @@ export class MetricSelectionComponent {
         isUserTiming: metricId.startsWith('_')
       }))
       .sort((a, b) => this.compareMetrics(a, b));
+  }
+
+  private findDefaultMetrics(): void {
+    this.metricFinderService.testResults$.subscribe((next: TestResult[]) => {
+      if (next.length === 0) {
+        this.measurandService.fetchMeasurands().subscribe((groups: MeasurandGroup[]) => {
+          const metrics: SelectableMetric[] = [];
+          groups.forEach((group: MeasurandGroup) => {
+            group.values.forEach((measurand: SelectableMeasurand) => {
+              metrics.push({
+                id: measurand.id,
+                name: this.metricFinderService.getMetricName(measurand.id),
+                isUserTiming: measurand.id.startsWith('_')
+              } as SelectableMetric);
+            });
+          });
+          metrics.sort((a, b) => this.compareMetrics(a, b));
+          this._availableMetrics = metrics;
+        });
+      } else if (next.length > 0) {
+        this._availableMetrics = [];
+      }
+    });
   }
 
   private intersect(metricLists: string[][]): string[] {

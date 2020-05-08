@@ -6,6 +6,7 @@ import {WptInfo} from "./wpt-info.model";
 export class TimeSeriesPoint {
   date: Date;
   value: number;
+  agent: string;
   tooltipText: string;
   wptInfo: WptInfo;
 
