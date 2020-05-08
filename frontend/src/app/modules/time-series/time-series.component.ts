@@ -21,6 +21,9 @@ export class TimeSeriesComponent implements OnInit {
   constructor(private linechartDataService: LinechartDataService, private resultSelectionStore: ResultSelectionStore) { }
 
   ngOnInit() {
+    if (this.resultSelectionStore.validQuery) {
+      this.getTimeSeriesChartData();
+    }
   }
 
   getTimeSeriesChartData() {

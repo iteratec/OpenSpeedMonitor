@@ -52,6 +52,10 @@ osm-time-series-line-chart {
         font-size: 14px;
         fill: $color-text-light;
       }
+
+      .unit {
+        text-anchor: middle;
+      }
     }
 
     .marker-line {
@@ -63,7 +67,6 @@ osm-time-series-line-chart {
       stroke-width: 2px;
       fill: white;
     }
-
   }
 }
 
