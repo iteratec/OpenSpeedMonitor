@@ -541,9 +541,9 @@ export class LineChartService {
         // Remove after resize
         chart.selectAll('.lines').remove();
         // Remove old dots
-        this._chartContentContainer.select('.single-dots').remove();
+        chart.selectAll('.single-dots').remove();
         // Remove old dots
-        this._chartContentContainer.select('.dots').remove();
+        chart.selectAll('.dots').remove();
       }
       // Create one group per line / data entry
       this._chartContentContainer
