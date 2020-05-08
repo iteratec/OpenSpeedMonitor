@@ -14,11 +14,14 @@ import {EventResultData} from '../../models/event-result-data.model';
 import {LineChartService} from '../../services/line-chart.service';
 import {NgxSmartModalService} from 'ngx-smart-modal';
 import {SpinnerService} from '../../../shared/services/spinner.service';
+import {TranslateService} from '@ngx-translate/core';
 
 
 @Component({
   selector: 'osm-time-series-line-chart',
-  encapsulation: ViewEncapsulation.None,  // needed! otherwise the scss style do not apply to svg content (see https://stackoverflow.com/questions/36214546/styles-in-component-for-d3-js-do-not-show-in-angular-2/36214723#36214723)
+  // needed! otherwise the scss style do not apply to svg content
+  // (see https://stackoverflow.com/questions/36214546/styles-in-component-for-d3-js-do-not-show-in-angular-2/36214723#36214723)
+  encapsulation: ViewEncapsulation.None,
   templateUrl: './time-series-line-chart.component.html',
   styleUrls: ['./time-series-line-chart.component.scss']
 })
@@ -31,11 +34,13 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   svgElement: ElementRef;
 
   public ngxSmartModalService;
+  dataTrimLabels: {[key: string]: string} = {};
 
   private _resizeTimeoutId: number;
 
   constructor(private lineChartService: LineChartService,
               private spinnerService: SpinnerService,
+              private translateService: TranslateService,
               ngxSmartModalService: NgxSmartModalService) {
     this.ngxSmartModalService = ngxSmartModalService;
   }
@@ -70,6 +75,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
     this.spinnerService.hideSpinner('time-series-line-chart-spinner');
 
     this.lineChartService.drawLineChart(this.timeSeriesResults);
+    this.dataTrimLabels = this.lineChartService.dataTrimLabels;
   }
 
   handlePointSelectionError() {

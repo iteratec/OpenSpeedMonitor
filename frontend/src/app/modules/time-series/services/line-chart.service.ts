@@ -46,13 +46,15 @@ export class LineChartService {
               private lineChartScaleService: LineChartScaleService) {
   }
 
+  dataTrimLabels: {[key: string]: string} = {};
+
   private DOT_RADIUS = 3;
   private DOT_HIGHLIGHT_RADIUS = 5;
 
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  private _margin: any = {top: 40, right: 75, bottom: 40, left: 75};
+  private _margin: any = {top: 60, right: 75, bottom: 40, left: 75};
   private _width: number = 600 - this._margin.left - this._margin.right;
   private _height: number = 550 - this._margin.top - this._margin.bottom;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
@@ -889,6 +891,8 @@ export class LineChartService {
       this.addMouseMarkerToChart(this._chartContentContainer);
       this.drawAllSelectedPoints();
 
+      this.setDataTrimLabels(incomingData.measurandGroups);
+
       this._chartContentContainer
         .attr('width', this._width)
         .attr('height', this._height);
@@ -1376,5 +1380,9 @@ export class LineChartService {
       (nearestDotXPosition - tooltipWidth + this._margin.left) : nearestDotXPosition + this._margin.left + 50;
     tooltip.style('top', `${top}px`);
     tooltip.style('left', `${left}px`);
+  }
+
+  private setDataTrimLabels(measurandGroups: any) {
+    this.dataTrimLabels = measurandGroups;
   }
 }

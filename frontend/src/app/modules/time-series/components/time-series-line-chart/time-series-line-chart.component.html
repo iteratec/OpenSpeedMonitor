@@ -1,6 +1,26 @@
 <div id="time-series-line-chart-container">
   <osm-spinner [spinnerId]="'time-series-line-chart-spinner'"></osm-spinner>
 
+  <div class="settings-row">
+    <span *ngFor="let measurandGroup of dataTrimLabels | keyvalue">
+      <span class="input-group dimension-group">
+        <label
+          class="input-group-addon settings-element dimension-label">{{'frontend.de.iteratec.isr.measurand.group.' + measurandGroup.key | translate}}</label>
+        <input class="form-control settings-element trim-value-input-field min-input"
+               min="0" placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.minimum' | translate}}"
+               type="number">
+        <input class="form-control settings-element trim-value-input-field"
+               min="0" placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.maximum' | translate}}"
+               type="number">
+        <label class="input-group-addon settings-element dimension-label">{{measurandGroup.value}}</label>
+      </span>
+        <!--(ngModelChange)="drawChart()" [(ngModel)]="dataTrimValue"
+               [max]="maxValueForInputField"
+               [step]="stepForInputField"-->
+    </span>
+
+  </div>
+
   <div class="card">
     <svg #svg/>
   </div>
