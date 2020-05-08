@@ -358,6 +358,9 @@ export class LineChartService {
             .attr('class', 'legend-text')
             .attr('x', 15)
             .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+            .style('opacity', (datum) => {
+              return (this.legendDataMap[datum].show) ? 1 : 0.2;
+            })
             .text(datum => this.legendDataMap[datum].text);
           return legendElement;
         },
