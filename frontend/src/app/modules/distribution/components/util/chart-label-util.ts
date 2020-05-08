@@ -2,23 +2,21 @@ export default class ChartLabelUtil {
   static groupingDelimiter = ' | ';
   static delimiter = ', ';
 
-  static processWith(series, i18nMap): ChartLabelProcessing {
-    return new ChartLabelProcessing(series, i18nMap);
+  static processWith(series): ChartLabelProcessing {
+    return new ChartLabelProcessing(series);
   }
 }
 
 class ChartLabelProcessing {
   seriesData = null;
-  i18nData = null;
   uniquePages = [];
   uniqueJobGroups = [];
   uniqueMeasurands = [];
   uniqueBrowsers = [];
 
-  constructor(series, i18nMap) {
+  constructor(series) {
     this.seriesData = series;
     this.deduceUniqueEntries();
-    this.i18nData = i18nMap || {};
   }
 
   deduceUniqueEntries(): void {

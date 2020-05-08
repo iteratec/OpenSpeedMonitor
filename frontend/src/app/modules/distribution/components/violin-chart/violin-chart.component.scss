@@ -1,13 +1,7 @@
-#violin-chart-component {
+.violin-chart-component {
   position: relative;
   // width: 100%;
   min-height: 100px;
-
-  #y-axis_left_label {
-    position: absolute;
-    transform: translate(0, -300px) rotate(-90deg);
-    white-space: nowrap;
-  }
 }
 
 .svg-container {
@@ -43,7 +37,7 @@
   }
 
   .max-value-input-field {
-    max-width: 10em;
+    width: 10em;
   }
 
   .filter-button {
@@ -57,4 +51,18 @@
   .filter-inactive {
     visibility: hidden;
   }
+}
+
+.x-axis-label {
+  font-size: 12px;
+  text-rendering: geometricPrecision;
+}
+
+.y-axis-left-label {
+  fill: #606060;
+  font-size: 14px;
+}
+
+.d3chart-y-axis-line {
+  shape-rendering: crispEdges;
 }

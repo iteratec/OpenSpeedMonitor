@@ -47,6 +47,11 @@ export class ViolinChartMathService {
     return [0, Math.min(maxValue, trimValue)];
   }
 
+  getAdequateStep(maximumValue: number): number {
+    const orderOfMagnitudeOfMaxValue: number = Math.max(Math.floor(Math.log(maximumValue) * Math.LOG10E), 0);
+    return 5 * Math.pow(10, orderOfMagnitudeOfMaxValue - 2);
+  }
+
   calculateMedian(arr: number[]): number {
     if (!arr || arr.length === 0) {
       return 0;

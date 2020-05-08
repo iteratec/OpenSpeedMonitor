@@ -1,19 +1,25 @@
 import {DistributionDTO} from './distribution.model';
 
 export interface DistributionDataDTO {
-  i18nMap: {};
   series: DistributionDTO[];
-  sortingRules: any;
+  measurandGroup: string;
+  dimensionalUnit: string;
+  sortingRules: {desc: number[], asc: number[]};
+  filterRules: {[key: string]: string[]};
 }
 
 export class DistributionData implements DistributionDataDTO {
-  i18nMap: {};
   series: DistributionDTO[];
-  sortingRules: any;
+  measurandGroup: string;
+  dimensionalUnit: string;
+  sortingRules: {desc: number[], asc: number[]};
+  filterRules: {[key: string]: string[]};
 
   constructor() {
-    this.i18nMap = {};
     this.series = [];
-    this.sortingRules = {};
+    this.measurandGroup = '';
+    this.dimensionalUnit = '';
+    this.sortingRules = {desc: [], asc: []};
+    this.filterRules = {};
   }
 }
