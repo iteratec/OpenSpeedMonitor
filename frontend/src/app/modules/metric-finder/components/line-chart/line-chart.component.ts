@@ -71,10 +71,10 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
     }
     this.width = this.svgElement.nativeElement.parentElement.offsetWidth - this.margin.left - this.margin.right;
     this.height = this.svgElement.nativeElement.parentElement.offsetHeight - this.margin.top - this.margin.bottom;
-    this.xScale =  scaleTime()
+    this.xScale = scaleTime()
       .domain(extent(this.results, result => result.date))
       .range([0, this.width]);
-    this.yScale =  scaleLinear()
+    this.yScale = scaleLinear()
       .domain([0, max(this.results, result => result.timings[this.metric])])
       .range([this.height, 0])
       .nice();
@@ -86,9 +86,13 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
   }
 
   public render() {
-    const selection = select(this.svgElement.nativeElement).selectAll('g.graph').data<TestResult[]>([this.results.filter((result: TestResult) => {
-      return !!result.timings[this.metric] && result.timings[this.metric] > 0
-    })]);
+    const selection = select(this.svgElement.nativeElement)
+      .selectAll('g.graph')
+      .data<TestResult[]>(
+        [this.results.filter((result: TestResult) => {
+          return !!result.timings[this.metric] && result.timings[this.metric] > 0;
+        })
+      ]);
     this.enter(selection.enter());
     this.update(selection.merge(selection.enter()));
     this.renderSelectedPoints();
@@ -103,7 +107,7 @@ export class LineChartComponent implements AfterContentInit, OnChanges {
       .selectAll('circle.selected-point')
       .data<TestResult>(
         this.selectedResults.filter((result: TestResult) => {
-          return !!result.timings[this.metric] && result.timings[this.metric] > 0
+          return !!result.timings[this.metric] && result.timings[this.metric] > 0;
         }),
         (result: TestResult) => result.id
       );

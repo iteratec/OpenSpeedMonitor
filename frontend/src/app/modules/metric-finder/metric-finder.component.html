@@ -1,5 +1,5 @@
 <osm-line-chart [results]="testResults$ | async" [metric]="selectedMetric"
-                (resultSelectionChange)="setSelectedResults($event)"></osm-line-chart>
+                (resultSelectionChange)="setSelectedResults($event)" *ngIf="(testResults$ | async).length > 0"></osm-line-chart>
 
 <osm-comparable-filmstrips [results]="selectedResults" [highlightedMetric]="selectedMetric"></osm-comparable-filmstrips>
 

@@ -5,6 +5,7 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.report.chart.WptEventResultInfo
 import de.iteratec.osm.result.CachedView
+import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
@@ -20,6 +21,8 @@ import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 class LineChartTimeSeriesService {
 
     PerformanceLoggingService performanceLoggingService
+
+    static int MEGA_BYTE = 1048576
 
     TimeSeriesChartDTO getTimeSeriesFor(GetLinechartCommand cmd) {
         Date from = cmd.from.toDate()
@@ -119,7 +122,10 @@ class LineChartTimeSeriesService {
                 jobGroups, measuredEvents, locations, connectivityProfiles, jobGroup, measuredEvent, location, connectivity)
 
         timeSeriesChartDTO = rebuildIdentifierForEdgeCases(timeSeriesChartDTO, measuredEvents, locations, connectivityProfiles)
-        timeSeriesChartDTO.series.sort { it.identifier.toUpperCase() }
+        timeSeriesChartDTO.series.each { series ->
+            series.value.sort { it.identifier.toUpperCase() }
+            timeSeriesChartDTO.numberOfTimeSeries += series.value.size()
+        }
         return timeSeriesChartDTO
     }
 
@@ -132,6 +138,7 @@ class LineChartTimeSeriesService {
             eventResultProjections.each { EventResultProjection eventResultProjection ->
                 String identifier = ""
                 Date date = (Date) eventResultProjection.jobResultDate
+                String testAgent = eventResultProjection.testAgent
                 if (jobGroups.size() > 1) {
                     jobGroup = (JobGroup) jobGroups.find {
                         jobGroupEntry -> jobGroupEntry.id == eventResultProjection.jobGroupId
@@ -180,8 +187,16 @@ class LineChartTimeSeriesService {
                     if ((measurands.size() + performanceAspectTypes.size()) > 1) {
                         identifierMeasurand = addMeasurandToIdentifier(measurandName, identifier)
                     }
-                    buildSeries(value, identifierMeasurand, date, wptInfo, measurandName, jobGroup, measuredEvent, location,
-                            connectivity, timeSeriesChartDTO)
+                    MeasurandGroup measurandGroup = measurand.measurandGroup
+                    String unit = measurandGroup.unit.label
+                    if (MeasurandGroup.REQUEST_SIZES.equals(measurandGroup)) {
+                        if (value) {
+                            value = (value / MEGA_BYTE).round(2)
+                        }
+                    }
+                    timeSeriesChartDTO.measurandGroups.put(measurandGroup, unit)
+                    buildSeries(value, identifierMeasurand, date, testAgent, wptInfo, measurandName, jobGroup, measuredEvent, location,
+                            connectivity, timeSeriesChartDTO, measurandGroup)
                 }
 
                 performanceAspectTypes.each { performanceAspectType ->
@@ -190,23 +205,31 @@ class LineChartTimeSeriesService {
                     if ((measurands.size() + performanceAspectTypes.size()) > 1) {
                         identifierAspect = addMeasurandToIdentifier(performanceAspectType.toString(), identifier)
                     }
-                    buildSeries(value, identifierAspect, date, wptInfo, performanceAspectType.toString(), jobGroup,
-                            measuredEvent, location, connectivity, timeSeriesChartDTO)
+                    MeasurandGroup measurandGroup = MeasurandGroup.LOAD_TIMES
+                    String unit = measurandGroup.unit.label
+                    timeSeriesChartDTO.measurandGroups.put(measurandGroup, unit)
+                    buildSeries(value, identifierAspect, date, testAgent, wptInfo, performanceAspectType.toString(), jobGroup,
+                            measuredEvent, location, connectivity, timeSeriesChartDTO, measurandGroup)
                 }
             }
-            timeSeriesChartDTO.series.any {
-                if (it.data.findAll { it.value == null }.size() == it.data.size()) {
-                    timeSeriesChartDTO.series.remove(it)
+            timeSeriesChartDTO.series.each { series ->
+                series.value.any {
+                    if (it.data.findAll { it.value == null }.size() == it.data.size()) {
+                        timeSeriesChartDTO.series.remove(it)
+                    }
                 }
             }
         }
         return timeSeriesChartDTO
     }
 
-    private void buildSeries(Double value, String identifier, Date date, TimeSeriesDataPointWptInfo wptInfo, String measurandName, JobGroup jobGroup,
-                             MeasuredEvent measuredEvent, Location location, ConnectivityProfile connectivity,
-                             TimeSeriesChartDTO timeSeriesChartDTO) {
-        TimeSeries timeSeries = timeSeriesChartDTO.series.find({ it.identifier == identifier })
+    private void buildSeries(Double value, String identifier, Date date, String testAgent, TimeSeriesDataPointWptInfo wptInfo,
+                             String measurandName, JobGroup jobGroup, MeasuredEvent measuredEvent, Location location,
+                             ConnectivityProfile connectivity, TimeSeriesChartDTO timeSeriesChartDTO, MeasurandGroup measurandGroup) {
+        if (!timeSeriesChartDTO.series[measurandGroup]) {
+            timeSeriesChartDTO.series[measurandGroup] = []
+        }
+        TimeSeries timeSeries = timeSeriesChartDTO.series[measurandGroup].find({ it.identifier == identifier })
         if (!timeSeries) {
             timeSeries = new TimeSeries(
                     identifier: identifier,
@@ -216,34 +239,41 @@ class LineChartTimeSeriesService {
                     location: location.uniqueIdentifierForServer,
                     connectivity: connectivity.name
             )
-            timeSeriesChartDTO.series.add(timeSeries)
+            timeSeriesChartDTO.series[measurandGroup].add(timeSeries)
         }
-        TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value, wptInfo: wptInfo)
+        TimeSeriesDataPoint timeSeriesDataPoint = new TimeSeriesDataPoint(date: date, value: value, agent: testAgent, wptInfo: wptInfo)
         timeSeries.data.add(timeSeriesDataPoint)
     }
 
     private TimeSeriesChartDTO rebuildIdentifierForEdgeCases(TimeSeriesChartDTO timeSeriesChartDTO, List<MeasuredEvent> measuredEvents,
                                                              List<Location> locations, List<ConnectivityProfile> connectivityProfiles) {
-        if (timeSeriesChartDTO.series.size() == 1) {
-            timeSeriesChartDTO.series.each { TimeSeries timeSeries ->
+        TimeSeries[] timeSeriesListOfFirstMeasurandGroup = timeSeriesChartDTO.series.entrySet().toArray()[0].value as TimeSeries[]
+        if (timeSeriesChartDTO.series.size() == 1 && timeSeriesListOfFirstMeasurandGroup.size() == 1) {
+            timeSeriesListOfFirstMeasurandGroup.each { TimeSeries timeSeries ->
                 timeSeries.identifier = "${timeSeries.measurand} | ${timeSeries.jobGroup} | ${timeSeries.measuredEvent} | ${timeSeries.location} | ${timeSeries.connectivity}"
-            }
+                }
             timeSeriesChartDTO.summaryLabels.clear()
         } else if (measuredEvents.size() == 0 || locations.size() == 0 || connectivityProfiles.size() == 0) {
             boolean sameMeasuredEvent = measuredEvents.size() == 0
             boolean sameLocation = locations.size() == 0
             boolean sameConnectivity = connectivityProfiles.size() == 0
 
-            String measuredEventName = timeSeriesChartDTO.series[0].measuredEvent
-            String locationName = timeSeriesChartDTO.series[0].location
-            String connectivityName = timeSeriesChartDTO.series[0].connectivity
-            timeSeriesChartDTO.series.each { TimeSeries timeSeries ->
+            TimeSeries firstTimeSeries = timeSeriesListOfFirstMeasurandGroup[0]
+            String measuredEventName = firstTimeSeries.measuredEvent
+            String locationName = firstTimeSeries.location
+            String connectivityName = firstTimeSeries.connectivity
+            timeSeriesChartDTO.series.each { series ->
                 if (!sameMeasuredEvent && !sameLocation && !sameConnectivity) {
                     return
                 }
-                sameMeasuredEvent = sameMeasuredEvent && timeSeries.measuredEvent == measuredEventName
-                sameLocation = sameLocation && timeSeries.location == locationName
-                sameConnectivity = sameConnectivity && timeSeries.connectivity == connectivityName
+                series.value.each { TimeSeries timeSeries ->
+                    if (!sameMeasuredEvent && !sameLocation && !sameConnectivity) {
+                        return
+                    }
+                    sameMeasuredEvent = sameMeasuredEvent && timeSeries.measuredEvent == measuredEventName
+                    sameLocation = sameLocation && timeSeries.location == locationName
+                    sameConnectivity = sameConnectivity && timeSeries.connectivity == connectivityName
+                }
             }
             if (sameMeasuredEvent) {
                 timeSeriesChartDTO.summaryLabels.add new SummaryLabel("measuredEvent", measuredEventName)
@@ -277,24 +307,26 @@ class LineChartTimeSeriesService {
                         oneConnectivity = true
                     }
                 }
-                timeSeriesChartDTO.series.each { TimeSeries timeSeries ->
-                    String identifier = ""
-                    if (!oneMeasurand) {
-                        identifier = timeSeries.measurand
+                timeSeriesChartDTO.series.each { series ->
+                    series.value.each { TimeSeries timeSeries ->
+                        String identifier = ""
+                        if (!oneMeasurand) {
+                            identifier = timeSeries.measurand
+                        }
+                        if (!oneApplication) {
+                            identifier = addToIdentifier(timeSeries.jobGroup, identifier)
+                        }
+                        if (!oneMeasuredEvent) {
+                            identifier = addToIdentifier(timeSeries.measuredEvent, identifier)
+                        }
+                        if (!oneLocation) {
+                            identifier = addToIdentifier(timeSeries.location, identifier)
+                        }
+                        if (!oneConnectivity) {
+                            identifier = addToIdentifier(timeSeries.connectivity, identifier)
+                        }
+                        timeSeries.identifier = identifier
                     }
-                    if (!oneApplication) {
-                        identifier = addToIdentifier(timeSeries.jobGroup, identifier)
-                    }
-                    if (!oneMeasuredEvent) {
-                        identifier = addToIdentifier(timeSeries.measuredEvent, identifier)
-                    }
-                    if (!oneLocation) {
-                        identifier = addToIdentifier(timeSeries.location, identifier)
-                    }
-                    if (!oneConnectivity) {
-                        identifier = addToIdentifier(timeSeries.connectivity, identifier)
-                    }
-                    timeSeries.identifier = identifier
                 }
             }
         }

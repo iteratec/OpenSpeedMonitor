@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient} from '@angular/common/http';
 import {
   catchError,
   filter,
@@ -7,20 +7,20 @@ import {
   mergeMap,
   switchMap,
   withLatestFrom
-} from "rxjs/operators";
-import {BehaviorSubject, combineLatest, EMPTY, Observable, ReplaySubject} from "rxjs";
-import {Page} from "../../../models/page.model";
-import {BrowserInfoDto} from "../../../models/browser.model";
-import {ApplicationService} from "../../../services/application.service";
+} from 'rxjs/operators';
+import {BehaviorSubject, combineLatest, EMPTY, Observable, ReplaySubject} from 'rxjs';
+import {Page} from '../../../models/page.model';
+import {BrowserInfoDto} from '../../../models/browser.model';
+import {ApplicationService} from '../../../services/application.service';
 import {
   ExtendedPerformanceAspect,
   PerformanceAspect,
   PerformanceAspectType
-} from "../../../models/perfomance-aspect.model";
-import {Application} from "../../../models/application.model";
-import {LocationDto} from "../../application-dashboard/models/location.model";
-import {PerformanceAspectService} from "../../../services/performance-aspect.service";
-import {ResponseWithLoadingState} from "../../../models/response-with-loading-state.model";
+} from '../../../models/perfomance-aspect.model';
+import {Application} from '../../../models/application.model';
+import {LocationDto} from '../../application-dashboard/models/location.model';
+import {PerformanceAspectService} from '../../../services/performance-aspect.service';
+import {ResponseWithLoadingState} from '../../../models/response-with-loading-state.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,19 +34,21 @@ export class AspectConfigurationService {
   selectedPage$ = new ReplaySubject<Page>(1);
   selectedAspectType$ = new ReplaySubject<PerformanceAspectType>(1);
 
-  constructor(private http: HttpClient, private applicationService: ApplicationService, private perfAspectService: PerformanceAspectService) {
+  constructor(private http: HttpClient,
+              private applicationService: ApplicationService,
+              private perfAspectService: PerformanceAspectService) {
     this.prepareExtensionOfAspects();
     this.loadBrowserInfos();
     this.getPerfAspectParams()
       .pipe(
         switchMap(perfAspectParams => this.getPerformanceAspects(perfAspectParams))
       ).subscribe(nextAspects => {
-      this.performanceAspectsForPage$.next(nextAspects)
+      this.performanceAspectsForPage$.next(nextAspects);
     });
   }
 
   loadApplication(applicationId: string): void {
-    this.applicationService.setSelectedApplication(applicationId)
+    this.applicationService.setSelectedApplication(applicationId);
   }
 
   loadPage(pageId: string): void {
@@ -59,7 +61,7 @@ export class AspectConfigurationService {
       })
     ).subscribe((page: Page) => {
       this.selectedPage$.next(page);
-    })
+    });
   }
 
   loadBrowserInfos() {
@@ -69,7 +71,7 @@ export class AspectConfigurationService {
         console.error(error);
         return EMPTY;
       })
-    ).subscribe(nextBrowserInfo => this.browserInfos$.next(nextBrowserInfo))
+    ).subscribe(nextBrowserInfo => this.browserInfos$.next(nextBrowserInfo));
   }
 
   prepareExtensionOfAspects() {
@@ -80,7 +82,7 @@ export class AspectConfigurationService {
         return extendedAspects;
       })
     ).subscribe((nextExtendedAspects: ExtendedPerformanceAspect[]) => {
-      this.extendedAspects$.next(nextExtendedAspects)
+      this.extendedAspects$.next(nextExtendedAspects);
     });
   }
 
@@ -88,9 +90,9 @@ export class AspectConfigurationService {
     const extendedAspects: ExtendedPerformanceAspect[] = [];
     if (aspects.length > 0 && browserInfos.length > 0) {
       aspects.forEach((aspect: PerformanceAspect) => {
-        const additionalInfos = browserInfos.filter((browserInfo: BrowserInfoDto) => browserInfo.browserId == aspect.browserId);
+        const additionalInfos = browserInfos.filter((browserInfo: BrowserInfoDto) => browserInfo.browserId === aspect.browserId);
         let extension: BrowserInfoDto;
-        if (additionalInfos.length == 1) {
+        if (additionalInfos.length === 1) {
           extension = additionalInfos[0];
         } else {
           extension = {
@@ -98,9 +100,9 @@ export class AspectConfigurationService {
             browserName: 'Unknown',
             operatingSystem: 'Unknown',
             deviceType: {name: 'Unknown', icon: 'question'}
-          }
+          };
         }
-        extendedAspects.push({...aspect, ...extension})
+        extendedAspects.push({...aspect, ...extension});
       });
     }
     return extendedAspects;
@@ -109,7 +111,7 @@ export class AspectConfigurationService {
   public initSelectedAspectType(typeName: string) {
     this.perfAspectService.aspectTypes$.pipe(
       map((types: ResponseWithLoadingState<PerformanceAspectType[]>) => {
-        return types.data.find((type: PerformanceAspectType) => type.name == typeName)
+        return types.data.find((type: PerformanceAspectType) => type.name === typeName);
       })
     ).subscribe((type: PerformanceAspectType) => this.selectedAspectType$.next(type));
   }
@@ -117,18 +119,18 @@ export class AspectConfigurationService {
   private getPerfAspectParams(): Observable<any> {
     return combineLatest(this.applicationService.selectedApplication$, this.selectedPage$)
       .pipe(
-        filter(([application, page]: [Application, Page]) => page.id !== -1 && page.name !== ""),
+        filter(([_, page]: [Application, Page]) => page.id !== -1 && page.name !== ''),
         mergeMap(([application, page]: [Application, Page]) => {
           const params = this.createLocationParams(application, page);
           return this.http.get<LocationDto[]>('/resultSelection/getLocations', {params}).pipe(
-            map((locations: LocationDto[]) => this.generateParams(application, page, locations)))
+            map((locations: LocationDto[]) => this.generateParams(application, page, locations)));
         })
       );
   }
 
   createLocationParams(application: Application, page: Page) {
-    let now: Date = new Date();
-    let fourWeeksAgo: Date = new Date();
+    const now: Date = new Date();
+    const fourWeeksAgo: Date = new Date();
     fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
     return {
       jobGroupIds: application.id.toString(),
@@ -143,7 +145,7 @@ export class AspectConfigurationService {
       applicationId: application.id,
       pageId: page.id,
       browserIds: locations.map(loc => loc.parent.id)
-    }
+    };
   }
 
   private getPerformanceAspects(params): Observable<PerformanceAspect[]> {
@@ -153,7 +155,7 @@ export class AspectConfigurationService {
             console.error(error);
             return EMPTY;
           }
-        ))
+        ));
   }
 
   createOrUpdatePerformanceAspect(perfAspectToCreateOrUpdate: PerformanceAspect) {
@@ -172,17 +174,17 @@ export class AspectConfigurationService {
           console.error(error);
           return EMPTY;
         }))
-      .subscribe((createdAspect: PerformanceAspect) => this.replacePerformanceAspect(createdAspect, false))
+      .subscribe((createdAspect: PerformanceAspect) => this.replacePerformanceAspect(createdAspect, false));
   }
 
 
   private replacePerformanceAspect(perfAspectToReplace: PerformanceAspect, isLoading: boolean) {
     let prevValue: PerformanceAspect[] = this.performanceAspectsForPage$.getValue();
-    let existingAspect: PerformanceAspect = prevValue.find((exAspect: PerformanceAspect) => {
-      return exAspect.id == perfAspectToReplace.id &&
-        exAspect.performanceAspectType == perfAspectToReplace.performanceAspectType &&
-        exAspect.pageId == perfAspectToReplace.pageId &&
-        exAspect.applicationId == perfAspectToReplace.applicationId
+    const existingAspect: PerformanceAspect = prevValue.find((exAspect: PerformanceAspect) => {
+      return exAspect.id === perfAspectToReplace.id &&
+        exAspect.performanceAspectType === perfAspectToReplace.performanceAspectType &&
+        exAspect.pageId === perfAspectToReplace.pageId &&
+        exAspect.applicationId === perfAspectToReplace.applicationId;
     });
     if (existingAspect) {
       prevValue = this.performanceAspectsForPage$.getValue();

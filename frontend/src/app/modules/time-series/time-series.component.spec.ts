@@ -25,7 +25,7 @@ describe('TimeSeriesComponent', () => {
       ],
       providers: [
         OsmLangService,
-        GrailsBridgeService,
+        GrailsBridgeService
       ]
     })
     .compileComponents();
