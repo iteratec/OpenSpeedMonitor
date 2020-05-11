@@ -17,6 +17,7 @@ import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+
 /**
  * Created by mwg on 31.08.2017.
  */
@@ -24,12 +25,19 @@ class EventResultQueryBuilder {
 
     static Logger log = LoggerFactory.getLogger(this)
 
+    private static MIN_DATA_SIZE_FOR_PERCENTILE = 30
+
+    private static LOG_INDENTATION_DEPTH_ONE = 1
+    private static LOG_INDENTATION_DEPTH_TWO = 2
+    private static LOG_INDENTATION_DEPTH_THREE = 3
+    private static LOG_INDENTATION_DEPTH_FOUR = 4
+
     private List<Closure> filters = []
     private Set<ProjectionProperty> baseProjections
     private List<MeasurandTrim> trims = []
     private PerformanceLoggingService performanceLoggingService
     private AspectUtil aspectUtil
-    public enum MetaDataSet {
+    enum MetaDataSet {
         NONE,
         COMPLETE,
         TEST_INFO,
@@ -270,12 +278,18 @@ class EventResultQueryBuilder {
     List<EventResultProjection> getRawData(MetaDataSet metaDataSet = MetaDataSet.COMPLETE) {
 
         if (this.aspectUtil.aspectsIncluded()) {
-            this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - appendAspectMetrics', 2) {
+            this.performanceLoggingService.logExecutionTimeSilently(
+                    PerformanceLoggingService.LogLevel.INFO,
+                    'getRawData - appendAspectMetrics',
+                    LOG_INDENTATION_DEPTH_TWO) {
                 aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
             }
         }
 
-        this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - preparation', 2) {
+        this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO,
+                'getRawData - preparation',
+                LOG_INDENTATION_DEPTH_TWO) {
             baseProjections.addAll(getMetaDataProjections(metaDataSet))
 
             measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
@@ -287,13 +301,19 @@ class EventResultQueryBuilder {
             userTimingQueryExecutor.setTrimmer(new UserTimingDataTrimmer())
         }
 
-        List<EventResultProjection> results = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - getting results', 2) {
+        List<EventResultProjection> results = this.performanceLoggingService.logExecutionTimeSilently(
+                PerformanceLoggingService.LogLevel.INFO,
+                'getRawData - getting results',
+                LOG_INDENTATION_DEPTH_TWO) {
             getResults(false)
         }
 
         if (this.aspectUtil.aspectsIncluded()) {
             try {
-                this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData - expandByAspects', 2) {
+                this.performanceLoggingService.logExecutionTimeSilently(
+                        PerformanceLoggingService.LogLevel.INFO,
+                        'getRawData - expandByAspects',
+                        LOG_INDENTATION_DEPTH_TWO) {
                     aspectUtil.expandByAspects(results, performanceLoggingService)
                 }
             } catch (IllegalStateException e) {
@@ -316,7 +336,10 @@ class EventResultQueryBuilder {
 
     List<EventResultProjection> getMedianDataWithoutAspects() {
         measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
-        measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(baseProjections: baseProjections, selectedMeasurands: measurandQueryExecutor.selectedMeasurands))
+        measurandQueryExecutor.setTransformer(new MeasurandMedianDataTransformer(
+                baseProjections: baseProjections,
+                selectedMeasurands: measurandQueryExecutor.selectedMeasurands)
+        )
         measurandQueryExecutor.setTrimmer(new MeasurandRawDataTrimmer())
 
         userTimingQueryExecutor.setProjector(new UserTimingRawDataProjector())
@@ -328,13 +351,13 @@ class EventResultQueryBuilder {
     List<EventResultProjection> getPercentile(int percentile) {
         if (this.aspectUtil.aspectsIncluded()) {
             List<EventResultProjection> rawData = getRawData(MetaDataSet.ASPECT)
-            if (rawData.size() >= 30) {
+            if (rawData.size() >= MIN_DATA_SIZE_FOR_PERCENTILE) {
                 return this.aspectUtil.getPercentileFrom(rawData, percentile)
             }
         } else {
             return getPercentileWithoutAspects(percentile)
         }
-        return [];
+        return []
     }
 
     List<EventResultProjection> getPercentileWithoutAspects(int percentile) {
@@ -351,10 +374,16 @@ class EventResultQueryBuilder {
     List<EventResultProjection> getAverageData() {
         if (this.aspectUtil.aspectsIncluded()) {
             this.performanceLoggingService.resetExecutionTimeLoggingSession()
-            List<EventResultProjection> rawData = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getRawData', 1) {
+            List<EventResultProjection> rawData = this.performanceLoggingService.logExecutionTimeSilently(
+                    PerformanceLoggingService.LogLevel.INFO,
+                    'getRawData',
+                    LOG_INDENTATION_DEPTH_ONE) {
                 getRawData(MetaDataSet.ASPECT)
             }
-            List<EventResultProjection> avgs = this.performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, 'getAverageFrom', 1) {
+            List<EventResultProjection> avgs = this.performanceLoggingService.logExecutionTimeSilently(
+                    PerformanceLoggingService.LogLevel.INFO,
+                    'getAverageFrom',
+                    LOG_INDENTATION_DEPTH_ONE) {
                 this.aspectUtil.getAverageFrom(rawData)
             }
             log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.DEBUG))
@@ -376,7 +405,7 @@ class EventResultQueryBuilder {
         return getResults(false)
     }
 
-    private List<EventResultProjection> getResults(boolean minimumLevel) {
+    private List<EventResultProjection> getResults(boolean isMinDataSizeRequired) {
         List<Map> userTimingRawData = []
         List<Map> measurandRawData = []
         List<EventResultProjection> userTimingsResult = []
@@ -385,21 +414,24 @@ class EventResultQueryBuilder {
         this.performanceLoggingService.logExecutionTimeSilently(
                 PerformanceLoggingService.LogLevel.INFO,
                 'getResults - getting user timing results',
-                3) {
+                LOG_INDENTATION_DEPTH_THREE) {
             userTimingRawData = userTimingQueryExecutor.getRawResultDataFor(filters, trims, baseProjections, performanceLoggingService)
             userTimingsResult = userTimingQueryExecutor.getResultFor(userTimingRawData, performanceLoggingService)
         }
         this.performanceLoggingService.logExecutionTimeSilently(
                 PerformanceLoggingService.LogLevel.INFO,
                 'getResults - getting measurand results',
-                3) {
+                LOG_INDENTATION_DEPTH_THREE) {
             measurandRawData = measurandQueryExecutor.getRawResultDataFor(filters, trims, baseProjections, performanceLoggingService)
             measurandResult = measurandQueryExecutor.getResultFor(measurandRawData, performanceLoggingService)
         }
 
-        if (!minimumLevel || userTimingRawData.size() + measurandRawData.size() >= 30) {
+        if (!isMinDataSizeRequired || userTimingRawData.size() + measurandRawData.size() >= MIN_DATA_SIZE_FOR_PERCENTILE) {
             List<EventResultProjection> merged = []
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.INFO, "getResults - merge ${measurandResult.size()} measurand results with ${userTimingsResult.size()} user timing results", 3) {
+            performanceLoggingService.logExecutionTimeSilently(
+                    PerformanceLoggingService.LogLevel.INFO,
+                    "getResults - merge ${measurandResult.size()} measurand results with ${userTimingsResult.size()} user timing results",
+                    LOG_INDENTATION_DEPTH_THREE) {
                 merged = mergeResults(measurandResult, userTimingsResult)
             }
 
@@ -410,13 +442,13 @@ class EventResultQueryBuilder {
 
     private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResults, List<EventResultProjection> userTimingResults) {
         Map<Object, List<EventResultProjection>> userTimingResultsById = this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group user timings', 4) {
+                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group user timings', LOG_INDENTATION_DEPTH_FOUR) {
             userTimingResults.groupBy { EventResultProjection erp ->
                 erp.id
             }
         }
         return (List<EventResultProjection>) this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group merge user timings into measurands', 4) {
+                PerformanceLoggingService.LogLevel.INFO, 'mergeResults - group merge user timings into measurands', LOG_INDENTATION_DEPTH_FOUR) {
             if (measurandResults && userTimingResults) {
                 measurandResults.each { result ->
                     userTimingResultsById[result.id].each { EventResultProjection userTimingResult ->
