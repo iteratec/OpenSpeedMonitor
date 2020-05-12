@@ -34,7 +34,18 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   svgElement: ElementRef;
 
   public ngxSmartModalService;
-  dataTrimLabels: {[key: string]: string} = {};
+
+  dataTrimLabels: { [key: string]: string } = {};
+  dataTrimMaxValues: { [key: string]: number } = {};
+
+  stepForInputFields: { [key: string]: number } = {};
+  minInputFieldsMax: { [key: string]: number } = {};
+  maxInputFieldsMin: { [key: string]: number } = {};
+  maxInputFieldsMax: { [key: string]: number } = {};
+  minInput: { [key: string]: { [key: string]: number } } = {min: {}, max: {}};
+  maxInput: { [key: string]: { [key: string]: number } } = {min: {}, max: {}};
+
+  selectedTrimValues: { [key: string]: { [key: string]: number } } = {min: {}, max: {}};
 
   private _resizeTimeoutId: number;
 
@@ -51,10 +62,11 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
   ngOnChanges(changes: SimpleChanges): void {
     this.redraw();
+    this.setDataTrimSettings();
   }
 
   @HostListener('window:resize', ['$event'])
-  windowIsResized() {
+  windowIsResized(): void {
     this.lineChartService.startResize(this.svgElement);
 
     // Wait until the resize is done before redrawing the chart
@@ -67,7 +79,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
     }, 500);
   }
 
-  redraw() {
+  redraw(): void {
     if (this.timeSeriesResults == null) {
       this.spinnerService.showSpinner('time-series-line-chart-spinner');
       return;
@@ -75,10 +87,53 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
     this.spinnerService.hideSpinner('time-series-line-chart-spinner');
 
     this.lineChartService.drawLineChart(this.timeSeriesResults);
-    this.dataTrimLabels = this.lineChartService.dataTrimLabels;
   }
 
-  handlePointSelectionError() {
+  handlePointSelectionError(): void {
     this.ngxSmartModalService.open('pointSelectionErrorModal');
+  }
+
+  redrawChartWithTrimmedData(measurandGroup: string): void {
+    this.validateInputValues(measurandGroup);
+
+    this.minInput.max[measurandGroup] =
+      Math.min(this.maxInputFieldsMax[measurandGroup], this.selectedTrimValues.max[measurandGroup]);
+    this.maxInput.min[measurandGroup] = this.selectedTrimValues.min[measurandGroup] || 0;
+
+    this.redraw();
+  }
+
+  validateInputValues(measurandGroup: string): void {
+    if (this.selectedTrimValues.min[measurandGroup] < this.minInput.min[measurandGroup]) {
+      this.selectedTrimValues.min[measurandGroup] = this.minInput.min[measurandGroup];
+    } else if (this.selectedTrimValues.min[measurandGroup] > this.minInput.max[measurandGroup]) {
+      this.selectedTrimValues.min[measurandGroup] = this.minInput.max[measurandGroup];
+    } else if (this.selectedTrimValues.max[measurandGroup] < this.maxInput.min[measurandGroup]) {
+      this.selectedTrimValues.max[measurandGroup] = this.maxInput.min[measurandGroup];
+    } else if (this.selectedTrimValues.max[measurandGroup] > this.maxInput.max[measurandGroup]) {
+      this.selectedTrimValues.max[measurandGroup] = this.maxInput.max[measurandGroup];
+    } else {
+      return;
+    }
+  }
+
+  private setDataTrimSettings(): void {
+    this.dataTrimLabels = this.lineChartService.dataTrimLabels;
+    this.dataTrimMaxValues = this.lineChartService.dataTrimMaxValues;
+
+    Object.keys(this.dataTrimMaxValues).forEach((measurandGroup: string) => {
+      this.stepForInputFields[measurandGroup] = this.getAdequateStep(this.dataTrimMaxValues[measurandGroup]);
+      this.minInput.min[measurandGroup] = 0;
+      this.maxInput.max[measurandGroup] = this.stepForInputFields[measurandGroup] *
+        Math.ceil(this.dataTrimMaxValues[measurandGroup] / this.stepForInputFields[measurandGroup]);
+      this.minInput.max[measurandGroup] =
+        Math.min(this.maxInput.max[measurandGroup], this.selectedTrimValues.max[measurandGroup]);
+      this.maxInput.min[measurandGroup] = Math.max(this.minInput.min[measurandGroup], this.selectedTrimValues.min[measurandGroup]);
+    });
+  }
+
+  private getAdequateStep(maximumValue: number): number {
+    const orderOfMagnitudeOfMaxValue: number = Math.max(Math.floor(Math.log(maximumValue) * Math.LOG10E), 0);
+    return 5 * Math.pow(10, orderOfMagnitudeOfMaxValue - 2);
   }
 }

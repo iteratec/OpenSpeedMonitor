@@ -47,14 +47,22 @@ export class LineChartService {
   }
 
   dataTrimLabels: {[key: string]: string} = {};
+  dataTrimMaxValues: {[key: string]: number} = {};
 
   private DOT_RADIUS = 3;
   private DOT_HIGHLIGHT_RADIUS = 5;
+  private Y_AXIS_WIDTH = 65;
+  private MARGIN: {[key: string]: number} = {top: 60, right: 60, bottom: 40, left: 75};
 
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  private _margin: any = {top: 60, right: 75, bottom: 40, left: 75};
+  private _margin: {[key: string]: number} = {
+    top: this.MARGIN.top,
+    right: this.MARGIN.right,
+    bottom: this.MARGIN.bottom,
+    left: this.MARGIN.left
+  };
   private _width: number = 600 - this._margin.left - this._margin.right;
   private _height: number = 550 - this._margin.top - this._margin.bottom;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
@@ -741,6 +749,37 @@ export class LineChartService {
       this._xAxisCluster = {};
     };
 
+    const adjustChartDimensions = ((incomingData: EventResultDataDTO) => {
+      this._width = this._width + this._margin.right;
+      if (Object.keys(incomingData.measurandGroups).length > 1) {
+        this._margin.right = this.MARGIN.right - 30;
+      } else {
+        this._margin.right = this.MARGIN.right;
+      }
+      this._width = this._width - this._margin.right;
+
+      if (Object.keys(incomingData.measurandGroups).length === 1) {
+        this._margin.top = this.MARGIN.top;
+      } else if (incomingData.summaryLabels.length === 0 || Object.keys(incomingData.measurandGroups).length === 2) {
+        this._margin.top = this.MARGIN.top + 10;
+      } else {
+        this._margin.top = this.MARGIN.top + 20;
+      }
+      this._legendGroupTop = this._margin.top + this._height + 50;
+
+      d3Select('#time-series-chart')
+        .attr('width', this._width + this._margin.left + this._margin.right);
+
+      d3Select('#header-group')
+        .attr('transform', `translate(${this._margin.left}, ${this._margin.top - 16})`);
+
+      d3Select('#time-series-chart-drawing-area')
+        .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`);
+
+      d3Select('#time-series-chart-legend')
+        .attr('transform', `translate(${this._margin.left}, ${this._legendGroupTop})`);
+    });
+
     /**
      * Prepares the incoming data for drawing with D3.js
      */
@@ -748,8 +787,10 @@ export class LineChartService {
       const data: TimeSeries[][] = [];
       const measurandGroups = Object.keys(incomingData.series);
       measurandGroups.forEach((measurandGroup: string) => {
+        let maxValue = 0;
         const series: TimeSeries[] = incomingData.series[measurandGroup].map((seriesDTO: EventResultSeriesDTO) => {
           const lineChartData: TimeSeries = new TimeSeries();
+
           if (incomingData.summaryLabels.length === 0 ||
             (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key !== 'measurand')) {
             seriesDTO.identifier = this.translateMeasurand(seriesDTO);
@@ -763,6 +804,7 @@ export class LineChartService {
             lineChartDataPoint.agent = point.agent;
             lineChartDataPoint.tooltipText = `${seriesDTO.identifier}: `;
             lineChartDataPoint.wptInfo = point.wptInfo;
+            maxValue = Math.max(maxValue, point.value);
             return lineChartDataPoint;
           });
 
@@ -770,6 +812,7 @@ export class LineChartService {
         });
 
         data.push(series);
+        this.dataTrimMaxValues[measurandGroup] = maxValue;
       });
 
       return data;
@@ -863,6 +906,7 @@ export class LineChartService {
       const data: TimeSeries[][] = prepareData(incomingData);
       setLegendData(incomingData);
 
+      adjustChartDimensions(incomingData);
       const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
       const width: number = this.getDrawingAreaWidth(Object.keys(incomingData.measurandGroups).length);
       const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, width);
@@ -905,8 +949,6 @@ export class LineChartService {
     const data: TimeSeries[][] = [[]];
     const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
     const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, this._width);
-    // TODO
-    // const yScale: D3ScaleLinear<number, number> = this.lineChartScaleService.getYScales(data, this._height);
 
     this.addXAxisToChart(chart, xScale);
     this.prepareMouseEventCatcher(chart);
@@ -930,7 +972,7 @@ export class LineChartService {
   private getDrawingAreaWidth(numberOfYAxes: number): number {
     let width: number = this._width;
     if (numberOfYAxes > 1) {
-      width = this._width - ((numberOfYAxes - 1) * 60);
+      width = this._width - ((numberOfYAxes - 1) * this.Y_AXIS_WIDTH);
     }
 
     return width;
@@ -1077,17 +1119,17 @@ export class LineChartService {
 
   }
 
-  private addYAxisUnits(measurandGroups: any, width: number): void {
+  private addYAxisUnits(measurandGroups: {[key: string]: string}, width: number): void {
     d3SelectAll('.axis-unit').selectAll('*').remove();
     const axisLabelKeys = Object.keys(measurandGroups);
     axisLabelKeys.forEach((axisLabelKey: string, index: number) => {
       let xPosition: number;
       if (index === 0) {
-        xPosition = -45;
+        xPosition = -42;
       } else {
-        xPosition = width - 5 + 60 * index;
+        xPosition = width - 12 + this.Y_AXIS_WIDTH * index;
       }
-      this.translationService.get(`frontend.de.iteratec.isr.measurand.group.${axisLabelKey}`).pipe(take(1)).subscribe(title => {
+      this.translationService.get(`frontend.de.iteratec.isr.measurand.group.axisLabel.${axisLabelKey}`).pipe(take(1)).subscribe(title => {
         d3Select(`.axis-unit${index}`).append('text')
           .attr('class', 'description unit')
           .attr('transform', `translate(${xPosition}, ${(this._height / 2 - this._margin.bottom)}) rotate(-90)`)
@@ -1173,7 +1215,7 @@ export class LineChartService {
       textPosition = -5;
     } else {
       strokeOpacity = 0;
-      textPosition = (index - 1) * 60 + drawingAreaWidth + 5;
+      textPosition = (index - 1) * this.Y_AXIS_WIDTH + drawingAreaWidth + 5;
     }
     transition.call(
       d3AxisRight(yScale)  // axis right, because we draw the background line with this
@@ -1382,7 +1424,7 @@ export class LineChartService {
     tooltip.style('left', `${left}px`);
   }
 
-  private setDataTrimLabels(measurandGroups: any) {
+  private setDataTrimLabels(measurandGroups: {[key: string]: string}): void {
     this.dataTrimLabels = measurandGroups;
   }
 }

@@ -1,28 +1,37 @@
-<div id="time-series-line-chart-container">
-  <osm-spinner [spinnerId]="'time-series-line-chart-spinner'"></osm-spinner>
+<div class="card">
+  <div class="time-series-chart">
+    <osm-spinner [spinnerId]="'time-series-line-chart-spinner'"></osm-spinner>
+    <div class="settings-row">
+      <div *ngFor="let measurandGroup of dataTrimLabels | keyvalue">
+        <span class="input-group dimension-group">
+          <label
+            class="input-group-addon settings-element dimension-label">{{'frontend.de.iteratec.isr.measurand.group.axisLabel.' + measurandGroup.key | translate}}</label>
+          <input (focusout)="validateInputValues(measurandGroup.key)"
+                 (ngModelChange)="redrawChartWithTrimmedData(measurandGroup.key)"
+                 [(ngModel)]="selectedTrimValues.min[measurandGroup.key]"
+                 [max]="minInput.max[measurandGroup.key]" [min]="minInput.min[measurandGroup.key]"
+                 [step]="stepForInputFields[measurandGroup.key]"
+                 class="form-control settings-element trim-value-input-field min-input"
+                 placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.minimum' | translate}}"
+                 type="number">
+          <input (focusout)="validateInputValues(measurandGroup.key)"
+                 (ngModelChange)="redrawChartWithTrimmedData(measurandGroup.key)"
+                 [(ngModel)]="selectedTrimValues.max[measurandGroup.key]"
+                 [max]="maxInput.max[measurandGroup.key]" [min]="maxInput.min[measurandGroup.key]"
+                 [step]="stepForInputFields[measurandGroup.key]"
+                 class="form-control settings-element trim-value-input-field"
+                 placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.maximum' | translate}}"
+                 type="number">
+          <label *ngIf="measurandGroup.value !== '#'"
+                 class="input-group-addon settings-element dimension-label">{{measurandGroup.value}}</label>
+        </span>
+      </div>
+    </div>
 
-  <div class="settings-row">
-    <span *ngFor="let measurandGroup of dataTrimLabels | keyvalue">
-      <span class="input-group dimension-group">
-        <label
-          class="input-group-addon settings-element dimension-label">{{'frontend.de.iteratec.isr.measurand.group.' + measurandGroup.key | translate}}</label>
-        <input class="form-control settings-element trim-value-input-field min-input"
-               min="0" placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.minimum' | translate}}"
-               type="number">
-        <input class="form-control settings-element trim-value-input-field"
-               min="0" placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.maximum' | translate}}"
-               type="number">
-        <label class="input-group-addon settings-element dimension-label">{{measurandGroup.value}}</label>
-      </span>
-        <!--(ngModelChange)="drawChart()" [(ngModel)]="dataTrimValue"
-               [max]="maxValueForInputField"
-               [step]="stepForInputField"-->
-    </span>
+    <div id="time-series-line-chart-container">
+      <svg #svg/>
+    </div>
 
-  </div>
-
-  <div class="card">
-    <svg #svg/>
   </div>
 </div>
 
