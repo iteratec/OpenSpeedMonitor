@@ -104,17 +104,8 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   }
 
   validateInputValues(measurandGroup: string): void {
-    if (this.selectedTrimValues.min[measurandGroup] < this.minInput.min[measurandGroup]) {
-      this.selectedTrimValues.min[measurandGroup] = this.minInput.min[measurandGroup];
-    } else if (this.selectedTrimValues.min[measurandGroup] > this.minInput.max[measurandGroup]) {
-      this.selectedTrimValues.min[measurandGroup] = this.minInput.max[measurandGroup];
-    } else if (this.selectedTrimValues.max[measurandGroup] < this.maxInput.min[measurandGroup]) {
-      this.selectedTrimValues.max[measurandGroup] = this.maxInput.min[measurandGroup];
-    } else if (this.selectedTrimValues.max[measurandGroup] > this.maxInput.max[measurandGroup]) {
-      this.selectedTrimValues.max[measurandGroup] = this.maxInput.max[measurandGroup];
-    } else {
-      return;
-    }
+    this.validateInputValuesByType('min', this.minInput, measurandGroup);
+    this.validateInputValuesByType('max', this.maxInput, measurandGroup);
   }
 
   private setDataTrimSettings(): void {
@@ -135,5 +126,14 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   private getAdequateStep(maximumValue: number): number {
     const orderOfMagnitudeOfMaxValue: number = Math.max(Math.floor(Math.log(maximumValue) * Math.LOG10E), 0);
     return 5 * Math.pow(10, orderOfMagnitudeOfMaxValue - 2);
+  }
+
+  private validateInputValuesByType(type: string, input: { [key: string]: { [key: string]: number } }, measurandGroup: string): void {
+    if (this.selectedTrimValues[type][measurandGroup] < input.min[measurandGroup]) {
+      this.selectedTrimValues[type][measurandGroup] = input.min[measurandGroup];
+    }
+    if (this.selectedTrimValues[type][measurandGroup] > input.max[measurandGroup]) {
+      this.selectedTrimValues[type][measurandGroup] = input.max[measurandGroup];
+    }
   }
 }
