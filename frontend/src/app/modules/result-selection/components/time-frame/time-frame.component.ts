@@ -1,9 +1,9 @@
 import {Component, Input, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {DateTimeAdapter, OwlDateTimeComponent} from 'ng-pick-datetime';
-import {fromEvent, merge, Observable, Subscription} from "rxjs";
-import {filter} from "rxjs/operators";
-import {OsmLangService} from "../../../../services/osm-lang.service";
-import {ResultSelectionStore} from "../../services/result-selection.store";
+import {fromEvent, merge, Observable, Subscription} from 'rxjs';
+import {filter} from 'rxjs/operators';
+import {OsmLangService} from '../../../../services/osm-lang.service';
+import {ResultSelectionStore} from '../../services/result-selection.store';
 import {TIME_FRAME_IN_SECONDS} from 'src/app/modules/result-selection/components/time-frame/time-frame-in-seconds.enum';
 
 @Component({
@@ -14,8 +14,8 @@ import {TIME_FRAME_IN_SECONDS} from 'src/app/modules/result-selection/components
 })
 export class TimeFrameComponent implements OnInit {
 
-  @Input() showAggregation: boolean = false;
-  @Input() showComparativeTimeFrame: boolean = false;
+  @Input() showAggregation = false;
+  @Input() showComparativeTimeFrame = false;
   @ViewChild('dateTimeFrom') dateTimeFrom: OwlDateTimeComponent<Date>;
   @ViewChild('dateTimeTo') dateTimeTo: OwlDateTimeComponent<Date>;
   @ViewChild('comparativeDateTimeFrom') comparativeDateTimeFrom: OwlDateTimeComponent<Date>;
@@ -44,12 +44,12 @@ export class TimeFrameComponent implements OnInit {
   selectedComparativeDates: Date[];
   max = new Date();
 
-  comparativeSelectionActive: boolean = false;
+  comparativeSelectionActive = false;
 
   CalendarType: typeof CalendarType = CalendarType;
 
   constructor(private resultSelectionStore: ResultSelectionStore, dateTimeAdapter: DateTimeAdapter<any>, osmLangService: OsmLangService) {
-    if (osmLangService.getOsmLang() == 'en') {
+    if (osmLangService.getOsmLang() === 'en') {
       dateTimeAdapter.setLocale('en-GB');
     } else {
       dateTimeAdapter.setLocale(osmLangService.getOsmLang());
@@ -58,12 +58,23 @@ export class TimeFrameComponent implements OnInit {
 
   ngOnInit() {
     if (this.resultSelectionStore.validQuery) {
-      this.selectedDates = [this.resultSelectionStore.resultSelectionCommand.from, this.resultSelectionStore.resultSelectionCommand.to];
+      this.selectedDates = [
+        this.resultSelectionStore.resultSelectionCommand.from,
+        this.resultSelectionStore.resultSelectionCommand.to
+      ];
+      if (this.resultSelectionStore.remainingResultSelection.fromComparative
+        && this.resultSelectionStore.remainingResultSelection.toComparative) {
+        this.comparativeSelectionActive = true;
+        this.selectedComparativeDates = [
+          this.resultSelectionStore.remainingResultSelection.fromComparative,
+          this.resultSelectionStore.remainingResultSelection.toComparative
+        ];
+      }
       this.selectTimeFrame();
 
     } else {
-      let defaultFrom = new Date();
-      let defaultTo = new Date();
+      const defaultFrom = new Date();
+      const defaultTo = new Date();
       defaultFrom.setDate(defaultTo.getDate() - 3);
       this.selectedDates = [defaultFrom, defaultTo];
       this.timeFrameInSeconds = TIME_FRAME_IN_SECONDS.THREE_DAYS;
@@ -77,10 +88,10 @@ export class TimeFrameComponent implements OnInit {
   }
 
   selectTimeFrame(): void {
-    if (this.timeFrameInSeconds != TIME_FRAME_IN_SECONDS.MANUAL_SELECTION) {
+    if (this.timeFrameInSeconds !== TIME_FRAME_IN_SECONDS.MANUAL_SELECTION) {
       this.setDatesFromTimeFrame();
 
-    } else if (this.selectedDates != undefined && this.selectedDates.length == 2) {
+    } else if (this.selectedDates !== undefined && this.selectedDates.length === 2) {
       this.setTimeFrameFromDates();
 
     }
@@ -93,56 +104,6 @@ export class TimeFrameComponent implements OnInit {
     if (this.comparativeSelectionActive) {
       this.resultSelectionStore.setRemainingResultSelectionComparativeTimeFrame(this.selectedComparativeDates);
     }
-  }
-
-  private setDatesFromTimeFrame(): void {
-    let to = new Date();
-    let from = new Date(to.getTime() - this.timeFrameInSeconds * 1000);
-
-    this.selectedDates = [from, to];
-
-    if (this.comparativeSelectionActive) {
-      this.setComparativeDatesFromDateSelection(from, to);
-    }
-  }
-
-  private setComparativeDatesFromDateSelection(from: Date, to: Date): void {
-    let comparativeFrom = new Date(from);
-    let comparativeTo = new Date(from);
-
-    comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
-
-    let calculatedTimeFrameInSeconds = this.calculateTimeFrameInSeconds(from, to);
-    comparativeFrom.setSeconds(comparativeTo.getSeconds() - calculatedTimeFrameInSeconds);
-
-    this.selectedComparativeDates = [comparativeFrom, comparativeTo];
-  }
-
-  private setTimeFrameFromDates(): void {
-    let from = new Date(this.selectedDates[0]);
-    let to = new Date(this.selectedDates[1]);
-
-    // Remove seconds and millisecond
-    from.setSeconds(0, 0);
-    to.setSeconds(0, 0);
-
-    let calculatedTimeFrameInSeconds = this.calculateTimeFrameInSeconds(from, to);
-    if (this.isValidTimeFrameUntilNow(calculatedTimeFrameInSeconds)) {
-      this.timeFrameInSeconds = calculatedTimeFrameInSeconds;
-    } else {
-      this.timeFrameInSeconds = TIME_FRAME_IN_SECONDS.MANUAL_SELECTION;
-    }
-  }
-
-  private calculateTimeFrameInSeconds(from: Date, to: Date): number {
-    let timeZoneOffsetInSeconds = (to.getTimezoneOffset() - from.getTimezoneOffset()) * 60;
-    return to.getTime() / 1000 - from.getTime() / 1000 - timeZoneOffsetInSeconds;
-  }
-
-  private isValidTimeFrameUntilNow(calculatedTimeFrameInSeconds: number): boolean {
-    let to = new Date(this.selectedDates[1]);
-    to.setHours(23, 59, 0, 0);
-    return to >= this.max && this.selectableTimeFramesInSeconds.find(value => value == calculatedTimeFrameInSeconds) != undefined
   }
 
   updateFromDate(calendar: CalendarType): void {
@@ -233,6 +194,56 @@ export class TimeFrameComponent implements OnInit {
 
   selectInterval() {
     this.resultSelectionStore.setRemainingResultSelectionInterval(this.aggregationIntervalInSeconds);
+  }
+
+  private setDatesFromTimeFrame(): void {
+    const to = new Date();
+    const from = new Date(to.getTime() - this.timeFrameInSeconds * 1000);
+
+    this.selectedDates = [from, to];
+
+    if (this.comparativeSelectionActive) {
+      this.setComparativeDatesFromDateSelection(from, to);
+    }
+  }
+
+  private setComparativeDatesFromDateSelection(from: Date, to: Date): void {
+    const comparativeFrom = new Date(from);
+    const comparativeTo = new Date(from);
+
+    comparativeTo.setSeconds(comparativeTo.getSeconds() - 1);
+
+    const calculatedTimeFrameInSeconds = this.calculateTimeFrameInSeconds(from, to);
+    comparativeFrom.setSeconds(comparativeTo.getSeconds() - calculatedTimeFrameInSeconds);
+
+    this.selectedComparativeDates = [comparativeFrom, comparativeTo];
+  }
+
+  private setTimeFrameFromDates(): void {
+    const from = new Date(this.selectedDates[0]);
+    const to = new Date(this.selectedDates[1]);
+
+    // Remove seconds and millisecond
+    from.setSeconds(0, 0);
+    to.setSeconds(0, 0);
+
+    const calculatedTimeFrameInSeconds = this.calculateTimeFrameInSeconds(from, to);
+    if (this.isValidTimeFrameUntilNow(calculatedTimeFrameInSeconds)) {
+      this.timeFrameInSeconds = calculatedTimeFrameInSeconds;
+    } else {
+      this.timeFrameInSeconds = TIME_FRAME_IN_SECONDS.MANUAL_SELECTION;
+    }
+  }
+
+  private calculateTimeFrameInSeconds(from: Date, to: Date): number {
+    const timeZoneOffsetInSeconds = (to.getTimezoneOffset() - from.getTimezoneOffset()) * 60;
+    return to.getTime() / 1000 - from.getTime() / 1000 - timeZoneOffsetInSeconds;
+  }
+
+  private isValidTimeFrameUntilNow(calculatedTimeFrameInSeconds: number): boolean {
+    const to = new Date(this.selectedDates[1]);
+    to.setHours(23, 59, 0, 0);
+    return to >= this.max && this.selectableTimeFramesInSeconds.find(value => value === calculatedTimeFrameInSeconds) !== undefined;
   }
 }
 
