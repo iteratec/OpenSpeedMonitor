@@ -1,14 +1,14 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {BehaviorSubject, combineLatest, Observable} from "rxjs";
-import {Location} from "../../../../../models/location.model";
-import {Page} from "../../../../../models/page.model";
-import {map} from "rxjs/operators";
-import {MeasuredEvent} from "../../../../../models/measured-event.model";
-import {Browser} from "../../../../../models/browser.model";
-import {Connectivity} from "../../../../../models/connectivity.model";
-import {ResponseWithLoadingState} from "../../../../../models/response-with-loading-state.model";
-import {ResultSelectionStore} from "../../../services/result-selection.store";
-import {ResultSelectionCommandParameter} from "../../../models/result-selection-command.model";
+import {BehaviorSubject, combineLatest, Observable} from 'rxjs';
+import {Location} from '../../../../../models/location.model';
+import {Page} from '../../../../../models/page.model';
+import {map} from 'rxjs/operators';
+import {MeasuredEvent} from '../../../../../models/measured-event.model';
+import {Browser} from '../../../../../models/browser.model';
+import {Connectivity} from '../../../../../models/connectivity.model';
+import {ResponseWithLoadingState} from '../../../../../models/response-with-loading-state.model';
+import {ResultSelectionStore} from '../../../services/result-selection.store';
+import {ResultSelectionCommandParameter} from '../../../models/result-selection-command.model';
 
 @Component({
   selector: 'osm-selection-data',
@@ -22,8 +22,8 @@ export class SelectionDataComponent implements OnInit {
 
   @Input() childType: ResultSelectionCommandParameter;
   @Input() parentType: ResultSelectionCommandParameter;
-  @Input() showChildSelection: boolean = true;
-  @Input() parentRequired: boolean = false;
+  @Input() showChildSelection = true;
+  @Input() parentRequired = false;
 
   parentSelection$ = new BehaviorSubject<number[]>([]);
   parentSelection: number[] = [];
@@ -73,8 +73,8 @@ export class SelectionDataComponent implements OnInit {
     return this.parentChildData$.pipe(
       map((next: ResponseWithLoadingState<(Location | MeasuredEvent)[]>) => {
         if (this.parentType !== ResultSelectionCommandParameter.CONNECTIVITIES) {
-          let parents: (Browser | Page)[] = next.data.map(value => value.parent);
-          let uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
+          const parents: (Browser | Page)[] = next.data.map(value => value.parent);
+          const uniqueParents: (Browser | Page)[] = this.getUniqueElements(parents);
           return this.sortAlphabetically(uniqueParents);
         } else {
           return this.sortAlphabetically(next.data);
@@ -94,15 +94,15 @@ export class SelectionDataComponent implements OnInit {
   }
 
   private getUniqueElements(items: (Browser | Page)[]): (Browser | Page)[] {
-    let map = new Map();
-    let parentElements = [];
-    for (let item of items) {
-      if (!map.has(item.id)) {
-        map.set(item.id, item.name);
+    const uniqueMap = new Map();
+    const parentElements = [];
+    for (const item of items) {
+      if (!uniqueMap.has(item.id)) {
+        uniqueMap.set(item.id, item.name);
         parentElements.push({
           id: item.id,
           name: item.name
-        })
+        });
       }
     }
     return parentElements;
@@ -111,7 +111,7 @@ export class SelectionDataComponent implements OnInit {
   private sortAlphabetically<T extends { name: string }>(items: T[]): T[] {
     return items.sort((a, b) => {
       return a.name.localeCompare(b.name);
-    })
+    });
   }
 
   private handleQueryParams(): void {

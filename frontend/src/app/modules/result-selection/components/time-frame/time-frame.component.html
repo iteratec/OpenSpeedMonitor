@@ -1,15 +1,18 @@
 <div class="card form-horizontal">
   <h2>
-    <ng-container *ngIf="showAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }} & </ng-container>
+    <ng-container
+      *ngIf="showAggregation">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}
+      &
+    </ng-container>
     {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}
   </h2>
 
-  <div class="row form-group" *ngIf="showAggregation">
+  <div *ngIf="showAggregation" class="row form-group">
     <label class="control-label col-md-3">
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}:
     </label>
     <div class="col-md-8">
-      <select class="form-control" [(ngModel)]="aggregationIntervalInSeconds" (ngModelChange)="selectInterval()">
+      <select (ngModelChange)="selectInterval()" [(ngModel)]="aggregationIntervalInSeconds" class="form-control">
         <option *ngFor="let intervals of selectableAggregationIntervalsInSeconds" [value]="intervals">
           {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.intervals.' + intervals | translate }}
         </option>
@@ -22,7 +25,7 @@
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}:
     </label>
     <div class="col-md-8">
-      <select class="form-control" [(ngModel)]="timeFrameInSeconds" (ngModelChange)="selectTimeFrame()">
+      <select (ngModelChange)="selectTimeFrame()" [(ngModel)]="timeFrameInSeconds" class="form-control">
         <option *ngFor="let seconds of selectableTimeFramesInSeconds" [value]="seconds">
           {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.seconds.' + seconds | translate }}
         </option>
@@ -32,17 +35,24 @@
 
   <div class="row form-group">
     <div class="col-md-3 time-frame-label">
-      <label for="main-date-time-picker" class="text-muted sub" *ngIf="comparativeSelectionActive">
+      <label *ngIf="comparativeSelectionActive" class="text-muted sub" for="main-date-time-picker">
         {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.label' | translate }}
       </label>
     </div>
     <div class="col-md-8" id="main-date-time-picker">
       <div class="input-group">
-        <input class="form-control" [owlDateTimeTrigger]="dateTimeFrom" [owlDateTime]="dateTimeFrom" [(ngModel)]="selectedDates" [selectMode]="'rangeFrom'" [max]="max">
-        <owl-date-time #dateTimeFrom firstDayOfWeek="1" (afterPickerClosed)="updateFromDate(CalendarType.From)" (afterPickerOpen)="observeCalendarClicks(CalendarType.From)"></owl-date-time>
+        <input [(ngModel)]="selectedDates" [max]="max" [owlDateTimeTrigger]="dateTimeFrom"
+               [owlDateTime]="dateTimeFrom" [selectMode]="'rangeFrom'" class="form-control">
+        <owl-date-time #dateTimeFrom (afterPickerClosed)="updateFromDate(CalendarType.From)"
+                       (afterPickerOpen)="observeCalendarClicks(CalendarType.From)"
+                       firstDayOfWeek="1"></owl-date-time>
         <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
-        <owl-date-time #dateTimeTo firstDayOfWeek="1" (afterPickerClosed)="updateToDate(CalendarType.To)" (afterPickerOpen)="observeCalendarClicks(CalendarType.To)"></owl-date-time>
-        <input class="form-control" [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [(ngModel)]="selectedDates" [selectMode]="'rangeTo'" [min]="selectedDates[0]" [max]="max">
+        <owl-date-time #dateTimeTo (afterPickerClosed)="updateToDate(CalendarType.To)"
+                       (afterPickerOpen)="observeCalendarClicks(CalendarType.To)"
+                       firstDayOfWeek="1"></owl-date-time>
+        <input [(ngModel)]="selectedDates" [max]="max" [min]="selectedDates[0]"
+               [owlDateTimeTrigger]="dateTimeTo" [owlDateTime]="dateTimeTo" [selectMode]="'rangeTo'"
+               class="form-control">
       </div>
     </div>
   </div>
@@ -52,17 +62,27 @@
     <div>
       <div class="row form-group">
         <div class="col-md-3 time-frame-label">
-          <label for="comparative-date-time-picker" class="text-muted sub">
+          <label class="text-muted sub" for="comparative-date-time-picker">
             {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.label' | translate }}
           </label>
         </div>
         <div class="col-md-8" id="comparative-date-time-picker">
           <div class="input-group">
-            <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeFrom" [owlDateTime]="comparativeDateTimeFrom" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeFrom'" [max]="max">
-            <owl-date-time #comparativeDateTimeFrom firstDayOfWeek="1" (afterPickerClosed)="updateFromDate(CalendarType.ComparativeFrom)" (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeFrom)"></owl-date-time>
-            <span class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
-            <owl-date-time #comparativeDateTimeTo firstDayOfWeek="1" (afterPickerClosed)="updateToDate(CalendarType.ComparativeTo)" (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeTo)"></owl-date-time>
-            <input class="form-control" [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo" [(ngModel)]="selectedComparativeDates" [selectMode]="'rangeTo'" [max]="max">
+            <input [(ngModel)]="selectedComparativeDates" [max]="max"
+                   [owlDateTimeTrigger]="comparativeDateTimeFrom" [owlDateTime]="comparativeDateTimeFrom"
+                   [selectMode]="'rangeFrom'" class="form-control">
+            <owl-date-time #comparativeDateTimeFrom (afterPickerClosed)="updateFromDate(CalendarType.ComparativeFrom)"
+                           (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeFrom)"
+                           firstDayOfWeek="1"></owl-date-time>
+            <span
+              class="input-group-addon">{{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.to' | translate }}</span>
+            <owl-date-time #comparativeDateTimeTo (afterPickerClosed)="updateToDate(CalendarType.ComparativeTo)"
+                           (afterPickerOpen)="observeCalendarClicks(CalendarType.ComparativeTo)"
+                           firstDayOfWeek="1"></owl-date-time>
+            <input [(ngModel)]="selectedComparativeDates" [max]="max"
+                   [owlDateTimeTrigger]="comparativeDateTimeTo" [owlDateTime]="comparativeDateTimeTo"
+                   [selectMode]="'rangeTo'"
+                   class="form-control">
           </div>
         </div>
         <div class="col-md-1 remove-comparative-time-frame">
@@ -74,11 +94,16 @@
     </div>
   </ng-template>
 
-  <div class="row form-group" *ngIf="!comparativeSelectionActive && showComparativeTimeFrame">
+  <div *ngIf="!comparativeSelectionActive && showComparativeTimeFrame" class="row form-group">
     <div class="col-md-8 col-md-offset-3">
-      <button type="button" id="show-comparative-button" class="btn btn-default btn-block" [title]="'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate"
-              (click)="toggleComparativeSelection()" [disabled]="resultSelectionStore.remainingResultSelection.measurands?.length > 1">
-        <i class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
+      <button (click)="toggleComparativeSelection()"
+              [disabled]="resultSelectionStore.remainingResultSelection.measurands?.length + resultSelectionStore.remainingResultSelection.performanceAspectTypes?.length > 1"
+              [title]="'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate"
+              class="btn btn-default btn-block"
+              id="show-comparative-button"
+              type="button">
+        <i
+          class="fas fa-plus"></i> {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.comparative.heading' | translate }}
       </button>
     </div>
   </div>
