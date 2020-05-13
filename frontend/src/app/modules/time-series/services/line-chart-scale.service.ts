@@ -17,18 +17,18 @@ export class LineChartScaleService {
   constructor() {
   }
 
-  public getMinDate(data: TimeSeries[][]): Date {
+  public getMinDate(data: { [key: string]: TimeSeries[] }): Date {
     return this.getDate(data, d3Min);
   }
 
-  public getMaxDate(data: TimeSeries[][]): Date {
+  public getMaxDate(data: { [key: string]: TimeSeries[] }): Date {
     return this.getDate(data, d3Max);
   }
 
   /**
    * Determine the xScale for the given data
    */
-  public getXScale(data: TimeSeries[][], width: number): D3ScaleTime<number, number> {
+  public getXScale(data: { [key: string]: TimeSeries[] }, width: number): D3ScaleTime<number, number> {
     return d3ScaleTime()               // Define a scale for the X-Axis
       .range([0, width])  // Display the X-Axis over the complete width
       .domain([this.getMinDate(data), this.getMaxDate(data)]);
@@ -37,14 +37,16 @@ export class LineChartScaleService {
   /**
    * Determine the yScales for the given data
    */
-  public getYScales(dataList: TimeSeries[][], height: number): D3ScaleLinear<number, number>[] {
-    const yScales: D3ScaleLinear<number, number>[] = [];
-    dataList.forEach((data: TimeSeries[]) => {
-      const yScale: D3ScaleLinear<number, number> = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
+  public getYScales(dataList: { [key: string]: TimeSeries[] },
+                    height: number,
+                    dataTrimValues: { [key: string]: { [key: string]: number } }
+  ): { [key: string]: D3ScaleLinear<number, number> } {
+    const yScales: { [key: string]: D3ScaleLinear<number, number> } = {};
+    Object.keys(dataList).forEach((key: string) => {
+      yScales[key] = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
         .range([height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-        .domain([0, this.getMaxValue(data)])
+        .domain([(dataTrimValues.min[key] || 0), (dataTrimValues.max[key] || this.getMaxValue(dataList[key]))])
         .nice();
-      yScales.push(yScale);
     });
 
     return yScales;
@@ -53,22 +55,27 @@ export class LineChartScaleService {
   /**
    * Determine the yScales for the given data in time range
    */
-  public getYScalesInTimeRange(dataList: TimeSeries[][], minDate: Date, maxDate: Date, height: number): D3ScaleLinear<number, number>[] {
-    const yScales: D3ScaleLinear<number, number>[] = [];
-    dataList.forEach((data: TimeSeries[]) => {
-      const yScale: D3ScaleLinear<number, number> = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
+  public getYScalesInTimeRange(dataList: { [key: string]: TimeSeries[] },
+                               minDate: Date,
+                               maxDate: Date,
+                               height: number,
+                               dataTrimValues: { [key: string]: { [key: string]: number } }
+  ): { [key: string]: D3ScaleLinear<number, number> } {
+    const yScales: { [key: string]: D3ScaleLinear<number, number> } = {};
+    Object.keys(dataList).forEach((key: string) => {
+      // TODO filter
+      yScales[key] = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
         .range([height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-        .domain([0, this.getMaxValueInTime(data, minDate, maxDate)])
+        .domain([(dataTrimValues.min[key] || 0), (dataTrimValues.max[key] || this.getMaxValueInTime(dataList[key], minDate, maxDate))])
         .nice();
-      yScales.push(yScale);
     });
 
     return yScales;
   }
 
-  private getDate(dataList: TimeSeries[][], f: Function): Date {
-    return f(dataList, (data: TimeSeries[]) => {
-      return f(data, (dataItem: TimeSeries) => {
+  private getDate(dataList: { [key: string]: TimeSeries[] }, f: Function): Date {
+    return f(Object.keys(dataList), (key: string) => {
+      return f(dataList[key], (dataItem: TimeSeries) => {
         return f(dataItem.values, (point: TimeSeriesPoint) => {
           return point.date;
         });

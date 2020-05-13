@@ -36,7 +36,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   public ngxSmartModalService;
 
   dataTrimLabels: { [key: string]: string } = {};
-  dataTrimMaxValues: { [key: string]: number } = {};
+  dataMaxValues: { [key: string]: number } = {};
 
   stepForInputFields: { [key: string]: number } = {};
   minInputFieldsMax: { [key: string]: number } = {};
@@ -86,7 +86,7 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
     }
     this.spinnerService.hideSpinner('time-series-line-chart-spinner');
 
-    this.lineChartService.drawLineChart(this.timeSeriesResults);
+    this.lineChartService.drawLineChart(this.timeSeriesResults, this.selectedTrimValues);
   }
 
   handlePointSelectionError(): void {
@@ -110,13 +110,13 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
 
   private setDataTrimSettings(): void {
     this.dataTrimLabels = this.lineChartService.dataTrimLabels;
-    this.dataTrimMaxValues = this.lineChartService.dataTrimMaxValues;
+    this.dataMaxValues = this.lineChartService.dataMaxValues;
 
-    Object.keys(this.dataTrimMaxValues).forEach((measurandGroup: string) => {
-      this.stepForInputFields[measurandGroup] = this.getAdequateStep(this.dataTrimMaxValues[measurandGroup]);
+    Object.keys(this.dataMaxValues).forEach((measurandGroup: string) => {
+      this.stepForInputFields[measurandGroup] = this.getAdequateStep(this.dataMaxValues[measurandGroup]);
       this.minInput.min[measurandGroup] = 0;
       this.maxInput.max[measurandGroup] = this.stepForInputFields[measurandGroup] *
-        Math.ceil(this.dataTrimMaxValues[measurandGroup] / this.stepForInputFields[measurandGroup]);
+        Math.ceil(this.dataMaxValues[measurandGroup] / this.stepForInputFields[measurandGroup]);
       this.minInput.max[measurandGroup] =
         Math.min(this.maxInput.max[measurandGroup], this.selectedTrimValues.max[measurandGroup]);
       this.maxInput.min[measurandGroup] = Math.max(this.minInput.min[measurandGroup], this.selectedTrimValues.min[measurandGroup]);
@@ -129,6 +129,10 @@ export class TimeSeriesLineChartComponent implements AfterContentInit, OnChanges
   }
 
   private validateInputValuesByType(type: string, input: { [key: string]: { [key: string]: number } }, measurandGroup: string): void {
+    if (this.selectedTrimValues[type][measurandGroup] === null || this.selectedTrimValues[type][measurandGroup] === undefined) {
+      return;
+    }
+
     if (this.selectedTrimValues[type][measurandGroup] < input.min[measurandGroup]) {
       this.selectedTrimValues[type][measurandGroup] = input.min[measurandGroup];
     }
