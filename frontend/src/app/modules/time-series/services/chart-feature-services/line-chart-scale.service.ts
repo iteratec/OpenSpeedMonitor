@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
-import {TimeSeries} from '../models/time-series.model';
+import {TimeSeries} from '../../models/time-series.model';
 import {
   scaleLinear as d3ScaleLinear,
   ScaleLinear as D3ScaleLinear,
   scaleTime as d3ScaleTime,
   ScaleTime as D3ScaleTime
 } from 'd3-scale';
-import {TimeSeriesPoint} from '../models/time-series-point.model';
+import {TimeSeriesPoint} from '../../models/time-series-point.model';
 import {max as d3Max, min as d3Min} from 'd3-array';
 
 @Injectable({
@@ -15,14 +15,6 @@ import {max as d3Max, min as d3Min} from 'd3-array';
 export class LineChartScaleService {
 
   constructor() {
-  }
-
-  public getMinDate(data: { [key: string]: TimeSeries[] }): Date {
-    return this.getDate(data, d3Min);
-  }
-
-  public getMaxDate(data: { [key: string]: TimeSeries[] }): Date {
-    return this.getDate(data, d3Max);
   }
 
   /**
@@ -43,9 +35,13 @@ export class LineChartScaleService {
   ): { [key: string]: D3ScaleLinear<number, number> } {
     const yScales: { [key: string]: D3ScaleLinear<number, number> } = {};
     Object.keys(dataList).forEach((key: string) => {
+      const min: number = dataTrimValues.min[key] ? Math.max(dataTrimValues.min[key], 0) : 0;
+      const max: number = dataTrimValues.max[key] ?
+        Math.min(dataTrimValues.max[key], this.getMaxValue(dataList[key])) :
+        this.getMaxValue(dataList[key]);
       yScales[key] = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
         .range([height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-        .domain([(dataTrimValues.min[key] || 0), (dataTrimValues.max[key] || this.getMaxValue(dataList[key]))])
+        .domain([min, max])
         .nice();
     });
 
@@ -63,24 +59,25 @@ export class LineChartScaleService {
   ): { [key: string]: D3ScaleLinear<number, number> } {
     const yScales: { [key: string]: D3ScaleLinear<number, number> } = {};
     Object.keys(dataList).forEach((key: string) => {
-      // TODO filter
+      const min: number = dataTrimValues.min[key] ? Math.max(dataTrimValues.min[key], 0) : 0;
+      const max: number = dataTrimValues.max[key] ?
+        Math.min(dataTrimValues.max[key], this.getMaxValueInTime(dataList[key], minDate, maxDate)) :
+        this.getMaxValueInTime(dataList[key], minDate, maxDate);
       yScales[key] = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
         .range([height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-        .domain([(dataTrimValues.min[key] || 0), (dataTrimValues.max[key] || this.getMaxValueInTime(dataList[key], minDate, maxDate))])
+        .domain([min, max])
         .nice();
     });
 
     return yScales;
   }
 
-  private getDate(dataList: { [key: string]: TimeSeries[] }, f: Function): Date {
-    return f(Object.keys(dataList), (key: string) => {
-      return f(dataList[key], (dataItem: TimeSeries) => {
-        return f(dataItem.values, (point: TimeSeriesPoint) => {
-          return point.date;
-        });
-      });
-    });
+  public getMinDate(data: { [key: string]: TimeSeries[] }): Date {
+    return this.getDate(data, d3Min);
+  }
+
+  public getMaxDate(data: { [key: string]: TimeSeries[] }): Date {
+    return this.getDate(data, d3Max);
   }
 
   private getMaxValue(data: TimeSeries[]): number {
@@ -96,6 +93,16 @@ export class LineChartScaleService {
       const valuesInRange = dataSeries.values.filter(value => value.date <= maxDate && value.date >= minDate);
       return d3Max(valuesInRange, (point: TimeSeriesPoint) => {
         return point.value;
+      });
+    });
+  }
+
+  private getDate(dataList: { [key: string]: TimeSeries[] }, f: Function): Date {
+    return f(Object.keys(dataList), (key: string) => {
+      return f(dataList[key], (dataItem: TimeSeries) => {
+        return f(dataItem.values, (point: TimeSeriesPoint) => {
+          return point.date;
+        });
       });
     });
   }

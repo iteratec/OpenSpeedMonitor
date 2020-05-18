@@ -5,7 +5,7 @@ import {SharedMocksModule} from "../../testing/shared-mocks.module";
 import {ResultSelectionModule} from "../result-selection/result-selection.module";
 import {OsmLangService} from "../../services/osm-lang.service";
 import {GrailsBridgeService} from "../../services/grails-bridge.service";
-import {TimeSeriesLineChartComponent} from "./components/time-series-line-chart/time-series-line-chart.component";
+import {TimeSeriesChartComponent} from "./components/time-series-chart/time-series-chart.component";
 import {SharedModule} from "../shared/shared.module";
 
 describe('TimeSeriesComponent', () => {
@@ -16,7 +16,7 @@ describe('TimeSeriesComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         TimeSeriesComponent,
-        TimeSeriesLineChartComponent
+        TimeSeriesChartComponent
       ],
       imports: [
         SharedModule,

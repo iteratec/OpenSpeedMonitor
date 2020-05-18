@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import {WptInfo} from "../models/wpt-info.model";
+import {Injectable} from '@angular/core';
+import {WptInfo} from '../models/wpt-info.model';
 
 @Injectable({
   providedIn: 'root'
@@ -7,11 +7,11 @@ import {WptInfo} from "../models/wpt-info.model";
 export class UrlBuilderService {
 
   options = {
-    waterfall: new UrlOption("details", "waterfall_view_step"),
-    performanceReview: new UrlOption("performance_optimization", "review_step"),
-    contentBreakdown: new UrlOption("breakdown", "breakdown_fv_step"),
-    domains: new UrlOption("domains", "breakdown_fv_step"),
-    screenshot: new UrlOption("screen_shot", "step_"),
+    waterfall: new UrlOption('details', 'waterfall_view_step'),
+    performanceReview: new UrlOption('performance_optimization', 'review_step'),
+    contentBreakdown: new UrlOption('breakdown', 'breakdown_fv_step'),
+    domains: new UrlOption('domains', 'breakdown_fv_step'),
+    screenshot: new UrlOption('screen_shot', 'step_'),
   };
 
   buildSummaryUrl(wptInfo: WptInfo): string {
@@ -29,11 +29,11 @@ export class UrlBuilderService {
 
   buildFilmstripToolUrl(wptInfo: WptInfo): string {
     const filmstripUrl = `${wptInfo.baseUrl}&testId=${wptInfo.testId}&view=filmstrip&step=${wptInfo.indexInJourney}`;
-    return `https://iteratec.github.io/wpt-filmstrip/#wptUrl=${filmstripUrl}`
+    return `https://iteratec.github.io/wpt-filmstrip/#wptUrl=${filmstripUrl}`;
   }
 
   buildFilmstripsComparisionUrl(wptInfos: WptInfo[]): string {
-    //baseUrl for every point must be the same
+    // baseUrl for every point must be the same
     const baseUrl = wptInfos[0].baseUrl;
 
     const testsDataString = wptInfos.map((info: WptInfo) => this.wptInfoToTestUrlData(info)).join(',');

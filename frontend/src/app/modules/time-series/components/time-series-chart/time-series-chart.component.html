@@ -6,19 +6,21 @@
         <span class="input-group dimension-group">
           <label
             class="input-group-addon settings-element dimension-label">{{'frontend.de.iteratec.isr.measurand.group.axisLabel.' + measurandGroup.key | translate}}</label>
-          <input (focusout)="validateInputValues(measurandGroup.key)"
-                 (ngModelChange)="redrawChartWithTrimmedData(measurandGroup.key)"
+          <input (focusout)="validateInputValues('min', 'max', measurandGroup.key); redraw(false)"
+                 (input)="validateInputValuesByEvent($event, 'min', 'max', measurandGroup.key); redraw(false)"
                  [(ngModel)]="selectedTrimValues.min[measurandGroup.key]"
-                 [max]="minInput.max[measurandGroup.key]" [min]="minInput.min[measurandGroup.key]"
-                 [step]="stepForInputFields[measurandGroup.key]"
+                 [max]="dataTrimInputRange.max[measurandGroup.key]"
+                 [min]="dataTrimInputRange.min[measurandGroup.key]"
+                 [step]="dataTrimInputStep[measurandGroup.key]"
                  class="form-control settings-element trim-value-input-field min-input"
                  placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.minimum' | translate}}"
                  type="number">
-          <input (focusout)="validateInputValues(measurandGroup.key)"
-                 (ngModelChange)="redrawChartWithTrimmedData(measurandGroup.key)"
+          <input (focusout)="validateInputValues('max', 'min', measurandGroup.key); redraw(false)"
+                 (input)="validateInputValuesByEvent($event, 'max', 'min', measurandGroup.key); redraw(false)"
                  [(ngModel)]="selectedTrimValues.max[measurandGroup.key]"
-                 [max]="maxInput.max[measurandGroup.key]" [min]="maxInput.min[measurandGroup.key]"
-                 [step]="stepForInputFields[measurandGroup.key]"
+                 [max]="dataTrimInputRange.max[measurandGroup.key]"
+                 [min]="dataTrimInputRange.min[measurandGroup.key]"
+                 [step]="dataTrimInputStep[measurandGroup.key]"
                  class="form-control settings-element trim-value-input-field"
                  placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.maximum' | translate}}"
                  type="number">
