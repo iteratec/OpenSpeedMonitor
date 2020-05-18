@@ -68,11 +68,41 @@ class QueryAspectsViaBuilderPercentileSpec extends NonTransactionalIntegrationSp
         result.PAGE_CONSTRUCTION_STARTED == 475
     }
 
-    void "40 percentile of aspect metrics, results with different aspect metrics, grouped by jobgroup + page"() {
+    void "Less than 30 Event Results, results should be empty"() {
         given: "Twenty EventResults with different aspect metrics and matching Aspects in db."
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint, page1, browser1)
         persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, startRender, page1, browser2)
         10.times {
+            LinkedHashMap<String, Integer> metrics = [
+                    startRenderInMillisecs      : 300,
+                    firstContentfulPaint        : 400,
+                    docCompleteTimeInMillisecs  : 1200,
+                    docCompleteRequests         : 35,
+                    visuallyCompleteInMillisecs : 500,
+                    timeToInteractiveInMillisecs: 600
+            ]
+            persistEventResult(metrics, page1, browser1)
+            persistEventResult(metrics, page1, browser2)
+        }
+
+        when: "the builder is given the aspect type of matching aspect"
+        EventResultQueryBuilder builder = new EventResultQueryBuilder()
+        List<EventResultProjection> results = builder
+                .withJobGroupIn([jobGroup])
+                .withPageIn([page1])
+                .withSelectedMeasurands([docComplete])
+                .withPerformanceAspects([PerformanceAspectType.PAGE_CONSTRUCTION_STARTED])
+                .getPercentile(40)
+
+        then: "Empty result"
+        results.size() == 0
+    }
+
+    void "40 percentile of aspect metrics, results with different aspect metrics, grouped by jobgroup + page"() {
+        given: "Thirty EventResults with different aspect metrics and matching Aspects in db."
+        persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, firstContentfulPaint, page1, browser1)
+        persistAspect(PerformanceAspectType.PAGE_CONSTRUCTION_STARTED, startRender, page1, browser2)
+        15.times {
             LinkedHashMap<String, Integer> metrics = [
                     startRenderInMillisecs      : 300,
                     firstContentfulPaint        : 400,

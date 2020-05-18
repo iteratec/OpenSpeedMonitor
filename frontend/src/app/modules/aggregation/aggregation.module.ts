@@ -1,13 +1,13 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {RouterModule, Routes} from "@angular/router";
-import {SharedModule} from "../shared/shared.module";
+import {RouterModule, Routes} from '@angular/router';
+import {SharedModule} from '../shared/shared.module';
 import {AggregationComponent} from './aggregation.component';
-import {ResultSelectionModule} from "../result-selection/result-selection.module";
+import {ResultSelectionModule} from '../result-selection/result-selection.module';
 import {AggregationChartComponent} from './components/aggregation-chart/aggregation-chart.component';
-import {BarchartDataService} from "./services/barchart-data.service";
-import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
-import {FormsModule} from "@angular/forms";
+import {BarchartDataService} from './services/barchart-data.service';
+import {AggregationChartDataService} from './services/aggregation-chart-data.service';
+import {FormsModule} from '@angular/forms';
 
 const AggregationRoutes: Routes = [
   {path: 'show', component: AggregationComponent},
@@ -27,4 +27,5 @@ const AggregationRoutes: Routes = [
     AggregationChartDataService
   ]
 })
-export class AggregationModule { }
+export class AggregationModule {
+}

@@ -1,8 +1,8 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {BehaviorSubject, Observable} from "rxjs";
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {ResultSelectionCommand} from "../../models/result-selection-command.model";
-import {RemainingResultSelection} from "../../models/remaing-result-selection.model";
+import {BehaviorSubject, Observable} from 'rxjs';
+import {ResultSelectionStore} from '../../services/result-selection.store';
+import {ResultSelectionCommand} from '../../models/result-selection-command.model';
+import {RemainingResultSelection} from '../../models/remaing-result-selection.model';
 
 @Component({
   selector: 'osm-result-selection-submit',
@@ -17,9 +17,9 @@ export class SubmitComponent implements OnInit {
   resultCount$: Observable<number>;
   dataAvailable$: Observable<boolean>;
 
-  @Input() applicationsRequired: boolean = false;
-  @Input() pagesRequired: boolean = false;
-  @Input() measurandsRequired: boolean = false;
+  @Input() applicationsRequired = false;
+  @Input() pagesRequired = false;
+  @Input() measurandsRequired = false;
   @Output() submit: EventEmitter<void> = new EventEmitter<void>();
 
   constructor(private resultSelectionStore: ResultSelectionStore) {
@@ -44,7 +44,8 @@ export class SubmitComponent implements OnInit {
         this.measurandsOrPerformanceAspectsSelected$.next(next.measurands.length > 0);
       }
       if (next.performanceAspectTypes) {
-        this.measurandsOrPerformanceAspectsSelected$.next(this.measurandsOrPerformanceAspectsSelected$.getValue() || next.performanceAspectTypes.length > 0)
+        this.measurandsOrPerformanceAspectsSelected$
+          .next(this.measurandsOrPerformanceAspectsSelected$.getValue() || next.performanceAspectTypes.length > 0);
       }
     });
   }

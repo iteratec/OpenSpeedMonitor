@@ -170,7 +170,12 @@ class BarchartAggregationService {
         return values
     }
 
-    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue, List<SelectedMeasurand> selectedMeasurands, List<EventResultProjection> measurandAggregations, List<JobGroup> jobGroups, List<Page> pages, List<PerformanceAspectType> performanceAspectTypes) {
+    private List<BarchartAggregation> createListForEventResultProjection(String selectedAggregationValue,
+                                                                         List<SelectedMeasurand> selectedMeasurands,
+                                                                         List<EventResultProjection> measurandAggregations,
+                                                                         List<JobGroup> jobGroups,
+                                                                         List<Page> pages,
+                                                                         List<PerformanceAspectType> performanceAspectTypes) {
         List<BarchartAggregation> result = []
         measurandAggregations.each { aggregation ->
             JobGroup jobGroup = jobGroups.find { it.id == aggregation.jobGroupId }

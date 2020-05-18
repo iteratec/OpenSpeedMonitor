@@ -1,8 +1,8 @@
 import {Component, OnInit} from '@angular/core';
-import {BarchartDataService} from "./services/barchart-data.service";
-import {ResultSelectionStore} from "../result-selection/services/result-selection.store";
-import {BehaviorSubject} from "rxjs";
-import {AggregationChartDataService} from "./services/aggregation-chart-data.service";
+import {BarchartDataService} from './services/barchart-data.service';
+import {ResultSelectionStore} from '../result-selection/services/result-selection.store';
+import {BehaviorSubject} from 'rxjs';
+import {AggregationChartDataService} from './services/aggregation-chart-data.service';
 
 @Component({
   selector: 'osm-aggregation',
@@ -13,9 +13,13 @@ export class AggregationComponent implements OnInit {
 
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  showChart: boolean = false;
+  showChart = false;
 
-  constructor(private barchartDataService: BarchartDataService, private resultSelectionStore: ResultSelectionStore, private aggregationChartDataService: AggregationChartDataService) {
+  constructor(
+    private barchartDataService: BarchartDataService,
+    private resultSelectionStore: ResultSelectionStore,
+    private aggregationChartDataService: AggregationChartDataService
+  ) {
     this.aggregationChartDataService.barchartAverageData$.subscribe((data) => {
       this.barchartAverageData$.next(data);
     });
@@ -36,6 +40,9 @@ export class AggregationComponent implements OnInit {
 
   getBarchartData(): void {
     this.showChart = true;
-    this.aggregationChartDataService.getBarchartData(this.resultSelectionStore.resultSelectionCommand, this.resultSelectionStore.remainingResultSelection);
+    this.aggregationChartDataService.getBarchartData(
+      this.resultSelectionStore.resultSelectionCommand,
+      this.resultSelectionStore.remainingResultSelection
+    );
   }
 }
