@@ -46,7 +46,7 @@ class EventResultQueryExecutor {
 
         List<Closure> queryParts = []
         performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, "getting results - preparation for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", 4) {
+                PerformanceLoggingService.LogLevel.INFO, "getting results - preparation for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", PerformanceLoggingService.IndentationDepth.FOUR) {
             queryParts.addAll(filters)
             List<Closure> trims = trimmer.buildTrims(selectedMeasurands, measurandTrims)
             queryParts.addAll(trims)
@@ -55,7 +55,7 @@ class EventResultQueryExecutor {
         }
 
         List<Map> rawData = (List<Map>) performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, "getting results - exec for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", 4) {
+                PerformanceLoggingService.LogLevel.INFO, "getting results - exec for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", PerformanceLoggingService.IndentationDepth.FOUR) {
             executeQuery(queryParts)
         }
         return rawData
@@ -63,7 +63,7 @@ class EventResultQueryExecutor {
 
     List<EventResultProjection> getResultFor(List<Map> rawData, PerformanceLoggingService performanceLoggingService) {
         List<EventResultProjection> result = (List<EventResultProjection>) performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, "getting results - transform for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", 4) {
+                PerformanceLoggingService.LogLevel.INFO, "getting results - transform for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", PerformanceLoggingService.IndentationDepth.FOUR) {
             transformer.transformRawQueryResult(rawData)
         }
         return result

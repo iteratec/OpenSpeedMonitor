@@ -225,7 +225,10 @@ class RawResultsApiController {
 
         List<EventResultDto> results = new LinkedList<EventResultDto>();
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.INFO, 'assembling results for json', 1) {
+        performanceLoggingService.logExecutionTime(
+                PerformanceLoggingService.LogLevel.INFO,
+                'assembling results for json',
+                PerformanceLoggingService.IndentationDepth.ONE) {
             Collection<EventResult> eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startTimeInclusive, endTimeInclusive, cmd.getCachedViewsToReturn(), queryParams)
             eventResults.each { eachEventResult ->
                 results.add(new EventResultDto(eachEventResult));

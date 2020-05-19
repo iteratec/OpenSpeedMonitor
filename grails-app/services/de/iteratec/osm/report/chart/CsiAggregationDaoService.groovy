@@ -224,7 +224,7 @@ class CsiAggregationDaoService {
 
     public List<CsiAggregation> getMvs(Date fromDate, Date toDate, MvQueryParams mvQueryParams, CsiAggregationInterval interval, AggregationType aggregationType) {
         def result
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "CsiAggregationDaoService: getMvs", 1) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "CsiAggregationDaoService: getMvs", PerformanceLoggingService.IndentationDepth.ONE) {
 
             List<JobGroup> jobGroups = JobGroup.getAll(mvQueryParams.jobGroupIds)
             List<MeasuredEvent> measuredEvents = MeasuredEvent.getAll(mvQueryParams.measuredEventIds)

@@ -84,17 +84,17 @@ class AspectUtil {
     public void expandByAspects(List<EventResultProjection> resultsFromDb, PerformanceLoggingService performanceLoggingService) throws IllegalStateException {
         aspectTypes.each { PerformanceAspectType type ->
             Map<String, List<EventResultProjection>> resultsByJobGroupPageAndBrowser = (Map<String, List<EventResultProjection>>) performanceLoggingService.logExecutionTimeSilently(
-                    PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - grouping results ${aspectLookup.size()}", 3) {
+                    PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - grouping results ${aspectLookup.size()}", PerformanceLoggingService.IndentationDepth.THREE) {
                 resultsFromDb.groupBy { EventResultProjection erp ->
                     "${erp.projectedProperties.jobGroupId}_${erp.projectedProperties.pageId}_${erp.projectedProperties.browserId}".toString()
                 }
             }
             resultsByJobGroupPageAndBrowser.each { String jobGroupPageAndBrowserKey, List<EventResultProjection> resultsOfKey ->
                 String typeAsString = type.toString()
-                PerformanceAspect usedAspect = (PerformanceAspect) performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - find aspect in list of ${aspectLookup.size()}", 3) {
+                PerformanceAspect usedAspect = (PerformanceAspect) performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - find aspect in list of ${aspectLookup.size()}", PerformanceLoggingService.IndentationDepth.THREE) {
                     aspectLookup["${jobGroupPageAndBrowserKey}_${typeAsString}".toString()]
                 }
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, 'expandByAspects - set metric', 3) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, 'expandByAspects - set metric', PerformanceLoggingService.IndentationDepth.THREE) {
                     String metricToUse = usedAspect ? usedAspect.metric.getDatabaseRelevantName() : type.defaultMetric.getEventResultField()
                     resultsOfKey.each { if (it[metricToUse]) it.projectedProperties[typeAsString] = it[metricToUse] }
                 }

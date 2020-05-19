@@ -52,7 +52,7 @@ class WeightingService {
 
         Double weight = 1
         if (weightFactors.contains(WeightFactor.HOUROFDAY)) {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] HOUROFDAY', 5) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] HOUROFDAY', PerformanceLoggingService.IndentationDepth.FIVE) {
                 weight *= getHourOfDayWeight(csiValue)
             }
             if (weight == 0d) {
@@ -61,7 +61,7 @@ class WeightingService {
         }
 
         if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', 5) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', PerformanceLoggingService.IndentationDepth.FIVE) {
                 weight *= getBrowserConnectivityWeight(csiValue, csiConfiguration.browserConnectivityWeights)
             }
             if (weight == 0d) {
@@ -70,7 +70,7 @@ class WeightingService {
         }
 
         if (weightFactors.contains(WeightFactor.PAGE)) {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] PAGE', 5) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] PAGE', PerformanceLoggingService.IndentationDepth.FIVE) {
                 weight *= getPageWeightFrom(csiValue, csiConfiguration.pageWeights)
             }
             if (weight == 0d) {
@@ -105,17 +105,17 @@ class WeightingService {
         double browserConnectivityWeight
 
         Browser browser
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser', 6) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.SIX) {
             browser = csiValue.retrieveBrowser()
         }
         ConnectivityProfile connectivityProfile
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get connectivity profile', 6) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get connectivity profile', PerformanceLoggingService.IndentationDepth.SIX) {
             connectivityProfile = csiValue.retrieveConnectivityProfile()
         }
         if (browser == null || connectivityProfile == null) {
             browserConnectivityWeight = 0
         } else {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser connectivity weight', 6) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser connectivity weight', PerformanceLoggingService.IndentationDepth.SIX) {
                 Double browserConnectivityWeightFromDb = browserConnectivityWeights.find {
                     it.browser == browser && it.connectivity == connectivityProfile
                 }?.weight

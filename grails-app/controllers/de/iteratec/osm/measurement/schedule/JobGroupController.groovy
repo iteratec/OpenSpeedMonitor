@@ -268,7 +268,7 @@ class JobGroupController {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", PerformanceLoggingService.IndentationDepth.ZERO, {
             def jobGroupAndPages = resultSelectionService.query(command.toResultSelectionCommand(), null, { existing ->
                 projections {
                     distinct(['jobGroup','page'])

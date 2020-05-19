@@ -69,11 +69,11 @@ class JobResultPersisterService {
         JobResultStatus jobResultStatus = determineJobResultStatusFromWptResult(resultXml, testId, job)
         log.info("Jobrun ${testId} has status ${jobResultStatus}")
         if (jobResultStatus.isTerminated()) {
-            performanceLoggingService.logExecutionTime(DEBUG, "Persisting finished jobrun ${testId} of job ${job.id}.", 1) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Persisting finished jobrun ${testId} of job ${job.id}.", PerformanceLoggingService.IndentationDepth.ONE) {
                 processFinishedJobResult(resultXml, jobResultStatus, job)
             }
         } else {
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", 1) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: updating jobresult.", PerformanceLoggingService.IndentationDepth.ONE) {
                 persistUnfinishedJobResult(job.id, testId, jobResultStatus, resultXml.wptStatus, "Polling job run.")
             }
         }
@@ -148,7 +148,7 @@ class JobResultPersisterService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     private void persistFinishedJobResult(WptResultXml resultXml, JobResultStatus jobResultStatus, Long jobId) throws OsmResultPersistanceException {
-        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", 4) {
+        performanceLoggingService.logExecutionTime(DEBUG, "persist JobResult for job ${resultXml.getLabel()}, test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
             String testId = resultXml.getTestId()
             log.debug("test-ID for which results should get persisted now=${testId}, jobResultStatus=${jobResultStatus}")
 

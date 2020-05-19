@@ -269,7 +269,7 @@ class CsiApiController {
 
         MvQueryParams queryParams = null;
         try {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "construct query params", 1) {
+            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "construct query params", PerformanceLoggingService.IndentationDepth.ONE) {
                 queryParams = cmd.createMvQueryParams(browserService)
             }
         } catch (NoResultException nre) {
@@ -283,7 +283,7 @@ class CsiApiController {
         CsiByEventResultsDto csiDtoToReturn
         try {
             if (cmd.system && cmd.page) {
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "calculate page csi", 1) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "calculate page csi", PerformanceLoggingService.IndentationDepth.ONE) {
                     csiDtoToReturn = csiByEventResultsService.retrieveCsi(
                             startDateTimeInclusive,
                             endDateTimeInclusive,
@@ -292,7 +292,7 @@ class CsiApiController {
                     )
                 }
             } else if (cmd.system) {
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "calculate shop csi", 1) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "calculate shop csi", PerformanceLoggingService.IndentationDepth.ONE) {
                     csiDtoToReturn = csiByEventResultsService.retrieveCsi(
                             startDateTimeInclusive,
                             endDateTimeInclusive,
@@ -316,7 +316,7 @@ class CsiApiController {
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo)
 
         performanceLoggingService.resetExecutionTimeLoggingSession()
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "cmd validation", 1) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "cmd validation", PerformanceLoggingService.IndentationDepth.ONE) {
 
             if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
                 ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')

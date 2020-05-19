@@ -14,7 +14,7 @@ class LoggedExecutionTimes {
      */
     class LoggedTime {
         PerformanceLoggingService.LogLevel level
-        Integer indentationDepth
+        PerformanceLoggingService.IndentationDepth indentationDepth
         Double elapsedMilliSecs
     }
 
@@ -26,13 +26,13 @@ class LoggedExecutionTimes {
      * @param description
      *          Logs Description.
      * @param indentationDepth
-     *          Logs indentationDepth depth.
+     *          Logs {@link de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth}
      * @param level
      *          Logs {@link de.iteratec.osm.util.PerformanceLoggingService.LogLevel}
      * @param execTime
      *          Time in seconds the logged execution time took.
      */
-    void addExecutionTime(String description, Integer indentationDepth, PerformanceLoggingService.LogLevel level, Double execTime) {
+    void addExecutionTime(String description, PerformanceLoggingService.IndentationDepth indentationDepth, PerformanceLoggingService.LogLevel level, Double execTime) {
         loggedDescriptions.add(description)
         executionTimesByDescription[description].add(
             new LoggedTime(level: level, indentationDepth: indentationDepth, elapsedMilliSecs: execTime)
@@ -49,7 +49,7 @@ class LoggedExecutionTimes {
         StringBuilder sb = new StringBuilder()
         loggedDescriptions.each {description->
             ArrayList<LoggedTime> loggedTimes = executionTimesByDescription[description]
-            sb.append("${INDENTATION_CHAR*loggedTimes[0].indentationDepth} ${description}: ")
+            sb.append("${INDENTATION_CHAR*loggedTimes[0].indentationDepth.value} ${description}: ")
             Map countAndTime = loggedTimes.inject([numOfTimes: 0, sumElapsedTime: 0]){Map<Integer, Integer> countAndTime, LoggedTime loggedTime ->
                 if (loggedTime.level.getValue() >= level.getValue()){
                     countAndTime["numOfTimes"] += 1

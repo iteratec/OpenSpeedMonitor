@@ -46,7 +46,7 @@ class CsiValueService {
     public List<WeightedCsiValue> getWeightedCsiValues(List<CsiValue> csiValues, Set<WeightFactor> weightFactors, CsiConfiguration csiConfiguration) {
 
         List<CsiValue> csiRelevantValues
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] filter csiValues by relevance', 3) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] filter csiValues by relevance', PerformanceLoggingService.IndentationDepth.THREE) {
             csiRelevantValues = csiValues.findAll { isCsiRelevant(it) }
         }
 
@@ -107,18 +107,18 @@ class CsiValueService {
         Double weight = 0
         List<Long> underlyingResultIds = []
 
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', 3) {
+        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.THREE) {
             csiValues.each { CsiValue csiValue ->
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get value', 4) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get value', PerformanceLoggingService.IndentationDepth.FOUR) {
                     value = getCsiValueClosure(csiValue)
                 }
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get weight', 4) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get weight', PerformanceLoggingService.IndentationDepth.FOUR) {
                     weight = weightingService.getWeight(csiValue, weightFactors, csiConfiguration)
                 }
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get underlying event results', 4) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] get underlying event results', PerformanceLoggingService.IndentationDepth.FOUR) {
                     underlyingResultIds = getUnderlyingEventResultsClosure(csiValue)
                 }
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] create new weighted value and add it to list', 4) {
+                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[build weighted values] create new weighted value and add it to list', PerformanceLoggingService.IndentationDepth.FOUR) {
                     if (value != null && weight != null && weight > 0) {
                         addNewWeightedValue(weightedCsiValues, value, weight, underlyingResultIds)
                     }
@@ -127,7 +127,7 @@ class CsiValueService {
         }
 
         List<WeightedCsiValue> flattened
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', 1) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.ONE) {
             flattened = flattenWeightedCsiValues(weightedCsiValues)
         }
 
@@ -148,7 +148,7 @@ class CsiValueService {
         Double weight = 0
         List<Long> underlyingResultIds = []
 
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', 1) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] build weighted values', PerformanceLoggingService.IndentationDepth.ONE) {
             csiValues.each { CsiValue csiValue ->
                 value = getCsiValueClosure(csiValue)
                 JobGroup jobGroupOfCsiValue = csiValue.retrieveJobGroup()
@@ -166,7 +166,7 @@ class CsiValueService {
         }
 
         List<WeightedCsiValue> flattened
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', 1) {
+        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, '[getWeightedCsiValues] flatten weighted values', PerformanceLoggingService.IndentationDepth.ONE) {
             flattened = flattenWeightedCsiValues(weightedCsiValues)
         }
 

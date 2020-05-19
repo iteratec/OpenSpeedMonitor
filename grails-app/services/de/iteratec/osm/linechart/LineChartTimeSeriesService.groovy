@@ -63,7 +63,7 @@ class LineChartTimeSeriesService {
     private List<EventResultProjection> getResultProjections(GetLinechartCommand cmd, Date from, Date to,
                                                              List<SelectedMeasurand> measurands,
                                                              List<PerformanceAspectType> performanceAspectTypes) {
-        EventResultQueryBuilder queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
+        EventResultQueryBuilder queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', PerformanceLoggingService.IndentationDepth.ONE) {
             return new EventResultQueryBuilder()
                     .withJobResultDateBetween(from, to)
                     .withJobGroupIdsIn(cmd.jobGroups as List)
@@ -75,12 +75,12 @@ class LineChartTimeSeriesService {
                     .withSelectedMeasurands(measurands)
         }
         if (performanceAspectTypes) {
-            queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', 1) {
+            queryBuilder = (EventResultQueryBuilder) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - with builder', PerformanceLoggingService.IndentationDepth.ONE) {
                 queryBuilder.withPerformanceAspects(performanceAspectTypes)
             }
         }
 
-        List<EventResultProjection> eventResultProjections = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', 2) {
+        List<EventResultProjection> eventResultProjections = (List<EventResultProjection>) performanceLoggingService.logExecutionTime(DEBUG, 'getting event-results - actually query the data', PerformanceLoggingService.IndentationDepth.TWO) {
             queryBuilder.getRawData()
         }
         return eventResultProjections
@@ -134,7 +134,7 @@ class LineChartTimeSeriesService {
                                         List<JobGroup> jobGroups, List<MeasuredEvent> measuredEvents, List<Location> locations,
                                         List<ConnectivityProfile> connectivityProfiles, JobGroup jobGroup,
                                         MeasuredEvent measuredEvent, Location location, ConnectivityProfile connectivity) {
-        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", 1) {
+        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for TimeSeriesChart", PerformanceLoggingService.IndentationDepth.ONE) {
             eventResultProjections.each { EventResultProjection eventResultProjection ->
                 String identifier = ""
                 Date date = (Date) eventResultProjection.jobResultDate

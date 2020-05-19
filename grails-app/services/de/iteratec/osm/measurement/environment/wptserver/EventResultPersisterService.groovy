@@ -96,10 +96,10 @@ class EventResultPersisterService implements iResultListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult, Long jobId) {
         Job job
-        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", 4) {
+        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
             job = jobDaoService.getJob(jobId)
         }
-        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", 4) {
+        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
             updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
         }
     }

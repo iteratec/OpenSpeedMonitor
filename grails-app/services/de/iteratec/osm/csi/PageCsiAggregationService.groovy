@@ -25,6 +25,7 @@ import de.iteratec.osm.result.CsiValueService
 import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.joda.time.DateTime
 
 class PageCsiAggregationService {
@@ -79,7 +80,10 @@ class PageCsiAggregationService {
         if (groups.size() == 0 || pages.size() == 0) {
             return result
         }
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', 1) {
+        performanceLoggingService.logExecutionTime(
+                LogLevel.DEBUG,
+                'getting csi-results - findAll - getMvs',
+                PerformanceLoggingService.IndentationDepth.ONE) {
             result = csiAggregationDaoService.getPageCsiAggregations(fromDate, toDate, groups, pages, targetInterval)
         }
         return result
@@ -232,7 +236,7 @@ class PageCsiAggregationService {
                 log.debug("weightedCsiValuesByVisuallyComplete.size()=${weightedCsiValuesByVisuallyComplete.size()}")
             }
 
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - calculation wmv: calc weighted mean", 4) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - calculation wmv: calc weighted mean", IndentationDepth.FOUR) {
                 if (weightedCsiValuesByDocComplete.size() > 0) {
                     toBeCalculated.csByWptDocCompleteInPercent = meanCalcService.calculateWeightedMean(weightedCsiValuesByDocComplete*.weightedValue)
                 }
@@ -257,7 +261,7 @@ class PageCsiAggregationService {
      */
     List<CsiAggregation> getHmvsByCsiGroupAndPage(List<JobGroup> csiGroups, List<Page> csiPages, DateTime startDateTime, DateTime endDateTime) {
         List<CsiAggregation> hourlyCsiAggregations
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getHmvs: getting", 4) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "  calcMvForPageAggregator - getHmvs: getting", IndentationDepth.FOUR) {
             hourlyCsiAggregations = eventCsiAggregationService.getHourlyCsiAggregations(startDateTime.toDate(), endDateTime.toDate(), csiGroups, csiPages)
         }
         return hourlyCsiAggregations
