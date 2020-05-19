@@ -32,6 +32,9 @@ export class LineChartEventService {
   private _contextMenuPoint: D3Selection<D3BaseType, TimeSeriesPoint, D3BaseType, any>;
   private brush: BrushBehavior<{}>;
 
+  private brushMinDate: Date = null;
+  private brushMaxDate: Date = null;
+
   constructor(private urlBuilderService: UrlBuilderService,
               private translationService: TranslateService,
               private lineChartDrawService: LineChartDrawService,
@@ -39,10 +42,6 @@ export class LineChartEventService {
   }
 
   private _pointSelectionErrorHandler: Function;
-
-  get pointSelectionErrorHandler(): Function {
-    return this._pointSelectionErrorHandler;
-  }
 
   set pointSelectionErrorHandler(value: Function) {
     this._pointSelectionErrorHandler = value;
@@ -156,6 +155,7 @@ export class LineChartEventService {
       }
     },
   ];
+
   private backgroundContextMenu: ContextMenuPosition[] = [
     {
       title: 'compareFilmstrips',
@@ -244,13 +244,14 @@ export class LineChartEventService {
            xScale: D3ScaleTime<number, number>,
            data: { [key: string]: TimeSeries[] },
            dataTrimValues: { [key: string]: { [key: string]: number } },
-           legendDataMap: { [key: string]: { [key: string]: (boolean | string) } }): void {
+           legendDataMap: { [key: string]: { [key: string]: (boolean | string) } },
+           keepZoom: boolean): void {
     // remove old brush
     d3Select('.brush').remove();
 
     this.brush = d3BrushX()
       .extent([[0, 0], [width, height]])
-      .on('end', () => this.updateChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap));
+      .on('end', () => this.zoomInTheChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap));
     chartContentContainer
       .append('g')
       .attr('class', 'brush')
@@ -258,6 +259,10 @@ export class LineChartEventService {
     d3Select('.overlay')
       .on('dblclick', () => this.resetChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap))
       .on('contextmenu', (d, i, e) => this.showContextMenu(this.backgroundContextMenu)(d, i, e));
+
+    if (keepZoom && this.brushMinDate !== null && this.brushMaxDate !== null) {
+      this.updateChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap);
+    }
   }
 
   addMouseMarkerToChart(markerParent: D3Selection<D3BaseType, {}, D3ContainerElement, {}>): void {
@@ -308,7 +313,7 @@ export class LineChartEventService {
     this.showTooltip(nearestDot, dotsOnMarker, nearestDot.datum().date, width, marginTop, marginLeft);
   }
 
-  private updateChart(chartContentContainer: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+  private zoomInTheChart(chartContentContainer: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
                       width: number,
                       height: number,
                       yAxisWidth: number,
@@ -323,18 +328,9 @@ export class LineChartEventService {
 
     // Remove the grey brush area
     d3Select('.brush').call(this.brush.move, null);
-    const minDate = xScale.invert(extent[0]);
-    const maxDate = xScale.invert(extent[1]);
-    xScale.domain([minDate, maxDate]);
-
-    d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) =>
-      this.lineChartDrawService.updateXAxis(transition, xScale));
-    const yNewScales = this.lineChartScaleService.getYScalesInTimeRange(data, minDate, maxDate, height, dataTrimValues);
-    this.lineChartDrawService.updateYAxes(yNewScales, width, yAxisWidth);
-    Object.keys(yNewScales).forEach((key: string, index: number) => {
-      this.lineChartDrawService.addDataLinesToChart(
-        chartContentContainer, this._pointsSelection, xScale, yNewScales[key], data[key], legendDataMap, index);
-    });
+    this.brushMinDate = xScale.invert(extent[0]);
+    this.brushMaxDate = xScale.invert(extent[1]);
+    this.updateChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap);
   }
 
   private resetChart(chartContentContainer: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
@@ -345,6 +341,11 @@ export class LineChartEventService {
                      data: { [key: string]: TimeSeries[] },
                      dataTrimValues: { [key: string]: { [key: string]: number } },
                      legendDataMap: { [key: string]: { [key: string]: (boolean | string) } }): void {
+    if (this.brushMinDate === null || this.brushMaxDate === null) {
+      return;
+    }
+    this.brushMinDate = null;
+    this.brushMaxDate = null;
     // Change X axis domain
     xScale.domain([this.lineChartScaleService.getMinDate(data), this.lineChartScaleService.getMaxDate(data)]);
     d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) =>
@@ -356,6 +357,26 @@ export class LineChartEventService {
         chartContentContainer, this._pointsSelection, xScale, yNewScales[key], data[key], legendDataMap, index);
     });
     this.showMarker();
+  }
+
+  private updateChart(chartContentContainer: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+                      width: number,
+                      height: number,
+                      yAxisWidth: number,
+                      xScale: D3ScaleTime<number, number>,
+                      data: { [key: string]: TimeSeries[] },
+                      dataTrimValues: { [key: string]: { [key: string]: number } },
+                      legendDataMap: { [key: string]: { [key: string]: (boolean | string) } }): void {
+    xScale.domain([this.brushMinDate, this.brushMaxDate]);
+
+    d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) =>
+    this.lineChartDrawService.updateXAxis(transition, xScale));
+    const yNewScales = this.lineChartScaleService.getYScalesInTimeRange(data, this.brushMinDate, this.brushMaxDate, height, dataTrimValues);
+    this.lineChartDrawService.updateYAxes(yNewScales, width, yAxisWidth);
+    Object.keys(yNewScales).forEach((key: string, index: number) => {
+    this.lineChartDrawService.addDataLinesToChart(
+      chartContentContainer, this._pointsSelection, xScale, yNewScales[key], data[key], legendDataMap, index);
+    });
   }
 
   private findNearestDot(mouseCoordinates: [number, number], dots): D3Selection<any, TimeSeriesPoint, null, any> {

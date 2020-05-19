@@ -113,7 +113,7 @@ export class LineChartService {
     const chartContentContainer = chart.select('.chart-content');
     this.lineChartEventService.createContextMenu();
     this.lineChartEventService.addBrush(chartContentContainer, this._width, this._height, this.Y_AXIS_WIDTH, xScale,
-      data, dataTrimValues, this.lineChartLegendService.legendDataMap);
+      data, dataTrimValues, this.lineChartLegendService.legendDataMap, !updateAllData);
 
     this.lineChartLegendService.addLegendsToChart(chartContentContainer, xScale, yScales, data, incomingData.numberOfTimeSeries);
     this.lineChartLegendService.setSummaryLabel(chart, incomingData.summaryLabels, this._width);
