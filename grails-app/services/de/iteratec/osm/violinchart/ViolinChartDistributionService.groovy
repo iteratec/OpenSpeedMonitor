@@ -11,7 +11,9 @@ import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.result.dao.EventResultQueryBuilder
+import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.gorm.transactions.Transactional
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
@@ -69,7 +71,7 @@ class ViolinChartDistributionService {
 
     private ViolinChartDTO buildDTO(List<EventResultProjection> distributions, List<JobGroup> allJobGroups, List<Page> allPages, List<SelectedMeasurand> measurands, List<PerformanceAspectType> performanceAspectTypes) {
         ViolinChartDTO violinChartDTO = new ViolinChartDTO()
-        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
+        performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", IndentationDepth.ONE) {
             distributions.each { EventResultProjection eventResultProjection ->
                 JobGroup jobGroup = (JobGroup) allJobGroups.find { jobGroup -> jobGroup.id == eventResultProjection.jobGroupId }
                 Page page = (Page) allPages.find { page -> page.id == eventResultProjection.pageId }

@@ -33,6 +33,7 @@ import de.iteratec.osm.result.dao.query.TrimQualifier
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import org.joda.time.DateTime
@@ -171,10 +172,10 @@ public class EventResultDashboardService {
             Date startDate, Date endDate, Integer interval, List<SelectedMeasurand> selectedMeasurands, ErQueryParams queryParams) {
 
         Collection<EventResultProjection> eventResults
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - with builder', 1) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - with builder', IndentationDepth.ONE) {
 
             EventResultQueryBuilder queryBuilder
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - create query builder', 2) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - create query builder', IndentationDepth.TWO) {
                 queryBuilder = new EventResultQueryBuilder()
                         .withJobResultDateBetween(startDate, endDate)
                         .withJobGroupIdsIn(queryParams.jobGroupIds as List)
@@ -185,14 +186,14 @@ public class EventResultDashboardService {
                         .withSelectedMeasurands(selectedMeasurands)
             }
 
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append connectivities', 2) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append connectivities', IndentationDepth.TWO) {
                 appendConnectivity(queryBuilder, queryParams)
             }
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append trims', 2) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - append trims', IndentationDepth.TWO) {
                 appendTrims(queryBuilder, queryParams)
             }
 
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - actually query the data', 2) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting event-results - actually query the data', IndentationDepth.TWO) {
                 eventResults = queryBuilder.getRawData()
             }
 
@@ -200,7 +201,7 @@ public class EventResultDashboardService {
         log.debug("getting event-results - Got ${eventResults.size()} EventResultProjections")
 
         OsmRickshawChart osmRickshawChart
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'calculateResultMap', 1) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'calculateResultMap', IndentationDepth.ONE) {
             osmRickshawChart = calculateResultMap(eventResults, selectedMeasurands, interval)
         }
         return osmRickshawChart
@@ -237,7 +238,7 @@ public class EventResultDashboardService {
      */
     private OsmRickshawChart calculateResultMap(Collection<EventResultProjection> eventResults, List<SelectedMeasurand> selectedMeasurands, Integer interval) {
         Map<GraphLabel, List<OsmChartPoint>> calculatedResultMap
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', 1) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting result-map', IndentationDepth.ONE) {
             if (interval == CsiAggregationInterval.RAW) {
                 calculatedResultMap = calculateResultMapForRawData(selectedMeasurands, eventResults)
             } else {
@@ -246,11 +247,11 @@ public class EventResultDashboardService {
         }
         List<OsmChartGraph> graphs = []
         OsmRickshawChart chart
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels and sorting', 1) {
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels', 2) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels and sorting', IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'set speaking graph labels', IndentationDepth.TWO) {
                 graphs = setSpeakingGraphLabelsAndSort(calculatedResultMap)
             }
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting', 2) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'sorting', IndentationDepth.TWO) {
                 chart = osmChartProcessingService.summarizeEventResultGraphs(graphs)
             }
         }
@@ -267,35 +268,35 @@ public class EventResultDashboardService {
             eventResults.each { EventResultProjection eventResult ->
 
                 Double value
-                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get normalized value', 2) {
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get normalized value', IndentationDepth.TWO) {
                     value = selectedMeasurand.getNormalizedValueFrom(eventResult)
                 }
 
                 if (selectedMeasurand.cachedView == eventResult.cachedView && value != null) {
 
                     GraphLabel graphLabel
-                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - create GraphLabels', 2) {
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - create GraphLabels', IndentationDepth.TWO) {
                         graphLabel = new GraphLabel(eventResult, null, selectedMeasurand)
                     }
                     URL testsDetailsURL
-                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', 2) {
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - building detail urls', IndentationDepth.TWO) {
                         testsDetailsURL = this.buildTestsDetailsURL(eventResult)
                     }
                     WptEventResultInfo chartPointWptInfo
-                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', 2) {
+                    performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - get points wpt infos', IndentationDepth.TWO) {
                         chartPointWptInfo = getChartPointsWptInfos(eventResult)
                     }
 
                     try {
-                        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - creating OsmChartPoints', 2) {
+                        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'getting result-map RAW - creating OsmChartPoints', IndentationDepth.TWO) {
                             long time
                             String agent
-                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - get values', 3) {
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - get values', IndentationDepth.THREE) {
                                 time = eventResult.jobResultDate.time
                                 agent = eventResult.testAgent
                             }
                             OsmChartPoint chartPoint
-                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - creation', 3) {
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - creation', IndentationDepth.THREE) {
                                 chartPoint = new OsmChartPoint(
                                         time: time,
                                         csiAggregation: value,
@@ -305,7 +306,7 @@ public class EventResultDashboardService {
                                         chartPointWptInfo: chartPointWptInfo
                                 )
                             }
-                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', 3) {
+                            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'creating OsmChartPoints - add to list', IndentationDepth.THREE) {
                                 if (chartPoint.isValid()) {
                                     // The following is a bit more verbose than using a groovy MapWithDefault, but significantly faster
                                     if (chartPointsForEachGraph[graphLabel] == null) {
@@ -365,7 +366,7 @@ public class EventResultDashboardService {
         Map<GraphLabel, List<OsmChartPoint>> chartPointsForEachGraph = [:].withDefault { [] }
         Map<GraphLabel, List<Double>> eventResultsToAggregate = [:].withDefault { [] }
 
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', 2) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'put results to map for aggregation', IndentationDepth.TWO) {
             eventResults.each { EventResultProjection eventResult ->
                 selectedMeasurands.each { SelectedMeasurand selectedMeasurand ->
                     if (eventResult.cachedView == selectedMeasurand.cachedView) {
@@ -380,7 +381,7 @@ public class EventResultDashboardService {
             }
         }
 
-        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'iterate over aggregation-map', 2) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'iterate over aggregation-map', IndentationDepth.TWO) {
             URL testsDetailsURL
             Double sum = 0
             Integer countValues = 0
@@ -388,7 +389,7 @@ public class EventResultDashboardService {
 
                 testsDetailsURL = buildTestsDetailsURL(key.jobGroupId, key.measuredEventId, key.pageId, key.browserId, key.locationId, key.selectedMeasurand, key.millisStartOfInterval, interval, value.size())
 
-                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', 3) {
+                performanceLoggingService.logExecutionTime(LogLevel.TRACE, 'calculate value and create OsmChartPoint', IndentationDepth.THREE) {
 
                     GraphLabel graphLabel = key.createCopy(false)
                     countValues = value.size()
@@ -421,7 +422,7 @@ public class EventResultDashboardService {
         Map<Serializable, MeasuredEvent> measuredEventMap = [:]
         Map<Serializable, Location> locationMap = [:]
         chartPointsForEachGraphOrigin.each { graphLabel, highChartPoints ->
-            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', 1) {
+            performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'TEST', IndentationDepth.ONE) {
 
                 graphLabel.validate()
 

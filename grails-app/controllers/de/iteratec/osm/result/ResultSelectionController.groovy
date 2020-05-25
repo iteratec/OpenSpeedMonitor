@@ -7,6 +7,7 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
 import grails.databinding.BindUsing
 import org.hibernate.exception.GenericJDBCException
@@ -39,7 +40,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             sendError(command)
             return
         }
-        def count = performanceLoggingService.logExecutionTime(DEBUG, "getResultCount for ${command as JSON}", 0, {
+        def count = performanceLoggingService.logExecutionTime(DEBUG, "getResultCount for ${command as JSON}", IndentationDepth.ZERO, {
             // we select static '1' for up to MAX_RESULT_COUNT records and count them afterwards
             // counting directly is slower, as we can't easily set a limit *before* counting the rows with GORM
             try {
@@ -65,7 +66,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroups for ${command as JSON}", IndentationDepth.ZERO, {
             def jobGroups = query(command, ResultSelectionService.ResultSelectionType.JobGroups, { existing ->
                 if (existing) {
                     not { 'in'('jobGroup', existing) }
@@ -98,7 +99,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getMeasuredEvents for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getMeasuredEvents for ${command as JSON}", IndentationDepth.ZERO, {
             def measuredEvents = query(command, ResultSelectionService.ResultSelectionType.MeasuredEvents, { existing ->
                 if (existing) {
                     or {
@@ -129,7 +130,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getLocations for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getLocations for ${command as JSON}", IndentationDepth.ZERO, {
             def locations = query(command, ResultSelectionService.ResultSelectionType.Locations, { existing ->
                 if (existing) {
                     or {
@@ -177,7 +178,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserOrHeroTimings for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getUserOrHeroTimings for ${command as JSON}", IndentationDepth.ZERO, {
             def userTimings = query(command, ResultSelectionService.ResultSelectionType.UserTimings, { existing ->
                 projections {
                     userTimings {
@@ -201,7 +202,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles all for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles all for ${command as JSON}", IndentationDepth.ZERO, {
             def dtos = getPredefinedConnectivityProfiles(command)
             if (command.caller == ResultSelectionCommand.Caller.EventResult) {
                 dtos += getCustomConnectivity(command)
@@ -219,7 +220,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             return
         }
 
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getPages for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getPages for ${command as JSON}", IndentationDepth.ZERO, {
             def pages = query(command, ResultSelectionService.ResultSelectionType.Pages, { existing ->
                 if (existing) {
                     not { 'in'('page', existing) }
@@ -245,7 +246,7 @@ class ResultSelectionController extends ExceptionHandlerController {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", 0, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", IndentationDepth.ZERO, {
             def jobGroupAndPages = query(command, null, { existing ->
                 projections {
                     distinct(['jobGroup', 'page'])
@@ -270,7 +271,7 @@ class ResultSelectionController extends ExceptionHandlerController {
     }
 
     private getPredefinedConnectivityProfiles(ResultSelectionCommand command) {
-        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", 1, {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles predefined for ${command as JSON}", IndentationDepth.ONE, {
             def connectivityProfiles = query(command, ResultSelectionService.ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('connectivityProfile')
                 if (existing) {
@@ -290,7 +291,7 @@ class ResultSelectionController extends ExceptionHandlerController {
     }
 
     private getCustomConnectivity(ResultSelectionCommand command) {
-        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles custom for ${command as JSON}", 1, {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles custom for ${command as JSON}", IndentationDepth.ONE, {
             def customProfiles = query(command, ResultSelectionService.ResultSelectionType.ConnectivityProfiles, { existing ->
                 isNotNull('customConnectivityName')
 
@@ -312,7 +313,7 @@ class ResultSelectionController extends ExceptionHandlerController {
     }
 
     private getNativeConnectivity(ResultSelectionCommand command) {
-        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles native for ${command as JSON}", 1, {
+        return performanceLoggingService.logExecutionTime(DEBUG, "getConnectivityProfiles native for ${command as JSON}", IndentationDepth.ONE, {
             def nativeConnectivity = query(command, ResultSelectionService.ResultSelectionType.ConnectivityProfiles, {
                 eq('noTrafficShapingAtAll', true)
                 maxResults 1

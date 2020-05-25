@@ -23,6 +23,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.Appender
 import ch.qos.logback.core.AppenderBase
 import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.testing.services.ServiceUnitTest
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
@@ -50,7 +51,7 @@ class PerformanceLoggingServiceSpec extends Specification implements ServiceUnit
 
         when: "We set the log level to Info and execute a operation which logs on Error"
         serviceLogger.setLevel(Level.INFO)
-        serviceUnderTest.logExecutionTime(LogLevel.ERROR, descriptionOfClosureToMeasure, 0) {
+        serviceUnderTest.logExecutionTime(LogLevel.ERROR, descriptionOfClosureToMeasure, IndentationDepth.ZERO) {
             Thread.sleep(1100)
         }
 
@@ -78,7 +79,7 @@ class PerformanceLoggingServiceSpec extends Specification implements ServiceUnit
 
         when: "We set the log level to Error and execute a operation which logs on Info"
         serviceLogger.setLevel(Level.ERROR)
-        serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, 0) {
+        serviceUnderTest.logExecutionTime(LogLevel.INFO, descriptionOfClosureToMeasure, IndentationDepth.ZERO) {
             Thread.sleep(1)
         }
 
@@ -102,19 +103,19 @@ class PerformanceLoggingServiceSpec extends Specification implements ServiceUnit
         serviceUnderTest.resetExecutionTimeLoggingSession()
 
         when: "We log execution times of nested code blocks"
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, 1) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, IndentationDepth.ONE) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, 1) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_2, IndentationDepth.ONE) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_3, 1) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_3, IndentationDepth.ONE) {
             Thread.sleep(10)
         }
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
             Thread.sleep(10)
         }
         List<String> loggingSessionDataLines = serviceUnderTest.getExecutionTimeLoggingSessionData(LogLevel.DEBUG).tokenize("\n")
@@ -143,20 +144,20 @@ class PerformanceLoggingServiceSpec extends Specification implements ServiceUnit
         serviceUnderTest.resetExecutionTimeLoggingSession()
 
         when: "We log execution times of nested code blocks"
-        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, 1) {
+        serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_1_1, IndentationDepth.ONE) {
             Thread.sleep(10)
             10.times {
-                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_1, 2) {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_1, IndentationDepth.TWO) {
                     Thread.sleep(10)
                 }
             }
             10.times {
-                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_2, 2) {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_2, IndentationDepth.TWO) {
                     Thread.sleep(10)
                 }
             }
             10.times {
-                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_3, 2) {
+                serviceUnderTest.logExecutionTimeSilently(LogLevel.DEBUG, descriptionLevel_2_3, IndentationDepth.TWO) {
                     Thread.sleep(10)
                 }
             }
