@@ -55,9 +55,9 @@ export class LineChartDrawService {
       // Remove after resize
       chartContentContainer.selectAll('.lines').remove();
       // Remove old dots
-      chartContentContainer.select('.single-dots').remove();
+      chartContentContainer.selectAll('.single-dots').remove();
       // Remove old dots
-      chartContentContainer.select('.dots').remove();
+      chartContentContainer.selectAll('.dots').remove();
     }
 
     // Create one group per line / data entry

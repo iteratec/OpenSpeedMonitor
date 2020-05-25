@@ -106,13 +106,13 @@ export class LineChartLegendService {
       enter => {
         const legendElement = enter
           .append('g')
-          .attr('class', 'legend-entry');
+          .attr('class', 'legend-entry')
+          .style('opacity', (datum) => {
+            return (this._legendDataMap[datum].show) ? 1 : 0.2;
+          });
         legendElement
           .append('rect')
           .attr('class', 'legend-rect')
-          .style('opacity', (datum) => {
-            return (this._legendDataMap[datum].show) ? 1 : 0.2;
-          })
           .attr('height', ChartCommons.COLOR_PREVIEW_SIZE)
           .attr('width', ChartCommons.COLOR_PREVIEW_SIZE)
           .attr('rx', 2)
