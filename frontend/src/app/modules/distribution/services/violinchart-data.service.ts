@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
-import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
-import {EMPTY, Observable, OperatorFunction} from "rxjs";
-import {catchError} from "rxjs/operators";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {ResultSelectionCommand} from '../../result-selection/models/result-selection-command.model';
+import {RemainingResultSelection} from '../../result-selection/models/remaing-result-selection.model';
+import {EMPTY, Observable, OperatorFunction} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 import {GetViolinchartCommand} from '../models/get-violin-chart-command.model';
 
 @Injectable({
@@ -11,17 +11,21 @@ import {GetViolinchartCommand} from '../models/get-violin-chart-command.model';
 })
 export class ViolinchartDataService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
-  fetchDistributionData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, url: string): Observable<T> {
+  fetchDistributionData<T>(resultSelectionCommand: ResultSelectionCommand,
+                           remainingResultSelection: RemainingResultSelection,
+                           url: string): Observable<T> {
     const cmd: GetViolinchartCommand = this.buildCommand(resultSelectionCommand, remainingResultSelection);
     const params = this.createParams(cmd);
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
-    )
+    );
   }
 
-  private buildCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): GetViolinchartCommand {
+  private buildCommand(resultSelectionCommand: ResultSelectionCommand,
+                       remainingResultSelection: RemainingResultSelection): GetViolinchartCommand {
     return new GetViolinchartCommand({
       preconfiguredDashboard: null,
       from: resultSelectionCommand.from,
@@ -45,7 +49,7 @@ export class ViolinchartDataService {
     let params = new HttpParams();
 
     Object.keys(getViolinchartCommand).forEach(key => {
-      if(getViolinchartCommand[key]) {
+      if (getViolinchartCommand[key]) {
         if (key === 'from' || key === 'to') {
           params = params.append(key, getViolinchartCommand[key].toISOString());
         } else if (key === 'interval') {

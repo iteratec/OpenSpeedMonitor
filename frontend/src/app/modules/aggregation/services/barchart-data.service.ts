@@ -33,11 +33,10 @@ export class BarchartDataService {
     });
   }
 
-  fetchBarchartData<T>(
-    resultSelectionCommand: ResultSelectionCommand,
-    remainingResultSelection: RemainingResultSelection,
-    aggregationValue: (string | number),
-    url: string
+  fetchBarchartData<T>(resultSelectionCommand: ResultSelectionCommand,
+                       remainingResultSelection: RemainingResultSelection,
+                       aggregationValue: (string | number),
+                       url: string
   ): Observable<T> {
     const getBarchartCommand = BarchartDataService.buildGetBarchartCommand(
       resultSelectionCommand,
