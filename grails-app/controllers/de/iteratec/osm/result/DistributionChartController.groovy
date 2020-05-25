@@ -117,6 +117,7 @@ class DistributionChartController extends ExceptionHandlerController {
         }
 
         ViolinChartDTO violinChartDTO = violinChartDistributionService.getDistributionFor(cmd)
+        violinChartDTO.filterRules = createFilterRules(Page.findAllByIdInList(cmd.pages), JobGroup.findAllByIdInList(cmd.jobGroups));
         ControllerUtils.sendObjectAsJSON(response, violinChartDTO)
     }
 

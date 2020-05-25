@@ -358,6 +358,9 @@ export class LineChartService {
             .attr('class', 'legend-text')
             .attr('x', 15)
             .attr('y', ChartCommons.COLOR_PREVIEW_SIZE)
+            .style('opacity', (datum) => {
+              return (this.legendDataMap[datum].show) ? 1 : 0.2;
+            })
             .text(datum => this.legendDataMap[datum].text);
           return legendElement;
         },
@@ -538,9 +541,9 @@ export class LineChartService {
         // Remove after resize
         chart.selectAll('.lines').remove();
         // Remove old dots
-        this._chartContentContainer.select('.single-dots').remove();
+        chart.selectAll('.single-dots').remove();
         // Remove old dots
-        this._chartContentContainer.select('.dots').remove();
+        chart.selectAll('.dots').remove();
       }
       // Create one group per line / data entry
       this._chartContentContainer
@@ -824,6 +827,9 @@ export class LineChartService {
 
       this._legendGroupColumnWidth = maximumLabelWidth + ChartCommons.COLOR_PREVIEW_SIZE + 30;
       this._legendGroupColumns = Math.floor(this._width / this._legendGroupColumnWidth);
+      if (this._legendGroupColumns < 1) {
+        this._legendGroupColumns = 1;
+      }
       this._legendGroupHeight = Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
     };
 
@@ -1086,7 +1092,7 @@ export class LineChartService {
       this.translationService.get(`frontend.de.iteratec.isr.measurand.group.${axisLabelKey}`).pipe(take(1)).subscribe(title => {
         d3Select(`.axis-unit${index}`).append('text')
           .attr('class', 'description unit')
-          .attr('transform', `translate(${xPosition}, ${(this._height / 2 - this._margin.bottom)}) rotate(-90)`)
+          .attr('transform', `translate(${xPosition}, ${this._height / 2}) rotate(-90)`)
           .text(`${title} [${measurandGroups[axisLabelKey]}]`);
       });
     });
