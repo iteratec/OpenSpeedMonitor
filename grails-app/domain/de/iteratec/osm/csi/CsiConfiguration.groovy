@@ -18,6 +18,8 @@
 package de.iteratec.osm.csi
 
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.gorm.annotation.Entity
 
 @Entity
@@ -54,9 +56,9 @@ class CsiConfiguration {
         PerformanceLoggingService performanceLoggingService = new PerformanceLoggingService()
 
         performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
+                LogLevel.DEBUG,
                 "creating CsiConfiguration with hour of day weights",
-                1
+                IndentationDepth.ONE
         ){
             configToReturn.with {
                 label = source.label
@@ -64,21 +66,13 @@ class CsiConfiguration {
                 csiDay = CsiDay.copyDay(source.csiDay)
             }
         }
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
-                "copy browser weights",
-                1
-        ){
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "copy browser weights", IndentationDepth.ONE){
             source.browserConnectivityWeights.each {
                 configToReturn.addToBrowserConnectivityWeights(BrowserConnectivityWeight.copyBrowserConnectivityWeight(it))
             }
         }
 
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
-                "copy page weights",
-                1
-        ){
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "copy page weights", IndentationDepth.ONE){
             source.pageWeights.each {
                 configToReturn.addToPageWeights(PageWeight.copyPageWeight(it))
             }
@@ -87,9 +81,9 @@ class CsiConfiguration {
 //        configToReturn.save(failOnError: true)
 
         performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
+                LogLevel.DEBUG,
                 "copy time to cs mappings",
-                1
+                IndentationDepth.ONE
         ){
 
 //            TimeToCsMapping.executeUpdate(

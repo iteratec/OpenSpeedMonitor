@@ -1,11 +1,11 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {SubmitComponent} from './submit.component';
-import {BarchartDataService} from "../../../aggregation/services/barchart-data.service";
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
-import {ResultSelectionService} from "../../services/result-selection.service";
-import {By} from "@angular/platform-browser";
+import {BarchartDataService} from '../../../aggregation/services/barchart-data.service';
+import {ResultSelectionStore} from '../../services/result-selection.store';
+import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
+import {ResultSelectionService} from '../../services/result-selection.service';
+import {By} from '@angular/platform-browser';
 
 describe('SubmitComponent', () => {
   let component: SubmitComponent;
@@ -14,7 +14,7 @@ describe('SubmitComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ SubmitComponent ],
+      declarations: [SubmitComponent],
       imports: [SharedMocksModule],
       providers: [
         BarchartDataService,
@@ -22,7 +22,7 @@ describe('SubmitComponent', () => {
         ResultSelectionService
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe('SubmitComponent', () => {
       pageIds: [4, 7, 9]
     });
     resultSelectionStore._remainingResultSelection$.next({
-      measurands: ["DOC_COMPLETE_TIME"]
+      measurands: ['DOC_COMPLETE_TIME']
     });
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#bet-barchart-data-submit')).nativeElement.disabled).toBeFalsy();
@@ -90,7 +90,7 @@ describe('SubmitComponent', () => {
       pageIds: [4, 7, 9]
     });
     resultSelectionStore._remainingResultSelection$.next({
-      measurands: ["DOC_COMPLETE_TIME"]
+      measurands: ['DOC_COMPLETE_TIME']
     });
     expect(fixture.debugElement.query(By.css('#bet-barchart-data-submit')).nativeElement.disabled).toBeTruthy();
     expect(fixture.debugElement.query(By.css('#unavailable-data'))).toBeTruthy();
@@ -197,7 +197,7 @@ describe('SubmitComponent', () => {
   it('should not warn about the selected meausrand', () => {
     resultSelectionStore.resultCount$.next(100);
     resultSelectionStore._remainingResultSelection$.next({
-      measurands: ["DOC_COMPLETE_TIME"]
+      measurands: ['DOC_COMPLETE_TIME']
     });
     fixture.detectChanges();
     expect(fixture.debugElement.query(By.css('#bet-barchart-data-submit')).nativeElement.disabled).toBeTruthy();

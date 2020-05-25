@@ -1,42 +1,45 @@
 <div class="card">
   <ul class="nav nav-tabs result-selection-tabs">
-    <li *ngIf="showPageSelection" id="pageAndEventTab"
-        (click)="activeTab = ActiveTab.PageAndEvent"
-        [class.active]="activeTab === ActiveTab.PageAndEvent">
+    <li (click)="activeTab = ActiveTab.PageAndEvent" *ngIf="showPageSelection"
+        [class.active]="activeTab === ActiveTab.PageAndEvent"
+        id="pageAndEventTab">
       <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.pageIds' | translate }}
         <ng-container *ngIf="showMeasuredStepSelection">
           | {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.measuredEventIds' | translate }}
         </ng-container>
       </a>
     </li>
-    <li *ngIf="showBrowserSelection" id="browserAndLocationTab"
-        (click)="activeTab = ActiveTab.BrowserAndLocation"
-        [class.active]="activeTab === ActiveTab.BrowserAndLocation">
+    <li (click)="activeTab = ActiveTab.BrowserAndLocation" *ngIf="showBrowserSelection"
+        [class.active]="activeTab === ActiveTab.BrowserAndLocation"
+        id="browserAndLocationTab">
       <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.browserIds' | translate }}
         <ng-container *ngIf="showLocationSelection">
           | {{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.locationIds' | translate }}</ng-container>
       </a>
     </li>
-    <li *ngIf="showConnectivitySelection" id="connectivityTab"
-        (click)="activeTab = ActiveTab.Connectivity"
-        [class.active]="activeTab === ActiveTab.Connectivity">
+    <li (click)="activeTab = ActiveTab.Connectivity" *ngIf="showConnectivitySelection"
+        [class.active]="activeTab === ActiveTab.Connectivity"
+        id="connectivityTab">
       <a>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.selectedConnectivities' | translate }}</a>
     </li>
   </ul>
 
   <div class="tab-content">
     <div class="tab-pane active">
-      <osm-selection-data *ngIf="showPageSelection" [hidden]="activeTab !== ActiveTab.PageAndEvent" [parentChildData$]="eventsAndPages$" [showChildSelection]="showMeasuredStepSelection"
-                          [childType]="ResultSelectionCommandParameter.MEASURED_EVENTS"
+      <osm-selection-data *ngIf="showPageSelection" [childType]="ResultSelectionCommandParameter.MEASURED_EVENTS"
+                          [hidden]="activeTab !== ActiveTab.PageAndEvent" [parentChildData$]="eventsAndPages$"
+                          [parentRequired]="pageRequired"
                           [parentType]="ResultSelectionCommandParameter.PAGES"
-                          [parentRequired]="pageRequired">
+                          [showChildSelection]="showMeasuredStepSelection">
       </osm-selection-data>
-      <osm-selection-data *ngIf="showBrowserSelection" [hidden]="activeTab !== ActiveTab.BrowserAndLocation" [parentChildData$]="locationsAndBrowsers$" [showChildSelection]="showLocationSelection"
-                          [childType]="ResultSelectionCommandParameter.LOCATIONS"
-                          [parentType]="ResultSelectionCommandParameter.BROWSERS">
+      <osm-selection-data *ngIf="showBrowserSelection" [childType]="ResultSelectionCommandParameter.LOCATIONS"
+                          [hidden]="activeTab !== ActiveTab.BrowserAndLocation" [parentChildData$]="locationsAndBrowsers$"
+                          [parentType]="ResultSelectionCommandParameter.BROWSERS"
+                          [showChildSelection]="showLocationSelection">
       </osm-selection-data>
-      <osm-selection-data *ngIf="showConnectivitySelection" [hidden]="activeTab !== ActiveTab.Connectivity" [parentChildData$]="connectivities$" [showChildSelection]="false"
-                          [parentType]="ResultSelectionCommandParameter.CONNECTIVITIES">
+      <osm-selection-data *ngIf="showConnectivitySelection" [hidden]="activeTab !== ActiveTab.Connectivity"
+                          [parentChildData$]="connectivities$" [parentType]="ResultSelectionCommandParameter.CONNECTIVITIES"
+                          [showChildSelection]="false">
       </osm-selection-data>
     </div>
   </div>

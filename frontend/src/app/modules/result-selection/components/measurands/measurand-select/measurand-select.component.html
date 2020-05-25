@@ -1,9 +1,9 @@
-<select class="form-control" [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()"
-        [compareWith]="compareMeasurands">
+<select [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()" [compareWith]="compareMeasurands"
+        class="form-control">
   <optgroup label="{{'frontend.de.iteratec.osm.performance-aspects' | translate}}">
-      <option *ngFor="let type of (perfAspectTypes$ |async)?.data" [ngValue]="type">
-        {{ 'frontend.de.iteratec.osm.performance-aspect.' + type.name + '.user-centric-question' | translate }}
-      </option>
+    <option *ngFor="let type of (perfAspectTypes$ |async)?.data" [ngValue]="type">
+      {{ 'frontend.de.iteratec.osm.performance-aspect.' + type.name + '.user-centric-question' | translate }}
+    </option>
   </optgroup>
   <ng-container *ngFor="let group$ of selectableMeasurandGroups.getValue().data">
     <optgroup *ngIf="group$.getValue().values && group$.getValue().values.length > 0"

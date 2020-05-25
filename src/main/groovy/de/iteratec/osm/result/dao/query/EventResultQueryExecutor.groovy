@@ -7,6 +7,8 @@ import de.iteratec.osm.result.dao.query.projector.EventResultProjector
 import de.iteratec.osm.result.dao.query.transformer.EventResultTransformer
 import de.iteratec.osm.result.dao.query.trimmer.EventResultTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 
 class EventResultQueryExecutor {
     private EventResultProjector projector
@@ -39,14 +41,14 @@ class EventResultQueryExecutor {
         this.trimmer = trimmer
     }
 
-    List<EventResultProjection> getResultFor(List<Closure> filters, List<MeasurandTrim> measurandTrims, Set<ProjectionProperty> baseProjections, PerformanceLoggingService performanceLoggingService) {
+    List<Map> getRawResultDataFor(List<Closure> filters, List<MeasurandTrim> measurandTrims, Set<ProjectionProperty> baseProjections, PerformanceLoggingService performanceLoggingService) {
         if (this.isNotValid()) {
             return []
         }
 
         List<Closure> queryParts = []
         performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, "getting results - preparation for ${selectedMeasurands[0]?.selectedType.isUserTiming() ? 'ut' : 'm'}", 4) {
+                LogLevel.INFO, "getting results - preparation for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", IndentationDepth.FOUR) {
             queryParts.addAll(filters)
             List<Closure> trims = trimmer.buildTrims(selectedMeasurands, measurandTrims)
             queryParts.addAll(trims)
@@ -55,11 +57,15 @@ class EventResultQueryExecutor {
         }
 
         List<Map> rawData = (List<Map>) performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, "getting results - exec for ${selectedMeasurands[0]?.selectedType.isUserTiming() ? 'ut' : 'm'}", 4) {
+                LogLevel.INFO, "getting results - exec for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", IndentationDepth.FOUR) {
             executeQuery(queryParts)
         }
+        return rawData
+    }
+
+    List<EventResultProjection> getResultFor(List<Map> rawData, PerformanceLoggingService performanceLoggingService) {
         List<EventResultProjection> result = (List<EventResultProjection>) performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO, "getting results - transform for ${selectedMeasurands[0]?.selectedType.isUserTiming() ? 'ut' : 'm'}", 4) {
+                LogLevel.INFO, "getting results - transform for ${selectedMeasurands[0]?.selectedType?.isUserTiming() ? 'ut' : 'm'}", IndentationDepth.FOUR) {
             transformer.transformRawQueryResult(rawData)
         }
         return result

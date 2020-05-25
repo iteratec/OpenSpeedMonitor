@@ -275,7 +275,7 @@ export class LineChartService {
       this.translationService.get(`frontend.de.iteratec.isr.measurand.group.axisLabel.${axisLabelKey}`).pipe(take(1)).subscribe(title => {
         d3Select(`.axis-unit${index}`).append('text')
           .attr('class', 'description unit')
-          .attr('transform', `translate(${xPosition}, ${(this._height / 2 - this._margin.bottom)}) rotate(-90)`)
+          .attr('transform', `translate(${xPosition}, ${this._height / 2}) rotate(-90)`)
           .text(`${title} [${measurandGroups[axisLabelKey]}]`);
       });
     });

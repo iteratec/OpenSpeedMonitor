@@ -9,6 +9,8 @@ import de.iteratec.osm.result.PerformanceAspectType
 import de.iteratec.osm.result.SelectedMeasurand
 import de.iteratec.osm.result.dao.EventResultProjection
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.grails.datastore.mapping.query.api.Criteria
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -84,17 +86,17 @@ class AspectUtil {
     public void expandByAspects(List<EventResultProjection> resultsFromDb, PerformanceLoggingService performanceLoggingService) throws IllegalStateException {
         aspectTypes.each { PerformanceAspectType type ->
             Map<String, List<EventResultProjection>> resultsByJobGroupPageAndBrowser = (Map<String, List<EventResultProjection>>) performanceLoggingService.logExecutionTimeSilently(
-                    PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - grouping results ${aspectLookup.size()}", 3) {
+                    LogLevel.DEBUG, "expandByAspects - grouping results ${aspectLookup.size()}", IndentationDepth.THREE) {
                 resultsFromDb.groupBy { EventResultProjection erp ->
                     "${erp.projectedProperties.jobGroupId}_${erp.projectedProperties.pageId}_${erp.projectedProperties.browserId}".toString()
                 }
             }
             resultsByJobGroupPageAndBrowser.each { String jobGroupPageAndBrowserKey, List<EventResultProjection> resultsOfKey ->
                 String typeAsString = type.toString()
-                PerformanceAspect usedAspect = (PerformanceAspect) performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "expandByAspects - find aspect in list of ${aspectLookup.size()}", 3) {
+                PerformanceAspect usedAspect = (PerformanceAspect) performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "expandByAspects - find aspect in list of ${aspectLookup.size()}", IndentationDepth.THREE) {
                     aspectLookup["${jobGroupPageAndBrowserKey}_${typeAsString}".toString()]
                 }
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, 'expandByAspects - set metric', 3) {
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, 'expandByAspects - set metric', IndentationDepth.THREE) {
                     String metricToUse = usedAspect ? usedAspect.metric.getDatabaseRelevantName() : type.defaultMetric.getEventResultField()
                     resultsOfKey.each { if (it[metricToUse]) it.projectedProperties[typeAsString] = it[metricToUse] }
                 }
