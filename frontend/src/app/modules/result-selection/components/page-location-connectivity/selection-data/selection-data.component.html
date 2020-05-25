@@ -1,5 +1,6 @@
 <div class="form-group">
-  <select (ngModelChange)="filterSelectableItems(parentSelection)" [(ngModel)]="parentSelection" [style.opacity]="determineOpacity(parentSelection.length)" class="form-control"
+  <select [(ngModel)]="parentSelection" (ngModelChange)="filterSelectableItems(parentSelection)"
+          [style.opacity]="determineOpacity(parentSelection.length)" class="form-control"
           id="result-selection-parent-selection"
           multiple="multiple">
     <ng-container *ngIf="(uniqueParents$ | async)?.length > 0; else noResults">
@@ -11,7 +12,8 @@
       </option>
     </ng-template>
   </select>
-  <div (click)="selectAllParentsCheckbox.checked = true; parentSelection = []; filterSelectableItems(parentSelection)" *ngIf="!parentRequired"
+  <div (click)="selectAllParentsCheckbox.checked = true; parentSelection = []; filterSelectableItems(parentSelection)"
+       *ngIf="!parentRequired"
        class="checkbox-inline">
     <input #selectAllParentsCheckbox [checked]="parentSelection.length < 1" id="selectAllParentsCheckbox"
            type="checkbox">
@@ -24,9 +26,10 @@
     <strong>{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.label.' + childType | translate }}
       :</strong>
   </label>
-  <ng-select (ngModelChange)="updateResultSelectionCommand()"
-             [(ngModel)]="childSelection" [closeOnSelect]="true" [groupBy]="'parent.id'"
-             [items]="childData$ | async" [multiple]="true" bindLabel="name" bindValue="id" id="result-selection-child-selection"
+  <ng-select [(ngModel)]="childSelection" (ngModelChange)="updateResultSelectionCommand()"
+             [closeOnSelect]="true" [groupBy]="'parent.id'"
+             [items]="childData$ | async" [multiple]="true" bindLabel="name" bindValue="id"
+             id="result-selection-child-selection"
              placeholder="{{ 'frontend.de.iteratec.osm.resultSelection.pageBrowserConnectivity.selectOption.placeholder' | translate }}">
   </ng-select>
   <div (click)="selectAllChildrenCheckbox.checked = true; childSelection = []; updateResultSelectionCommand()"

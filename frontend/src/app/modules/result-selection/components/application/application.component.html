@@ -1,6 +1,6 @@
 <div class="card form-horizontal">
   <h2>{{ 'frontend.de.iteratec.osm.resultSelection.application.title' | translate }}</h2>
-  <select (ngModelChange)="onSelectionChange()" [(ngModel)]="selectedApplications" class="form-control" id='applications-selection'
+  <select [(ngModel)]="selectedApplications" (ngModelChange)="onSelectionChange()" class="form-control" id='applications-selection'
           multiple>
     <ng-container *ngIf="filteredApplications?.length > 0; else elseBlock">
       <option *ngFor="let application of filteredApplications" [ngValue]="application.id">

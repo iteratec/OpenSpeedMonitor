@@ -1,4 +1,4 @@
-<select (ngModelChange)="selectMeasurand()" [(ngModel)]="selectedMeasurand" [compareWith]="compareMeasurands"
+<select [(ngModel)]="selectedMeasurand" (ngModelChange)="selectMeasurand()" [compareWith]="compareMeasurands"
         class="form-control">
   <optgroup label="{{'frontend.de.iteratec.osm.performance-aspects' | translate}}">
     <option *ngFor="let type of (perfAspectTypes$ |async)?.data" [ngValue]="type">

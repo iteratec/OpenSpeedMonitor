@@ -12,7 +12,7 @@
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.heading' | translate }}:
     </label>
     <div class="col-md-8">
-      <select (ngModelChange)="selectInterval()" [(ngModel)]="aggregationIntervalInSeconds" class="form-control">
+      <select [(ngModel)]="aggregationIntervalInSeconds" (ngModelChange)="selectInterval()" class="form-control">
         <option *ngFor="let intervals of selectableAggregationIntervalsInSeconds" [value]="intervals">
           {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.aggregation.intervals.' + intervals | translate }}
         </option>
@@ -25,7 +25,7 @@
       {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.heading' | translate }}:
     </label>
     <div class="col-md-8">
-      <select (ngModelChange)="selectTimeFrame()" [(ngModel)]="timeFrameInSeconds" class="form-control">
+      <select [(ngModel)]="timeFrameInSeconds" (ngModelChange)="selectTimeFrame()" class="form-control">
         <option *ngFor="let seconds of selectableTimeFramesInSeconds" [value]="seconds">
           {{ 'frontend.de.iteratec.osm.resultSelection.timeFrame.seconds.' + seconds | translate }}
         </option>
