@@ -12,6 +12,8 @@ import de.iteratec.osm.result.ThresholdService
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import io.swagger.annotations.*
 import org.joda.time.DateTime
 import org.joda.time.Duration
@@ -225,10 +227,7 @@ class RawResultsApiController {
 
         List<EventResultDto> results = new LinkedList<EventResultDto>();
 
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.INFO,
-                'assembling results for json',
-                PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.INFO, 'assembling results for json', IndentationDepth.ONE) {
             Collection<EventResult> eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(startTimeInclusive, endTimeInclusive, cmd.getCachedViewsToReturn(), queryParams)
             eventResults.each { eachEventResult ->
                 results.add(new EventResultDto(eachEventResult));

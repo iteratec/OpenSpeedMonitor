@@ -80,10 +80,7 @@ class PageCsiAggregationService {
         if (groups.size() == 0 || pages.size() == 0) {
             return result
         }
-        performanceLoggingService.logExecutionTime(
-                LogLevel.DEBUG,
-                'getting csi-results - findAll - getMvs',
-                PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'getting csi-results - findAll - getMvs', IndentationDepth.ONE) {
             result = csiAggregationDaoService.getPageCsiAggregations(fromDate, toDate, groups, pages, targetInterval)
         }
         return result

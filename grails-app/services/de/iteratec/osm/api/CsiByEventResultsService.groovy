@@ -31,6 +31,8 @@ import de.iteratec.osm.result.EventResult
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.result.dao.EventResultDaoService
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.gorm.transactions.Transactional
 import org.joda.time.DateTime
 
@@ -57,7 +59,7 @@ class CsiByEventResultsService {
     public CsiByEventResultsDto retrieveCsi(DateTime start, DateTime end, MvQueryParams queryParams, Set<WeightFactor> weightFactors) {
 
         List<EventResult> eventResults
-		performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] get event results', PerformanceLoggingService.IndentationDepth.TWO){
+		performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[retrieveCsi] get event results', IndentationDepth.TWO){
             eventResults = eventResultDaoService.getByStartAndEndTimeAndMvQueryParams(start.toDate(), end.toDate(), [CachedView.UNCACHED], queryParams)
         }
 
@@ -67,20 +69,20 @@ class CsiByEventResultsService {
         if (eventResults.size() > 0) {
             JobGroup jobGroup
             CsiConfiguration csiConfiguration
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] get JobGroup and CsiConfiguration', PerformanceLoggingService.IndentationDepth.TWO){
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[retrieveCsi] get JobGroup and CsiConfiguration', IndentationDepth.TWO){
                 jobGroup = JobGroup.get(queryParams.jobGroupIds[0])
                 csiConfiguration = jobGroup ? jobGroup.csiConfiguration : null
                 if(!csiConfiguration) {
                     throw new IllegalArgumentException("there is no csi configuratin for jobGroup with id ${queryParams.jobGroupIds[0]}")
                 }
             }
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] weight event results', PerformanceLoggingService.IndentationDepth.TWO){
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[retrieveCsi] weight event results', IndentationDepth.TWO){
                 weightedCsiValues = csiValueService.getWeightedCsiValues(eventResults, weightFactors, csiConfiguration)
             }
         }
 
         CsiByEventResultsDto csiDto
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[retrieveCsi] calculate weighted mean and prepare return value', PerformanceLoggingService.IndentationDepth.TWO){
+        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[retrieveCsi] calculate weighted mean and prepare return value', IndentationDepth.TWO){
             log.info("retrieveCsi: ${weightedCsiValues.size()} WeightedCsiValues were determined for ${eventResults.size()} EventResults.")
             if (weightedCsiValues.size()>0) {
                 double weightedValueAsPercentage = meanCalcService.calculateWeightedMean(weightedCsiValues*.weightedValue)

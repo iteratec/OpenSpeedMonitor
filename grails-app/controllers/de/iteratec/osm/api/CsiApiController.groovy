@@ -13,6 +13,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import io.swagger.annotations.*
 import org.joda.time.DateTime
 import org.joda.time.Duration
@@ -269,7 +271,7 @@ class CsiApiController {
 
         MvQueryParams queryParams = null;
         try {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "construct query params", PerformanceLoggingService.IndentationDepth.ONE) {
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "construct query params", IndentationDepth.ONE) {
                 queryParams = cmd.createMvQueryParams(browserService)
             }
         } catch (NoResultException nre) {
@@ -283,7 +285,7 @@ class CsiApiController {
         CsiByEventResultsDto csiDtoToReturn
         try {
             if (cmd.system && cmd.page) {
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "calculate page csi", PerformanceLoggingService.IndentationDepth.ONE) {
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "calculate page csi", IndentationDepth.ONE) {
                     csiDtoToReturn = csiByEventResultsService.retrieveCsi(
                             startDateTimeInclusive,
                             endDateTimeInclusive,
@@ -292,7 +294,7 @@ class CsiApiController {
                     )
                 }
             } else if (cmd.system) {
-                performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "calculate shop csi", PerformanceLoggingService.IndentationDepth.ONE) {
+                performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "calculate shop csi", IndentationDepth.ONE) {
                     csiDtoToReturn = csiByEventResultsService.retrieveCsi(
                             startDateTimeInclusive,
                             endDateTimeInclusive,
@@ -305,7 +307,7 @@ class CsiApiController {
             ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.NOT_FOUND, e.getMessage())
             return
         }
-        log.debug("performance logdata getResults:\n" + performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.DEBUG))
+        log.debug("performance logdata getResults:\n" + performanceLoggingService.getExecutionTimeLoggingSessionData(LogLevel.DEBUG))
         return ControllerUtils.sendObjectAsJSON(response, [target: csiDtoToReturn], params.pretty && params.pretty == 'true')
 
     }
@@ -316,7 +318,7 @@ class CsiApiController {
         DateTime endDateTimeInclusive = API_DATE_FORMAT.parseDateTime(cmd.timestampTo)
 
         performanceLoggingService.resetExecutionTimeLoggingSession()
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, "cmd validation", PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, "cmd validation", IndentationDepth.ONE) {
 
             if (endDateTimeInclusive.isBefore(startDateTimeInclusive)) {
                 ControllerUtils.sendSimpleResponseAsStream(response, HttpStatus.BAD_REQUEST, 'The end of requested time-frame could not be before start of time-frame.')

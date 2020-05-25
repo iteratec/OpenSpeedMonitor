@@ -13,6 +13,7 @@ import de.iteratec.osm.result.ResultSelectionService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
 import org.hibernate.sql.JoinType
 import org.joda.time.DateTime
@@ -268,7 +269,7 @@ class JobGroupController {
             sendError(command)
             return
         }
-        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", PerformanceLoggingService.IndentationDepth.ZERO, {
+        def dtos = performanceLoggingService.logExecutionTime(DEBUG, "getJobGroupToPagesMap for ${command as JSON}", IndentationDepth.ZERO, {
             def jobGroupAndPages = resultSelectionService.query(command.toResultSelectionCommand(), null, { existing ->
                 projections {
                     distinct(['jobGroup','page'])

@@ -1,5 +1,8 @@
 package de.iteratec.osm.util
 
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
+
 import static de.iteratec.osm.util.PerformanceLoggingService.INDENTATION_CHAR
 
 /**
@@ -13,8 +16,8 @@ class LoggedExecutionTimes {
      * Single logged execution time.
      */
     class LoggedTime {
-        PerformanceLoggingService.LogLevel level
-        PerformanceLoggingService.IndentationDepth indentationDepth
+        LogLevel level
+        IndentationDepth indentationDepth
         Double elapsedMilliSecs
     }
 
@@ -32,7 +35,7 @@ class LoggedExecutionTimes {
      * @param execTime
      *          Time in seconds the logged execution time took.
      */
-    void addExecutionTime(String description, PerformanceLoggingService.IndentationDepth indentationDepth, PerformanceLoggingService.LogLevel level, Double execTime) {
+    void addExecutionTime(String description, IndentationDepth indentationDepth, LogLevel level, Double execTime) {
         loggedDescriptions.add(description)
         executionTimesByDescription[description].add(
             new LoggedTime(level: level, indentationDepth: indentationDepth, elapsedMilliSecs: execTime)
@@ -45,7 +48,7 @@ class LoggedExecutionTimes {
      *          in String representation.
      * @return  String representation of all the logged execution times assembled within this instance.
      */
-    String getRepresentation(PerformanceLoggingService.LogLevel level){
+    String getRepresentation(LogLevel level){
         StringBuilder sb = new StringBuilder()
         loggedDescriptions.each {description->
             ArrayList<LoggedTime> loggedTimes = executionTimesByDescription[description]

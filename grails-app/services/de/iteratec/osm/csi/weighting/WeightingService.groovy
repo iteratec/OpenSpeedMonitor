@@ -23,6 +23,8 @@ import de.iteratec.osm.measurement.schedule.ConnectivityProfile
 import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.Contract
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.joda.time.DateTime
 
 /**
@@ -52,7 +54,7 @@ class WeightingService {
 
         Double weight = 1
         if (weightFactors.contains(WeightFactor.HOUROFDAY)) {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] HOUROFDAY', PerformanceLoggingService.IndentationDepth.FIVE) {
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[getWeight] HOUROFDAY', IndentationDepth.FIVE) {
                 weight *= getHourOfDayWeight(csiValue)
             }
             if (weight == 0d) {
@@ -61,7 +63,7 @@ class WeightingService {
         }
 
         if (weightFactors.contains(WeightFactor.BROWSER_CONNECTIVITY_COMBINATION)) {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', PerformanceLoggingService.IndentationDepth.FIVE) {
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[getWeight] BROWSER_CONNECTIVITY_COMBINATION', IndentationDepth.FIVE) {
                 weight *= getBrowserConnectivityWeight(csiValue, csiConfiguration.browserConnectivityWeights)
             }
             if (weight == 0d) {
@@ -70,7 +72,7 @@ class WeightingService {
         }
 
         if (weightFactors.contains(WeightFactor.PAGE)) {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] PAGE', PerformanceLoggingService.IndentationDepth.FIVE) {
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[getWeight] PAGE', IndentationDepth.FIVE) {
                 weight *= getPageWeightFrom(csiValue, csiConfiguration.pageWeights)
             }
             if (weight == 0d) {
@@ -105,17 +107,17 @@ class WeightingService {
         double browserConnectivityWeight
 
         Browser browser
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser', PerformanceLoggingService.IndentationDepth.SIX) {
+        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[getWeight] BCC - get browser', IndentationDepth.SIX) {
             browser = csiValue.retrieveBrowser()
         }
         ConnectivityProfile connectivityProfile
-        performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get connectivity profile', PerformanceLoggingService.IndentationDepth.SIX) {
+        performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[getWeight] BCC - get connectivity profile', IndentationDepth.SIX) {
             connectivityProfile = csiValue.retrieveConnectivityProfile()
         }
         if (browser == null || connectivityProfile == null) {
             browserConnectivityWeight = 0
         } else {
-            performanceLoggingService.logExecutionTimeSilently(PerformanceLoggingService.LogLevel.DEBUG, '[getWeight] BCC - get browser connectivity weight', PerformanceLoggingService.IndentationDepth.SIX) {
+            performanceLoggingService.logExecutionTimeSilently(LogLevel.DEBUG, '[getWeight] BCC - get browser connectivity weight', IndentationDepth.SIX) {
                 Double browserConnectivityWeightFromDb = browserConnectivityWeights.find {
                     it.browser == browser && it.connectivity == connectivityProfile
                 }?.weight

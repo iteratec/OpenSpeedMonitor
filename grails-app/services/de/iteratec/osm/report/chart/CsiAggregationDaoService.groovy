@@ -26,6 +26,8 @@ import de.iteratec.osm.measurement.schedule.JobGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.joda.time.DateTime
 /**
  * Contains only methods that query {@link CsiAggregation}s from database. Doesn't contain any dependencies to other domains or
@@ -224,7 +226,7 @@ class CsiAggregationDaoService {
 
     public List<CsiAggregation> getMvs(Date fromDate, Date toDate, MvQueryParams mvQueryParams, CsiAggregationInterval interval, AggregationType aggregationType) {
         def result
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "CsiAggregationDaoService: getMvs", PerformanceLoggingService.IndentationDepth.ONE) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "CsiAggregationDaoService: getMvs", IndentationDepth.ONE) {
 
             List<JobGroup> jobGroups = JobGroup.getAll(mvQueryParams.jobGroupIds)
             List<MeasuredEvent> measuredEvents = MeasuredEvent.getAll(mvQueryParams.measuredEventIds)

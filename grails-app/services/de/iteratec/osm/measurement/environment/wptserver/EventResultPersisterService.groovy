@@ -31,6 +31,7 @@ import de.iteratec.osm.report.external.GraphiteReportService
 import de.iteratec.osm.report.external.MetricReportingService
 import de.iteratec.osm.result.*
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.gorm.transactions.Transactional
 import grails.web.mapping.LinkGenerator
 import groovy.util.slurpersupport.GPathResult
@@ -96,10 +97,10 @@ class EventResultPersisterService implements iResultListener {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     void checkJobAndLocation(WptResultXml resultXml, WebPageTestServer wptserverOfResult, Long jobId) {
         Job job
-        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTime(DEBUG, "get or persist Job ${resultXml.getLabel()} while processing test ${resultXml.getTestId()}...", IndentationDepth.FOUR) {
             job = jobDaoService.getJob(jobId)
         }
-        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", PerformanceLoggingService.IndentationDepth.FOUR) {
+        performanceLoggingService.logExecutionTime(DEBUG, "updateLocationIfNeededAndPossible while processing test ${resultXml.getTestId()}...", IndentationDepth.FOUR) {
             updateLocationIfNeededAndPossible(job, resultXml, wptserverOfResult);
         }
     }

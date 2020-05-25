@@ -13,6 +13,8 @@ import de.iteratec.osm.result.dao.query.trimmer.MeasurandAverageDataTrimmer
 import de.iteratec.osm.result.dao.query.trimmer.MeasurandRawDataTrimmer
 import de.iteratec.osm.result.dao.query.trimmer.UserTimingDataTrimmer
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.hibernate.criterion.CriteriaSpecification
 import org.hibernate.sql.JoinType
 import org.slf4j.Logger
@@ -273,18 +275,12 @@ class EventResultQueryBuilder {
     List<EventResultProjection> getRawData(MetaDataSet metaDataSet = MetaDataSet.COMPLETE) {
 
         if (this.aspectUtil.aspectsIncluded()) {
-            this.performanceLoggingService.logExecutionTimeSilently(
-                    PerformanceLoggingService.LogLevel.INFO,
-                    'getRawData - appendAspectMetrics',
-                    PerformanceLoggingService.IndentationDepth.TWO) {
+            this.performanceLoggingService.logExecutionTimeSilently(LogLevel.INFO, 'getRawData - appendAspectMetrics', IndentationDepth.TWO) {
                 aspectUtil.appendAspectMetrics(userTimingQueryExecutor.selectedMeasurands, measurandQueryExecutor.selectedMeasurands)
             }
         }
 
-        this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO,
-                'getRawData - preparation',
-                PerformanceLoggingService.IndentationDepth.TWO) {
+        this.performanceLoggingService.logExecutionTimeSilently(LogLevel.INFO, 'getRawData - preparation', IndentationDepth.TWO) {
             baseProjections.addAll(getMetaDataProjections(metaDataSet))
 
             measurandQueryExecutor.setProjector(new MeasurandRawDataProjector())
@@ -297,18 +293,18 @@ class EventResultQueryBuilder {
         }
 
         List<EventResultProjection> results = this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO,
+                LogLevel.INFO,
                 'getRawData - getting results',
-                PerformanceLoggingService.IndentationDepth.TWO) {
+                IndentationDepth.TWO) {
             getResults(false)
         }
 
         if (this.aspectUtil.aspectsIncluded()) {
             try {
                 this.performanceLoggingService.logExecutionTimeSilently(
-                        PerformanceLoggingService.LogLevel.INFO,
+                        LogLevel.INFO,
                         'getRawData - expandByAspects',
-                        PerformanceLoggingService.IndentationDepth.TWO) {
+                        IndentationDepth.TWO) {
                     aspectUtil.expandByAspects(results, performanceLoggingService)
                 }
             } catch (IllegalStateException e) {
@@ -370,18 +366,18 @@ class EventResultQueryBuilder {
         if (this.aspectUtil.aspectsIncluded()) {
             this.performanceLoggingService.resetExecutionTimeLoggingSession()
             List<EventResultProjection> rawData = this.performanceLoggingService.logExecutionTimeSilently(
-                    PerformanceLoggingService.LogLevel.INFO,
+                    LogLevel.INFO,
                     'getRawData',
-                    PerformanceLoggingService.IndentationDepth.ONE) {
+                    IndentationDepth.ONE) {
                 getRawData(MetaDataSet.ASPECT)
             }
             List<EventResultProjection> avgs = this.performanceLoggingService.logExecutionTimeSilently(
-                    PerformanceLoggingService.LogLevel.INFO,
+                    LogLevel.INFO,
                     'getAverageFrom',
-                    PerformanceLoggingService.IndentationDepth.ONE) {
+                    IndentationDepth.ONE) {
                 this.aspectUtil.getAverageFrom(rawData)
             }
-            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(PerformanceLoggingService.LogLevel.DEBUG))
+            log.info(this.performanceLoggingService.getExecutionTimeLoggingSessionData(LogLevel.DEBUG))
             return avgs
         } else {
             return getAverageDataWithoutAspects()
@@ -407,16 +403,16 @@ class EventResultQueryBuilder {
         List<EventResultProjection> measurandResult = []
 
         this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO,
+                LogLevel.INFO,
                 'getResults - getting user timing results',
-                PerformanceLoggingService.IndentationDepth.THREE) {
+                IndentationDepth.THREE) {
             userTimingRawData = userTimingQueryExecutor.getRawResultDataFor(filters, trims, baseProjections, performanceLoggingService)
             userTimingsResult = userTimingQueryExecutor.getResultFor(userTimingRawData, performanceLoggingService)
         }
         this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO,
+                LogLevel.INFO,
                 'getResults - getting measurand results',
-                PerformanceLoggingService.IndentationDepth.THREE) {
+                IndentationDepth.THREE) {
             measurandRawData = measurandQueryExecutor.getRawResultDataFor(filters, trims, baseProjections, performanceLoggingService)
             measurandResult = measurandQueryExecutor.getResultFor(measurandRawData, performanceLoggingService)
         }
@@ -424,9 +420,9 @@ class EventResultQueryBuilder {
         if (!isMinDataSizeRequired || userTimingRawData.size() + measurandRawData.size() >= MIN_DATA_SIZE_FOR_PERCENTILE) {
             List<EventResultProjection> merged = []
             performanceLoggingService.logExecutionTimeSilently(
-                    PerformanceLoggingService.LogLevel.INFO,
+                    LogLevel.INFO,
                     "getResults - merge ${measurandResult.size()} measurand results with ${userTimingsResult.size()} user timing results",
-                    PerformanceLoggingService.IndentationDepth.THREE) {
+                    IndentationDepth.THREE) {
                 merged = mergeResults(measurandResult, userTimingsResult)
             }
 
@@ -437,17 +433,17 @@ class EventResultQueryBuilder {
 
     private List<EventResultProjection> mergeResults(List<EventResultProjection> measurandResults, List<EventResultProjection> userTimingResults) {
         Map<Object, List<EventResultProjection>> userTimingResultsById = this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO,
+                LogLevel.INFO,
                 'mergeResults - group user timings',
-                PerformanceLoggingService.IndentationDepth.FOUR) {
+                IndentationDepth.FOUR) {
             userTimingResults.groupBy { EventResultProjection erp ->
                 erp.id
             }
         }
         return (List<EventResultProjection>) this.performanceLoggingService.logExecutionTimeSilently(
-                PerformanceLoggingService.LogLevel.INFO,
+                LogLevel.INFO,
                 'mergeResults - group merge user timings into measurands',
-                PerformanceLoggingService.IndentationDepth.FOUR) {
+                IndentationDepth.FOUR) {
             if (measurandResults && userTimingResults) {
                 measurandResults.each { result ->
                     userTimingResultsById[result.id].each { EventResultProjection userTimingResult ->
