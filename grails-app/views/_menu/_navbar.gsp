@@ -32,7 +32,7 @@
         <ul class="nav navbar-nav">
             <li class="${controllerName.equals("landing") ? 'active' : ''}" data-active-matches="^/$">
                 <g:link uri="/"><i class="fas fa-home"></i>
-                    <g:message code="navbar.home" default="Home"/>
+                    <g:message code="frontend.de.iteratec.osm.landing.title" default="Home"/>
                 </g:link>
             </li>
             <li class="dropdown ${mainTab.equals('results') ? 'active open' : ''}"
@@ -61,7 +61,7 @@
                         data-active-matches="/aggregation/show/?.*">
                         <a href="${createLink(uri: '/aggregation/show')}">
                             <i class="fas fa-chart-bar"></i>
-                            <g:message code="de.iteratec.isocsi.aggregationChart" default="Aggregation"/>
+                            <g:message code="frontend.de.iteratec.osm.aggregation.title" default="Aggregation"/>
                         </a>
                     </li>
                     <li class="${controllerName.equals('distributionChart') ? 'active' : ''}" id="distributionMainMenu">

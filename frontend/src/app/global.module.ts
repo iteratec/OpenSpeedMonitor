@@ -7,7 +7,6 @@ import {OsmLangService} from './services/osm-lang.service';
 import {ApplicationService} from './services/application.service';
 import {ResultSelectionService} from './modules/result-selection/services/result-selection.service';
 import {ResultSelectionStore} from './modules/result-selection/services/result-selection.store';
-import {Title} from '@angular/platform-browser';
 
 // AoT requires an exported function for factories
 export function createTranslateLoader(http: HttpClient) {
@@ -30,8 +29,7 @@ export function createTranslateLoader(http: HttpClient) {
     OsmLangService,
     ApplicationService,
     ResultSelectionService,
-    ResultSelectionStore,
-    Title
+    ResultSelectionStore
   ],
 })
 export class GlobalModule {

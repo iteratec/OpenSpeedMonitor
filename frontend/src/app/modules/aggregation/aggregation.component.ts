@@ -3,8 +3,7 @@ import {BarchartDataService} from './services/barchart-data.service';
 import {ResultSelectionStore} from '../result-selection/services/result-selection.store';
 import {BehaviorSubject} from 'rxjs';
 import {AggregationChartDataService} from './services/aggregation-chart-data.service';
-import {Title} from '@angular/platform-browser';
-import {TranslateService} from '@ngx-translate/core';
+import {TitleService} from '../../services/title.service';
 
 @Component({
   selector: 'osm-aggregation',
@@ -20,18 +19,11 @@ export class AggregationComponent implements OnInit {
   constructor(private barchartDataService: BarchartDataService,
               private resultSelectionStore: ResultSelectionStore,
               private aggregationChartDataService: AggregationChartDataService,
-              private titleService: Title,
-              private translateService: TranslateService) {
+              private titleService: TitleService) {
   }
 
   ngOnInit() {
-    this.translateService.get('frontend.de.iteratec.osm.aggregation.aggregationTitle')
-      .subscribe((title: string) => {
-        if (title) {
-          this.titleService.setTitle(this.translateService.instant('frontend.de.iteratec.osm.aggregation.aggregationTitle'));
-        }
-        // this.titleService.setTitle(title);
-    });
+    this.titleService.setTitle('frontend.de.iteratec.osm.aggregation.title');
     this.showChart = false;
     this.initDataObservables();
     if (this.resultSelectionStore.validQuery) {
