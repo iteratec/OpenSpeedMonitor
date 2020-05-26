@@ -2,9 +2,13 @@
 <p>
   {{ 'frontend.de.iteratec.osm.distribution.description' | translate }}
 </p>
+
+<osm-violin-chart [dataInput]="this.results$ | async" [hidden]="!showChartCard"></osm-violin-chart>
+
 <div class="action-row">
   <div class="col-md-12">
-    <osm-result-selection-submit [applicationsRequired]="true" [measurandsRequired]="true" [pagesRequired]="true" (submit)="getDistributionChartData()"></osm-result-selection-submit>
+    <osm-result-selection-submit (submit)="getDistributionChartData()" [applicationsRequired]="true" [measurandsRequired]="true"
+                                 [pagesRequired]="true"></osm-result-selection-submit>
   </div>
 </div>
 <div class="row">
@@ -18,9 +22,9 @@
         <osm-result-selection-application></osm-result-selection-application>
       </div>
       <div class="col-md-5">
-        <osm-result-selection-page-location-connectivity [showPageSelection]="true"
-                                                         [showBrowserSelection]="true"
-                                                         [pageRequired]="true">
+        <osm-result-selection-page-location-connectivity [pageRequired]="true"
+                                                         [showBrowserSelection]="false"
+                                                         [showPageSelection]="true">
         </osm-result-selection-page-location-connectivity>
       </div>
       <div class="col-md-12">

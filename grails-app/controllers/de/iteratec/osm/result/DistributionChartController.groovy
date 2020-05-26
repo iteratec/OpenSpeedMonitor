@@ -22,6 +22,7 @@ import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.ExceptionHandlerController
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.springframework.http.HttpStatus
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
@@ -116,6 +117,7 @@ class DistributionChartController extends ExceptionHandlerController {
         }
 
         ViolinChartDTO violinChartDTO = violinChartDistributionService.getDistributionFor(cmd)
+        violinChartDTO.filterRules = createFilterRules(Page.findAllByIdInList(cmd.pages), JobGroup.findAllByIdInList(cmd.jobGroups));
         ControllerUtils.sendObjectAsJSON(response, violinChartDTO)
     }
 
@@ -212,7 +214,7 @@ class DistributionChartController extends ExceptionHandlerController {
                 .getRawData(EventResultQueryBuilder.MetaDataSet.NONE)
         DistributionChartDTO distributionChartDTO = new DistributionChartDTO()
         if(aggregations.any {it."${selectedMeasurand.getDatabaseRelevantName()}" != null}){
-            performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", 1) {
+            performanceLoggingService.logExecutionTime(DEBUG, "create DTO for DistributionChart", IndentationDepth.ONE) {
                 aggregations.each {EventResultProjection eventResultProjection ->
                     if(eventResultProjection."${selectedMeasurand.getDatabaseRelevantName()}"){
                         JobGroup jobGroup = allJobGroups.find{jobGroup -> jobGroup.id == eventResultProjection.jobGroupId}

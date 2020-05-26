@@ -27,6 +27,8 @@ import de.iteratec.osm.report.UserspecificDashboardService
 import de.iteratec.osm.util.ControllerUtils
 import de.iteratec.osm.util.I18nService
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
 
 /**
@@ -144,11 +146,7 @@ class CsiConfigurationController {
 
         CsiConfiguration sourceConfig
 
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
-                "Getting source CSI Configuration",
-                1
-        ) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "Getting source CSI Configuration", IndentationDepth.ONE) {
             if (CsiConfiguration.findByLabel(params.label)) {
                 throw new IllegalArgumentException("CsiConfiguration already exists with name " + params.label)
             }
@@ -161,28 +159,16 @@ class CsiConfigurationController {
         }
 
         CsiConfiguration newCsiConfig
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
-                "copy CSI Configuration",
-                1
-        ) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "copy CSI Configuration", IndentationDepth.ONE) {
             newCsiConfig = CsiConfiguration.copyConfiguration(sourceConfig)
         }
 
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
-                "save copied CSI Configuration",
-                1
-        ) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "save copied CSI Configuration", IndentationDepth.ONE) {
             newCsiConfig.label = params.label
             newCsiConfig.save(failOnError: true, flush: true)
         }
 
-        performanceLoggingService.logExecutionTime(
-                PerformanceLoggingService.LogLevel.DEBUG,
-                "redirect",
-                1
-        ) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "redirect", IndentationDepth.ONE) {
             List csi_configurations = []
             CsiConfiguration.list().each { csi_configurations << ['id': it.id, 'label': it.label] }
             render([
@@ -371,7 +357,7 @@ class CsiConfigurationController {
                 "Removed ${toDelete.size()} Mappings of page ${pageToRemoveMappingFrom.name} from CsiConfiguration ${csiConfigurationToRemovePageMappingFrom.label}.",
                 [toDelete.size(), pageToRemoveMappingFrom.name, csiConfigurationToRemovePageMappingFrom.label]
         )
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, "render mappings", 1) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, "render mappings", IndentationDepth.ONE) {
             render successMessage
         }
 

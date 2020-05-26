@@ -5,7 +5,6 @@ import {TestResult} from '../../models/test-result.model';
 import {filter, map} from 'rxjs/operators';
 import {combineLatest} from 'rxjs/internal/observable/combineLatest';
 import {FilmstripView, Timing} from '../../models/filmstrip-view.model';
-import {TranslateService} from '@ngx-translate/core';
 import {MetricFinderService} from '../../services/metric-finder.service';
 
 
