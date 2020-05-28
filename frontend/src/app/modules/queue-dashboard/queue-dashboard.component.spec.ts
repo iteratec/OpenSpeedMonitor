@@ -1,16 +1,18 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {QueueDashboardComponent} from "./queue-dashboard.component";
-import {SharedMocksModule} from "../../testing/shared-mocks.module";
-import {QueueDashboardService, ServerInfo} from "./services/queue-dashboard.service";
-import {LocationInfoListComponent} from "./components/location-info-list/location-info-list.component";
-import {OsmLangService} from "../../services/osm-lang.service";
-import {GrailsBridgeService} from "../../services/grails-bridge.service";
+import {QueueDashboardComponent} from './queue-dashboard.component';
+import {SharedMocksModule} from '../../testing/shared-mocks.module';
+import {QueueDashboardService, ServerInfo} from './services/queue-dashboard.service';
+import {LocationInfoListComponent} from './components/location-info-list/location-info-list.component';
+import {OsmLangService} from '../../services/osm-lang.service';
+import {GrailsBridgeService} from '../../services/grails-bridge.service';
+import {TitleService} from '../../services/title.service';
 
 
-describe("QueueDashboardComponent", () => {
+describe('QueueDashboardComponent', () => {
   let component: QueueDashboardComponent;
   let fixture: ComponentFixture<QueueDashboardComponent>;
   let queueDashboardService: QueueDashboardService;
+  let titleService: TitleService;
   let mockserver = [];
   let mockinformation = [];
 
@@ -28,7 +30,7 @@ describe("QueueDashboardComponent", () => {
         OsmLangService,
         GrailsBridgeService
       ]
-    }).compileComponents()
+    }).compileComponents();
   }));
 
   beforeEach( () => {
@@ -37,14 +39,14 @@ describe("QueueDashboardComponent", () => {
     fixture.detectChanges();
 
     mockserver = [{
-      label:"prod.server02.wpt.iteratec.de",
-      baseUrl:"http://prod.server02.wpt.iteratec.de/",
-      id:11
+      label: 'prod.server02.wpt.iteratec.de',
+      baseUrl: 'http://prod.server02.wpt.iteratec.de/',
+      id: 11
     },
       {
-        label:"dev.server02.wpt.iteratec.de",
-        baseUrl:"http://dev.server02.wpt.iteratec.de/",
-        id:1
+        label: 'dev.server02.wpt.iteratec.de',
+        baseUrl: 'http://dev.server02.wpt.iteratec.de/',
+        id: 1
       }
     ];
 
@@ -54,18 +56,18 @@ describe("QueueDashboardComponent", () => {
       eventResultLastHour: 0,
       eventsNextHour: 2,
       executingJobs: [
-        [{jobConfigLabel: "label",
-          date: "2018-10-14 14:00:16.0",
-          wptServerBaseUrl: "url",
+        [{jobConfigLabel: 'label',
+          date: '2018-10-14 14:00:16.0',
+          wptServerBaseUrl: 'url',
           testId: 55,
-          jobResultStatus: {name: "WAITING"}}]
+          jobResultStatus: {name: 'WAITING'}}]
       ],
-      id: "Dulles_GalaxyS5:undefined",
+      id: 'Dulles_GalaxyS5:undefined',
       jobResultsLastHour: 0,
       jobs: 2,
       jobsNextHour: 1,
-      label: "Dulles_GalaxyS5",
-      lastHealthCheckDate: "2018-10-15 15:00:16.0",
+      label: 'Dulles_GalaxyS5',
+      lastHealthCheckDate: '2018-10-15 15:00:16.0',
       pendingJobs: 2,
       runningJobs: 0}];
   });
@@ -76,8 +78,9 @@ describe("QueueDashboardComponent", () => {
 
   it('should be able to call the queueDashboardService method from the QueueDashboardService', () => {
     queueDashboardService = TestBed.get(QueueDashboardService);
-    spyOn(queueDashboardService, "getActiveWptServer");
-    new QueueDashboardComponent(queueDashboardService);
+    titleService = TestBed.get(TitleService);
+    spyOn(queueDashboardService, 'getActiveWptServer');
+    new QueueDashboardComponent(queueDashboardService, titleService);
     expect(queueDashboardService.getActiveWptServer).toHaveBeenCalled();
   });
 
@@ -97,15 +100,15 @@ describe("QueueDashboardComponent", () => {
     queueDashboardService.activeServers$.next(mockserver);
     fixture.detectChanges();
 
-    const datatableEl: HTMLCollection = fixture.nativeElement.querySelectorAll("#data-table-id");
+    const datatableEl: HTMLCollection = fixture.nativeElement.querySelectorAll('#data-table-id');
     expect(datatableEl.length).toEqual(0);
 
-    const buttons : HTMLButtonElement = fixture.nativeElement.querySelectorAll("#load-data-button");
+    const buttons: HTMLButtonElement = fixture.nativeElement.querySelectorAll('#load-data-button');
     buttons[0].click();
     buttons[1].click();
 
     fixture.detectChanges();
-    const datatableEl2: HTMLCollection = fixture.nativeElement.querySelectorAll("#data-table-id");
+    const datatableEl2: HTMLCollection = fixture.nativeElement.querySelectorAll('#data-table-id');
     expect(datatableEl2.length).toBeGreaterThan(0);
   });
 
@@ -115,10 +118,10 @@ describe("QueueDashboardComponent", () => {
     queueDashboardService.activeServers$.next(mockserver);
     fixture.detectChanges();
 
-    const datarows : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
+    const datarows: HTMLCollection = fixture.nativeElement.querySelectorAll('.queueRow');
     expect(datarows.length).toEqual(0);
 
-    fixture.nativeElement.querySelectorAll(".card").forEach(card => {
+    fixture.nativeElement.querySelectorAll('.card').forEach(card => {
       card.isOpened = true;
       card.isLoaded = true;
     });
@@ -131,7 +134,7 @@ describe("QueueDashboardComponent", () => {
 
     fixture.detectChanges();
 
-    const datarows2 : HTMLCollection = fixture.nativeElement.querySelectorAll(".queueRow");
+    const datarows2: HTMLCollection = fixture.nativeElement.querySelectorAll('.queueRow');
     expect(datarows2).toBeTruthy();
     expect(datarows2[0].firstElementChild.textContent ).toEqual(mockinformation[0].id);
   });
