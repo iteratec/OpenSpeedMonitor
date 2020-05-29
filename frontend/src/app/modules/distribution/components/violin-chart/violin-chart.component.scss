@@ -1,0 +1,67 @@
+.violin-chart-component {
+  position: relative;
+  min-height: 100px;
+}
+
+.svg-container {
+  width: auto;
+  text-align: center;
+}
+
+@media screen and (max-width: 1650px) {
+  .settings-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    z-index: 2;
+    padding: 6px 12px;
+  }
+}
+
+@media screen and (min-width: 1651px) {
+  .settings-row {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: 4px;
+    right: 0;
+    z-index: 2;
+    padding: 6px 12px;
+  }
+}
+
+.settings-row {
+  .settings-element {
+    margin-right: .5em;
+  }
+
+  .max-value-input-field {
+    width: 10em;
+  }
+
+  .filter-button {
+    height: 34px;
+  }
+
+  ul > li > a {
+    cursor: pointer;
+  }
+
+  .filter-inactive {
+    visibility: hidden;
+  }
+}
+
+.x-axis-label {
+  font-size: 12px;
+  text-rendering: geometricPrecision;
+}
+
+.y-axis-left-label {
+  fill: #606060;
+  font-size: 14px;
+}
+
+.d3chart-y-axis-line {
+  shape-rendering: crispEdges;
+}

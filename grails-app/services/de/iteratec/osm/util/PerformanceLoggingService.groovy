@@ -21,15 +21,15 @@ import org.joda.time.DateTime
 
 class PerformanceLoggingService {
 
-    static final ThreadLocal<LoggedExecutionTimes> loggedExecutionTimesThreadLocal = new ThreadLocal<LoggedExecutionTimes>(){
+    static final ThreadLocal<LoggedExecutionTimes> loggedExecutionTimesThreadLocal = new ThreadLocal<LoggedExecutionTimes>() {
         @Override
-        protected LoggedExecutionTimes initialValue(){
+        protected LoggedExecutionTimes initialValue() {
             return new LoggedExecutionTimes()
         }
     }
     static final INDENTATION_CHAR = "-"
 
-	enum LogLevel{
+    enum LogLevel {
         ERROR(4),
         WARN(3),
         INFO(2),
@@ -37,13 +37,15 @@ class PerformanceLoggingService {
         TRACE(0)
 
         private final Integer value
-        LogLevel(Integer value){
+
+        LogLevel(Integer value) {
             this.value = value
         }
-        Integer getValue(){
+
+        Integer getValue() {
             return this.value
         }
-	}
+    }
 
     enum IndentationDepth {
         ZERO(0),
@@ -56,50 +58,52 @@ class PerformanceLoggingService {
 
         private final Integer value
 
-        IndentationDepth(Integer value){
+        IndentationDepth(Integer value) {
             this.value = value
         }
 
-        Integer getValue(){
+        Integer getValue() {
             return this.value
         }
     }
 
-    def logExecutionTime(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
-		DateTime started = new DateTime()
-		def returnValue = toMeasure.call()
-		if (level==LogLevel.ERROR) {
-			log.error(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.WARN) {
-			log.warn(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.INFO) {
-			log.info(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.DEBUG) {
-			log.debug(getMessage(started, description, indentationDepth))
-		}else if (level==LogLevel.TRACE) {
-			log.trace(getMessage(started, description, indentationDepth))
-		}
-		return returnValue
+    def logExecutionTime(LogLevel level, String description, IndentationDepth indentationDepth, Closure toMeasure) {
+        DateTime started = new DateTime()
+        def returnValue = toMeasure.call()
+        if (level == LogLevel.ERROR) {
+            log.error(getMessage(started, description, indentationDepth))
+        } else if (level == LogLevel.WARN) {
+            log.warn(getMessage(started, description, indentationDepth))
+        } else if (level == LogLevel.INFO) {
+            log.info(getMessage(started, description, indentationDepth))
+        } else if (level == LogLevel.DEBUG) {
+            log.debug(getMessage(started, description, indentationDepth))
+        } else if (level == LogLevel.TRACE) {
+            log.trace(getMessage(started, description, indentationDepth))
+        }
+        return returnValue
     }
-    void resetExecutionTimeLoggingSession(){
+
+    void resetExecutionTimeLoggingSession() {
         loggedExecutionTimesThreadLocal.set(new LoggedExecutionTimes())
     }
 
-    def logExecutionTimeSilently(LogLevel level, String description, Integer indentationDepth, Closure toMeasure) {
+    def logExecutionTimeSilently(LogLevel level, String description, IndentationDepth indentationDepth, Closure toMeasure) {
         DateTime started = new DateTime()
         def returnValue = toMeasure.call()
         loggedExecutionTimesThreadLocal.get().addExecutionTime(description, indentationDepth, level, getElapsedSeconds(started))
         return returnValue
     }
-    String getExecutionTimeLoggingSessionData(LogLevel level){
+
+    String getExecutionTimeLoggingSessionData(LogLevel level) {
         return loggedExecutionTimesThreadLocal.get().getRepresentation(level)
 
     }
 
-	private String getMessage(DateTime started, String description, Integer indentationDepth){
+    private String getMessage(DateTime started, String description, IndentationDepth indentationDepth) {
         Double eleapsedInSeconds = getElapsedSeconds(started)
-		return "${INDENTATION_CHAR*indentationDepth}${description}  -> Elapsed Sec: ${eleapsedInSeconds}"
-	}
+        return "${INDENTATION_CHAR * indentationDepth.value}${description}  -> Elapsed Sec: ${eleapsedInSeconds}"
+    }
 
     private Double getElapsedSeconds(DateTime started) {
         Long elapsedInMillis = new DateTime().getMillis() - started.getMillis()

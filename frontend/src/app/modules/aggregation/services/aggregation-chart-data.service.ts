@@ -11,6 +11,7 @@ import {SpinnerService} from '../../shared/services/spinner.service';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {ResultSelectionStore} from '../../result-selection/services/result-selection.store';
 import {TranslateService} from '@ngx-translate/core';
+import {MeasurandColorService} from '../../shared/services/measurand-color.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,37 +30,6 @@ export class AggregationChartDataService {
   dataForHeader = '';
   uniqueSideLabels: string[] = [];
   hasComparativeData = false;
-
-  loadingTimeColors: Array<string> = [
-    '#1660A7',
-    '#558BBF',
-    '#95b6d7',
-    '#d4e2ef'
-  ];
-  countOfRequestColors: Array<string> = [
-    '#E41A1C',
-    '#eb5859',
-    '#f29697',
-    '#fad5d5'
-  ];
-  sizeOfRequestColors: Array<string> = [
-    '#F18F01',
-    '#f4ad46',
-    '#f8cc8b',
-    '#fcead0'
-  ];
-  csiColors: Array<string> = [
-    '#59B87A',
-    '#86cb9e',
-    '#b3dec2',
-    '#e0f2e6'
-  ];
-
-  trafficColors = [
-    '#5cb85c',
-    '#f0ad4e',
-    '#d9534f'
-  ];
 
   measurandOrder: string[] = [
     'CS_BY_WPT_VISUALLY_COMPLETE',
@@ -84,18 +54,6 @@ export class AggregationChartDataService {
     'DOC_COMPLETE_REQUESTS'
   ];
 
-  speedIndexColors: Array<string> = this.loadingTimeColors;
-
-  measurandGroupColorCombination = {
-    'ms': this.loadingTimeColors,
-    's': this.loadingTimeColors,
-    '#': this.countOfRequestColors,
-    'KB': this.sizeOfRequestColors,
-    'MB': this.sizeOfRequestColors,
-    '%': this.csiColors,
-    '': this.speedIndexColors
-  };
-
   barchartAverageData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   barchartMedianData$: BehaviorSubject<any> = new BehaviorSubject<any>([]);
   ascSelected = true;
@@ -106,7 +64,8 @@ export class AggregationChartDataService {
               private router: Router,
               private resultSelectionStore: ResultSelectionStore,
               private spinnerService: SpinnerService,
-              private translateService: TranslateService
+              private translateService: TranslateService,
+              private measurandColorService: MeasurandColorService
   ) {
     route.queryParams.subscribe((params: Params) => {
       this.selectedFilter = params.selectedFilter ? params.selectedFilter : this.selectedFilter;
@@ -150,10 +109,9 @@ export class AggregationChartDataService {
     });
   }
 
-  reloadPercentile(
-    percentile: number,
-    resultSelectionCommand: ResultSelectionCommand,
-    remainingResultSelection: RemainingResultSelection
+  reloadPercentile(percentile: number,
+                   resultSelectionCommand: ResultSelectionCommand,
+                   remainingResultSelection: RemainingResultSelection
   ): void {
     this.percentileValue = percentile;
     this.barchartDataService.fetchBarchartData<any>(
@@ -231,12 +189,12 @@ export class AggregationChartDataService {
         measurandData.isDeterioration = firstSeries.isDeterioration;
 
         if (measurandData.isImprovement || measurandData.isDeterioration) {
-          const color = this.getColorScaleForTrafficLight()(measurandData.isImprovement ? 'good' : 'bad');
+          const color = this.measurandColorService.getColorScaleForTrafficLight()(measurandData.isImprovement ? 'good' : 'bad');
           measurandData.color = color.toString();
         } else {
           const unit = measurandData.unit;
           const colorScales = {};
-          colorScales[unit] = colorScales[unit] || this.getColorScaleForMeasurandGroup(unit, this.hasComparativeData);
+          colorScales[unit] = colorScales[unit] || this.measurandColorService.getColorScaleForMeasurandGroup(unit, this.hasComparativeData);
           measurandData.color = colorScales[unit](measurands.indexOf(measurand));
         }
       });
@@ -352,27 +310,6 @@ export class AggregationChartDataService {
         });
       }
     });
-  }
-
-  getColorScaleForMeasurandGroup(measurandUnit: string, skipFirst: boolean) {
-    const colors = this.measurandGroupColorCombination[measurandUnit].slice(skipFirst ? 1 : 0);
-    return scaleOrdinal()
-      .domain(this.createDomain(colors.length))
-      .range(colors);
-  }
-
-  getColorScaleForTrafficLight() {
-    return scaleOrdinal()
-      .domain(['good', 'ok', 'bad'] as ReadonlyArray<string>)
-      .range(this.trafficColors);
-  }
-
-  createDomain(arrayLength: number): ReadonlyArray<string> {
-    const array = [];
-    for (let i = 0; i < arrayLength; i++) {
-      array.push(i);
-    }
-    return array as ReadonlyArray<string>;
   }
 
   public setComparativeData(series: AggregationChartSeries[]) {

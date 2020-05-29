@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
-import {HttpClientTestingModule} from "@angular/common/http/testing";
-import { ViolinchartDataService } from './violinchart-data.service';
+import {TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ViolinchartDataService} from './violinchart-data.service';
 
 describe('ViolinchartDataService', () => {
   beforeEach(() =>
@@ -11,7 +11,7 @@ describe('ViolinchartDataService', () => {
       imports: [
         HttpClientTestingModule
       ]
-  }));
+    }));
 
   it('should be created', () => {
     const service: ViolinchartDataService = TestBed.get(ViolinchartDataService);

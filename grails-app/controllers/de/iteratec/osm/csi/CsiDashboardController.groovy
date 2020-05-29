@@ -33,6 +33,8 @@ import de.iteratec.osm.result.MeasurandGroup
 import de.iteratec.osm.result.MeasuredEvent
 import de.iteratec.osm.result.MvQueryParams
 import de.iteratec.osm.util.*
+import de.iteratec.osm.util.PerformanceLoggingService.LogLevel
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.converters.JSON
 import grails.plugin.springsecurity.SpringSecurityService
 import grails.web.mapping.LinkGenerator
@@ -448,7 +450,7 @@ class CsiDashboardController {
         Interval fixedTimeFrame = fixTimeFrame(timeFrame, CsiAggregationInterval.HOURLY)
 
         OsmRickshawChart chart
-        performanceLoggingService.logExecutionTime(PerformanceLoggingService.LogLevel.DEBUG, 'CsiDashboardController: getHourlies', 1) {
+        performanceLoggingService.logExecutionTime(LogLevel.DEBUG, 'CsiDashboardController: getHourlies', IndentationDepth.ONE) {
 
             chart = customerSatisfactionHighChartService.getCalculatedHourlyEventCsiAggregationsAsHighChartMap(
                     fixedTimeFrame.getStart().toDate(), fixedTimeFrame.getEnd().toDate(), queryParams, csiType

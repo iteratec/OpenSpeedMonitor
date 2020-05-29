@@ -23,6 +23,7 @@ import de.iteratec.osm.measurement.environment.WebPageTestServer
 import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import groovy.util.slurpersupport.GPathResult
 import groovy.util.slurpersupport.NodeChild
 import groovyx.net.http.NativeHandlers
@@ -89,7 +90,7 @@ class WptInstructionService {
         Map paramsNotNull = parameters.findAll { k, v -> v != null }
         def result = null
         log.debug("Try to launch job at wptserver=${wptServer} with params=${parameters}")
-        performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", 1) {
+        performanceLoggingService.logExecutionTime(DEBUG, "Launching job ${job.label}: Calling initial runtest on wptserver.", IndentationDepth.ONE) {
             result = httpRequestService.getRestClientFrom(wptServer).post {
                 request.uri.path = '/runtest.php'
                 request.body = paramsNotNull

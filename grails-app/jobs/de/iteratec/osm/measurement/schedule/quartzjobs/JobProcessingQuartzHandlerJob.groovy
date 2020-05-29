@@ -22,6 +22,7 @@ import de.iteratec.osm.measurement.schedule.Job
 import de.iteratec.osm.measurement.schedule.JobRunService
 import de.iteratec.osm.measurement.schedule.TriggerGroup
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import org.quartz.JobExecutionContext
 
 import java.util.concurrent.locks.ReentrantLock
@@ -89,7 +90,7 @@ class JobProcessingQuartzHandlerJob {
     }
 
     private void handleLaunching(Job job) {
-        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", 1) {
+        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Launching job ${job.label}", IndentationDepth.ONE) {
             try {
                 jobRunService.launchJobRun(job)
             } catch (Exception exception) {
@@ -102,7 +103,7 @@ class JobProcessingQuartzHandlerJob {
         String lockKey = getOrCreateLockKeyFor(job, testId)
         if (pollingLocks[lockKey].tryLock()) {
             try {
-                performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", 1) {
+                performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Polling of job ${job.label}", IndentationDepth.ONE) {
                     jobRunService.pollJobRun(job, testId)
                 }
             } finally {
@@ -112,7 +113,7 @@ class JobProcessingQuartzHandlerJob {
     }
 
     private void handleTimeout(Job job, String testId) {
-        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Handle Job run timeout for job ${job.label}", 1) {
+        performanceLoggingService.logExecutionTime(DEBUG, "JobProcessingQuartzHandler: Handle Job run timeout for job ${job.label}", IndentationDepth.ONE) {
             removePollingLock(job, testId)
             jobRunService.handleJobRunTimeout(job, testId)
         }
