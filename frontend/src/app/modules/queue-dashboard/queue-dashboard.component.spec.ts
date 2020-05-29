@@ -5,14 +5,12 @@ import {QueueDashboardService, ServerInfo} from './services/queue-dashboard.serv
 import {LocationInfoListComponent} from './components/location-info-list/location-info-list.component';
 import {OsmLangService} from '../../services/osm-lang.service';
 import {GrailsBridgeService} from '../../services/grails-bridge.service';
-import {TitleService} from '../../services/title.service';
 
 
 describe('QueueDashboardComponent', () => {
   let component: QueueDashboardComponent;
   let fixture: ComponentFixture<QueueDashboardComponent>;
   let queueDashboardService: QueueDashboardService;
-  let titleService: TitleService;
   let mockserver = [];
   let mockinformation = [];
 
@@ -78,9 +76,8 @@ describe('QueueDashboardComponent', () => {
 
   it('should be able to call the queueDashboardService method from the QueueDashboardService', () => {
     queueDashboardService = TestBed.get(QueueDashboardService);
-    titleService = TestBed.get(TitleService);
     spyOn(queueDashboardService, 'getActiveWptServer');
-    new QueueDashboardComponent(queueDashboardService, titleService);
+    new QueueDashboardComponent(queueDashboardService);
     expect(queueDashboardService.getActiveWptServer).toHaveBeenCalled();
   });
 
