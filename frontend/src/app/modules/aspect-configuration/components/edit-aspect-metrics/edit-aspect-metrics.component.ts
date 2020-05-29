@@ -15,7 +15,6 @@ import {MetricFinderService} from '../../../metric-finder/services/metric-finder
 import {MetricFinderComponent} from '../../../metric-finder/metric-finder.component';
 import {AspectMetricsComponent} from '../aspect-metrics/aspect-metrics.component';
 import {GrailsBridgeService} from '../../../../services/grails-bridge.service';
-import {TitleService} from '../../../../services/title.service';
 
 @Component({
   selector: 'osm-edit-aspect-metrics',
@@ -44,7 +43,6 @@ export class EditAspectMetricsComponent implements OnInit {
     private applicationService: ApplicationService,
     private aspectConfService: AspectConfigurationService,
     private metricFinderService: MetricFinderService,
-    private titleService: TitleService,
     grailsBridgeService: GrailsBridgeService
   ) {
     this.application$ = applicationService.selectedApplication$;
@@ -56,7 +54,6 @@ export class EditAspectMetricsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('frontend.de.iteratec.osm.performance-aspect.configuration.edit.title');
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.aspectConfService.loadApplication(params.get('applicationId'));
       this.aspectConfService.loadPage(params.get('pageId'));

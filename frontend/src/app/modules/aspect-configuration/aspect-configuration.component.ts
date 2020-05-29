@@ -8,7 +8,6 @@ import {Application} from '../../models/application.model';
 import {AspectConfigurationService} from './services/aspect-configuration.service';
 import {PerformanceAspectService} from '../../services/performance-aspect.service';
 import {ResponseWithLoadingState} from '../../models/response-with-loading-state.model';
-import {TitleService} from '../../services/title.service';
 
 @Component({
   selector: 'osm-aspect-configuration',
@@ -27,8 +26,7 @@ export class AspectConfigurationComponent implements OnInit {
     private route: ActivatedRoute,
     private applicationService: ApplicationService,
     private aspectConfService: AspectConfigurationService,
-    private perfAspectService: PerformanceAspectService,
-    private titleService: TitleService
+    private perfAspectService: PerformanceAspectService
   ) {
     this.application$ = applicationService.selectedApplication$;
     this.page$ = aspectConfService.selectedPage$;
@@ -37,7 +35,6 @@ export class AspectConfigurationComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('frontend.de.iteratec.osm.performance-aspect.configuration.overview.title');
     this.route.paramMap.subscribe((params: ParamMap) => {
       this.aspectConfService.loadApplication(params.get('applicationId'));
       this.aspectConfService.loadPage(params.get('pageId'));

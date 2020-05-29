@@ -11,7 +11,6 @@ import {FailingJobStatistic} from './models/failing-job-statistic.model';
 import {PerformanceAspectService} from '../../services/performance-aspect.service';
 import {PerformanceAspectType} from '../../models/perfomance-aspect.model';
 import {ResponseWithLoadingState} from '../../models/response-with-loading-state.model';
-import {TitleService} from '../../services/title.service';
 
 @Component({
   selector: 'osm-application-dashboard',
@@ -35,9 +34,7 @@ export class ApplicationDashboardComponent implements OnDestroy {
     private router: Router,
     private applicationService: ApplicationService,
     private performanceAspectService: PerformanceAspectService,
-    private titleService: TitleService
   ) {
-    this.titleService.setTitle('frontend.de.iteratec.osm.applicationDashboard.title');
     this.pages$ = this.applicationService.aspectMetrics$;
     this.applications$ = applicationService.applications$.pipe(
       filter(response => !response.isLoading && !!response.data),

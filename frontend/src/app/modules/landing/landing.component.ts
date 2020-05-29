@@ -5,7 +5,6 @@ import {combineLatest, Observable, of} from 'rxjs';
 import {ApplicationWithCsi} from './models/application-with-csi.model';
 import {ResponseWithLoadingState} from '../../models/response-with-loading-state.model';
 import {FailingJob} from './models/failing-jobs.model';
-import {TitleService} from '../../services/title.service';
 
 @Component({
   selector: 'osm-landing',
@@ -20,8 +19,7 @@ export class LandingComponent {
   failingJobs$: Observable<{ [application: string]: FailingJob[] }>;
   isHealthy$: Observable<boolean> = of(false);
 
-  constructor(private applicationService: ApplicationService, private titleService: TitleService) {
-    this.titleService.setTitle('frontend.de.iteratec.osm.landing.title');
+  constructor(private applicationService: ApplicationService) {
     this.hasData$ = this.applicationService.applications$.pipe(map(response => this.dataHasLoaded(response)));
     this.showApplicationEmptyState$ = this.applicationService.applications$.pipe(
       map(response => this.dataHasLoaded(response) && response.data.length < 1),

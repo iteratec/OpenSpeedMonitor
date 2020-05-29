@@ -3,7 +3,6 @@ import {BarchartDataService} from './services/barchart-data.service';
 import {ResultSelectionStore} from '../result-selection/services/result-selection.store';
 import {BehaviorSubject} from 'rxjs';
 import {AggregationChartDataService} from './services/aggregation-chart-data.service';
-import {TitleService} from '../../services/title.service';
 
 @Component({
   selector: 'osm-aggregation',
@@ -18,12 +17,10 @@ export class AggregationComponent implements OnInit {
 
   constructor(private barchartDataService: BarchartDataService,
               private resultSelectionStore: ResultSelectionStore,
-              private aggregationChartDataService: AggregationChartDataService,
-              private titleService: TitleService) {
+              private aggregationChartDataService: AggregationChartDataService) {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('frontend.de.iteratec.osm.aggregation.title');
     this.showChart = false;
     this.initDataObservables();
     if (this.resultSelectionStore.validQuery) {

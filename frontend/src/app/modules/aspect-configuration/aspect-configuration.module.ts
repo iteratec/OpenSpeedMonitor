@@ -8,8 +8,8 @@ import {MetricFinderModule} from '../metric-finder/metric-finder.module';
 import {EditAspectMetricsComponent} from './components/edit-aspect-metrics/edit-aspect-metrics.component';
 
 const routes: Routes = [
-  {path: ':applicationId/:pageId', component: AspectConfigurationComponent},
-  {path: 'edit/:applicationId/:pageId/:browserId/:aspectType', component: EditAspectMetricsComponent}
+  {path: ':applicationId/:pageId', component: AspectConfigurationComponent, data: {title: 'frontend.de.iteratec.osm.performance-aspect.configuration.overview.title'}},
+  {path: 'edit/:applicationId/:pageId/:browserId/:aspectType', component: EditAspectMetricsComponent, data: {title: 'frontend.de.iteratec.osm.performance-aspect.configuration.edit.title'}}
 ];
 
 @NgModule({
