@@ -68,7 +68,7 @@
                         <g:link controller="distributionChart" action="show"
                                 title="${message(code:'de.iteratec.osm.distributionChart', default:'Distribution Chart')}">
                             <i class="fas fa-chart-area"></i>
-                            <g:message code="de.iteratec.osm.distributionChart" default="Distribution Chart"/>
+                            <g:message code="frontend.de.iteratec.osm.distribution.title" default="Distribution Chart"/>
                         </g:link>
                     </li>
                     <li class="${controllerName.equals('pageComparison') ? 'active' : ''}" id="pageComparisonMainMenu">

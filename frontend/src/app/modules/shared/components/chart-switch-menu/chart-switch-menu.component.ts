@@ -23,7 +23,7 @@ export class ChartSwitchMenuComponent implements OnInit {
     },
     {
       baseUrl: '/distributionChart/show',
-      label: 'frontend.de.iteratec.osm.results.distribution',
+      label: 'frontend.de.iteratec.osm.distribution.title',
       icon: 'fas fa-chart-area',
       devUrl: '/distributionDev/show'
     },
