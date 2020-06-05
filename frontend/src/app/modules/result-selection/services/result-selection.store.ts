@@ -55,15 +55,32 @@ export class ResultSelectionStore {
 
   validQuery = false;
 
-  oldToNewChartKeyMap = {
+  oldToNewChartKeyMap: {[key: string]: string} = {
+    // General
     selectedFolder: 'jobGroupIds',
     selectedPages: 'pageIds',
     selectedAggrGroupValuesUnCached: 'measurands',
     selectedBrowsers: 'browserIds',
     selectedLocations: 'locationIds',
+
+    // Time series
     comparativeFrom: 'fromComparative',
     comparativeTo: 'toComparative',
-    selectedTimeFrameInterval: 'interval'
+    selectedTimeFrameInterval: 'interval',
+    trimAboveLoadTimes: 'maxLoadTimes',
+    trimAboveRequestCounts: 'maxRequestCounts',
+    trimAboveRequestSizes: 'maxRequestSizes',
+    trimBelowLoadTimes: 'minLoadTimes',
+    trimBelowRequestCounts: 'minRequestCounts',
+    trimBelowRequestSizes: 'minRequestSizes',
+
+    // Aggregation
+    selectedAggregationValue: 'aggregationType',
+    selectedFilter: 'filter',
+    selectedPercentile: 'precentileValue',
+
+    // Distribution
+    measurand: 'measurands'
   };
 
   constructor(private resultSelectionService: ResultSelectionService, private route: ActivatedRoute, private router: Router) {
@@ -225,14 +242,29 @@ export class ResultSelectionStore {
     return date instanceof Date && !isNaN(date.getTime());
   }
 
-  private renameParamKeys = (keysMap, object) =>
-    Object.keys(object).reduce(
-      (acc, key) => ({
+  private renameParamKeys(keysMap: {[k: string]: string}, params: Params): Params {
+    return Object.keys(params).reduce(
+      (acc: {}, key: string) => ({
         ...acc,
-        ...{[keysMap[key] || key]: object[key]}
+        ...{[keysMap[key] || key]: this.getParamValue(key, params)}
       }),
       {}
-    )
+    );
+  }
+
+  private getParamValue(key: string, params: Params): string {
+    if (key === 'measurand') {
+      try {
+        const json = JSON.parse(decodeURIComponent(params[key]));
+        if (json && typeof json === 'object' && json.hasOwnProperty('values')) {
+          return json.values;
+        }
+      } catch {
+        return params[key];
+      }
+    }
+    return params[key];
+  }
 
   private setRemainingResultSelection(newState: RemainingResultSelection): void {
     this.dataAvailable$.next(true);
