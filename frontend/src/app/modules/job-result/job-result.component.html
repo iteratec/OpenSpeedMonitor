@@ -5,25 +5,65 @@
   {{ 'frontend.de.iteratec.osm.jobResult.description' | translate }}
 </p>
 
-<div [ngSwitch]="jobResults.length" class="card">
-  <span *ngSwitchCase="1">No Data</span>
+<div [class.align-center]="jobResults.length === 0" [ngSwitch]="jobResults.length" class="card">
+  <span *ngSwitchCase="0">{{ 'frontend.de.iteratec.osm.jobResult.noData' | translate }}</span>
   <table *ngSwitchDefault class="table table-striped">
     <thead>
     <tr>
-      <th (sort)="sort($event)">
-        <div>{{ 'frontend.de.iteratec.osm.jobResult.tableHead.date' | translate }}</div>
-        <div class="job-id-table-head">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.testId' | translate }}</div>
+      <th (click)="sort('date')" class="sortable">
+        <div>
+          {{ 'frontend.de.iteratec.osm.jobResult.tableHead.date' | translate }}
+          <i *ngIf="currentSortingRule.column === 'date' && currentSortingRule.direction === 'desc'"
+             aria-hidden="true" class="fas fa-sort-down"></i>
+          <i *ngIf="currentSortingRule.column === 'date' && currentSortingRule.direction === 'asc'"
+             aria-hidden="true" class="fas fa-sort-up"></i>
+        </div>
+        <div class="job-id-table-head">
+          {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testId' | translate }}
+        </div>
       </th>
-      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.testAgent' | translate }}</th>
-      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.jobResultStatus' | translate }}</th>
-      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.wptStatus' | translate }}</th>
-      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.description' | translate }}</th>
+      <th (click)="sort('testAgent')" class="sortable">
+        <span>
+          {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testAgent' | translate }}
+          <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'desc'"
+             aria-hidden="true" class="fas fa-sort-down"></i>
+          <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'asc'"
+             aria-hidden="true" class="fas fa-sort-up"></i>
+        </span>
+      </th>
+      <th (click)="sort('jobResultStatus')" class="sortable">
+        <span>
+          {{ 'frontend.de.iteratec.osm.jobResult.tableHead.jobResultStatus' | translate }}
+          <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'desc'"
+             aria-hidden="true" class="fas fa-sort-down"></i>
+          <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'asc'"
+             aria-hidden="true" class="fas fa-sort-up"></i>
+        </span>
+      </th>
+      <th (click)="sort('wptStatus')" class="sortable">
+        <span>
+          {{ 'frontend.de.iteratec.osm.jobResult.tableHead.wptStatus' | translate }}
+          <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'desc'"
+             aria-hidden="true" class="fas fa-sort-down"></i>
+          <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'asc'"
+             aria-hidden="true" class="fas fa-sort-up"></i>
+        </span>
+      </th>
+      <th (click)="sort('description')" class="sortable">
+        <span>
+          {{ 'frontend.de.iteratec.osm.jobResult.tableHead.description' | translate }}
+          <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'desc'"
+             aria-hidden="true" class="fas fa-sort-down"></i>
+          <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'asc'"
+             aria-hidden="true" class="fas fa-sort-up"></i>
+        </span>
+      </th>
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let test of jobResults">
       <td>
-        <a [ngClass]="{'text-success': isTestSuccessful(test), 'job-status-error': !isTestSuccessful(test)}"
+        <a [class.job-status-error]="!isTestSuccessful(test)" [class.text-success]="isTestSuccessful(test)"
            href="{{ test.testUrl }}">
           <div class="job-date">{{ test.date }}</div>
           <div class="job-id">{{ test.testId }}</div>
