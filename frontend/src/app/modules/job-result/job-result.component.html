@@ -1,3 +1,40 @@
-<p>
-  job-result works!
+<h1>
+  {{ 'frontend.de.iteratec.osm.jobResult.title' | translate }}
+</h1>
+<p class="description">
+  {{ 'frontend.de.iteratec.osm.jobResult.description' | translate }}
 </p>
+
+<div [ngSwitch]="jobResults.length" class="card">
+  <span *ngSwitchCase="1">No Data</span>
+  <table *ngSwitchDefault class="table table-striped">
+    <thead>
+    <tr>
+      <th (sort)="sort($event)">
+        <div>{{ 'frontend.de.iteratec.osm.jobResult.tableHead.date' | translate }}</div>
+        <div class="job-id-table-head">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.testId' | translate }}</div>
+      </th>
+      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.testAgent' | translate }}</th>
+      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.jobResultStatus' | translate }}</th>
+      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.wptStatus' | translate }}</th>
+      <th (sort)="sort($event)">{{ 'frontend.de.iteratec.osm.jobResult.tableHead.description' | translate }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let test of jobResults">
+      <td>
+        <a [ngClass]="{'text-success': isTestSuccessful(test), 'job-status-error': !isTestSuccessful(test)}"
+           href="{{ test.testUrl }}">
+          <div class="job-date">{{ test.date }}</div>
+          <div class="job-id">{{ test.testId }}</div>
+        </a>
+
+      </td>
+      <td>{{ test.testAgent ? test.testAgent : '-' }}</td>
+      <td>{{ test.jobResultStatus }}</td>
+      <td>{{ test.wptStatus }}</td>
+      <td>{{ test.description }}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

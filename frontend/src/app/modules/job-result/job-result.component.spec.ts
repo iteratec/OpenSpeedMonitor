@@ -1,6 +1,8 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { JobResultComponent } from './job-result.component';
+import {JobResultComponent} from './job-result.component';
+import {SharedModule} from '../shared/shared.module';
+import {SharedMocksModule} from '../../testing/shared-mocks.module';
 
 describe('JobResultComponent', () => {
   let component: JobResultComponent;
@@ -8,9 +10,13 @@ describe('JobResultComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ JobResultComponent ]
+      declarations: [JobResultComponent],
+      imports: [
+        SharedModule,
+        SharedMocksModule
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

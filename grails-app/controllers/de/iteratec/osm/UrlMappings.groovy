@@ -219,5 +219,12 @@ class UrlMappings {
             controller = "distribution"
             action = [GET: "getDistributionChartData"]
         }
+
+        // JobResultController //////////////////////////////////////////
+
+        "/jobResult/getJobResults" {
+            controller = "jobResult"
+            action = [GET: "getJobResults"]
+        }
     }
 }
