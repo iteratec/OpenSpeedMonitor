@@ -222,6 +222,11 @@ class UrlMappings {
 
         // JobResultController //////////////////////////////////////////
 
+        "/jobResult/getAllJobs" {
+            controller = "jobResult"
+            action = [GET: "getAllJobs"]
+        }
+
         "/jobResult/getJobResults" {
             controller = "jobResult"
             action = [GET: "getJobResults"]

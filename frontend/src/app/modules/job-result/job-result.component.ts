@@ -9,6 +9,7 @@ import {JobResult} from './models/job-result.model';
 })
 export class JobResultComponent implements OnInit {
 
+  jobs: { [key: number]: string } = {};
   jobResults: JobResult[] = [];
   currentSortingRule: { [key: string]: string } = {column: 'date', direction: 'desc'};
 
@@ -16,7 +17,13 @@ export class JobResultComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.getAllJobs();
     this.getJobResults();
+  }
+
+  getAllJobs(): void {
+    this.dataService.getAllJobs()
+      .subscribe((jobs: { [key: number]: string }) => this.jobs = jobs);
   }
 
   getJobResults(): void {

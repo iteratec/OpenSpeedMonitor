@@ -25,6 +25,13 @@ class JobResultController {
     }
 
     @RestAction
+    def getAllJobs() {
+        Map<Long, String> allJobs = jobDaoService.getJobLabels()
+
+        return ControllerUtils.sendObjectAsJSON(response, allJobs)
+    }
+
+    @RestAction
     def getJobResults(Long jobId) {
         List<JobResult> jobResultsForJob
         Job job = Job.get(jobId)
@@ -35,7 +42,7 @@ class JobResultController {
         List<JobResultDTO> dtos = []
         jobResultsForJob.each {
             JobResultDTO jobResultDTO = new JobResultDTO(it)
-            jobResultDTO.date = new SimpleDateFormat(i18nService.msg("default.date.format.medium", "yyyy-MM-dd")).format(it.date)
+            jobResultDTO.date = it.date.toString()
             dtos << jobResultDTO
         }
 

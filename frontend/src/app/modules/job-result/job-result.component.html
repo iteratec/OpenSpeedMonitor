@@ -65,7 +65,8 @@
       <td>
         <a [class.job-status-error]="!isTestSuccessful(test)" [class.text-success]="isTestSuccessful(test)"
            href="{{ test.testUrl }}">
-          <div class="job-date">{{ test.date }}</div>
+          <div
+            class="job-date">{{ test.date | date:('frontend.de.iteratec.osm.jobResult.dateFormat' | translate) }}</div>
           <div class="job-id">{{ test.testId }}</div>
         </a>
 

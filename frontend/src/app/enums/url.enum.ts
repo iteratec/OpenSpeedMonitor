@@ -11,5 +11,6 @@ export enum URL {
   AGGREGATION_BARCHART_DATA = '/aggregation/getBarchartData',
   EVENT_RESULT_DASHBOARD_LINECHART_DATA = '/eventResultDashboard/getLinechartData',
   DISTRIBUTION_VIOLINCHART_DATA = '/distributionChart/getViolinchartData',
+  ALL_JOBS = '/jobResult/getAllJobs',
   JOB_RESULTS = '/jobResult/getJobResults'
 }
