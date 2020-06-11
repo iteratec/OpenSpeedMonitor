@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {JobResultDataService} from './services/job-result-data.service';
 import {JobResult} from './models/job-result.model';
+import {Job} from './models/job.model';
 
 @Component({
   selector: 'osm-job-result',
@@ -9,8 +10,10 @@ import {JobResult} from './models/job-result.model';
 })
 export class JobResultComponent implements OnInit {
 
-  jobs: { [key: number]: string } = {};
+  jobs: Job[] = [];
   jobResults: JobResult[] = [];
+
+  selectedJob: Job = null;
   currentSortingRule: { [key: string]: string } = {column: 'date', direction: 'desc'};
 
   constructor(private dataService: JobResultDataService) {
@@ -18,16 +21,15 @@ export class JobResultComponent implements OnInit {
 
   ngOnInit() {
     this.getAllJobs();
-    this.getJobResults();
   }
 
   getAllJobs(): void {
     this.dataService.getAllJobs()
-      .subscribe((jobs: { [key: number]: string }) => this.jobs = jobs);
+      .subscribe((jobs: Job[]) => this.jobs = jobs);
   }
 
-  getJobResults(): void {
-    this.dataService.getJobResults(1065)
+  getJobResults(jobId: number): void {
+    this.dataService.getJobResults(jobId)
       .subscribe((jobResults: JobResult[]) => this.jobResults = jobResults);
   }
 

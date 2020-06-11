@@ -5,9 +5,24 @@
   {{ 'frontend.de.iteratec.osm.jobResult.description' | translate }}
 </p>
 
-<div [class.align-center]="jobResults.length === 0" [ngSwitch]="jobResults.length" class="card">
-  <span *ngSwitchCase="0">{{ 'frontend.de.iteratec.osm.jobResult.noData' | translate }}</span>
-  <table *ngSwitchDefault class="table table-striped">
+<div class="card">
+  <div class="col-sm-3">
+    <label for="select-job">
+      <strong>{{ 'frontend.de.iteratec.osm.jobResult.select.label' | translate }}:</strong>
+    </label>
+    <ng-select [(ngModel)]="selectedJob" (change)="getJobResults(selectedJob.id)" [items]="jobs"
+               id="select-job"
+               clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
+               loadingText="{{ 'frontend.de.iteratec.osm.jobResult.select.loading' | translate }}"
+               notFoundText="{{ 'frontend.de.iteratec.osm.jobResult.select.notFound' | translate }}"
+               placeholder="{{ 'frontend.de.iteratec.osm.jobResult.select.placeholder' | translate }}"
+               typeToSearchText="{{ 'frontend.de.iteratec.osm.jobResult.select.search' | translate }}">
+    </ng-select>
+  </div>
+
+  <!--<div *ngIf="selectedJob && jobResults.length === 0">{{ 'frontend.de.iteratec.osm.jobResult.noData' | translate }}</div>-->
+
+  <table *ngIf="jobResults.length > 0" class="table table-striped">
     <thead>
     <tr>
       <th (click)="sort('date')" class="sortable">

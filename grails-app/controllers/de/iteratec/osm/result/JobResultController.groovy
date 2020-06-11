@@ -17,7 +17,7 @@ class JobResultController {
     I18nService i18nService
 
     def listFailed(Long jobId) {
-        Map<Long, String> allJobs = jobDaoService.getJobLabels()
+        Map<Long, String> allJobs = jobDaoService.getJobLabelsAsMap()
 
         String selectedJobId = jobId ?: ''
 
@@ -26,7 +26,7 @@ class JobResultController {
 
     @RestAction
     def getAllJobs() {
-        Map<Long, String> allJobs = jobDaoService.getJobLabels()
+        List<Job> allJobs = jobDaoService.getJobLabels()
 
         return ControllerUtils.sendObjectAsJSON(response, allJobs)
     }
