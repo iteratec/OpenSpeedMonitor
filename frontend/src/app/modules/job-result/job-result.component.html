@@ -6,13 +6,13 @@
 </p>
 
 <div class="card">
-  <div class="col-sm-3">
+  <div class="col-sm-3 job-selection ">
     <label for="select-job">
-      <strong>{{ 'frontend.de.iteratec.osm.jobResult.select.label' | translate }}:</strong>
+      <strong>{{ 'frontend.de.iteratec.osm.jobResult.select.label.job' | translate }}</strong>
     </label>
-    <ng-select [(ngModel)]="selectedJob" (change)="getJobResults(selectedJob.id)" [items]="jobs"
-               id="select-job"
+    <ng-select [(ngModel)]="selectedJob" (change)="setJob(selectedJob)" [items]="jobs"
                clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
+               id="select-job"
                loadingText="{{ 'frontend.de.iteratec.osm.jobResult.select.loading' | translate }}"
                notFoundText="{{ 'frontend.de.iteratec.osm.jobResult.select.notFound' | translate }}"
                placeholder="{{ 'frontend.de.iteratec.osm.jobResult.select.placeholder' | translate }}"
@@ -20,7 +20,8 @@
     </ng-select>
   </div>
 
-  <!--<div *ngIf="selectedJob && jobResults.length === 0">{{ 'frontend.de.iteratec.osm.jobResult.noData' | translate }}</div>-->
+  <div *ngIf="selectedJob && jobResults.length === 0"
+       class="col-sm-12">{{ 'frontend.de.iteratec.osm.jobResult.noData' | translate }}</div>
 
   <table *ngIf="jobResults.length > 0" class="table table-striped">
     <thead>
@@ -37,41 +38,49 @@
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testId' | translate }}
         </div>
       </th>
-      <th (click)="sort('testAgent')" class="sortable">
-        <span>
+      <th>
+        <span (click)="sort('testAgent')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testAgent' | translate }}
           <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'desc'"
              aria-hidden="true" class="fas fa-sort-down"></i>
           <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
+        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
+               type="text">
       </th>
-      <th (click)="sort('jobResultStatus')" class="sortable">
-        <span>
+      <th>
+        <span (click)="sort('jobResultStatus')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.jobResultStatus' | translate }}
           <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'desc'"
              aria-hidden="true" class="fas fa-sort-down"></i>
           <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
+        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
+               type="text">
       </th>
-      <th (click)="sort('wptStatus')" class="sortable">
-        <span>
+      <th>
+        <span (click)="sort('wptStatus')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.wptStatus' | translate }}
           <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'desc'"
              aria-hidden="true" class="fas fa-sort-down"></i>
           <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
+        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
+               type="text">
       </th>
-      <th (click)="sort('description')" class="sortable">
-        <span>
+      <th>
+        <span (click)="sort('description')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.description' | translate }}
           <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'desc'"
              aria-hidden="true" class="fas fa-sort-down"></i>
           <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
+        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
+               type="text">
       </th>
     </tr>
     </thead>
