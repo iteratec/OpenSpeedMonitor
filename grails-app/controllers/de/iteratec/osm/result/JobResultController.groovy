@@ -36,7 +36,7 @@ class JobResultController {
         List<JobResult> jobResultsForJob
         Job job = Job.get(jobId)
         if (job) {
-            jobResultsForJob = jobStatisticService.getLast150CompletedJobResultsFor(job)
+            jobResultsForJob = jobStatisticService.getLast150JobResultsFor(job)
         }
 
         List<JobResultDTO> dtos = []

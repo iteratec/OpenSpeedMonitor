@@ -26,17 +26,19 @@
   <table *ngIf="jobResults.length > 0" class="table table-striped">
     <thead>
     <tr>
-      <th (click)="sort('date')" class="sortable">
-        <div>
+      <th class="date-table-head">
+        <span (click)="sort('date')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.date' | translate }}
           <i *ngIf="currentSortingRule.column === 'date' && currentSortingRule.direction === 'desc'"
              aria-hidden="true" class="fas fa-sort-down"></i>
           <i *ngIf="currentSortingRule.column === 'date' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
-        </div>
-        <div class="job-id-table-head">
+        </span>
+        <span><i class="far fa-calendar date-filter-icon"></i></span>
+        <br>
+        <span (click)="sort('date')" class="job-id sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testId' | translate }}
-        </div>
+        </span>
       </th>
       <th>
         <span (click)="sort('testAgent')" class="sortable">
@@ -46,10 +48,13 @@
           <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
+        <input [(ngModel)]="filter.testAgent" (ngModelChange)="setFilter()"
+               [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate)"
+               class="form-control input-filter"
                type="text">
+
       </th>
-      <th>
+      <th class="status-table-head">
         <span (click)="sort('jobResultStatus')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.jobResultStatus' | translate }}
           <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'desc'"
@@ -57,10 +62,16 @@
           <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
-               type="text">
+        <ng-select [(ngModel)]="filter.jobResultStatus" (change)="setFilter()" [closeOnSelect]="false"
+                   [groupBy]="jobResultStatusGroupByFn" [groupValue]="groupValueFn"
+                   [items]="allJobResultStatus" [multiple]="true" [selectableGroup]="true" class="custom"
+                   clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
+                   notFoundText="{{ 'frontend.de.iteratec.osm.jobResult.filter.notFound' | translate }}"
+                   placeholder="{{ 'frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate }}"
+                   typeToSearchText="{{ 'frontend.de.iteratec.osm.jobResult.select.search' | translate }}">
+        </ng-select>
       </th>
-      <th>
+      <th class="status-table-head">
         <span (click)="sort('wptStatus')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.wptStatus' | translate }}
           <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'desc'"
@@ -68,8 +79,14 @@
           <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
-               type="text">
+        <ng-select [(ngModel)]="filter.wptStatus" (change)="setFilter()" [closeOnSelect]="false"
+                   [groupBy]="wptStatusGroupByFn" [groupValue]="groupValueFn"
+                   [items]="allWptStatus" [multiple]="true" [selectableGroup]="true" class="custom"
+                   clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
+                   notFoundText="{{ 'frontend.de.iteratec.osm.jobResult.filter.notFound' | translate }}"
+                   placeholder="{{ 'frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate }}"
+                   typeToSearchText="{{ 'frontend.de.iteratec.osm.jobResult.select.search' | translate }}">
+        </ng-select>
       </th>
       <th>
         <span (click)="sort('description')" class="sortable">
@@ -79,15 +96,19 @@
           <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <input [placeholder]="('frontend.de.iteratec.osm.jobResult.tableHead.filter' | translate)" class="form-control input-filter"
+        <input [(ngModel)]="filter.description" (ngModelChange)="setFilter()"
+               [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate)"
+               class="form-control input-filter"
                type="text">
       </th>
     </tr>
     </thead>
     <tbody>
-    <tr *ngFor="let test of jobResults">
+    <tr *ngFor="let test of filteredJobResults">
       <td>
-        <a [class.job-status-error]="!isTestSuccessful(test)" [class.text-success]="isTestSuccessful(test)"
+        <a [class.text-info]="isTestNotTerminated(test.jobResultStatus)"
+           [class.text-success]="isTestSuccessful(test.jobResultStatus)"
+           [class.job-status-error]="hasTestFailed(test.jobResultStatus)"
            href="{{ test.testUrl }}">
           <div
             class="job-date">{{ test.date | date:('frontend.de.iteratec.osm.jobResult.dateFormat' | translate) }}</div>
@@ -96,9 +117,16 @@
 
       </td>
       <td>{{ test.testAgent ? test.testAgent : '-' }}</td>
-      <td>{{ test.jobResultStatus }}</td>
-      <td>{{ test.wptStatus }}</td>
-      <td>{{ test.description }}</td>
+      <td>{{ test.jobResultStatus ? test.jobResultStatus : '-' }}</td>
+      <td>{{ test.wptStatus ? test.wptStatus : '-' }}</td>
+      <td>{{ test.description ? test.description : '-' }}</td>
+    </tr>
+    <tr *ngIf="filteredJobResults.length === 0">
+      <td class="no-data-after-filter">-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
     </tr>
     </tbody>
   </table>
