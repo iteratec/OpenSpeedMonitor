@@ -7,6 +7,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {StatusGroup} from './models/status-group.enum';
 import {JobResultStatus} from './models/job-result-status.enum';
 import {WptStatus} from './models/wpt-status.enum';
+import {JobResultFilter} from './models/job-result-filter.model';
 
 @Component({
   selector: 'osm-job-result',
@@ -23,7 +24,50 @@ export class JobResultComponent implements OnInit {
   filteredJobResults: JobResult[] = [];
   selectedJob: Job = null;
   currentSortingRule: { [key: string]: string } = {column: 'date', direction: 'desc'};
-  filter: { [key: string]: any } = {testAgent: '', jobResultStatus: [], wptStatus: [], description: ''};
+  filter: JobResultFilter = {from: null, to: null, testAgent: '', jobResultStatus: [], wptStatus: [], description: ''};
+
+  JOB_RESULT_STATUS_GROUPS: {[key: string]: string []} = {
+    GROUP_NOT_TERMINATED: [
+      JobResultStatus.WAITING,
+      JobResultStatus.RUNNING
+    ],
+    GROUP_SUCCESS: [
+      JobResultStatus.SUCCESS
+    ],
+    GROUP_FAILED: [
+      JobResultStatus.INCOMPLETE,
+      JobResultStatus.LAUNCH_ERROR,
+      JobResultStatus.FETCH_ERROR,
+      JobResultStatus.PERSISTENCE_ERROR,
+      JobResultStatus.TIMEOUT,
+      JobResultStatus.FAILED,
+      JobResultStatus.CANCELED,
+      JobResultStatus.ORPHANED,
+      JobResultStatus.DID_NOT_START
+    ]
+  };
+
+  WPT_STATUS_GROUPS: {[key: string]: string []} = {
+    GROUP_NOT_TERMINATED: [
+      WptStatus.UNKNOWN,
+      WptStatus.PENDING,
+      WptStatus.IN_PROGRESS
+    ],
+    GROUP_SUCCESS: [
+      WptStatus.SUCCESSFUL,
+      WptStatus.COMPLETED,
+      WptStatus.TEST_HAS_A_UNDEFINED_PROBLEM,
+      WptStatus.TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED
+    ],
+    GROUP_FAILED: [
+      WptStatus.TESTED_APPLICATION_CLIENT_ERROR,
+      WptStatus.TESTED_APPLICATION_INTERNAL_SERVER_ERROR,
+      WptStatus.TEST_DID_NOT_START,
+      WptStatus.TEST_FAILED_WAITING_FOR_DOM_ELEMENT,
+      WptStatus.TEST_TIMED_OUT,
+      WptStatus.TEST_TIMED_OUT_CONTENT_ERRORS
+    ]
+  };
 
   constructor(private dataService: JobResultDataService,
               private route: ActivatedRoute,
@@ -31,11 +75,11 @@ export class JobResultComponent implements OnInit {
               private translateService: TranslateService) {
   }
 
-  jobResultStatusGroupByFn = (test: string): string => this.getJobResultStatusGroupName(test);
+  jobResultStatusGroupByFn = (jobResultStatus: string): string => this.getJobResultStatusGroupName(jobResultStatus);
 
-  wptStatusGroupByFn = (test: string): string => this.getWptStatusGroupName(test);
+  wptStatusGroupByFn = (wptStatus: string): string => this.getWptStatusGroupName(wptStatus);
 
-  groupValueFn = (groupName: string, children: any[]): any[] => children;
+  groupValueFn = (groupName: string, children: any[]): any => ({label: groupName, children: children});
 
   ngOnInit() {
     this.getAllJobs();
@@ -51,10 +95,10 @@ export class JobResultComponent implements OnInit {
 
   setJob(job: Job): void {
     if (job) {
-      this.writeQueryParams(job.id);
+      this.writeQueryParams();
       this.getJobResults(job.id);
     } else {
-      this.writeQueryParams(null);
+      this.writeQueryParams();
       this.jobResults = [];
       this.filteredJobResults = [];
     }
@@ -78,6 +122,7 @@ export class JobResultComponent implements OnInit {
   }
 
   setFilter(): void {
+    this.writeQueryParams();
     this.filteredJobResults = this.jobResults.filter((jobResult: JobResult) => {
       if (this.arePropertiesThatAreFilteredEmpty(jobResult)) {
         return false;
@@ -87,56 +132,38 @@ export class JobResultComponent implements OnInit {
   }
 
   isTestNotTerminated(jobResultStatus: string): boolean {
-    const notTerminatedStatus: string[] = [
-      JobResultStatus.WAITING,
-      JobResultStatus.RUNNING
-    ];
-    return notTerminatedStatus.includes(jobResultStatus);
+    return this.JOB_RESULT_STATUS_GROUPS.GROUP_NOT_TERMINATED.includes(jobResultStatus);
   }
 
   isTestSuccessful(jobResultStatus: string): boolean {
-    const successfulStatus: string[] = [
-      JobResultStatus.SUCCESS
-    ];
-    return successfulStatus.includes(jobResultStatus);
+    return this.JOB_RESULT_STATUS_GROUPS.GROUP_SUCCESS.includes(jobResultStatus);
   }
 
   hasTestFailed(jobResultStatus: string): boolean {
-    const failedStatus: string[] = [
-      JobResultStatus.INCOMPLETE,
-      JobResultStatus.LAUNCH_ERROR,
-      JobResultStatus.FETCH_ERROR,
-      JobResultStatus.PERSISTENCE_ERROR,
-      JobResultStatus.TIMEOUT,
-      JobResultStatus.FAILED,
-      JobResultStatus.CANCELED,
-      JobResultStatus.ORPHANED,
-      JobResultStatus.DID_NOT_START
-    ];
-    return failedStatus.includes(jobResultStatus);
+    return this.JOB_RESULT_STATUS_GROUPS.GROUP_FAILED.includes(jobResultStatus);
   }
 
-  private getJobResultStatusGroupName(test: string): string {
-    if (this.isTestNotTerminated(test)) {
-      return this.translateService.instant(StatusGroup.NOT_TERMINATED);
+  private getJobResultStatusGroupName(jobResultStatus: string): string {
+    if (this.isTestNotTerminated(jobResultStatus)) {
+      return this.translateService.instant(StatusGroup.GROUP_NOT_TERMINATED);
     }
-    if (this.isTestSuccessful(test)) {
-      return this.translateService.instant(StatusGroup.SUCCESS);
+    if (this.isTestSuccessful(jobResultStatus)) {
+      return this.translateService.instant(StatusGroup.GROUP_SUCCESS);
     }
-    if (this.hasTestFailed(test)) {
-      return this.translateService.instant(StatusGroup.FAILED);
+    if (this.hasTestFailed(jobResultStatus)) {
+      return this.translateService.instant(StatusGroup.GROUP_FAILED);
     }
   }
 
-  private getWptStatusGroupName(test: string): string {
-    if (this.isWptNotTerminated(test)) {
-      return this.translateService.instant(StatusGroup.NOT_TERMINATED);
+  private getWptStatusGroupName(wptStatus: string): string {
+    if (this.isWptNotTerminated(wptStatus)) {
+      return this.translateService.instant(StatusGroup.GROUP_NOT_TERMINATED);
     }
-    if (this.isWptSuccessful(test)) {
-      return this.translateService.instant(StatusGroup.SUCCESS);
+    if (this.isWptSuccessful(wptStatus)) {
+      return this.translateService.instant(StatusGroup.GROUP_SUCCESS);
     }
-    if (this.hasWptFailed(test)) {
-      return this.translateService.instant(StatusGroup.FAILED);
+    if (this.hasWptFailed(wptStatus)) {
+      return this.translateService.instant(StatusGroup.GROUP_FAILED);
     }
   }
 
@@ -144,17 +171,34 @@ export class JobResultComponent implements OnInit {
     this.route.queryParams.subscribe((params: Params) => {
       if (this.checkQuery(params)) {
         const jobId = parseInt(params.job, 10);
-        this.selectedJob = this.jobs.find((job: Job) => job.id === jobId);
-        this.getJobResults(jobId);
+        if (jobId) {
+          this.selectedJob = this.jobs.find((job: Job) => job.id === jobId);
+          // this.filter.from = decodeURIComponent(params.from);
+          // this.filter.to = decodeURIComponent(params.to);
+          this.filter.testAgent = params.testAgent ? decodeURIComponent(params.testAgent) : '';
+          this.filter.jobResultStatus = this.readStatusByQueryParam(params.status, JobResultStatus, this.JOB_RESULT_STATUS_GROUPS);
+          this.filter.wptStatus = this.readStatusByQueryParam(params.wptStatus, WptStatus, this.WPT_STATUS_GROUPS);
+          this.filter.description = params.description ? decodeURIComponent(params.description) : '';
+          this.getJobResults(jobId);
+        }
       }
-    });
+    }).unsubscribe();
   }
 
-  private writeQueryParams(jobId: number): void {
+  private writeQueryParams(): void {
+    const params: Params = {
+      job: this.selectedJob.id,
+      // from: encodeURIComponent(this.filter.from),
+      // to: encodeURIComponent(this.filter.to),
+      testAgent: this.filter.testAgent !== '' ? encodeURIComponent(this.filter.testAgent) : null,
+      status: this.writeStatusAsQueryParam(this.filter.jobResultStatus, JobResultStatus),
+      wptStatus: this.writeStatusAsQueryParam(this.filter.wptStatus, WptStatus),
+      description: this.filter.description !== '' ? encodeURIComponent(this.filter.description) : null
+    };
+
     this.router.navigate([], {
-      queryParams: {
-        job: jobId
-      }
+      queryParams: params,
+      replaceUrl: true
     });
   }
 
@@ -163,6 +207,7 @@ export class JobResultComponent implements OnInit {
       .subscribe((jobResults: JobResult[]) => {
         this.jobResults = jobResults;
         this.filteredJobResults = jobResults;
+        this.setFilter();
       });
   }
 
@@ -235,44 +280,71 @@ export class JobResultComponent implements OnInit {
 
   private isStatusIncludingTerms(status: string, terms: any): boolean {
     return terms.find((termOrTermList: (string | string[])) => {
-      if (Array.isArray(termOrTermList)) {
-        return termOrTermList.find((term: string) => status.toLowerCase().includes(term.toLowerCase()));
-      }
       if (typeof termOrTermList === 'string') {
         return status.toLowerCase().includes(termOrTermList.toLowerCase());
+      }
+      if (typeof termOrTermList === 'object' && termOrTermList['children'] && Array.isArray(termOrTermList['children'])) {
+        return termOrTermList['children'].find((term: string) => status.toLowerCase().includes(term.toLowerCase()));
       }
       return false;
     });
   }
 
   private isWptNotTerminated(wptStatus: string): boolean {
-    const notTerminatedStatus: string[] = [
-      WptStatus.UNKNOWN,
-      WptStatus.PENDING,
-      WptStatus.IN_PROGRESS
-    ];
-    return notTerminatedStatus.includes(wptStatus);
+    return this.WPT_STATUS_GROUPS.GROUP_NOT_TERMINATED.includes(wptStatus);
   }
 
   private isWptSuccessful(wptStatus: string): boolean {
-    const successfulStatus: string[] = [
-      WptStatus.SUCCESSFUL,
-      WptStatus.COMPLETED,
-      WptStatus.TEST_HAS_A_UNDEFINED_PROBLEM,
-      WptStatus.TEST_COMPLETED_BUT_INDIVIDUAL_REQUEST_FAILED
-    ];
-    return successfulStatus.includes(wptStatus);
+    return this.WPT_STATUS_GROUPS.GROUP_SUCCESS.includes(wptStatus);
   }
 
   private hasWptFailed(wptStatus: string): boolean {
-    const failedStatus: string[] = [
-      WptStatus.TESTED_APPLICATION_CLIENT_ERROR,
-      WptStatus.TESTED_APPLICATION_INTERNAL_SERVER_ERROR,
-      WptStatus.TEST_DID_NOT_START,
-      WptStatus.TEST_FAILED_WAITING_FOR_DOM_ELEMENT,
-      WptStatus.TEST_TIMED_OUT,
-      WptStatus.TEST_TIMED_OUT_CONTENT_ERRORS
-    ];
-    return failedStatus.includes(wptStatus);
+    return this.WPT_STATUS_GROUPS.GROUP_FAILED.includes(wptStatus);
+  }
+
+  private writeStatusAsQueryParam(statusList: (string | object)[], enumeration: any): string[] {
+    if (statusList.length > 0) {
+      return statusList.map(status => {
+        if (typeof status === 'string') {
+          return Object.keys(enumeration).find(key => enumeration[key] === status).toLowerCase();
+        }
+        if (typeof status === 'object' && status['label'] && typeof status['label'] === 'string') {
+          return Object.keys(StatusGroup).find(key =>
+              this.translateService.instant(StatusGroup[key]) === status['label']).toLowerCase();
+        }
+      });
+    }
+    return null;
+  }
+
+  private readStatusByQueryParam(statusParam: (string | string[]),
+                                 enumeration: any,
+                                 statusGroupType: {[key: string]: string []}
+                                 ): (string | object)[] {
+    if (!statusParam) {
+      return [];
+    }
+    if (typeof statusParam === 'string') {
+      statusParam = statusParam.toUpperCase();
+      if (Object.keys(StatusGroup).find(key => key === statusParam)) {
+        return [].concat({
+          label: this.translateService.instant(StatusGroup[statusParam]),
+          children: statusGroupType[statusParam]
+        });
+      }
+      return [].concat(enumeration[statusParam]);
+    }
+    if (Array.isArray(statusParam)) {
+      return statusParam.map((status: string) => {
+        status = status.toUpperCase();
+        if (Object.keys(StatusGroup).find(key => key === status)) {
+          return {
+            label: this.translateService.instant(StatusGroup[status]),
+            children: statusGroupType[status]
+          };
+        }
+        return enumeration[status];
+      });
+    }
   }
 }
