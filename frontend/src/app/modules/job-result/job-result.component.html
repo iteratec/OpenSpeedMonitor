@@ -26,6 +26,7 @@
   <table *ngIf="jobResults.length > 0" class="table table-striped">
     <thead>
     <tr>
+
       <th class="date-table-head">
         <span (click)="sort('date')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.date' | translate }}
@@ -40,7 +41,8 @@
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testId' | translate }}
         </span>
       </th>
-      <th>
+
+      <th class="table-head">
         <span (click)="sort('testAgent')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.testAgent' | translate }}
           <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'desc'"
@@ -48,13 +50,20 @@
           <i *ngIf="currentSortingRule.column === 'testAgent' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <input [(ngModel)]="filter.testAgent" (ngModelChange)="setFilter()"
-               [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate)"
-               class="form-control input-filter"
-               type="text">
-
+        <div class="input-container">
+          <input [(ngModel)]="filter.testAgent" (ngModelChange)="applyFilter()"
+                 [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate)"
+                 class="form-control input-filter"
+                 type="text">
+          <span (click)="clearTextFilter('testAgent')" *ngIf="filter.testAgent"
+                [title]="('frontend.de.iteratec.osm.jobResult.select.clearAll' | translate)"
+                class="clear-input-wrapper">
+            <span aria-hidden="true" class="clear-input">×</span>
+          </span>
+        </div>
       </th>
-      <th class="status-table-head">
+
+      <th class="table-head">
         <span (click)="sort('jobResultStatus')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.jobResultStatus' | translate }}
           <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'desc'"
@@ -62,7 +71,7 @@
           <i *ngIf="currentSortingRule.column === 'jobResultStatus' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <ng-select [(ngModel)]="filter.jobResultStatus" (change)="setFilter()" [closeOnSelect]="false"
+        <ng-select [(ngModel)]="filter.jobResultStatus" (change)="applyFilter()" [closeOnSelect]="false"
                    [groupBy]="jobResultStatusGroupByFn" [groupValue]="groupValueFn"
                    [items]="allJobResultStatus" [multiple]="true" [selectableGroup]="true" class="custom"
                    clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
@@ -71,7 +80,8 @@
                    typeToSearchText="{{ 'frontend.de.iteratec.osm.jobResult.select.search' | translate }}">
         </ng-select>
       </th>
-      <th class="status-table-head">
+
+      <th class="table-head">
         <span (click)="sort('wptStatus')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.wptStatus' | translate }}
           <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'desc'"
@@ -79,7 +89,7 @@
           <i *ngIf="currentSortingRule.column === 'wptStatus' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <ng-select [(ngModel)]="filter.wptStatus" (change)="setFilter()" [closeOnSelect]="false"
+        <ng-select [(ngModel)]="filter.wptStatus" (change)="applyFilter()" [closeOnSelect]="false"
                    [groupBy]="wptStatusGroupByFn" [groupValue]="groupValueFn"
                    [items]="allWptStatus" [multiple]="true" [selectableGroup]="true" class="custom"
                    clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
@@ -88,7 +98,8 @@
                    typeToSearchText="{{ 'frontend.de.iteratec.osm.jobResult.select.search' | translate }}">
         </ng-select>
       </th>
-      <th>
+
+      <th class="table-head">
         <span (click)="sort('description')" class="sortable">
           {{ 'frontend.de.iteratec.osm.jobResult.tableHead.description' | translate }}
           <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'desc'"
@@ -96,19 +107,27 @@
           <i *ngIf="currentSortingRule.column === 'description' && currentSortingRule.direction === 'asc'"
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
-        <input [(ngModel)]="filter.description" (ngModelChange)="setFilter()"
-               [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate)"
-               class="form-control input-filter"
-               type="text">
+        <div class="input-container">
+          <input [(ngModel)]="filter.description" (ngModelChange)="applyFilter()"
+                 [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder' | translate)"
+                 class="form-control input-filter"
+                 type="text">
+          <span (click)="clearTextFilter('description')" *ngIf="filter.description"
+                [title]="('frontend.de.iteratec.osm.jobResult.select.clearAll' | translate)"
+                class="clear-input-wrapper">
+            <span aria-hidden="true" class="clear-input">×</span>
+          </span>
+        </div>
       </th>
+
     </tr>
     </thead>
     <tbody>
     <tr *ngFor="let test of filteredJobResults">
       <td>
-        <a [class.text-info]="isTestNotTerminated(test.jobResultStatus)"
-           [class.text-success]="isTestSuccessful(test.jobResultStatus)"
-           [class.job-status-error]="hasTestFailed(test.jobResultStatus)"
+        <a [class.job-status-error]="statusService.hasTestFailed(test.jobResultStatus)"
+           [class.text-info]="statusService.isTestNotTerminated(test.jobResultStatus)"
+           [class.text-success]="statusService.isTestSuccessful(test.jobResultStatus)"
            href="{{ test.testUrl }}">
           <div
             class="job-date">{{ test.date | date:('frontend.de.iteratec.osm.jobResult.dateFormat' | translate) }}</div>
