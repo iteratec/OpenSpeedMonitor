@@ -68,7 +68,6 @@ export class JobResultComponent implements OnInit {
   }
 
   setJob(job: Job): void {
-    console.log('job', job);
     if (job) {
       this.writeQueryParams();
       this.getJobResults(job.id);

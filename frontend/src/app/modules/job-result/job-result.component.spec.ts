@@ -3,6 +3,8 @@ import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {JobResultComponent} from './job-result.component';
 import {SharedModule} from '../shared/shared.module';
 import {SharedMocksModule} from '../../testing/shared-mocks.module';
+import {OsmLangService} from '../../services/osm-lang.service';
+import {GrailsBridgeService} from '../../services/grails-bridge.service';
 
 describe('JobResultComponent', () => {
   let component: JobResultComponent;
@@ -12,8 +14,11 @@ describe('JobResultComponent', () => {
     TestBed.configureTestingModule({
       declarations: [JobResultComponent],
       imports: [
-        SharedModule,
         SharedMocksModule
+      ],
+      providers: [
+        OsmLangService,
+        GrailsBridgeService
       ]
     })
       .compileComponents();
