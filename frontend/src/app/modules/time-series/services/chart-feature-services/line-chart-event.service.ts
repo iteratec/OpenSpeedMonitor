@@ -25,7 +25,7 @@ import {TranslateService} from '@ngx-translate/core';
 })
 export class LineChartEventService {
 
-  private DOT_HIGHLIGHT_RADIUS = 5;
+  private _DOT_HIGHLIGHT_RADIUS = 5;
   private _contextMenuBackground: D3Selection<D3BaseType, number, D3BaseType, unknown>;
   private _contextMenu: D3Selection<D3BaseType, number, D3BaseType, unknown>;
   private _dotsOnMarker: D3Selection<D3BaseType, {}, HTMLElement, any>;
@@ -67,7 +67,7 @@ export class LineChartEventService {
       icon: 'fas fa-bars',
       action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
-          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.waterfall));
+          .buildWaterfallUrl(d.wptInfo));
       }
     },
     {
@@ -75,7 +75,7 @@ export class LineChartEventService {
       icon: 'fas fa-check',
       action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
-          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.performanceReview));
+          .buildPerformanceReviewUrl(d.wptInfo));
       }
     },
     {
@@ -83,7 +83,7 @@ export class LineChartEventService {
       icon: 'fas fa-chart-pie',
       action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
-          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.contentBreakdown));
+          .buildContentBreakdownUrl(d.wptInfo));
       }
     },
     {
@@ -91,7 +91,7 @@ export class LineChartEventService {
       icon: 'fas fa-list',
       action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
-          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.domains));
+          .buildDomainsUrl(d.wptInfo));
       }
     },
     {
@@ -99,7 +99,7 @@ export class LineChartEventService {
       icon: 'fas fa-image',
       action: (d: TimeSeriesPoint) => {
         window.open(this.urlBuilderService
-          .buildUrlByOption(d.wptInfo, this.urlBuilderService.options.screenshot));
+          .buildScreenshotUrl(d.wptInfo));
       }
     },
     {
@@ -244,8 +244,7 @@ export class LineChartEventService {
            xScale: D3ScaleTime<number, number>,
            data: { [key: string]: TimeSeries[] },
            dataTrimValues: { [key: string]: { [key: string]: number } },
-           legendDataMap: { [key: string]: { [key: string]: (boolean | string) } },
-           keepZoom: boolean): void {
+           legendDataMap: { [key: string]: { [key: string]: (boolean | string) } }): void {
     // remove old brush
     d3Select('.brush').remove();
 
@@ -259,8 +258,17 @@ export class LineChartEventService {
     d3Select('.overlay')
       .on('dblclick', () => this.resetChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap))
       .on('contextmenu', (d, i, e) => this.showContextMenu(this.backgroundContextMenu)(d, i, e));
+  }
 
-    if (keepZoom && this.brushMinDate !== null && this.brushMaxDate !== null) {
+  restoreSelectedZoom(chartContentContainer: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+                      width: number,
+                      height: number,
+                      yAxisWidth: number,
+                      xScale: D3ScaleTime<number, number>,
+                      data: { [key: string]: TimeSeries[] },
+                      dataTrimValues: { [key: string]: { [key: string]: number } },
+                      legendDataMap: { [key: string]: { [key: string]: (boolean | string) } }): void {
+    if (this.brushMinDate !== null && this.brushMaxDate !== null) {
       this.updateChart(chartContentContainer, width, height, yAxisWidth, xScale, data, dataTrimValues, legendDataMap);
     }
   }
@@ -286,6 +294,7 @@ export class LineChartEventService {
   }
 
   private moveMarker(node: D3ContainerElement, width: number, containerHeight: number, marginTop: number, marginLeft: number): void {
+    // marker can only be moved from one dot to another dot if there are at least two dots
     if (this.lineChartDrawService.xAxisCluster.length < 2) {
       return;
     }
@@ -306,7 +315,7 @@ export class LineChartEventService {
     this.hideOldDotsOnMarker();
     const dotsOnMarker = this.findDotsOnMarker(markerPositionX);
     this.showDotsOnMarker(dotsOnMarker);
-    nearestDot.attr('r', this.DOT_HIGHLIGHT_RADIUS);
+    nearestDot.attr('r', this._DOT_HIGHLIGHT_RADIUS);
 
     this._dotsOnMarker = dotsOnMarker;
 
@@ -413,7 +422,7 @@ export class LineChartEventService {
           this.changePointSelection(dotData);
         } else {
           window.open(this.urlBuilderService
-            .buildUrlByOption(dotData.wptInfo, this.urlBuilderService.options.waterfall));
+            .buildWaterfallUrl(dotData.wptInfo));
         }
       });
   }

@@ -24,14 +24,13 @@ export class LineChartDrawService {
   constructor() {
   }
 
+  // Map that holds all points clustered by their x-axis values
+  private _xAxisCluster: any = {};
   private _DOT_RADIUS = 3;
 
   get DOT_RADIUS(): number {
     return this._DOT_RADIUS;
   }
-
-  // Map that holds all points clustered by their x-axis values
-  private _xAxisCluster: any = {};
 
   get xAxisCluster(): any {
     return this._xAxisCluster;

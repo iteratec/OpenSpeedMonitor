@@ -56,8 +56,16 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.redraw(true);
-    this.setDataTrimSettings();
+    for (const property in changes) {
+      if (changes.hasOwnProperty(property)) {
+        switch (property) {
+          case 'timeSeriesResults': {
+            this.redraw();
+            this.setDataTrimSettings();
+          }
+        }
+      }
+    }
   }
 
   @HostListener('window:resize', ['$event'])
@@ -68,34 +76,52 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
     clearTimeout(this._resizeTimeoutId);
     this._resizeTimeoutId = window.setTimeout(() => {
       this.lineChartService.resizeChart(this.svgElement);
-      this.redraw(false);
+      this.redrawWithRestoredZoomAndLegendSelection();
 
       this.lineChartService.endResize(this.svgElement);
     }, 500);
   }
 
-  redraw(updateAllData: boolean): void {
+  redraw(): void {
     if (this.timeSeriesResults == null) {
       this.spinnerService.showSpinner('time-series-line-chart-spinner');
       return;
     }
+    const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
+    this.lineChartService.prepareLegend(this.timeSeriesResults);
+
     this.spinnerService.hideSpinner('time-series-line-chart-spinner');
 
-    this.lineChartService.drawLineChart(this.timeSeriesResults, this.selectedTrimValues, updateAllData);
+    this.lineChartService.drawLineChart(timeSeries, this.timeSeriesResults.measurandGroups,
+      this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
+  }
+
+  redrawWithRestoredZoomAndLegendSelection(): void {
+    if (this.timeSeriesResults == null) {
+      this.spinnerService.showSpinner('time-series-line-chart-spinner');
+      return;
+    }
+    const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
+
+    this.spinnerService.hideSpinner('time-series-line-chart-spinner');
+
+    this.lineChartService.drawLineChart(timeSeries, this.timeSeriesResults.measurandGroups,
+      this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
+    this.lineChartService.restoreZoom(timeSeries, this.selectedTrimValues);
   }
 
   handlePointSelectionError(): void {
     this.ngxSmartModalService.open('pointSelectionErrorModal');
   }
 
-  validateInputValuesByEvent(event, selectedInput: string, otherInput: string, measurandGroup: string): void {
+  adjustInputRangeAndInputValuesByEvent(event, selectedInput: string, otherInput: string, measurandGroup: string): void {
     if (event.inputType !== 'insertText' && !event.inputType.startsWith('delete')) {
       this.considerMaxInputTmpRange(selectedInput, measurandGroup);
-      this.validateInputValues(selectedInput, otherInput, measurandGroup);
+      this.adjustInputRangeAndInputValues(selectedInput, otherInput, measurandGroup);
     }
   }
 
-  validateInputValues(selectedInput: string, otherInput: string, measurandGroup: string): void {
+  adjustInputRangeAndInputValues(selectedInput: string, otherInput: string, measurandGroup: string): void {
     if (
       this.selectedTrimValues.min[measurandGroup] &&
       this.selectedTrimValues.max[measurandGroup] &&
@@ -114,7 +140,7 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
       Math.min(this.dataTrimInputRange.max[measurandGroup], this.selectedTrimValues.max[measurandGroup]) :
       this.dataTrimInputRange.max[measurandGroup];
 
-    this.validateInputValuesByType(otherInput, inputRangeMin, inputRangeMax, measurandGroup);
+    this.adjustInputValues(otherInput, inputRangeMin, inputRangeMax, measurandGroup);
     this.maxInputTmpRange[measurandGroup] = this.selectedTrimValues.min[measurandGroup] &&
       (this.selectedTrimValues.max[measurandGroup] === undefined || this.selectedTrimValues.max[measurandGroup] === null);
   }
@@ -136,7 +162,7 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
     return 5 * Math.pow(10, orderOfMagnitudeOfMaxValue - 2);
   }
 
-  private validateInputValuesByType(type: string, inputRangeMin: number, inputRangeMax: number, measurandGroup: string): void {
+  private adjustInputValues(type: string, inputRangeMin: number, inputRangeMax: number, measurandGroup: string): void {
     if (this.selectedTrimValues[type][measurandGroup] === null || this.selectedTrimValues[type][measurandGroup] === undefined) {
       return;
     }

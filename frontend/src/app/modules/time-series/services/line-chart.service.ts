@@ -25,6 +25,7 @@ import {LineChartScaleService} from './chart-feature-services/line-chart-scale.s
 import {LineChartDrawService} from './chart-feature-services/line-chart-draw.service';
 import {LineChartEventService} from './chart-feature-services/line-chart-event.service';
 import {LineChartLegendService} from './chart-feature-services/line-chart-legend.service';
+import {SummaryLabel} from '../models/summary-label.model';
 
 /**
  * Generate line charts with ease and fun 😎
@@ -48,6 +49,7 @@ export class LineChartService {
   private _width: number = 600 - this._margin.left - this._margin.right;
   private _height: number = 550 - this._margin.top - this._margin.bottom;
   private _legendGroupTop: number = this._margin.top + this._height + 50;
+  private _xScale: D3ScaleTime<number, number>;
 
   constructor(private translationService: TranslateService,
               private urlBuilderService: UrlBuilderService,
@@ -74,29 +76,71 @@ export class LineChartService {
 
     const data: { [key: string]: TimeSeries[] } = {};
     const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = this.createChart(svgElement);
-    const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, this._width);
+    this._xScale = this.lineChartScaleService.getXScale(data, this._width);
 
-    this.addXAxisToChart(chart, xScale);
+    this.addXAxisToChart(chart);
     this.lineChartEventService.prepareMouseEventCatcher(chart, this._width, this._height, this._margin.top, this._margin.left);
   }
 
-  drawLineChart(incomingData: EventResultDataDTO,
-                dataTrimValues: { [key: string]: { [key: string]: number } },
-                updateAllData: boolean): void {
+  /**
+   * Prepares the incoming data for drawing with D3.js
+   */
+  prepareData(incomingData: EventResultDataDTO,
+              dataTrimValues: { [key: string]: { [key: string]: number } }): { [key: string]: TimeSeries[] } {
+    const data: { [key: string]: TimeSeries[] } = {};
+    const measurandGroups = Object.keys(incomingData.series);
+    measurandGroups.forEach((measurandGroup: string) => {
+      let maxValue = 0;
+      data[measurandGroup] = incomingData.series[measurandGroup].map((seriesDTO: EventResultSeriesDTO) => {
+        const lineChartData: TimeSeries = new TimeSeries();
+        if (incomingData.summaryLabels.length === 0 ||
+          (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key !== 'measurand')) {
+          seriesDTO.identifier = this.lineChartLegendService.translateMeasurand(seriesDTO);
+        }
+        lineChartData.key = this.lineChartLegendService.generateKey(seriesDTO);
+
+        lineChartData.values = seriesDTO.data.map((point: EventResultPointDTO) => {
+          const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
+          lineChartDataPoint.date = parseDate(point.date);
+          lineChartDataPoint.value = point.value;
+          lineChartDataPoint.agent = point.agent;
+          lineChartDataPoint.tooltipText = `${seriesDTO.identifier}: `;
+          lineChartDataPoint.wptInfo = point.wptInfo;
+          maxValue = Math.max(maxValue, point.value);
+          return lineChartDataPoint;
+        }).filter((point: TimeSeriesPoint) => {
+          const min: boolean = dataTrimValues.min[measurandGroup] ? point.value >= dataTrimValues.min[measurandGroup] : true;
+          const max: boolean = dataTrimValues.max[measurandGroup] ? point.value <= dataTrimValues.max[measurandGroup] : true;
+          return min && max;
+        });
+
+        return lineChartData;
+      });
+
+      this._dataMaxValues[measurandGroup] = maxValue;
+    });
+
+    return data;
+  }
+
+  prepareLegend(incomingData: EventResultDataDTO): void {
+    this.lineChartLegendService.setLegendData(incomingData);
+  }
+
+  drawLineChart(timeSeries: { [key: string]: TimeSeries[] },
+                measurandGroups: { [key: string]: string },
+                summaryLabels: SummaryLabel[],
+                timeSeriesAmount: number,
+                dataTrimValues: { [key: string]: { [key: string]: number } }): void {
     this.lineChartEventService.prepareCleanState();
 
-    const data: { [key: string]: TimeSeries[] } = this.prepareData(incomingData, dataTrimValues);
-    if (updateAllData) {
-      this.lineChartLegendService.setLegendData(incomingData);
-    }
-
-    this.adjustChartDimensions(incomingData);
+    this.adjustChartDimensions(measurandGroups, summaryLabels);
     const chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}> = d3Select('g#time-series-chart-drawing-area');
-    const width: number = this.lineChartDrawService.getDrawingAreaWidth(
-      this._width, this.Y_AXIS_WIDTH, Object.keys(incomingData.measurandGroups).length);
-    const xScale: D3ScaleTime<number, number> = this.lineChartScaleService.getXScale(data, width);
-    const yScales: { [key: string]: D3ScaleLinear<number, number> } =
-      this.lineChartScaleService.getYScales(data, this._height, dataTrimValues);
+    const width: number = this.lineChartDrawService.getDrawingAreaWidth(this._width, this.Y_AXIS_WIDTH,
+      Object.keys(measurandGroups).length);
+    this._xScale = this.lineChartScaleService.getXScale(timeSeries, width);
+    const yScales: { [key: string]: D3ScaleLinear<number, number> } = this.lineChartScaleService.getYScales(
+      timeSeries, this._height, dataTrimValues);
     this.lineChartDrawService.setYAxesInChart(chart, yScales);
     const legendGroupHeight = this.lineChartLegendService.calculateLegendDimensions(this._width);
 
@@ -104,33 +148,41 @@ export class LineChartService {
       .transition()
       .duration(500)
       .attr('height', this._height + legendGroupHeight + this._margin.top + this._margin.bottom);
+
     d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) => {
-      this.lineChartDrawService.updateXAxis(transition, xScale);
+      this.lineChartDrawService.updateXAxis(transition, this._xScale);
     });
     this.lineChartDrawService.updateYAxes(yScales, this._width, this.Y_AXIS_WIDTH);
-    this.addYAxisUnits(incomingData.measurandGroups, width);
+    this.addYAxisUnits(measurandGroups, width);
 
     const chartContentContainer = chart.select('.chart-content');
     this.lineChartEventService.createContextMenu();
-    this.lineChartEventService.addBrush(chartContentContainer, this._width, this._height, this.Y_AXIS_WIDTH, xScale,
-      data, dataTrimValues, this.lineChartLegendService.legendDataMap, !updateAllData);
+    this.lineChartEventService.addBrush(chartContentContainer, this._width, this._height, this.Y_AXIS_WIDTH, this._xScale,
+      timeSeries, dataTrimValues, this.lineChartLegendService.legendDataMap);
 
-    this.lineChartLegendService.addLegendsToChart(chartContentContainer, xScale, yScales, data, incomingData.numberOfTimeSeries);
-    this.lineChartLegendService.setSummaryLabel(chart, incomingData.summaryLabels, this._width);
+    this.lineChartLegendService.addLegendsToChart(chartContentContainer, this._xScale, yScales, timeSeries, timeSeriesAmount);
+    this.lineChartLegendService.setSummaryLabel(chart, summaryLabels, this._width);
 
     Object.keys(yScales).forEach((key: string, index: number) => {
       this.lineChartDrawService.addDataLinesToChart(chartContentContainer, this.lineChartEventService.pointsSelection,
-        xScale, yScales[key], data[key], this.lineChartLegendService.legendDataMap, index);
+        this._xScale, yScales[key], timeSeries[key], this.lineChartLegendService.legendDataMap, index);
     });
 
     this.lineChartEventService.addMouseMarkerToChart(chartContentContainer);
     this.lineChartDrawService.drawAllSelectedPoints(this.lineChartEventService.pointsSelection);
 
-    this.setDataTrimLabels(incomingData.measurandGroups);
+    this.setDataTrimLabels(measurandGroups);
 
     chartContentContainer
       .attr('width', this._width)
       .attr('height', this._height);
+  }
+
+  restoreZoom(timeSeriesData: { [key: string]: TimeSeries[] },
+              dataTrimValues: { [key: string]: { [key: string]: number } }): void {
+    const chartContentContainer = d3Select('g#time-series-chart-drawing-area .chart-content');
+    this.lineChartEventService.restoreSelectedZoom(chartContentContainer, this._width, this._height,
+      this.Y_AXIS_WIDTH, this._xScale, timeSeriesData, dataTrimValues, this.lineChartLegendService.legendDataMap);
   }
 
   startResize(svgElement: ElementRef): void {
@@ -176,10 +228,9 @@ export class LineChartService {
   /**
    * Print the x-axis on the graph
    */
-  private addXAxisToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-                          xScale: D3ScaleTime<number, number>): void {
+  private addXAxisToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>): void {
 
-    const xAxis = d3AxisBottom(xScale);
+    const xAxis = d3AxisBottom(this._xScale);
 
     // Add the X-Axis to the chart
     chart.append('g')                   // new group for the X-Axis (see https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g)
@@ -189,60 +240,19 @@ export class LineChartService {
       .call(xAxis);
   }
 
-  /**
-   * Prepares the incoming data for drawing with D3.js
-   */
-  private prepareData(incomingData: EventResultDataDTO,
-                      dataTrimValues: { [key: string]: { [key: string]: number } }
-  ): { [key: string]: TimeSeries[] } {
-    const data: { [key: string]: TimeSeries[] } = {};
-    const measurandGroups = Object.keys(incomingData.series);
-    measurandGroups.forEach((measurandGroup: string) => {
-      let maxValue = 0;
-      data[measurandGroup] = incomingData.series[measurandGroup].map((seriesDTO: EventResultSeriesDTO) => {
-        const lineChartData: TimeSeries = new TimeSeries();
-        if (incomingData.summaryLabels.length === 0 ||
-          (incomingData.summaryLabels.length > 0 && incomingData.summaryLabels[0].key !== 'measurand')) {
-          seriesDTO.identifier = this.lineChartLegendService.translateMeasurand(seriesDTO);
-        }
-        lineChartData.key = this.lineChartLegendService.generateKey(seriesDTO);
-
-        lineChartData.values = seriesDTO.data.map((point: EventResultPointDTO) => {
-          const lineChartDataPoint: TimeSeriesPoint = new TimeSeriesPoint();
-          lineChartDataPoint.date = parseDate(point.date);
-          lineChartDataPoint.value = point.value;
-          lineChartDataPoint.agent = point.agent;
-          lineChartDataPoint.tooltipText = `${seriesDTO.identifier}: `;
-          lineChartDataPoint.wptInfo = point.wptInfo;
-          maxValue = Math.max(maxValue, point.value);
-          return lineChartDataPoint;
-        }).filter((point: TimeSeriesPoint) => {
-          const min: boolean = dataTrimValues.min[measurandGroup] ? point.value >= dataTrimValues.min[measurandGroup] : true;
-          const max: boolean = dataTrimValues.max[measurandGroup] ? point.value <= dataTrimValues.max[measurandGroup] : true;
-          return min && max;
-        });
-
-        return lineChartData;
-      });
-
-      this._dataMaxValues[measurandGroup] = maxValue;
-    });
-
-    return data;
-  }
-
-  private adjustChartDimensions(incomingData: EventResultDataDTO): void {
+  private adjustChartDimensions(measurandGroups: { [key: string]: string },
+                                summaryLabels: SummaryLabel[]): void {
     this._width = this._width + this._margin.right;
-    if (Object.keys(incomingData.measurandGroups).length > 1) {
+    if (Object.keys(measurandGroups).length > 1) {
       this._margin.right = this.MARGIN.right - 30;
     } else {
       this._margin.right = this.MARGIN.right;
     }
     this._width = this._width - this._margin.right;
 
-    if (Object.keys(incomingData.measurandGroups).length === 1) {
+    if (Object.keys(measurandGroups).length === 1) {
       this._margin.top = this.MARGIN.top;
-    } else if (incomingData.summaryLabels.length === 0 || Object.keys(incomingData.measurandGroups).length === 2) {
+    } else if (summaryLabels.length === 0 || Object.keys(measurandGroups).length === 2) {
       this._margin.top = this.MARGIN.top + 10;
     } else {
       this._margin.top = this.MARGIN.top + 20;

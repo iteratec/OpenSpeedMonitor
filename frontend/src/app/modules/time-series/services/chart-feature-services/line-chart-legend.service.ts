@@ -25,14 +25,13 @@ export class LineChartLegendService {
 
   private _legendGroupColumnWidth: number;
   private _legendGroupColumns: number;
-  private focusedLegendEntry: string;
+  private _focusedLegendEntry: string;
+  private _legendDataMap: { [key: string]: { [key: string]: (boolean | string) } } = {};
 
   constructor(private translationService: TranslateService,
               private lineChartDrawService: LineChartDrawService,
               private lineChartEventService: LineChartEventService) {
   }
-
-  private _legendDataMap: { [key: string]: { [key: string]: (boolean | string) } } = {};
 
   get legendDataMap(): { [p: string]: { [p: string]: boolean | string } } {
     return this._legendDataMap;
@@ -231,16 +230,16 @@ export class LineChartLegendService {
     if (d3Event.metaKey || d3Event.ctrlKey) {
       this._legendDataMap[labelKey].show = !this._legendDataMap[labelKey].show;
     } else {
-      if (labelKey === this.focusedLegendEntry) {
+      if (labelKey === this._focusedLegendEntry) {
         Object.keys(this._legendDataMap).forEach((legend) => {
           this._legendDataMap[legend].show = true;
         });
-        this.focusedLegendEntry = '';
+        this._focusedLegendEntry = '';
       } else {
         Object.keys(this._legendDataMap).forEach((legend) => {
           if (legend === labelKey) {
             this._legendDataMap[legend].show = true;
-            this.focusedLegendEntry = legend;
+            this._focusedLegendEntry = legend;
           } else {
             this._legendDataMap[legend].show = false;
           }
