@@ -305,7 +305,6 @@ grails:
                             {pattern: '/job/showLastResultForJob/**',                   access: ['permitAll']},
                             {pattern: '/job/showLastAggregationForJob/**',              access: ['permitAll']},
                             {pattern: '/jobResult/**',                                  access: ['permitAll']},
-                            {pattern: '/jobResultDev/**',                               access: ['permitAll']},
                             {pattern: '/script/list',                                   access: ['permitAll']},
                             {pattern: '/register/*',                                    access: ['permitAll']},
                             {pattern: '/queueStatus/list',                              access: ['permitAll']},

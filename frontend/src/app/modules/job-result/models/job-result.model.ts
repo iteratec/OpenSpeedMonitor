@@ -1,8 +1,7 @@
 export interface JobResult {
-  testId: string;
   testUrl: string;
-  testAgent: string;
   date: Date;
+  testAgent: string;
   jobResultStatus: string;
   wptStatus: string;
   description: string;

@@ -37,7 +37,7 @@ const appRoutes: Routes = [
     loadChildren: './modules/distribution/distribution.module#DistributionModule'
   },
   {
-    path: 'jobResultDev',
+    path: 'jobResult',
     loadChildren: './modules/job-result/job-result.module#JobResultModule'
   },
   {

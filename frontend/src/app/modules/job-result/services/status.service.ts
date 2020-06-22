@@ -79,15 +79,19 @@ export class StatusService {
     }
   }
 
-  writeStatusAsQueryParam(statusList: (string | object)[], enumeration: any): string[] {
-    if (statusList.length > 0) {
+  writeStatusAsQueryParam(statusList: (string | object)[], enumeration: any, isJobSelected: boolean): string[] {
+    if (isJobSelected && statusList.length > 0) {
       return statusList.map(status => {
         if (typeof status === 'string') {
-          return Object.keys(enumeration).find(key => enumeration[key] === status).toLowerCase();
+          return encodeURIComponent(
+            Object.keys(enumeration).find(key => enumeration[key] === status).toLowerCase()
+          );
         }
         if (typeof status === 'object' && status['label'] && typeof status['label'] === 'string') {
-          return Object.keys(StatusGroup).find(key =>
-            this.translateService.instant(StatusGroup[key]) === status['label']).toLowerCase();
+          return encodeURIComponent(
+            Object.keys(StatusGroup).find(key =>
+              this.translateService.instant(StatusGroup[key]) === status['label']).toLowerCase()
+          );
         }
       });
     }
@@ -101,7 +105,7 @@ export class StatusService {
       return [];
     }
     if (typeof statusParam === 'string') {
-      statusParam = statusParam.toUpperCase();
+      statusParam = decodeURIComponent(statusParam).toUpperCase();
       if (Object.keys(StatusGroup).find(key => key === statusParam)) {
         return [].concat({
           label: this.translateService.instant(StatusGroup[statusParam]),
@@ -112,7 +116,7 @@ export class StatusService {
     }
     if (Array.isArray(statusParam)) {
       return statusParam.map((status: string) => {
-        status = status.toUpperCase();
+        status = decodeURIComponent(status).toUpperCase();
         if (Object.keys(StatusGroup).find(key => key === status)) {
           return {
             label: this.translateService.instant(StatusGroup[status]),

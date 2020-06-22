@@ -1,6 +1,5 @@
 export interface JobResultFilter {
-  from: Date;
-  to: Date;
+  dateTimeRange: Date[];
   testAgent: string;
   jobResultStatus: (string | object)[];
   wptStatus: (string | object)[];
