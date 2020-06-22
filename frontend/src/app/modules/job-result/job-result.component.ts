@@ -30,8 +30,6 @@ export class JobResultComponent implements OnInit {
   currentSortingRule: { [key: string]: string } = {column: 'date', direction: 'desc'};
   filter: JobResultFilter = {dateTimeRange: [], testAgent: '', jobResultStatus: [], wptStatus: [], description: ''};
 
-  minDate: Date;
-  maxDate: Date;
   DateTimeRange: typeof DateTimeRange = DateTimeRange;
 
   @ViewChild('dateTimeRangeFrom') private dateTimeRangeFrom: OwlDateTimeComponent<Date>;
@@ -224,7 +222,6 @@ export class JobResultComponent implements OnInit {
       .subscribe((jobResults: JobResult[]) => {
         this.jobResults = jobResults;
         this.filteredJobResults = jobResults;
-        this.setMinAndMaxDate(jobResults);
         this.applyFilter();
       });
   }
@@ -302,11 +299,6 @@ export class JobResultComponent implements OnInit {
       return false;
     }
     return true;
-  }
-
-  private setMinAndMaxDate(jobResults: JobResult[]): void {
-    this.minDate = jobResults && jobResults.length > 0 ? jobResults[jobResults.length - 1].date : null;
-    this.maxDate = jobResults && jobResults.length > 0 ? jobResults[0].date : null;
   }
 }
 

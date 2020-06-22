@@ -37,8 +37,8 @@
         </span>
         <div class="date-input-container">
           <span class="input-container date-input-wrapper">
-            <input [(ngModel)]="filter.dateTimeRange" [max]="maxDate" [min]="minDate"
-                   [owlDateTimeTrigger]="dateTimeRangeFrom" [owlDateTime]="dateTimeRangeFrom"
+            <input [(ngModel)]="filter.dateTimeRange" [owlDateTimeTrigger]="dateTimeRangeFrom"
+                   [owlDateTime]="dateTimeRangeFrom"
                    [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder.date.from' | translate)"
                    [selectMode]="'rangeFrom'" class="form-control input-filter input-from">
             <owl-date-time #dateTimeRangeFrom (afterPickerClosed)="setDateTimeRange(DateTimeRange.FROM)"
@@ -52,8 +52,8 @@
           </span>
 
           <span class="input-container date-input-wrapper">
-            <input [(ngModel)]="filter.dateTimeRange" [max]="maxDate" [min]="minDate"
-                   [owlDateTimeTrigger]="dateTimeRangeTo" [owlDateTime]="dateTimeRangeTo"
+            <input [(ngModel)]="filter.dateTimeRange" [owlDateTimeTrigger]="dateTimeRangeTo"
+                   [owlDateTime]="dateTimeRangeTo"
                    [placeholder]="('frontend.de.iteratec.osm.jobResult.filter.placeholder.date.to' | translate)"
                    [selectMode]="'rangeTo'"
                    class="form-control input-filter input-to">
