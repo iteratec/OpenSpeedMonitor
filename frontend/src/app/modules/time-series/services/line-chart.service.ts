@@ -21,10 +21,10 @@ import {TimeSeries} from 'src/app/modules/time-series/models/time-series.model';
 import {TimeSeriesPoint} from 'src/app/modules/time-series/models/time-series-point.model';
 import {parseDate} from 'src/app/utils/date.util';
 import {UrlBuilderService} from './url-builder.service';
-import {LineChartScaleService} from './chart-feature-services/line-chart-scale.service';
-import {LineChartDrawService} from './chart-feature-services/line-chart-draw.service';
-import {LineChartEventService} from './chart-feature-services/line-chart-event.service';
-import {LineChartLegendService} from './chart-feature-services/line-chart-legend.service';
+import {LineChartScaleService} from './chart-services/line-chart-scale.service';
+import {LineChartDrawService} from './chart-services/line-chart-draw.service';
+import {LineChartEventService} from './chart-services/line-chart-event.service';
+import {LineChartLegendService} from './chart-services/line-chart-legend.service';
 import {SummaryLabel} from '../models/summary-label.model';
 
 /**

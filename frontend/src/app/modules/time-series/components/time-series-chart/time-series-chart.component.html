@@ -6,8 +6,8 @@
         <span class="input-group dimension-group">
           <label
             class="input-group-addon settings-element dimension-label">{{'frontend.de.iteratec.isr.measurand.group.axisLabel.' + measurandGroup.key | translate}}</label>
-          <input (focusout)="adjustInputRangeAndInputValues('min', 'max', measurandGroup.key); redraw()"
-                 (input)="adjustInputRangeAndInputValuesByEvent($event, 'min', 'max', measurandGroup.key); redraw()"
+          <input (focusout)="adjustInputRangeAndInputValues('min', 'max', measurandGroup.key)"
+                 (input)="adjustInputByEvent($event, 'min', 'max', measurandGroup.key)"
                  [(ngModel)]="selectedTrimValues.min[measurandGroup.key]"
                  [max]="dataTrimInputRange.max[measurandGroup.key]"
                  [min]="dataTrimInputRange.min[measurandGroup.key]"
@@ -15,8 +15,8 @@
                  class="form-control settings-element trim-value-input-field min-input"
                  placeholder="{{'frontend.de.iteratec.osm.timeSeries.chart.settings.minimum' | translate}}"
                  type="number">
-          <input (focusout)="adjustInputRangeAndInputValues('max', 'min', measurandGroup.key); redraw()"
-                 (input)="adjustInputRangeAndInputValuesByEvent($event, 'max', 'min', measurandGroup.key); redraw()"
+          <input (focusout)="adjustInputRangeAndInputValues('max', 'min', measurandGroup.key)"
+                 (input)="adjustInputByEvent($event, 'max', 'min', measurandGroup.key)"
                  [(ngModel)]="selectedTrimValues.max[measurandGroup.key]"
                  [max]="dataTrimInputRange.max[measurandGroup.key]"
                  [min]="dataTrimInputRange.min[measurandGroup.key]"

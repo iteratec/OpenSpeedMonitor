@@ -87,13 +87,13 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
       this.spinnerService.showSpinner('time-series-line-chart-spinner');
       return;
     }
+
     const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
     this.lineChartService.prepareLegend(this.timeSeriesResults);
-
-    this.spinnerService.hideSpinner('time-series-line-chart-spinner');
-
     this.lineChartService.drawLineChart(timeSeries, this.timeSeriesResults.measurandGroups,
       this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
+
+    this.spinnerService.hideSpinner('time-series-line-chart-spinner');
   }
 
   redrawWithRestoredZoomAndLegendSelection(): void {
@@ -101,32 +101,33 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
       this.spinnerService.showSpinner('time-series-line-chart-spinner');
       return;
     }
+
     const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
-
-    this.spinnerService.hideSpinner('time-series-line-chart-spinner');
-
     this.lineChartService.drawLineChart(timeSeries, this.timeSeriesResults.measurandGroups,
       this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
     this.lineChartService.restoreZoom(timeSeries, this.selectedTrimValues);
+
+    this.spinnerService.hideSpinner('time-series-line-chart-spinner');
   }
 
   handlePointSelectionError(): void {
     this.ngxSmartModalService.open('pointSelectionErrorModal');
   }
 
-  adjustInputRangeAndInputValuesByEvent(event, selectedInput: string, otherInput: string, measurandGroup: string): void {
+  adjustInputByEvent(event, selectedInput: string, otherInput: string, measurandGroup: string): void {
     if (event.inputType !== 'insertText' && !event.inputType.startsWith('delete')) {
       this.considerMaxInputTmpRange(selectedInput, measurandGroup);
       this.adjustInputRangeAndInputValues(selectedInput, otherInput, measurandGroup);
     }
+    this.redrawWithRestoredZoomAndLegendSelection();
   }
 
   adjustInputRangeAndInputValues(selectedInput: string, otherInput: string, measurandGroup: string): void {
-    if (
-      this.selectedTrimValues.min[measurandGroup] &&
-      this.selectedTrimValues.max[measurandGroup] &&
-      this.selectedTrimValues.min[measurandGroup] >= this.selectedTrimValues.max[measurandGroup]
-    ) {
+    const previousSelectedMin = this.selectedTrimValues.min[measurandGroup];
+    const previousSelectedMax = this.selectedTrimValues.max[measurandGroup];
+
+    if (this.selectedTrimValues.min[measurandGroup] && this.selectedTrimValues.max[measurandGroup] &&
+        this.selectedTrimValues.min[measurandGroup] >= this.selectedTrimValues.max[measurandGroup]) {
       this.selectedTrimValues[otherInput][measurandGroup] = selectedInput === 'min' ?
         this.selectedTrimValues[selectedInput][measurandGroup] + this.dataTrimInputStep[measurandGroup] :
         this.selectedTrimValues[selectedInput][measurandGroup] - this.dataTrimInputStep[measurandGroup];
@@ -143,6 +144,11 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
     this.adjustInputValues(otherInput, inputRangeMin, inputRangeMax, measurandGroup);
     this.maxInputTmpRange[measurandGroup] = this.selectedTrimValues.min[measurandGroup] &&
       (this.selectedTrimValues.max[measurandGroup] === undefined || this.selectedTrimValues.max[measurandGroup] === null);
+
+    if (previousSelectedMin !== this.selectedTrimValues.min[measurandGroup] ||
+        previousSelectedMax !== this.selectedTrimValues.max[measurandGroup]) {
+      this.redrawWithRestoredZoomAndLegendSelection();
+    }
   }
 
   private setDataTrimSettings(): void {

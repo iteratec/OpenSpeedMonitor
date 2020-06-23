@@ -140,7 +140,7 @@ export class LineChartDrawService {
         .transition()
         .delay(100)
         .duration(500)
-        .attr('opacity', '1.0');
+        .attr('opacity', '0.7');
     });
   }
 
@@ -347,13 +347,13 @@ export class LineChartDrawService {
       lastTick = tick;
     });
 
-    return (onlyDays ? '%A' : '%H:%M') + ' _nl_ %Y-%m-%d';
+    return (onlyDays ? '%A' : '%H:%M') + ' \n %Y-%m-%d';
   }
 
   private insertLinebreakToLabels(index: number, groups: SVGGElement[]): void {
     d3Select(groups[index]).selectAll('g.tick text').each((_, nodeIndex: number, nodes: SVGTextElement[]) => {
       const element = d3Select(nodes[nodeIndex]);
-      const lines = element.text().split(' _nl_ ');
+      const lines = element.text().split(' \n ');
 
       // Reset the text as we will replace it
       element.text('');

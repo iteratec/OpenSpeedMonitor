@@ -380,7 +380,7 @@ export class LineChartEventService {
 
     d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) =>
     this.lineChartDrawService.updateXAxis(transition, xScale));
-    const yNewScales = this.lineChartScaleService.getYScalesInTimeRange(data, this.brushMinDate, this.brushMaxDate, height, dataTrimValues);
+    const yNewScales = this.lineChartScaleService.getYScalesInTimeRange(data, height, dataTrimValues, this.brushMinDate, this.brushMaxDate);
     this.lineChartDrawService.updateYAxes(yNewScales, width, yAxisWidth);
     Object.keys(yNewScales).forEach((key: string, index: number) => {
     this.lineChartDrawService.addDataLinesToChart(

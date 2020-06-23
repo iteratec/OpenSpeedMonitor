@@ -31,34 +31,22 @@ export class LineChartScaleService {
    */
   getYScales(dataList: { [key: string]: TimeSeries[] },
              height: number,
-             dataTrimValues: { [key: string]: { [key: string]: number } }
-  ): { [key: string]: D3ScaleLinear<number, number> } {
-    const yScales: { [key: string]: D3ScaleLinear<number, number> } = {};
-    Object.keys(dataList).forEach((key: string) => {
-      const min: number = dataTrimValues.min[key] ? Math.max(dataTrimValues.min[key], 0) : 0;
-      const max: number = this.getMaxValue(dataList[key], dataTrimValues.max[key]);
-      yScales[key] = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
-        .range([height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
-        .domain([min, max])
-        .nice();
-    });
-
-    return yScales;
+             dataTrimValues: { [key: string]: { [key: string]: number } }): { [key: string]: D3ScaleLinear<number, number> } {
+    return this.getYScalesInTimeRange(dataList, height, dataTrimValues);
   }
 
   /**
    * Determine the yScales for the given data in time range
    */
   getYScalesInTimeRange(dataList: { [key: string]: TimeSeries[] },
-                        minDate: Date,
-                        maxDate: Date,
                         height: number,
-                        dataTrimValues: { [key: string]: { [key: string]: number } }
-  ): { [key: string]: D3ScaleLinear<number, number> } {
+                        dataTrimValues: { [key: string]: { [key: string]: number } },
+                        minDate?: Date,
+                        maxDate?: Date): { [key: string]: D3ScaleLinear<number, number> } {
     const yScales: { [key: string]: D3ScaleLinear<number, number> } = {};
     Object.keys(dataList).forEach((key: string) => {
       const min: number = dataTrimValues.min[key] ? Math.max(dataTrimValues.min[key], 0) : 0;
-      const max: number = this.getMaxValueInTime(dataList[key], minDate, maxDate, dataTrimValues.max[key]);
+      const max: number = this.getMaxValueInTimeRange(dataList[key], dataTrimValues.max[key], minDate, maxDate);
       yScales[key] = d3ScaleLinear()              // Linear scale for the numbers on the Y-Axis
         .range([height, 0])  // Display the Y-Axis over the complete height - origin is top left corner, so height comes first
         .domain([min, max])
@@ -76,25 +64,17 @@ export class LineChartScaleService {
     return this.getDate(data, d3Max);
   }
 
-  private getMaxValue(data: TimeSeries[], dataTrimValue: number): number {
-    const maxValue: number = d3Max(data, (dataItem: TimeSeries) => {
-      return d3Max(dataItem.values, (point: TimeSeriesPoint) => {
-        return point.value;
-      });
-    });
-
-    return this.getMaxValueInTrimmedData(maxValue, dataTrimValue);
-  }
-
-  private getMaxValueInTime(data: TimeSeries[], minDate: Date, maxDate: Date, dataTrimValue: number): number {
-    const maxValueInTime = d3Max(data, (dataSeries: TimeSeries) => {
-      const valuesInRange = dataSeries.values.filter(value => value.date <= maxDate && value.date >= minDate);
+  private getMaxValueInTimeRange(data: TimeSeries[], dataTrimValue: number, minDate?: Date, maxDate?: Date): number {
+    const maxValue = d3Max(data, (dataSeries: TimeSeries) => {
+      const valuesInRange = minDate && maxDate ?
+        dataSeries.values.filter(value => value.date <= maxDate && value.date >= minDate) :
+        dataSeries.values;
       return d3Max(valuesInRange, (point: TimeSeriesPoint) => {
         return point.value;
       });
     });
 
-    return this.getMaxValueInTrimmedData(maxValueInTime, dataTrimValue);
+    return this.getMaxValueInTrimmedData(maxValue, dataTrimValue);
   }
 
   private getDate(dataList: { [key: string]: TimeSeries[] }, f: Function): Date {
