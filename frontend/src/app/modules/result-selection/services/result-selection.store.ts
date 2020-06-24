@@ -55,7 +55,7 @@ export class ResultSelectionStore {
 
   validQuery = false;
 
-  oldToNewChartKeyMap: {[key: string]: string} = {
+  private readonly oldToNewChartKeyMap: {[key: string]: string} = {
     // General
     selectedFolder: 'jobGroupIds',
     selectedPages: 'pageIds',
@@ -64,9 +64,6 @@ export class ResultSelectionStore {
     selectedLocations: 'locationIds',
 
     // Time series
-    comparativeFrom: 'fromComparative',
-    comparativeTo: 'toComparative',
-    selectedTimeFrameInterval: 'interval',
     trimAboveLoadTimes: 'maxLoadTimes',
     trimAboveRequestCounts: 'maxRequestCounts',
     trimAboveRequestSizes: 'maxRequestSizes',
