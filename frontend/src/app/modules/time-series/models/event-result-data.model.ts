@@ -1,15 +1,15 @@
 import {EventResultSeriesDTO} from './event-result-series.model';
-import {SummaryLabel} from "./summary-label.model";
+import {SummaryLabel} from './summary-label.model';
 
 export interface EventResultDataDTO {
-  measurandGroups: any;
+  measurandGroups: { [key: string]: string };
   series: EventResultSeriesDTO[];
   summaryLabels: SummaryLabel[];
   numberOfTimeSeries: number;
 }
 
 export class EventResultData implements EventResultDataDTO {
-  measurandGroups: any;
+  measurandGroups: { [key: string]: string };
   series: EventResultSeriesDTO[];
   summaryLabels: SummaryLabel[];
   numberOfTimeSeries: number;

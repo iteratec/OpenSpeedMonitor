@@ -1,7 +1,7 @@
 /**
  * Representation of one point on the y-axis (value) with additional informations.
  */
-import {WptInfo} from "./wpt-info.model";
+import {WptInfo} from './wpt-info.model';
 
 export class TimeSeriesPoint {
   date: Date;
@@ -10,9 +10,10 @@ export class TimeSeriesPoint {
   tooltipText: string;
   wptInfo: WptInfo;
 
-  constructor() {}
+  constructor() {
+  }
 
   public equals(other: TimeSeriesPoint) {
-    return other && this.date.getTime() == other.date.getTime() && this.tooltipText == other.tooltipText && this.value == other.value;
+    return other && this.date.getTime() === other.date.getTime() && this.tooltipText === other.tooltipText && this.value === other.value;
   }
 }
