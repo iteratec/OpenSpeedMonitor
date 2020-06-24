@@ -1,25 +1,28 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {ResultSelectionCommand} from "../../result-selection/models/result-selection-command.model";
-import {RemainingResultSelection} from "../../result-selection/models/remaing-result-selection.model";
-import {EMPTY, Observable, OperatorFunction} from "rxjs";
-import {GetBarchartCommand} from "../../aggregation/models/get-barchart-command.model";
-import {catchError} from "rxjs/operators";
-import {GetEventResultDataCommand} from "../models/get-line-chart-command.model";
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {ResultSelectionCommand} from '../../result-selection/models/result-selection-command.model';
+import {RemainingResultSelection} from '../../result-selection/models/remaing-result-selection.model';
+import {EMPTY, Observable, OperatorFunction} from 'rxjs';
+import {GetBarchartCommand} from '../../aggregation/models/get-barchart-command.model';
+import {catchError} from 'rxjs/operators';
+import {GetEventResultDataCommand} from '../models/get-line-chart-command.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class LinechartDataService {
+export class LineChartDataService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
 
-  fetchEventResultData<T>(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection, url: string): Observable<T> {
+  fetchEventResultData<T>(resultSelectionCommand: ResultSelectionCommand,
+                          remainingResultSelection: RemainingResultSelection,
+                          url: string): Observable<T> {
     const cmd: GetEventResultDataCommand = this.buildCommand(resultSelectionCommand, remainingResultSelection);
     const params = this.createParams(cmd);
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
-    )
+    );
   }
 
   fetchEvents<T>(resultSeclectionCommand: ResultSelectionCommand, url: string): Observable<T> {
@@ -37,7 +40,8 @@ export class LinechartDataService {
     )
   }
 
-  private buildCommand(resultSelectionCommand: ResultSelectionCommand, remainingResultSelection: RemainingResultSelection): GetEventResultDataCommand {
+  private buildCommand(resultSelectionCommand: ResultSelectionCommand,
+                       remainingResultSelection: RemainingResultSelection): GetEventResultDataCommand {
     return new GetEventResultDataCommand({
       preconfiguredDashboard: null,
       from: resultSelectionCommand.from,
@@ -60,7 +64,7 @@ export class LinechartDataService {
     let params = new HttpParams();
 
     Object.keys(getBarchartCommand).forEach(key => {
-      if(getBarchartCommand[key]) {
+      if (getBarchartCommand[key]) {
         if (key === 'from' || key === 'to') {
           params = params.append(key, getBarchartCommand[key].toISOString());
         } else if (key === 'interval') {

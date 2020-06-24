@@ -1,15 +1,15 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
-import { MeasurandsComponent } from './measurands.component';
-import {MeasurandSelectComponent} from "./measurand-select/measurand-select.component";
-import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {ResultSelectionService} from "../../services/result-selection.service";
-import {By} from "@angular/platform-browser";
-import {MeasurandGroup} from "../../../../models/measurand.model";
-import {PerformanceAspectType} from "../../../../models/perfomance-aspect.model";
-import {PerformanceAspectService} from "../../../../services/performance-aspect.service";
-import {ResponseWithLoadingState} from "../../../../models/response-with-loading-state.model";
+import {MeasurandsComponent} from './measurands.component';
+import {MeasurandSelectComponent} from './measurand-select/measurand-select.component';
+import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
+import {ResultSelectionStore} from '../../services/result-selection.store';
+import {ResultSelectionService} from '../../services/result-selection.service';
+import {By} from '@angular/platform-browser';
+import {MeasurandGroup} from '../../../../models/measurand.model';
+import {PerformanceAspectType} from '../../../../models/perfomance-aspect.model';
+import {PerformanceAspectService} from '../../../../services/performance-aspect.service';
+import {ResponseWithLoadingState} from '../../../../models/response-with-loading-state.model';
 
 describe('MeasurandsComponent', () => {
   let component: MeasurandsComponent;
@@ -19,14 +19,14 @@ describe('MeasurandsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [ SharedMocksModule ],
-      declarations: [ MeasurandsComponent, MeasurandSelectComponent ],
+      imports: [SharedMocksModule],
+      declarations: [MeasurandsComponent, MeasurandSelectComponent],
       providers: [
         ResultSelectionStore,
         ResultSelectionService
       ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {
@@ -40,22 +40,22 @@ describe('MeasurandsComponent', () => {
       isLoading: false,
       data: [
         {
-          icon: "fas fa-hourglass-start",
-          name: "PAGE_CONSTRUCTION_STARTED",
-          unit: "ms",
-          kind: "performance-aspect-type"
+          icon: 'fas fa-hourglass-start',
+          name: 'PAGE_CONSTRUCTION_STARTED',
+          unit: 'ms',
+          kind: 'performance-aspect-type'
         },
         {
-          icon: "fas fa-eye",
-          name: "PAGE_SHOWS_USEFUL_CONTENT",
-          unit: "ms",
-          kind: "performance-aspect-type"
+          icon: 'fas fa-eye',
+          name: 'PAGE_SHOWS_USEFUL_CONTENT',
+          unit: 'ms',
+          kind: 'performance-aspect-type'
         },
         {
-          icon: "fas fa-hand-pointer",
-          name: "PAGE_IS_USABLE",
-          unit: "ms",
-          kind: "performance-aspect-type"
+          icon: 'fas fa-hand-pointer',
+          name: 'PAGE_IS_USABLE',
+          unit: 'ms',
+          kind: 'performance-aspect-type'
         }
       ]
     };
@@ -65,17 +65,17 @@ describe('MeasurandsComponent', () => {
       name: 'frontend.de.iteratec.isr.measurand.group.LOAD_TIMES',
       values: [
         {
-          kind: "selectable-measurand",
+          kind: 'selectable-measurand',
           id: 'DOC_COMPLETE_TIME',
           name: 'frontend.de.iteratec.isr.measurand.DOC_COMPLETE_TIME'
         },
         {
-          kind: "selectable-measurand",
+          kind: 'selectable-measurand',
           id: 'DOM_TIME',
           name: 'frontend.de.iteratec.isr.measurand.DOM_TIME'
         },
         {
-          kind: "selectable-measurand",
+          kind: 'selectable-measurand',
           id: 'FIRST_BYTE',
           name: 'frontend.de.iteratec.isr.measurand.FIRST_BYTE'
         }

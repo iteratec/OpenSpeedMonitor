@@ -1,6 +1,6 @@
 <osm-menu></osm-menu>
 
-<div class="action-row">
+<div class="action-row" *ngIf="showTimeSeriesChart">
   <div class="col-md-12">
     <osm-time-series-line-chart [timeSeriesResults]="results$ | async"></osm-time-series-line-chart>
   </div>
@@ -8,7 +8,9 @@
 
 <div class="action-row">
   <div class="col-md-12">
-    <osm-result-selection-submit [measurandsRequired]="true" [applicationsRequired]="true" [pagesRequired]="true" (submit)="getData()"></osm-result-selection-submit>
+    <osm-result-selection-submit (submit)="getData()" [measurandsRequired]="true" [applicationsRequired]="true"
+                                 [pagesRequired]="true">
+    </osm-result-selection-submit>
   </div>
 </div>
 <div class="row">

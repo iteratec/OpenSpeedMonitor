@@ -64,14 +64,14 @@ class PageComparisonController extends ExceptionHandlerController {
         BarchartDatum comparativeSeries = mapToSeriesFor(aggregation.comperativeAggregation)
         return new BarchartSeries(
                 stacked: false,
-                dimensionalUnit: aggregation.baseAggregation.selectedMeasurand.getMeasurandGroup().unit.label,
+                dimensionalUnit: aggregation.baseAggregation.unit,
                 data: [baseSeries, comparativeSeries]
         )
     }
 
     private BarchartDatum mapToSeriesFor(BarchartAggregation aggregation) {
         return new BarchartDatum(
-                measurand: i18nService.msg("de.iteratec.isr.measurand.${aggregation.selectedMeasurand.name}", aggregation.selectedMeasurand.name),
+                measurand: i18nService.msg("de.iteratec.isr.measurand.${aggregation.measurandName}", aggregation.measurandName),
                 value: aggregation.value,
                 aggregationValue: aggregation.aggregationValue,
                 grouping: "${aggregation.jobGroup.name} | ${aggregation.page.name}")

@@ -10,9 +10,11 @@ import de.iteratec.osm.result.JobResult
 import de.iteratec.osm.result.JobResultStatus
 import de.iteratec.osm.result.WptStatus
 import de.iteratec.osm.util.PerformanceLoggingService
+import de.iteratec.osm.util.PerformanceLoggingService.IndentationDepth
 import grails.gorm.transactions.Transactional
 import org.apache.commons.lang.exception.ExceptionUtils
 import org.joda.time.DateTime
+
 
 import static de.iteratec.osm.util.PerformanceLoggingService.LogLevel.DEBUG
 
@@ -95,10 +97,10 @@ class JobRunService {
         JobResultStatus jobResultStatus = JobResultStatus.PERSISTANCE_ERROR
         try {
             WptResultXml resultXml
-            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", 1) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Polling jobrun ${testId} of job ${job.id}: fetching results from wptrserver.", IndentationDepth.ONE) {
                 resultXml = wptInstructionService.fetchResult(job.location.wptServer, testId)
             }
-            performanceLoggingService.logExecutionTime(DEBUG, "Handling WPT result of jobrun ${testId} of job ${job.id}", 1) {
+            performanceLoggingService.logExecutionTime(DEBUG, "Handling WPT result of jobrun ${testId} of job ${job.id}", IndentationDepth.ONE) {
                 jobResultStatus = jobResultPersisterService.handleWptResult(resultXml, testId, job)
             }
         } catch (Exception e) {

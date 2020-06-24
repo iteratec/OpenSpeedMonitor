@@ -1,7 +1,8 @@
 <div class="card form-horizontal">
   <h2>{{ 'frontend.de.iteratec.osm.resultSelection.application.title' | translate }}</h2>
-  <select multiple class="form-control" id='applications-selection' [(ngModel)]="selectedApplications" (ngModelChange)="onSelectionChange()">
-    <ng-container *ngIf="filteredApplications?.length > 0; else elseBlock" >
+  <select [(ngModel)]="selectedApplications" (ngModelChange)="onSelectionChange()" class="form-control" id='applications-selection'
+          multiple>
+    <ng-container *ngIf="filteredApplications?.length > 0; else elseBlock">
       <option *ngFor="let application of filteredApplications" [ngValue]="application.id">
         {{application.name}}
       </option>
@@ -14,7 +15,8 @@
   </select>
 
   <div class="tag-button-group">
-    <button class="btn btn-xs btn-default tag-buttons" id="filterBtn" *ngFor="let tag of selectableTags" (click)="selectTag(tag)" [ngClass]="{'active': isTagSelected&&selectedTag===tag}">
+    <button (click)="selectTag(tag)" *ngFor="let tag of selectableTags" [ngClass]="{'active': isTagSelected&&selectedTag===tag}"
+            class="btn btn-xs btn-default tag-buttons" id="filterBtn">
       <i class="fas fa-filter"></i>
       &nbsp;{{tag}}
     </button>

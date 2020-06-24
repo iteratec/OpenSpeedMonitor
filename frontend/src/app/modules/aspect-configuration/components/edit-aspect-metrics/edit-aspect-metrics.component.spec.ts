@@ -1,24 +1,25 @@
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {EditAspectMetricsComponent} from './edit-aspect-metrics.component';
-import {SharedMocksModule} from "../../../../testing/shared-mocks.module";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {ApplicationService} from "../../../../services/application.service";
-import {AspectConfigurationService} from "../../services/aspect-configuration.service";
-import {AspectMetricsComponent} from "../aspect-metrics/aspect-metrics.component";
-import {BehaviorSubject, ReplaySubject} from "rxjs";
-import {Application} from "../../../../models/application.model";
-import {Page} from "../../../../models/page.model";
-import {PerformanceAspect} from "../../../../models/perfomance-aspect.model";
-import {MetricFinderComponent} from "../../../metric-finder/metric-finder.component";
-import {LineChartComponent} from "../../../metric-finder/components/line-chart/line-chart.component";
-import {ComparableFilmstripsComponent} from "../../../metric-finder/components/comparable-filmstrips/comparable-filmstrips.component";
-import {MetricSelectionComponent} from "../../../metric-finder/components/metric-selection/metric-selection.component";
-import {FilmstripComponent} from "../../../metric-finder/components/filmstrip/filmstrip.component";
-import {MetricFinderService} from "../../../metric-finder/services/metric-finder.service";
-import {FilmstripService} from "../../../metric-finder/services/filmstrip.service";
-import {GrailsBridgeService} from "../../../../services/grails-bridge.service";
-import {GlobalOsmNamespace} from "../../../../models/global-osm-namespace.model";
+import {SharedMocksModule} from '../../../../testing/shared-mocks.module';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {ApplicationService} from '../../../../services/application.service';
+import {AspectConfigurationService} from '../../services/aspect-configuration.service';
+import {AspectMetricsComponent} from '../aspect-metrics/aspect-metrics.component';
+import {BehaviorSubject, ReplaySubject} from 'rxjs';
+import {Application} from '../../../../models/application.model';
+import {Page} from '../../../../models/page.model';
+import {PerformanceAspect} from '../../../../models/perfomance-aspect.model';
+import {MetricFinderComponent} from '../../../metric-finder/metric-finder.component';
+import {LineChartComponent} from '../../../metric-finder/components/line-chart/line-chart.component';
+import {ComparableFilmstripsComponent} from '../../../metric-finder/components/comparable-filmstrips/comparable-filmstrips.component';
+import {MetricSelectionComponent} from '../../../metric-finder/components/metric-selection/metric-selection.component';
+import {FilmstripComponent} from '../../../metric-finder/components/filmstrip/filmstrip.component';
+import {MetricFinderService} from '../../../metric-finder/services/metric-finder.service';
+import {FilmstripService} from '../../../metric-finder/services/filmstrip.service';
+import {GrailsBridgeService} from '../../../../services/grails-bridge.service';
+import {GlobalOsmNamespace} from '../../../../models/global-osm-namespace.model';
+import {ResultSelectionService} from '../../../result-selection/services/result-selection.service';
 
 describe('EditAspectMetricsComponent', () => {
   let component: EditAspectMetricsComponent;
@@ -50,6 +51,7 @@ describe('EditAspectMetricsComponent', () => {
         AspectConfigurationService,
         MetricFinderService,
         FilmstripService,
+        ResultSelectionService,
         {
           provide: GrailsBridgeService,
           useClass: MockGrailsBridgeService

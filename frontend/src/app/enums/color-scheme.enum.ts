@@ -13,7 +13,7 @@ export enum COLOR_SCHEME {
   DARK_BLUE             = '#751ec3', // dark blue
   RED                   = '#ff0000', // red
   BLACK                 = '#0d233a', // black
-  YELLOW                = '#ffdb00', // yellow  
+  YELLOW                = '#ffdb00', // yellow
   HIGHCHARTS_YELLOW     = '#ffdc08', // highcharts yellow
   HIGHCHARTS_PURPLE     = '#492970', // highcharts purple
   HIGHCHARTS_LIGHT_BLUE = '#77a1e5', // highcharts light blue
@@ -21,7 +21,7 @@ export enum COLOR_SCHEME {
   HIGHCHARTS_RED        = '#910000', // highcharts red
   HIGHCHARTS_BLACK      = '#0d233a', // highcharts black
   HIGHCHARTS_BLUE       = '#2f7ed8', // highcharts blue
-  HIGHCHARTS_GREEN      = '#8bbc21' // highcharts green
+  HIGHCHARTS_GREEN      = '#8bbc21'  // highcharts green
 }
 
 export function getColorScheme(): string[] {

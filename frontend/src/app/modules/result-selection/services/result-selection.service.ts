@@ -1,21 +1,28 @@
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {EMPTY, Observable, OperatorFunction} from "rxjs";
-import {catchError} from "rxjs/operators";
-import {URL} from "../../../enums/url.enum";
-import {Caller, ResultSelectionCommand} from "../models/result-selection-command.model";
+import {HttpClient, HttpParams} from '@angular/common/http';
+import {EMPTY, Observable, OperatorFunction} from 'rxjs';
+import {catchError} from 'rxjs/operators';
+import {URL} from '../../../enums/url.enum';
+import {Caller, ResultSelectionCommand} from '../models/result-selection-command.model';
+import {MeasurandGroup} from '../../../models/measurand.model';
 
 @Injectable()
 export class ResultSelectionService {
   constructor(private http: HttpClient) {
   }
 
-  fetchResultSelectionData<T>(resultSelectionCommand: ResultSelectionCommand, url: URL): Observable<T> {
+  fetchMeasurands(): Observable<MeasurandGroup[]> {
+    return this.http.get<MeasurandGroup[]>(URL.MEASURANDS).pipe(
+      this.handleError()
+    );
+  }
+
+  fetchResultSelectionData<T>(url: URL, resultSelectionCommand: ResultSelectionCommand): Observable<T> {
     if (resultSelectionCommand.from && resultSelectionCommand.to) {
       const params = this.createParamsFromResultSelectionCommand(resultSelectionCommand);
       return this.http.get<T>(url, {params: params}).pipe(
         this.handleError()
-      )
+      );
     }
     return new Observable<T>();
   }
@@ -32,7 +39,7 @@ export class ResultSelectionService {
       }
       if (resultSelectionCommand[key].length > 0) {
         resultSelectionCommand[key].forEach(id => {
-          params = params.append(key, id.toString())
+          params = params.append(key, id.toString());
         });
       }
     });

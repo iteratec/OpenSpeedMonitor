@@ -10,6 +10,8 @@ import {FilmstripServiceMock} from './services/filmstrip.service.mock';
 import {ComparableFilmstripsComponent} from './components/comparable-filmstrips/comparable-filmstrips.component';
 import {MetricFinderServiceMock} from './services/metric-finder.service.mock';
 import {MetricSelectionComponent} from './components/metric-selection/metric-selection.component';
+import {ResultSelectionService} from '../result-selection/services/result-selection.service';
+import {SharedMocksModule} from '../../testing/shared-mocks.module';
 
 describe('MetricFinderComponent', () => {
   let component: MetricFinderComponent;
@@ -25,7 +27,10 @@ describe('MetricFinderComponent', () => {
         ComparableFilmstripsComponent,
         MetricSelectionComponent
       ],
-      imports: [FormsModule],
+      imports: [
+        FormsModule,
+        SharedMocksModule
+      ],
       providers: [
         {
           provide: MetricFinderService,
@@ -33,7 +38,8 @@ describe('MetricFinderComponent', () => {
         }, {
           provide: FilmstripService,
           useClass: FilmstripServiceMock
-        }
+        },
+        ResultSelectionService
       ]
     })
       .compileComponents();

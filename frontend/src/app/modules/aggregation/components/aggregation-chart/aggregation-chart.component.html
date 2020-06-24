@@ -2,63 +2,76 @@
   <div class="aggregation-chart">
     <osm-spinner [spinnerId]="'aggregation-chart-spinner'"></osm-spinner>
     <div class="filter-dropdown-group">
-      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="stack-bars-switch" *ngIf="!isHidden">
-        <label class="btn btn-sm btn-default" id="switch-beside-button"
-               [class.active]="!aggregationChartDataService.stackBars" (click)="changeStackBars(beside.value); redraw()">
-          <input #beside type="radio" name="stackBars" [value]="false">
-          Beside
-        </label>
-        <label class="btn btn-sm btn-default" id="switch-infront-button"
-               [class.active]="aggregationChartDataService.stackBars" (click)="changeStackBars(inFront.value); redraw()">
-          <input #inFront type="radio" name="stackBars" [value]="true">
-          In Front
-        </label>
+      <div *ngIf="showDiagramTypeSwitch" class="btn-group pull-left perc-element" data-toggle="buttons"
+           id="stack-bars-switch">
+        <button (click)="selectDiagramType('grouped')" [class.active]="!aggregationChartDataService.stackBars"
+                class="btn btn-sm btn-default"
+                id="switch-beside-button">
+          {{'frontend.de.iteratec.osm.barchart.settings.beside' | translate }}
+        </button>
+        <button (click)="selectDiagramType('stacked')" [class.active]="aggregationChartDataService.stackBars"
+                class="btn btn-sm btn-default"
+                id="switch-infront-button">
+          {{'frontend.de.iteratec.osm.barchart.settings.inFront' | translate }}
+        </button>
       </div>
-      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="aggregation-value-switch">
-        <label class="btn btn-sm btn-default" id="aggregation-average-button"
-               [class.active]="aggregationChartDataService.aggregationType === 'avg'"
-               (click)="aggregationChartDataService.aggregationType = average.value; redraw()">
-          <input #average type="radio" name="aggregationValue" value="avg" checked>
-          Average
-        </label>
-        <label class="btn btn-sm btn-default" id="aggregation-percentile-button"
-               [class.active]="aggregationChartDataService.aggregationType === 'percentile'"
-               (click)="aggregationChartDataService.aggregationType = percentile.value; redraw()">
-          <input #percentile type="radio" name="aggregationValue" value="percentile">
-          Percentile
-        </label>
+      <div class="btn-group pull-left perc-element" data-toggle="buttons" id="aggregation-type-switch">
+        <button (click)="selectAggregationType('avg')"
+                [class.active]="aggregationChartDataService.aggregationType === 'avg'"
+                class="btn btn-sm btn-default" id="aggregation-average-button">
+          {{'frontend.de.iteratec.osm.barchart.settings.average' | translate }}
+        </button>
+        <button (click)="selectAggregationType('percentile')"
+                [class.active]="aggregationChartDataService.aggregationType === 'percentile'"
+                [disabled]="!enoughPercentileValues()"
+                class="btn btn-sm btn-default" id="aggregation-percentile-button"
+                title="{{!enoughPercentileValues() ? ('frontend.de.iteratec.osm.barchart.settings.notEnoughData' | translate) : ''}}">
+          {{'frontend.de.iteratec.osm.barchart.settings.percentile' | translate }}
+        </button>
+
       </div>
 
-      <input class="btn btn-sm btn-default perc-element" id="percentage-field" type="number" placeholder="%"
-             [(ngModel)]="percentileValue" (ngModelChange)="reloadPercentile()" min="1" max="100" style="max-width: 5em;" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
-      <input class="form-control perc-element perc-slider" id="percentage-slider" type="range"
-             [(ngModel)]="percentileValue" (mouseup)="reloadPercentile()" min="5" max="100" step="5" [disabled]="aggregationChartDataService.aggregationType === 'avg'"/>
+      <input (ngModelChange)="reloadPercentile()" *ngIf="enoughPercentileValues()"
+             [(ngModel)]="aggregationChartDataService.percentileValue"
+             [disabled]="aggregationChartDataService.aggregationType === 'avg'"
+             class="btn btn-sm btn-default perc-element" id="percentage-field" max="100" min="1"
+             placeholder="%" style="max-width: 5em;"
+             type="number"/>
+      <input (mouseup)="reloadPercentile()" *ngIf="enoughPercentileValues()"
+             [(ngModel)]="aggregationChartDataService.percentileValue"
+             [disabled]="aggregationChartDataService.aggregationType === 'avg'"
+             class="form-control perc-element perc-slider" id="percentage-slider" max="100" min="5"
+             step="5"
+             type="range"/>
 
-      <button id="filter-dropdown" type="button" class="btn btn-default btn-sm dropdown-toggle perc-element"
+      <button aria-expanded="false" aria-haspopup="true" class="btn btn-default btn-sm dropdown-toggle perc-element"
               data-toggle="dropdown"
-              aria-haspopup="true" aria-expanded="false">Filter <span class="caret"></span>
+              id="filter-dropdown" type="button">{{'frontend.de.iteratec.osm.barchart.filter' | translate }} <span
+        class="caret"></span>
       </button>
       <ul class="dropdown-menu pull-right">
-        <li id="all-bars-header" class="dropdown-header">
+        <li class="dropdown-header" id="all-bars-header">
           {{'frontend.de.iteratec.osm.barchart.filter.noFilterHeader' | translate }}
         </li>
         <li>
-          <a class="chart-filter" (click)="selectFilter('desc')"><i [ngClass]="aggregationChartDataService.descSelected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+          <a (click)="selectFilter('desc')" class="chart-filter"><i
+            [ngClass]="aggregationChartDataService.descSelected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
             {{'frontend.de.iteratec.osm.barchart.filter.noFilterDesc' | translate }}
           </a>
         </li>
         <li>
-          <a class="chart-filter" (click)="selectFilter('asc')"><i [ngClass]="aggregationChartDataService.ascSelected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
+          <a (click)="selectFilter('asc')" class="chart-filter"><i
+            [ngClass]="aggregationChartDataService.ascSelected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
             {{'frontend.de.iteratec.osm.barchart.filter.noFilterAsc' | translate }}
           </a>
         </li>
         <ng-container *ngIf="hasFilterRules">
-          <li id="customer-journey-header" class="dropdown-header">
+          <li class="dropdown-header" id="customer-journey-header">
             {{'frontend.de.iteratec.osm.barchart.filter.customerJourneyHeader' | translate}}
           </li>
           <li *ngFor="let filterRule of filterRules | keyvalue">
-            <a class="chart-filter" (click)="selectFilter(filterRule.key)">
-              <i [ngClass]="filterRule.value.selected ? 'fas fa-check' : 'fas fa-check filter-inactive'" ></i>
+            <a (click)="selectFilter(filterRule.key)" class="chart-filter">
+              <i [ngClass]="filterRule.value.selected ? 'fas fa-check' : 'fas fa-check filter-inactive'"></i>
               {{filterRule.key}}
             </a>
           </li>
@@ -66,7 +79,7 @@
       </ul>
 
       <div class="in-chart-buttons">
-        <a data-toggle="modal" role="button" title="Download as PNG">
+        <a data-toggle="modal" role="button" title="{{'frontend.de.iteratec.osm.barchart.download.png' | translate}}">
           <i class="fas fa-download"></i>
         </a>
       </div>
@@ -74,7 +87,8 @@
     </div>
 
     <div class="svg-container">
-      <svg #svg id="aggregation-chart-svg" class="aggregation-chart-svg" xmlns="http://www.w3.org/1999/html" (window:resize)="redraw()"></svg>
+      <svg #svg (window:resize)="redraw()" class="aggregation-chart-svg" id="aggregation-chart-svg"
+           xmlns="http://www.w3.org/1999/html"></svg>
     </div>
   </div>
 </div>

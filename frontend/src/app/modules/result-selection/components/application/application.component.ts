@@ -1,28 +1,35 @@
-import {Component, ViewEncapsulation,} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {SelectableApplication} from 'src/app/models/application.model';
-import {ResultSelectionStore} from "../../services/result-selection.store";
-import {ResultSelectionCommandParameter} from "../../models/result-selection-command.model";
-import {UiComponent} from "../../../../enums/ui-component.enum";
-import {ActivatedRoute, Params} from "@angular/router";
+import {ResultSelectionStore} from '../../services/result-selection.store';
+import {ResultSelectionCommandParameter} from '../../models/result-selection-command.model';
+import {UiComponent} from '../../../../enums/ui-component.enum';
+import {ActivatedRoute} from '@angular/router';
 
 @Component({
-    selector: 'osm-result-selection-application',
-    templateUrl: './application.component.html',
-    styleUrls: ['./application.component.scss'],
-    encapsulation: ViewEncapsulation.None
-  })
+  selector: 'osm-result-selection-application',
+  templateUrl: './application.component.html',
+  styleUrls: ['./application.component.scss'],
+  encapsulation: ViewEncapsulation.None
+})
 
-export class ApplicationComponent {
+export class ApplicationComponent implements OnInit {
+
   applications: SelectableApplication[];
   filteredApplications: SelectableApplication[];
   selectedApplications: number[] = [];
   selectableTags: string[];
-  selectedTag: string = '';
+  selectedTag = '';
   unfilteredSelectedApplications: number[] = [];
 
   constructor(private resultSelectionStore: ResultSelectionStore, private route: ActivatedRoute) {
     this.resultSelectionStore.applications$.subscribe(applications => {
       this.updateApplicationsAndTags(applications.data);
+    });
+  }
+
+  private static sortByName(applications: SelectableApplication[]): SelectableApplication[] {
+    return applications.sort((a, b) => {
+      return a.name.localeCompare(b.name);
     });
   }
 
@@ -42,7 +49,7 @@ export class ApplicationComponent {
   }
 
   selectTag(tag: string): void {
-    if (tag == this.selectedTag && this.isTagSelected()) {
+    if (tag === this.selectedTag && this.isTagSelected()) {
       this.selectedTag = '';
     } else {
       this.selectedTag = tag;
@@ -51,7 +58,7 @@ export class ApplicationComponent {
   }
 
   isTagSelected(): boolean {
-    return this.selectedTag != '';
+    return this.selectedTag !== '';
   }
 
   updateApplicationsAndTags(applications: SelectableApplication[]) {
@@ -71,12 +78,12 @@ export class ApplicationComponent {
   private updateTags(applications: SelectableApplication[]) {
     if (applications) {
       this.selectableTags = applications.map(value => value.tags).reduce((a, b) =>
-         a.concat(b), []).filter((v, i, a) =>
-         a.indexOf(v) === i);
+        a.concat(b), []).filter((v, i, a) =>
+        a.indexOf(v) === i);
     } else {
       this.selectableTags = [];
     }
-    if (this.selectableTags.indexOf(this.selectedTag) == -1) {
+    if (this.selectableTags.indexOf(this.selectedTag) === -1) {
       this.selectedTag = '';
     }
   }
@@ -105,7 +112,7 @@ export class ApplicationComponent {
 
   private filterSelectedApplications(): void {
     let selectedApplications: number[] = [];
-    if (this.unfilteredSelectedApplications.length == 0) {
+    if (this.unfilteredSelectedApplications.length === 0) {
       selectedApplications = this.selectedApplications.filter((selectedAppId: number) =>
         this.filteredApplications.map(item => item.id).includes(selectedAppId)
       );
@@ -118,7 +125,7 @@ export class ApplicationComponent {
       selectedApplications = this.unfilteredSelectedApplications.filter((selectedAppId: number) =>
         this.filteredApplications.map(item => item.id).includes(selectedAppId)
       );
-      if (this.unfilteredSelectedApplications.length == selectedApplications.length) {
+      if (this.unfilteredSelectedApplications.length === selectedApplications.length) {
         this.unfilteredSelectedApplications = [];
       }
       if (selectedApplications.length > this.selectedApplications.length) {
@@ -126,11 +133,5 @@ export class ApplicationComponent {
         this.resultSelectionStore.setResultSelectionCommandIds(this.selectedApplications, ResultSelectionCommandParameter.APPLICATIONS);
       }
     }
-  }
-
-  private static sortByName(applications: SelectableApplication[]): SelectableApplication[] {
-    return applications.sort((a, b) => {
-      return a.name.localeCompare(b.name);
-    });
   }
 }

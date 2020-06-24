@@ -1,0 +1,162 @@
+@import "../../../../../styles/colors";
+
+osm-time-series-line-chart {
+  #time-series-line-chart-container {
+    rect.overlay {
+      cursor: default !important
+    }
+  }
+
+  #marker-tooltip {
+    position: absolute;
+    text-align: left;
+    font: 10pt sans-serif;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+    pointer-events: none;
+
+    tr.active {
+      background: rgba(255, 255, 255, 0.75);
+      color: black;
+    }
+
+    td {
+      padding: 0.2em 0.75em 0.2em 0.75em;
+
+      i {
+        padding-right: 5px;
+      }
+    }
+  }
+
+  #time-series-chart-drawing-area {
+    .axis {
+      .domain {
+        display: none;
+      }
+
+      line {
+        stroke: $color-contour-medium;
+        opacity: 0.7;
+      }
+
+      text {
+        fill: $color-text-light;
+      }
+
+      .description {
+        font-size: 14px;
+        fill: $color-text-light;
+        opacity: 0.5;
+      }
+
+      .unit {
+        text-anchor: middle;
+      }
+    }
+
+    .y-axis text {
+      opacity: 0.7;
+    }
+
+    .marker-line {
+      stroke: $color-contour-medium;
+      stroke-width: 1px;
+      opacity: 0.7;
+    }
+
+    circle.dot {
+      stroke-width: 2px;
+      fill: white;
+    }
+  }
+}
+
+.time-series-chart {
+  position: relative;
+  width: 100%;
+}
+
+.summary-label-key {
+  font-weight: bold;
+}
+
+.summary-label {
+  font-weight: normal;
+}
+
+.legend-entry {
+  cursor: pointer;
+}
+
+.legend-text {
+  font-size: 12px;
+}
+
+#pointSelectionErrorModal {
+  header {
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  main {
+    position: relative;
+    padding: 15px;
+  }
+
+  footer {
+    padding: 15px;
+    text-align: right;
+    border-top: 1px solid #e5e5e5;
+  }
+}
+
+@media screen and (max-width: 1650px) {
+  .settings-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    z-index: 2;
+    padding: 6px 12px;
+  }
+}
+
+@media screen and (min-width: 1651px) {
+  .settings-row {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    z-index: 2;
+    padding: 6px 12px;
+  }
+}
+
+.settings-row {
+  .dimension-group {
+    margin-right: 1em;
+  }
+
+  .settings-element {
+    font-size: 12px;
+  }
+
+  .dimension-label {
+    background-color: $color-background;
+  }
+
+  .trim-value-input-field {
+    width: 7em;
+    height: 30px;
+  }
+
+  .min-input {
+    border-right: 0;
+  }
+}
