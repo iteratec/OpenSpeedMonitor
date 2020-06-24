@@ -2,9 +2,6 @@
 
 osm-time-series-line-chart {
   #time-series-line-chart-container {
-    position: relative;
-    width: 100%;
-
     rect.overlay {
       cursor: default !important
     }
@@ -42,6 +39,7 @@ osm-time-series-line-chart {
 
       line {
         stroke: $color-contour-medium;
+        opacity: 0.7;
       }
 
       text {
@@ -51,6 +49,7 @@ osm-time-series-line-chart {
       .description {
         font-size: 14px;
         fill: $color-text-light;
+        opacity: 0.5;
       }
 
       .unit {
@@ -58,9 +57,14 @@ osm-time-series-line-chart {
       }
     }
 
+    .y-axis text {
+      opacity: 0.7;
+    }
+
     .marker-line {
       stroke: $color-contour-medium;
       stroke-width: 1px;
+      opacity: 0.7;
     }
 
     circle.dot {
@@ -68,6 +72,11 @@ osm-time-series-line-chart {
       fill: white;
     }
   }
+}
+
+.time-series-chart {
+  position: relative;
+  width: 100%;
 }
 
 .summary-label-key {
@@ -101,5 +110,53 @@ osm-time-series-line-chart {
     padding: 15px;
     text-align: right;
     border-top: 1px solid #e5e5e5;
+  }
+}
+
+@media screen and (max-width: 1650px) {
+  .settings-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    position: absolute;
+    top: -10px;
+    right: 5px;
+    z-index: 2;
+    padding: 6px 12px;
+  }
+}
+
+@media screen and (min-width: 1651px) {
+  .settings-row {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    top: -5px;
+    right: 5px;
+    z-index: 2;
+    padding: 6px 12px;
+  }
+}
+
+.settings-row {
+  .dimension-group {
+    margin-right: 1em;
+  }
+
+  .settings-element {
+    font-size: 12px;
+  }
+
+  .dimension-label {
+    background-color: $color-background;
+  }
+
+  .trim-value-input-field {
+    width: 7em;
+    height: 30px;
+  }
+
+  .min-input {
+    border-right: 0;
   }
 }
