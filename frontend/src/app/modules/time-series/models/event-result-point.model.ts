@@ -1,4 +1,4 @@
-import {WptInfo} from "./wpt-info.model";
+import {WptInfo} from './wpt-info.model';
 
 export interface EventResultPointDTO {
   date: Date;

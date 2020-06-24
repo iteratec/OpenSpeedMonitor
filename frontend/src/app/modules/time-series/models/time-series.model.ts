@@ -8,7 +8,7 @@ export class TimeSeries {
   values: TimeSeriesPoint[];
 
   constructor() {
-    this.key = "";
+    this.key = '';
     this.values = [new TimeSeriesPoint()];
   }
 }

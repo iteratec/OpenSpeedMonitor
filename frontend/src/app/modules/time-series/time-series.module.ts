@@ -1,12 +1,13 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { TimeSeriesComponent } from './time-series.component';
-import {RouterModule, Routes} from "@angular/router";
-import {SharedModule} from "../shared/shared.module";
-import {ResultSelectionModule} from "../result-selection/result-selection.module";
-import {TimeSeriesLineChartComponent} from './components/time-series-line-chart/time-series-line-chart.component';
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {TimeSeriesComponent} from './time-series.component';
+import {RouterModule, Routes} from '@angular/router';
+import {SharedModule} from '../shared/shared.module';
+import {ResultSelectionModule} from '../result-selection/result-selection.module';
+import {TimeSeriesChartComponent} from './components/time-series-chart/time-series-chart.component';
 import {LineChartService} from './services/line-chart.service';
-import {LinechartDataService} from './services/linechart-data.service';
+import {LineChartDataService} from './services/line-chart-data.service';
+import {FormsModule} from '@angular/forms';
 
 const TimeSeriesRoutes: Routes = [
   {path: 'showAll', component: TimeSeriesComponent},
@@ -15,20 +16,22 @@ const TimeSeriesRoutes: Routes = [
 @NgModule({
   declarations: [
     TimeSeriesComponent,
-    TimeSeriesLineChartComponent
+    TimeSeriesChartComponent
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(TimeSeriesRoutes),
     SharedModule,
-    ResultSelectionModule
+    ResultSelectionModule,
+    FormsModule
   ],
   providers: [
     LineChartService,
-    LinechartDataService
+    LineChartDataService
   ],
   exports: [
     TimeSeriesComponent
   ]
 })
-export class TimeSeriesModule { }
+export class TimeSeriesModule {
+}

@@ -1,4 +1,4 @@
-import {TimeSeriesPoint} from "./time-series-point.model";
+import {TimeSeriesPoint} from './time-series-point.model';
 
 export class PointsSelection {
 
@@ -17,7 +17,7 @@ export class PointsSelection {
   }
 
   public unselectPoint(pointToSelect: TimeSeriesPoint) {
-    this.selectedPoints = this.selectedPoints.filter(elem => !elem.equals(pointToSelect))
+    this.selectedPoints = this.selectedPoints.filter(elem => !elem.equals(pointToSelect));
   }
 
   public count(): number {
@@ -29,7 +29,7 @@ export class PointsSelection {
   }
 
   public getFirst(): TimeSeriesPoint {
-    if(this.count() === 0) {
+    if (this.count() === 0) {
       return null;
     }
     return this.selectedPoints[0];
