@@ -31,6 +31,17 @@ osm-time-series-line-chart {
     }
   }
 
+  #event-marker-tooltip {
+    position: absolute;
+    text-align: left;
+    font: 10pt sans-serif;
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+    pointer-events: none;
+  }
+
   #time-series-chart-drawing-area {
     .axis {
       .domain {

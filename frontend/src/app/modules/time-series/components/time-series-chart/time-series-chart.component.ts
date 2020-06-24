@@ -15,6 +15,7 @@ import {LineChartService} from '../../services/line-chart.service';
 import {NgxSmartModalService} from 'ngx-smart-modal';
 import {SpinnerService} from '../../../shared/services/spinner.service';
 import {TranslateService} from '@ngx-translate/core';
+import {TimeEvent} from "../../models/event.model";
 
 
 @Component({
@@ -89,8 +90,9 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
     }
 
     const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
-    this.lineChartService.prepareLegend(this.timeSeriesResults);
-    this.lineChartService.drawLineChart(timeSeries, this.timeSeriesResults.measurandGroups,
+    const eventData: TimeEvent[] = this.lineChartService.prepareEventsData(this.timeSeriesResults.events);
+    this.lineChartService.prepareLegendData(this.timeSeriesResults);
+    this.lineChartService.drawLineChart(timeSeries, eventData, this.timeSeriesResults.measurandGroups,
       this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
 
     this.spinnerService.hideSpinner('time-series-line-chart-spinner');
@@ -103,9 +105,10 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
     }
 
     const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
-    this.lineChartService.drawLineChart(timeSeries, this.timeSeriesResults.measurandGroups,
+    const eventData: TimeEvent[] = this.lineChartService.prepareEventsData(this.timeSeriesResults.events);
+    this.lineChartService.drawLineChart(timeSeries, eventData, this.timeSeriesResults.measurandGroups,
       this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
-    this.lineChartService.restoreZoom(timeSeries, this.selectedTrimValues);
+    this.lineChartService.restoreZoom(timeSeries, this.selectedTrimValues, eventData);
 
     this.spinnerService.hideSpinner('time-series-line-chart-spinner');
   }
