@@ -39,7 +39,7 @@ export class JobResultComponent implements OnInit {
   private calendarEventSubscription: Subscription;
 
   constructor(private dataService: JobResultDataService,
-              public statusService: StatusService,
+              private statusService: StatusService,
               private route: ActivatedRoute,
               private router: Router,
               private dateTimeAdapter: DateTimeAdapter<any>,
@@ -165,6 +165,18 @@ export class JobResultComponent implements OnInit {
       return !isNaN(this.filter.dateTimeRange[1].valueOf());
     }
     return false;
+  }
+
+  isTestNotTerminated(jobResultStatus: string): boolean {
+    return this.statusService.isTestNotTerminated(jobResultStatus);
+  }
+
+  isTestSuccessful(jobResultStatus: string): boolean {
+    return this.statusService.isTestSuccessful(jobResultStatus);
+  }
+
+  hasTestFailed(jobResultStatus: string): boolean {
+    return this.statusService.hasTestFailed(jobResultStatus);
   }
 
   private setCalendarLanguage(): void {

@@ -153,9 +153,9 @@
     <tbody>
     <tr *ngFor="let test of filteredJobResults">
       <td>
-        <a [class.job-status-error]="statusService.hasTestFailed(test.jobResultStatus)"
-           [class.text-info]="statusService.isTestNotTerminated(test.jobResultStatus)"
-           [class.text-success]="statusService.isTestSuccessful(test.jobResultStatus)"
+        <a [class.job-status-error]="hasTestFailed(test.jobResultStatus)"
+           [class.text-info]="isTestNotTerminated(test.jobResultStatus)"
+           [class.text-success]="isTestSuccessful(test.jobResultStatus)"
            href="{{ test.testUrl }}">
           <div><strong>{{ test.date | date:('frontend.de.iteratec.osm.jobResult.dateFormat' | translate) }}</strong></div>
         </a>
