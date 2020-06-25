@@ -75,12 +75,52 @@ osm-time-series-line-chart {
     .marker-line {
       stroke: $color-contour-medium;
       stroke-width: 1px;
-      opacity: 0.7;
+      shape-rendering: crispEdges;
     }
 
     circle.dot {
       stroke-width: 2px;
       fill: white;
+    }
+
+    circle.event-marker-dot {
+      fill: $color-contour-light;
+      opacity: 0.9;
+    }
+
+    circle.selected-event-marker-dot {
+      fill: $color-contour-medium;
+    }
+
+    .event-marker-line {
+      stroke: $color-contour-medium;
+      stroke-width: 1px;
+      shape-rendering: crispEdges;
+    }
+
+    .unselected-event-marker-line {
+      opacity: 0;
+    }
+
+    .selected-event-marker-line {
+      opacity: 1;
+    }
+
+    circle.event-marker-dot:hover {
+      fill: $color-contour-medium;
+      opacity: 0.7;
+    }
+
+    .event-time-line {
+      stroke: $color-contour-light;
+      stroke-width: 1px;
+      shape-rendering: crispEdges;
+    }
+
+    .event-time-line-label {
+      font-size: 10px;
+      fill: $color-text-light;
+      opacity: 0.7;
     }
   }
 }

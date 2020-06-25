@@ -8,38 +8,66 @@ import {
 } from 'd3-selection';
 import {ScaleTime as D3ScaleTime} from 'd3-scale';
 import {parseDate} from '../../../../utils/date.util';
+import {TranslateService} from '@ngx-translate/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LineChartTimeEventService {
 
-  constructor() {
+  private readonly EVENT_LINE_OFFSET = 100;
+  private readonly EVENT_MARKER_RADIUS = 8;
+
+  private selectedEventMarkerIds: number[] = [];
+
+  constructor(private translateService: TranslateService) {
   }
 
   addEventMarkerGroupToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>) {
-    chart.append('g').attr('id', 'event-marker-group');
+    chart
+      .append('g')
+      .attr('id', 'event-group');
   }
 
   addEventMarkerTooltipBoxToSvgParent() {
-    d3Select('#time-series-chart').select(function () {
-      return (<SVGElement>this).parentNode;
-    }).append('div')
+    d3Select('#time-series-chart')
+      .select(function () {
+        return (<SVGElement>this).parentNode;
+      })
+      .append('div')
       .attr('id', 'event-marker-tooltip')
       .style('opacity', '0.9');
   }
 
-  addEventMarkerToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
-                        xScale: D3ScaleTime<number, number>,
-                        events: EventDTO[],
-                        width: number,
-                        height: number,
-                        margin: { [key: string]: number }): void {
-    const eventMarkerGroup = d3Select('#event-marker-group')
-      .selectAll('g')
-      .data(events, (d: EventDTO) => {
-        // fixme This key is not unique. EventDTO has no unique date.
-        return d.eventDate.toString();
+  addEventTimeLineAndMarkersToChart(chart: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,
+                                    xScale: D3ScaleTime<number, number>,
+                                    events: EventDTO[],
+                                    width: number,
+                                    height: number,
+                                    margin: { [key: string]: number }): void {
+    const eventGroup = d3Select('#event-group');
+    eventGroup.selectAll('*').remove();
+
+    const eventTimeLineGroup = eventGroup
+      .append('g')
+      .attr('id', 'event-time-line-group');
+    eventTimeLineGroup
+      .append('text')
+      .attr('class', 'event-time-line-label')
+      .attr('x', 0)
+      .attr('y', height + this.EVENT_LINE_OFFSET - 2.5 * this.EVENT_MARKER_RADIUS)
+      .text(this.translateService.instant('frontend.de.iteratec.osm.timeSeries.chart.eventTimeLine.label'));
+    eventTimeLineGroup.append('line')
+      .attr('class', 'event-time-line')
+      .attr('x1', 0)
+      .attr('x2', width)
+      .attr('y1', height + this.EVENT_LINE_OFFSET)
+      .attr('y2', height + this.EVENT_LINE_OFFSET);
+
+    const eventMarkerGroup = eventGroup
+      .selectAll('g#event-marker-group')
+      .data(events, (event: EventDTO) => {
+        return event.id.toString();
       })
       .join(
         enter => {
@@ -48,8 +76,7 @@ export class LineChartTimeEventService {
             .attr('class', 'event-marker');
           eventMarker
             .append('line')
-            .attr('class', 'event-marker-line')
-            .style('opacity', '0')
+            .attr('class', 'event-marker-line unselected-event-marker-line')
             .attr('y1', 0)
             .attr('y2', height);
           eventMarker
@@ -58,9 +85,9 @@ export class LineChartTimeEventService {
             .style('cursor', 'pointer')
             .on('mouseover', (event: EventDTO, index: number, nodes: []) => this.showEventMarkerTooltip(event, index, nodes, width, margin))
             .on('mouseout', () => d3Select('#event-marker-tooltip').style('opacity', 0))
-            .on('click', (_, index: number, nodes: []) => this.changeLineVisibility(index, nodes))
-            .attr('cy', height)
-            .attr('r', 8);
+            .on('click', (event: EventDTO, index: number, nodes: []) => this.setEventMarkerSelection(event.id, index, nodes))
+            .attr('cy', height + this.EVENT_LINE_OFFSET)
+            .attr('r', this.EVENT_MARKER_RADIUS);
           return eventMarker;
         }
       );
@@ -70,10 +97,19 @@ export class LineChartTimeEventService {
       .attr('x2', (event: EventDTO) => xScale(event.eventDate));
     eventMarkerGroup.selectAll('.event-marker-dot')
       .attr('cx', (event: EventDTO) => xScale(parseDate(event.eventDate)));
+
+    if (this.selectedEventMarkerIds.length > 0) {
+      this.restoreEventMarkerSelection(eventMarkerGroup);
+    }
+  }
+
+  clearEventMarkerSelection(): void {
+    this.selectedEventMarkerIds = [];
   }
 
   private showEventMarkerTooltip(event: EventDTO,
-                                 index: number, nodes: [],
+                                 index: number,
+                                 nodes: [],
                                  width: number,
                                  margin: { [key: string]: number }): D3Selection<SVGCircleElement, EventDTO, D3BaseType, unknown> {
     const eventMarkerTooltipBox = d3Select('#event-marker-tooltip');
@@ -92,12 +128,19 @@ export class LineChartTimeEventService {
     return nodes[index];
   }
 
-  private changeLineVisibility(index: number, nodes) {
+  private setEventMarkerSelection(eventId: number, index: number, nodes) {
     const eventMarkerLineSelection = d3Select(nodes[index].parentNode).select('.event-marker-line');
-    if (eventMarkerLineSelection.style('opacity') === '1') {
-      eventMarkerLineSelection.style('opacity', '0');
+    const eventMarkerDotSelection = d3Select(nodes[index]);
+    const arrayIndex = this.selectedEventMarkerIds.indexOf(eventId);
+
+    if (arrayIndex !== -1) {
+      eventMarkerLineSelection.attr('class', 'event-marker-line unselected-event-marker-line');
+      eventMarkerDotSelection.attr('class', 'event-marker-dot');
+      this.selectedEventMarkerIds.splice(arrayIndex, 1);
     } else {
-      eventMarkerLineSelection.style('opacity', '1');
+      eventMarkerLineSelection.attr('class', 'event-marker-line selected-event-marker-line');
+      eventMarkerDotSelection.attr('class', 'selected-event-marker-dot');
+      this.selectedEventMarkerIds.push(eventId);
     }
   }
 
@@ -123,5 +166,18 @@ export class LineChartTimeEventService {
     container.append(descriptionItem);
 
     return container;
+  }
+
+  private restoreEventMarkerSelection(eventMarkerGroup: D3Selection<any, any, any, any>): void {
+    eventMarkerGroup.selectAll('.event-marker-line')
+      .attr('class', (event: EventDTO) =>
+        this.selectedEventMarkerIds.includes(event.id) ?
+          'event-marker-line selected-event-marker-line' :
+          'event-marker-line unselected-event-marker-line'
+      );
+    eventMarkerGroup.selectAll('.event-marker-dot')
+      .attr('class', (event: EventDTO) =>
+        this.selectedEventMarkerIds.includes(event.id) ? 'selected-event-marker-dot' : 'event-marker-dot');
+
   }
 }

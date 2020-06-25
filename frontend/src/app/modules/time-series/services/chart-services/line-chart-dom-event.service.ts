@@ -299,7 +299,7 @@ export class LineChartDomEventService {
       .select((_, index: number, elem) => (<SVGElement>elem[index]).parentNode)
       .append('div')
       .attr('id', 'marker-tooltip')
-      .style('opacity', '0.9');
+      .style('opacity', '1');
   }
 
   private moveMarker(node: D3ContainerElement, width: number, containerHeight: number, marginTop: number, marginLeft: number): void {
@@ -372,7 +372,7 @@ export class LineChartDomEventService {
     xScale.domain([this.lineChartScaleService.getMinDate(data), this.lineChartScaleService.getMaxDate(data)]);
     d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) =>
       this.lineChartDrawService.updateXAxis(transition, xScale));
-    this.lineChartTimeEventService.addEventMarkerToChart(chartContentContainer, xScale, events, width, height, margin);
+    this.lineChartTimeEventService.addEventTimeLineAndMarkersToChart(chartContentContainer, xScale, events, width, height, margin);
     const yNewScales = this.lineChartScaleService.getYScales(data, height, dataTrimValues);
     this.lineChartDrawService.updateYAxes(yNewScales, width, yAxisWidth);
     Object.keys(yNewScales).forEach((key: string, index: number) => {
@@ -396,7 +396,7 @@ export class LineChartDomEventService {
 
     d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) =>
       this.lineChartDrawService.updateXAxis(transition, xScale));
-    this.lineChartTimeEventService.addEventMarkerToChart(chartContentContainer, xScale, events, width, height, margin);
+    this.lineChartTimeEventService.addEventTimeLineAndMarkersToChart(chartContentContainer, xScale, events, width, height, margin);
     const yNewScales = this.lineChartScaleService.getYScalesInTimeRange(data, height, dataTrimValues, this.brushMinDate, this.brushMaxDate);
     this.lineChartDrawService.updateYAxes(yNewScales, width, yAxisWidth);
     Object.keys(yNewScales).forEach((key: string, index: number) => {
@@ -455,7 +455,7 @@ export class LineChartDomEventService {
   }
 
   private showMarker(): void {
-    d3Select('.marker-line').style('opacity', 1);
+    d3Select('.marker-line').style('opacity', 0.5);
     d3Select('#marker-tooltip').style('opacity', 1);
   }
 
@@ -664,6 +664,8 @@ export class LineChartDomEventService {
     value.append(lineColorDot);
     if (currentPoint.value !== undefined && currentPoint.value !== null) {
       value.append(currentPoint.value.toString());
+    } else {
+      value.append(' -');
     }
 
     const row: HTMLTableRowElement = document.createElement('tr');

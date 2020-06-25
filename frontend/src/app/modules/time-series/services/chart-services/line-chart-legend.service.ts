@@ -93,7 +93,7 @@ export class LineChartLegendService {
     if (this._legendGroupColumns < 1) {
       this._legendGroupColumns = 1;
     }
-    return Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT + 30;
+    return Math.ceil(labels.length / this._legendGroupColumns) * ChartCommons.LABEL_HEIGHT;
   }
 
   addLegendsToChart(chartContentContainer: D3Selection<D3BaseType, {}, D3ContainerElement, {}>,

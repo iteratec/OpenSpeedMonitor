@@ -37,7 +37,7 @@ export class LineChartDataService {
 
     return this.http.get<T>(url, {params: params}).pipe(
       this.handleError()
-    )
+    );
   }
 
   private buildCommand(resultSelectionCommand: ResultSelectionCommand,

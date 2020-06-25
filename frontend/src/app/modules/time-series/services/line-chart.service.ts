@@ -39,8 +39,9 @@ export class LineChartService {
   // D3 margin conventions
   // > With this convention, all subsequent code can ignore margins.
   // see: https://bl.ocks.org/mbostock/3019563
-  private MARGIN: { [key: string]: number } = {top: 60, right: 60, bottom: 40, left: 75};
+  private MARGIN: { [key: string]: number } = {top: 60, right: 60, bottom: 20, left: 75};
   private Y_AXIS_WIDTH = 65;
+  private readonly LEGEND_GROUP_OFFSET = 130;
 
   private _margin: { [key: string]: number } = {
     top: this.MARGIN.top,
@@ -50,7 +51,6 @@ export class LineChartService {
   };
   private _width: number = 600 - this._margin.left - this._margin.right;
   private _height: number = 550 - this._margin.top - this._margin.bottom;
-  private _legendGroupTop: number = this._margin.top + this._height + 50;
   private _xScale: D3ScaleTime<number, number>;
 
   constructor(private translationService: TranslateService,
@@ -133,8 +133,9 @@ export class LineChartService {
   }
 
   prepareEventsData(events: EventDTO[]): TimeEvent[] {
+    this.lineChartTimeEventService.clearEventMarkerSelection();
     return events.map(eventDto => {
-      return new TimeEvent(new Date(eventDto.eventDate), eventDto.description, eventDto.shortName);
+      return new TimeEvent(eventDto.id, new Date(eventDto.eventDate), eventDto.description, eventDto.shortName);
     });
   }
 
@@ -159,7 +160,7 @@ export class LineChartService {
     d3Select('svg#time-series-chart')
       .transition()
       .duration(500)
-      .attr('height', this._height + legendGroupHeight + this._margin.top + this._margin.bottom);
+      .attr('height', this._margin.top + this._height + this.LEGEND_GROUP_OFFSET + legendGroupHeight + this._margin.bottom);
 
     d3Select('.x-axis').transition().call((transition: D3Transition<SVGGElement, any, HTMLElement, any>) => {
       this.lineChartDrawService.updateXAxis(transition, this._xScale);
@@ -171,7 +172,8 @@ export class LineChartService {
     this.lineChartDomEventService.createContextMenu();
     this.lineChartDomEventService.addBrush(chartContentContainer, this._width, this._height, this.Y_AXIS_WIDTH, this._margin,
       this._xScale, timeSeries, dataTrimValues, this.lineChartLegendService.legendDataMap, eventData);
-    this.lineChartTimeEventService.addEventMarkerToChart(chart, this._xScale, eventData, this._width, this._height, this._margin);
+    this.lineChartTimeEventService.addEventTimeLineAndMarkersToChart(chart, this._xScale, eventData, width,
+      this._height, this._margin);
 
     this.lineChartLegendService.addLegendsToChart(chartContentContainer, this._xScale, yScales, timeSeries, timeSeriesAmount);
     this.lineChartLegendService.setSummaryLabel(chart, summaryLabels, this._width);
@@ -234,7 +236,7 @@ export class LineChartService {
     svg.append('g')
       .attr('id', 'time-series-chart-legend')
       .attr('class', 'legend-group')
-      .attr('transform', `translate(${this._margin.left}, ${this._legendGroupTop})`);
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top + this._height + this.LEGEND_GROUP_OFFSET})`);
 
     return chart;
   }
@@ -271,7 +273,6 @@ export class LineChartService {
     } else {
       this._margin.top = this.MARGIN.top + 20;
     }
-    this._legendGroupTop = this._margin.top + this._height + 50;
 
     d3Select('#time-series-chart')
       .attr('width', this._width + this._margin.left + this._margin.right);
@@ -283,7 +284,7 @@ export class LineChartService {
       .attr('transform', `translate(${this._margin.left}, ${this._margin.top})`);
 
     d3Select('#time-series-chart-legend')
-      .attr('transform', `translate(${this._margin.left}, ${this._legendGroupTop})`);
+      .attr('transform', `translate(${this._margin.left}, ${this._margin.top + this._height + this.LEGEND_GROUP_OFFSET})`);
   }
 
   private addYAxisUnits(measurandGroups: { [key: string]: string }, width: number): void {

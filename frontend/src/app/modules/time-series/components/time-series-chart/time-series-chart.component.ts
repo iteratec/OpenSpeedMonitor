@@ -15,7 +15,8 @@ import {LineChartService} from '../../services/line-chart.service';
 import {NgxSmartModalService} from 'ngx-smart-modal';
 import {SpinnerService} from '../../../shared/services/spinner.service';
 import {TranslateService} from '@ngx-translate/core';
-import {TimeEvent} from "../../models/event.model";
+import {TimeEvent} from '../../models/event.model';
+import {TimeSeries} from '../../models/time-series.model';
 
 
 @Component({
@@ -89,8 +90,9 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
       return;
     }
 
-    const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
+    const timeSeries: { [key: string]: TimeSeries[] } = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
     const eventData: TimeEvent[] = this.lineChartService.prepareEventsData(this.timeSeriesResults.events);
+
     this.lineChartService.prepareLegendData(this.timeSeriesResults);
     this.lineChartService.drawLineChart(timeSeries, eventData, this.timeSeriesResults.measurandGroups,
       this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
@@ -104,8 +106,9 @@ export class TimeSeriesChartComponent implements AfterContentInit, OnChanges {
       return;
     }
 
-    const timeSeries = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
+    const timeSeries: { [key: string]: TimeSeries[] } = this.lineChartService.prepareData(this.timeSeriesResults, this.selectedTrimValues);
     const eventData: TimeEvent[] = this.lineChartService.prepareEventsData(this.timeSeriesResults.events);
+
     this.lineChartService.drawLineChart(timeSeries, eventData, this.timeSeriesResults.measurandGroups,
       this.timeSeriesResults.summaryLabels, this.timeSeriesResults.numberOfTimeSeries, this.selectedTrimValues);
     this.lineChartService.restoreZoom(timeSeries, this.selectedTrimValues, eventData);
