@@ -117,11 +117,11 @@ export class LineChartTimeEventService {
     eventMarkerTooltipBox.html(this.createEventMarkerTooltipContent(event).outerHTML);
 
     const circle = d3Select(nodes[index]);
-    const top = parseFloat(circle.attr('cy')) + margin.top;
+    const top = parseFloat(circle.attr('cy')) + 5;
 
     const tooltipWidth: number = (<HTMLDivElement>eventMarkerTooltipBox.node()).getBoundingClientRect().width;
     const xPos = parseFloat(circle.attr('cx'));
-    const left = (tooltipWidth + xPos > width) ? xPos - tooltipWidth + margin.right + 10 : xPos + margin.left + 50;
+    const left = (tooltipWidth + xPos > width) ? xPos - tooltipWidth + margin.right - 10 : xPos + margin.left + 25;
     eventMarkerTooltipBox.style('top', top + 'px');
     eventMarkerTooltipBox.style('left', left + 'px');
 
@@ -146,21 +146,25 @@ export class LineChartTimeEventService {
 
   private createEventMarkerTooltipContent(event: EventDTO): HTMLDivElement {
     const container: HTMLDivElement = document.createElement('div');
-    container.className = 'gridContainer';
+    container.className = 'grid-container';
 
     const dateItem = document.createElement('div');
+    dateItem.className = 'event-marker-tooltip-element event-marker-tooltip-date';
     dateItem.append(event.eventDate.toLocaleString());
     container.append(dateItem);
 
     const shortNameItem = document.createElement('div');
+    shortNameItem.className = 'event-marker-tooltip-element';
     const shortNameParagraph = document.createElement('p');
-    shortNameParagraph.style.fontWeight = 'bold';
-    shortNameParagraph.append(event.shortName + ':');
+    shortNameParagraph.className = 'event-marker-tooltip-title';
+    shortNameParagraph.append(`${event.shortName}:`);
     shortNameItem.append(shortNameParagraph);
     container.append(shortNameItem);
 
     const descriptionItem = document.createElement('div');
+    descriptionItem.className = 'event-marker-tooltip-element';
     const descriptionParagraph = document.createElement('p');
+    descriptionParagraph.className = 'event-marker-tooltip-text';
     descriptionParagraph.append(event.description);
     descriptionItem.append(descriptionParagraph);
     container.append(descriptionItem);

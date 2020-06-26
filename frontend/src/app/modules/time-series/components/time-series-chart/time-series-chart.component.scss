@@ -40,6 +40,7 @@ osm-time-series-line-chart {
     border: 1px solid rgba(0, 0, 0, 0.4);
     border-radius: 3px;
     pointer-events: none;
+    max-width: 250px;
   }
 
   #time-series-chart-drawing-area {
@@ -210,4 +211,26 @@ osm-time-series-line-chart {
   .min-input {
     border-right: 0;
   }
+}
+
+.grid-container {
+  display: grid;
+}
+
+.event-marker-tooltip-element {
+  padding: 0.2em 0.75em 0.2em 0.75em;
+}
+
+.event-marker-tooltip-date {
+  margin-bottom: 10px;
+}
+
+.event-marker-tooltip-title {
+  font-weight: bold;
+  margin: 0;
+}
+
+.event-marker-tooltip-text {
+  margin: 0;
+  text-align: justify;
 }
