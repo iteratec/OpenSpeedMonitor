@@ -100,7 +100,7 @@
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
         <ng-select [(ngModel)]="filter.jobResultStatus" (change)="applyFilter()" [closeOnSelect]="false"
-                   [groupBy]="jobResultStatusGroupByFn" [groupValue]="groupValueFn"
+                   [compareWith]="compareStatusFn" [groupBy]="jobResultStatusGroupByFn" [groupValue]="groupValueFn"
                    [items]="allJobResultStatus" [multiple]="true" [selectableGroup]="true" class="custom"
                    clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
                    notFoundText="-"
@@ -118,7 +118,7 @@
              aria-hidden="true" class="fas fa-sort-up"></i>
         </span>
         <ng-select [(ngModel)]="filter.wptStatus" (change)="applyFilter()" [closeOnSelect]="false"
-                   [groupBy]="wptStatusGroupByFn" [groupValue]="groupValueFn"
+                   [compareWith]="compareStatusFn" [groupBy]="wptStatusGroupByFn" [groupValue]="groupValueFn"
                    [items]="allWptStatus" [multiple]="true" [selectableGroup]="true" class="custom"
                    clearAllText="{{ 'frontend.de.iteratec.osm.jobResult.select.clearAll' | translate }}"
                    notFoundText="-"

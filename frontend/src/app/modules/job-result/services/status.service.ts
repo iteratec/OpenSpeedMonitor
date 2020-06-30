@@ -55,7 +55,15 @@ export class StatusService {
   constructor(private translateService: TranslateService) {
   }
 
-  getJobResultStatusGroupName(jobResultStatus: string): string {
+  compareStatus(item, selected): boolean {
+    if (selected.label) {
+      return item.label ? item.label === selected.label : false;
+    } else {
+      return item === selected;
+    }
+  }
+
+  getJobResultStatusGroupLabel(jobResultStatus: string): string {
     if (this.isTestNotTerminated(jobResultStatus)) {
       return this.translateService.instant(StatusGroup.GROUP_NOT_TERMINATED);
     }
@@ -67,7 +75,7 @@ export class StatusService {
     }
   }
 
-  getWptStatusGroupName(wptStatus: string): string {
+  getWptStatusGroupLabel(wptStatus: string): string {
     if (this.isWptNotTerminated(wptStatus)) {
       return this.translateService.instant(StatusGroup.GROUP_NOT_TERMINATED);
     }
@@ -79,18 +87,18 @@ export class StatusService {
     }
   }
 
-  writeStatusAsQueryParam(statusList: (string | object)[], enumeration: any, isJobSelected: boolean): string[] {
-    if (isJobSelected && statusList.length > 0) {
-      return statusList.map(status => {
-        if (typeof status === 'string') {
+  writeStatusAsQueryParam(selectedStatusList: (string | object)[], statusEnum: any, isJobSelected: boolean): string[] {
+    if (isJobSelected && selectedStatusList.length > 0) {
+      return selectedStatusList.map(selectedStatus => {
+        if (typeof selectedStatus === 'string') {
           return encodeURIComponent(
-            Object.keys(enumeration).find(key => enumeration[key] === status).toLowerCase()
+            Object.keys(statusEnum).find(key => statusEnum[key] === selectedStatus).toLowerCase()
           );
         }
-        if (typeof status === 'object' && status['label'] && typeof status['label'] === 'string') {
+        if (typeof selectedStatus === 'object' && selectedStatus['label'] && typeof selectedStatus['label'] === 'string') {
           return encodeURIComponent(
             Object.keys(StatusGroup).find(key =>
-              this.translateService.instant(StatusGroup[key]) === status['label']).toLowerCase()
+              this.translateService.instant(StatusGroup[key]) === selectedStatus['label']).toLowerCase()
           );
         }
       });
@@ -98,32 +106,20 @@ export class StatusService {
     return null;
   }
 
-  readStatusByQueryParam(statusParam: (string | string[]),
-                         enumeration: any,
-                         statusGroupType: { [key: string]: string [] }): (string | object)[] {
-    if (!statusParam) {
+  readStatusByQueryParam(queryParam: (string | string[]),
+                         statusEnum: any,
+                         childrenByStatusGroup: { [key: string]: string [] }): (string | object)[] {
+    if (!queryParam) {
       return [];
     }
-    if (typeof statusParam === 'string') {
-      statusParam = decodeURIComponent(statusParam).toUpperCase();
-      if (Object.keys(StatusGroup).find(key => key === statusParam)) {
-        return [].concat({
-          label: this.translateService.instant(StatusGroup[statusParam]),
-          children: statusGroupType[statusParam]
-        });
-      }
-      return [].concat(enumeration[statusParam]);
+    if (typeof queryParam === 'string') {
+      queryParam = decodeURIComponent(queryParam).toUpperCase();
+      return [].concat(this.getStatusLabelOrStatusGroup(queryParam, statusEnum, childrenByStatusGroup));
     }
-    if (Array.isArray(statusParam)) {
-      return statusParam.map((status: string) => {
+    if (typeof queryParam === 'object' && Array.isArray(queryParam)) {
+      return queryParam.map((status: string) => {
         status = decodeURIComponent(status).toUpperCase();
-        if (Object.keys(StatusGroup).find(key => key === status)) {
-          return {
-            label: this.translateService.instant(StatusGroup[status]),
-            children: statusGroupType[status]
-          };
-        }
-        return enumeration[status];
+        return this.getStatusLabelOrStatusGroup(status, statusEnum, childrenByStatusGroup);
       });
     }
   }
@@ -162,5 +158,20 @@ export class StatusService {
 
   private hasWptFailed(wptStatus: string): boolean {
     return this.WPT_STATUS_GROUPS.GROUP_FAILED.includes(wptStatus);
+  }
+
+  private getStatusLabelOrStatusGroup(status: string,
+                                      statusEnum: any,
+                                      childrenByStatusGroup: { [key: string]: string [] }): (string | object) {
+    if (Object.keys(StatusGroup).find(key => key === status)) {
+      // status group
+      return {
+        label: this.translateService.instant(StatusGroup[status]),
+        children: childrenByStatusGroup[status]
+      };
+    } else {
+      // status
+      return statusEnum[status];
+    }
   }
 }

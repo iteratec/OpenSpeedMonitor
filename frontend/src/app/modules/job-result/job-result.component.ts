@@ -46,23 +46,17 @@ export class JobResultComponent implements OnInit {
               private osmLangService: OsmLangService) {
   }
 
-  jobResultStatusGroupByFn = (jobResultStatus: string): string => this.statusService.getJobResultStatusGroupName(jobResultStatus);
+  compareStatusFn = (item, selected): boolean => this.statusService.compareStatus(item, selected);
 
-  wptStatusGroupByFn = (wptStatus: string): string => this.statusService.getWptStatusGroupName(wptStatus);
+  jobResultStatusGroupByFn = (jobResultStatus: string): string => this.statusService.getJobResultStatusGroupLabel(jobResultStatus);
+
+  wptStatusGroupByFn = (wptStatus: string): string => this.statusService.getWptStatusGroupLabel(wptStatus);
 
   groupValueFn = (groupName: string, children: any[]): any => ({label: groupName, children: children});
 
   ngOnInit() {
     this.setCalendarLanguage();
     this.getAllJobs();
-  }
-
-  getAllJobs(): void {
-    this.dataService.getAllJobs()
-      .subscribe((jobs: Job[]) => {
-        this.jobs = jobs;
-        this.readQueryParams();
-      });
   }
 
   setJob(job: Job): void {
@@ -129,6 +123,28 @@ export class JobResultComponent implements OnInit {
     this.applyFilter();
   }
 
+  isDateTimeRangeSet(dateTimeComponent: DateTimeRange): boolean {
+    if (dateTimeComponent === DateTimeRange.FROM && this.filter.dateTimeRange[0]) {
+      return !isNaN(this.filter.dateTimeRange[0].valueOf());
+    }
+    if (dateTimeComponent === DateTimeRange.TO && this.filter.dateTimeRange[1]) {
+      return !isNaN(this.filter.dateTimeRange[1].valueOf());
+    }
+    return false;
+  }
+
+  isTestNotTerminated(jobResultStatus: string): boolean {
+    return this.statusService.isTestNotTerminated(jobResultStatus);
+  }
+
+  isTestSuccessful(jobResultStatus: string): boolean {
+    return this.statusService.isTestSuccessful(jobResultStatus);
+  }
+
+  hasTestFailed(jobResultStatus: string): boolean {
+    return this.statusService.hasTestFailed(jobResultStatus);
+  }
+
   observeCalendarEvents(dateTimeComponent: DateTimeRange): void {
     if (!this.dateTimeRangeFrom || !this.dateTimeRangeTo) {
       return;
@@ -157,34 +173,20 @@ export class JobResultComponent implements OnInit {
     });
   }
 
-  isDateTimeRangeSet(dateTimeComponent: DateTimeRange): boolean {
-    if (dateTimeComponent === DateTimeRange.FROM && this.filter.dateTimeRange[0]) {
-      return !isNaN(this.filter.dateTimeRange[0].valueOf());
-    }
-    if (dateTimeComponent === DateTimeRange.TO && this.filter.dateTimeRange[1]) {
-      return !isNaN(this.filter.dateTimeRange[1].valueOf());
-    }
-    return false;
-  }
-
-  isTestNotTerminated(jobResultStatus: string): boolean {
-    return this.statusService.isTestNotTerminated(jobResultStatus);
-  }
-
-  isTestSuccessful(jobResultStatus: string): boolean {
-    return this.statusService.isTestSuccessful(jobResultStatus);
-  }
-
-  hasTestFailed(jobResultStatus: string): boolean {
-    return this.statusService.hasTestFailed(jobResultStatus);
-  }
-
   private setCalendarLanguage(): void {
     if (this.osmLangService.getOsmLang() === 'en') {
       this.dateTimeAdapter.setLocale('en-GB');
     } else {
       this.dateTimeAdapter.setLocale(this.osmLangService.getOsmLang());
     }
+  }
+
+  private getAllJobs(): void {
+    this.dataService.getAllJobs()
+      .subscribe((jobs: Job[]) => {
+        this.jobs = jobs;
+        this.readQueryParams();
+      });
   }
 
   private readQueryParams(): void {
