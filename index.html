@@ -223,6 +223,24 @@
             font-weight: bold;
         }
 
+        footer > div {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        footer > div > * {
+            margin: 0 0 0 1.5rem;
+        }
+
+        footer a {
+            text-transform: initial;
+        }
+
+        footer a:hover {
+            color: #484848;
+        }
+
         .nav-entry-container{
             display: flex;
             flex-grow: 1;
@@ -388,7 +406,10 @@
         </article>
     </section>
     <footer>
-        <p class="fixed-width">© <span id="current-year"></span> iteratec GmbH</p>
+        <div class="fixed-width">
+            <a href="https://www.iteratec.com/imprint/">Imprint</a>
+            <p>© <span id="current-year"></span> iteratec GmbH</p>
+        </div>
     </footer>
 
     <script type="text/javascript">
