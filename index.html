@@ -92,10 +92,11 @@
         }
         header mark {
             display: none;
-            background: #008cd2;
+            background: #AD343E;
             color: #ededed;
             padding: 0.5em;
             text-align: center;
+            font-weight: bold;
             margin: 0;
         }
         header mark a {
@@ -318,7 +319,7 @@
         </nav>
         <mark id="release-banner">
             <div class="fixed-width">
-                OpenSpeedMonitor <span id="version"></span> is now available! Read the <a id="version-link" href="">release notes</a>.
+                OpenSpeedMonitor is not actively developed anymore. Find more information in our <a href="https://github.com/iteratec/OpenSpeedMonitor">README</a>.
             </div>
         </mark>
         <main>
@@ -426,30 +427,7 @@
             yearSpan.innerText = year.toString();
         }
 
-        async function displayCurrentReleaseAndLinkToIt() {
-            let releaseData = null;
-
-            await fetch('https://api.github.com/repos/iteratec/OpenSpeedMonitor/releases/latest')
-                .then(response => response.json())
-                .then(data => releaseData = data);
-
-            if (releaseData && releaseData.tag_name && releaseData.html_url) {
-                const version = releaseData.tag_name;
-                const versionLink = releaseData.html_url;
-
-                const versionSpan = document.querySelector('#version');
-                const versionLinkSpan = document.querySelector('#version-link');
-                const releaseBanner = document.querySelector('#release-banner');
-
-                versionSpan.innerText = version.toString();
-                versionLinkSpan.href = versionLink.toString();
-
-                releaseBanner.style.display = "block";
-            }
-        }
-
         displayCurrentYearInCopyright();
-        displayCurrentReleaseAndLinkToIt();
     </script>
 </body>
 </html>
