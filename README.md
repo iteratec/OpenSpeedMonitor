@@ -1,5 +1,9 @@
-### Status
-[![Build Status](https://travis-ci.org/iteratec/OpenSpeedMonitor.svg?branch=develop)](https://travis-ci.org/iteratec/OpenSpeedMonitor)
+## ⚠️ This project is not actively maintained anymore ⚠️
+Due to lack of time and the fast development in the world of WebPerformance, we have decided to stop actively developing and maintaining OpenSpeedMonitor.
+We want to thank every user and contributor of OpenSpeedMonitor for using it, giving us feedback and helping us.
+
+You can still use the latest release. At this point (June 2021), it should still work with the latest WebPagetest version, but we cannot gurantee any compatibilty.
+If you are interested in OpenSpeedMonitor, feel free to make changes and ask questions. We will try to help as much as possible.
 
 OpenSpeedMonitor
 ================
