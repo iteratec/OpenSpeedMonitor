@@ -19,7 +19,6 @@ OpenSpeedMonitor automates web performance measurements based on [WebPagetest][1
 
 _The timings you have to keep track of - always on expressive, well arranged dashboards. Without losing all the details of the single WebPageTests if needed!_
 
-You want to see it running? No problem, there is a demo up and running at [demo.openspeedmonitor.org][14].
 
 ![Einstieg OSM](https://github.com/IteraSpeed/OpenSpeedMonitor/wiki/images/osm_v4_result_dashboard.jpg)
 
@@ -264,7 +263,6 @@ Although it works with an H2 in memory database out of the box it's highly recom
 [11]: https://www.debian.org/ "debian"
 [12]: mailto:wpt@iteratec.de "contact us"
 [13]: https://marketplace.eclipse.org/content/groovygrails-tool-suite-ggts-eclipse "GGTS"
-[14]: http://demo.openspeedmonitor.org "demo.openspeedmonitor.org"
 [15]: https://github.com/iteratec/OsmDetailAnalysis
 [16]: https://dc-js.github.io/dc.js/
 [17]: https://docs.docker.com/compose/install/
